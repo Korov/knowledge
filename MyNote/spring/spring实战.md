@@ -1,3 +1,256 @@
+# 1.spring之旅
+
+## 1.1简化spring开发
+
+为了降低Java开发的复杂性，Spring采取了以下4种关键策略：
+
+基于POJO的轻量级和最小侵入性编程；
+
+通过依赖注入和面向接口实现松耦合；
+
+基于切面和惯例进行声明式编程；
+
+通过切面和模板减少样板式代码。
+
+### 1.1.1依赖注入
+
+DI能够实现松耦合，一个对象只通过接口（而不是具体实现或初始化过程）来表明依赖关系，那么这种依赖就能够在对象本身毫不知情的情况下，用不同的具体实现进行替换。
+
+两种方式实现依赖注入：xml配置，java配置
+
+获取上下文：
+
+Spring通过应用上下文（Application Context）装载bean的定义并把他们组装起来。Spring应用上下文全权负责对象的创建和组装。例如：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean id="knight" class="generator.BraveKnight">
+    </bean>
+</beans>
+```
+
+```java
+public static void main(String[] args) {
+        FileSystemXmlApplicationContext context = new FileSystemXmlApplicationContext(
+            String.join(File.separator, "src", "main", "resources", "generator", "knights.xml"));
+        Knight knight = context.getBean(Knight.class);
+        knight.embarkOnQuest();
+        context.close();
+    }
+```
+
+
+
+### 1.1.2应用切面
+
+DI能够让相互协作的软件组件保持松散耦合，而面向切面编程（AOP）允许你把遍布应用各处的功能分离出来形成可重用的组件。
+
+诸如日志、事物管理和安全这样的系统服务经常融入到自身具有核心业务逻辑的组件中去，这些系统服务通常被称为横切关注点，因为他们会跨越系统的多个组件。AOP能够使这些服务模块化，并以声明的方式将他们应用到它们需要影响的组件中去。所造成的结果就是这些组件会具有更高的内内聚性并且会更加关注自身业务，完全不需要了解涉及系统服务所带来的复杂性。
+
+例如：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+    <bean id="knight" class="generator.BraveKnight"></bean>
+    <bean id="minstrel" class="generator.Minstrel"></bean>
+    <aop:config>
+        <aop:aspect ref="minstrel">
+            <!--将切点定义在embarkOnQuest方法上-->
+            <aop:pointcut id="embark" expression="execution(* *.embarkOnQuest(..))"></aop:pointcut>
+            <!--执行embarkOnQuest方法前执行singBefore方法-->
+            <aop:before pointcut-ref="embark" method="singBefore"></aop:before>
+            <!--执行embarkOnQuest方法后执行singEnd方法-->
+            <aop:after pointcut-ref="embark" method="singEnd"></aop:after>
+        </aop:aspect>
+    </aop:config>
+</beans>
+
+```
+
+```java
+public static void main(String[] args) {
+    FileSystemXmlApplicationContext context = new FileSystemXmlApplicationContext(
+        String.join(File.separator, "src", "main", "resources", "generator", "knights.xml"));
+    Knight knight = context.getBean(Knight.class);
+    knight.embarkOnQuest();
+    context.close();
+    /**
+    执行结果：
+    Minstrel sing before
+    I am BraveKnight
+    Minstrel sing end
+    */
+}
+```
+
+[^这里使用了Spring的AOP配置命名空间把Minstrel bean声明为一个切面。首先，需要把Minstrel声明为一个bean，然后在<aop:aspect>元素中引用该bean。为了进一步定义切面，声明（使用<aop:before>）在embarkOnQuest()方法执行前调用Minstrel的singBeforeQuest()方法。这种方式被称为前置通知，同时声明（使用<aop:after>）在embarkQuest()方法执行后调用singAfterQuest()方法，这种方式被称为后置通知。]: 
+
+# 2.装配bean
+
+## 2.1spring配置的可选方案
+
+spring提供了三种主要的装配机制：
+
+1. 在xml中进行显示的配置
+2. 在java中进行显示的配置
+3. 隐式的bean发现机制和自动装配
+
+建议：尽可能的使用自动配置的机制，显示配置的越少越好，当必须使用显示配置的时候推荐使用类型安全并且比xml更加强大的JavaConfig。
+
+## 2.2自动化装配bean
+
+spring从两个角度来实现自动化装配：
+
+1. 组件扫描（component scanning）：spring会自动发现应用上下文中所创建的bean
+2. 自动装配（autowiring）：spring自动满足bean之间的依赖
+
+### 2.2.1创建可被发现的bean
+
+在普通的类文件上面加上@Component注解，然后在配置类文件上面加上@Configuration和@ComponentScan两个注解。
+
+如果没有自他配置，@ComponentScan默认会扫描与配置类相同的包及其子包。
+
+也可以使用xml的<context:component-scan base-packae="***"></context:component>实现组件扫描。
+
+### 2.2.2为组件扫描的bean命名
+
+spring会为bean设置一个默认ID，类名首字母小写。若想指定bean的ID可以使用@Component("yourName")，双引号中的内容为指定的ID。也可以使用@Named("yourName")。两者有细微差别，但是大多数场景中，他们可以相互替换。
+
+### 2.2.3设置扫描的基础包
+
+默认的@ComponentScan会以配置文件所在的包为基础包，可以@ComponentScan("soundsystem")将基础包设置为soundsystem。
+
+@ComponentScan(basePackages={"soundsystem","viedo"})设置多个基础包，缺陷：重构时，指定的基础包可能出错。
+
+@ComponentScan(basePackageClasses={CDPlayer.class,DVDPlayer.class})，为basePackageClasses属性所设置的数组中包含了类，这些类所在的包将会作为组件扫描的基础。可以考虑在包中创建一个用来进行扫描的空标记接口。
+
+### 2.2.4为bean添加注解实现自动装配
+
+```java
+@Autowired
+public CDPlayer(CompactDisc cd){this.cd = cd;}
+
+@Autowired
+public void insertDisc(CompactDisc cd){this.cd = cd;}
+```
+
+@Autowired可以用在类的任何方法上。
+
+## 2.3通过java代码装配bean
+
+要将第三方库中的组件装配到你的应用中，在这种情况下，是没有办法在他的类上添加@Component和@Autowired注解的。可以使用java和xml，优先选择java。
+
+### 2.3.1创建配置类
+
+在类上面加上@Configuration
+
+### 2.3.2声明简单的bean
+
+```java
+//bean的ID为sgtPeppers
+@Bean
+public CompactDisc sgtPeppers(){return new SgtPeppers();}
+
+//bean的ID为lonelyHeartsClubBand
+@Bean(name="lonelyHeartsClubBand")
+public CompactDisc sgtPeppers(){return new SgtPeppers();}
+
+// 返回一个已经注入CompactDisc的CDPlayer的bean
+@Bean
+public CDPlayer cdPlayer(CompactDisc compactDisc){
+    return new CDPlayer(compactDisc);
+}
+```
+
+带有@Bean注解的方法可以采用任何必要的java功能来产生bean实例。
+
+### 2.3.3使用xml装配bean
+
+<bean id ="compactDisc" class="soundsystem.SgtPeppers">
+
+注入bean
+
+```xml
+<bean id ="cdPlayer" class="soundsystem.CDPlayer"></bean>
+    <constructor-arg ref="compactDisc"></constructor>
+</bean>
+
+#使用c-命名空间
+<bean id="cdPlayer" class="soundsystem.CDPlayer" c:cd-ref="compactDisc"></bean>
+```
+
+可以使用xml声明一个bean，也可以在xml中通过构造器初始化一个bean，可以在构造器中注意一个bean引用也可以把字面量注入构造器中。
+
+## 2.4导入和混合配置
+
+### 2.4.1在javaConfig中引用配置文件
+
+```java
+@Configuration
+@Import({CDPlayerConfig.class})
+@ImportResource("classpath:cd-config.xml")
+public class SoundSystemConfig{}
+```
+
+使用@Import引用javaconfig文件，使用@ImportResource引用xml配置文件。使用一个配置文件将散乱的配置文件整合起来。
+
+### 2.4.2在xml配置中引用javaconfig
+
+使用import引入xml文件使用bean引入javaConfig文件
+
+# 3.高级装配
+
+## 3.1环境与profile
+
+### 3.1.1配置profile bean
+
+Spring为环境相关的bean所提供的解决方案起始与构建时的方案没有太大差别。当然，在这个过程中需要根据环境决定该创建哪个bean和不创建哪个bean。spring是在运行时确定的。
+
+要使用profile，首先要将所有不同的bean定义整理到一个或多个profile中，在将应用部署到每个环境时，要确保对应的profile处于激活状态。
+
+在java配置中，可以使用@Profile注解指定某个bean属于哪一个profile。此注解可以使用在类上也可以使用在方法上
+
+也可以在xml中配置profile。
+
+### 3.1.2激活profile
+
+spring使用spring.profiles.active和spring.profiles.default，如果设置了active就会激活指定的，否则激活默认的。
+
+有多种方式来设置这两个属性：
+
+1. 作为DispatcherServlet的初始化参数
+2. 作为Web应用的上下文
+3. 作为JNDI条目
+4. 作为环境变量
+5. 作为JVM的系统属性
+6. 在集成测试类上，使用@ActiveProfiles注解设置
+
+## 3.2条件化bean
+
+spring4引入了一个新的@Conditional注解，它可以用到带有@Bean注解的方法上。如果给定的条件计算结果为true，就会创建这个bean，否则的话，这个bean会被忽略。
+
+### 3.2.1创建自定义的限定符
+
+@Qualifier与@Component一起使用可以自定义bean的ID，使用的时候用@Autowired与@Qualifier配合使用可以获取指定的bean。@Qualifier也可以与@Bean一起使用指定bean的ID。
+
+使用自定义的限定符注解
+
+```java
+@Target({ElementType.CONSTRUCTOR,ElementType.FIELD,
+        ElementType.METHOD,ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+@Qualifier
+public @interface Creamy{}
+
+//Creamy是类名，可以使用@Creamy来注入bean
+```
+
 ## 3.4bean的作用域
 
 默认情况下，Spring应用上下文所有bean都是以单例（singleton）的形式创建的，也就是说，不管给定的一个bean被注入到其他bean多少次，每次所注入的都是同一个实例。
