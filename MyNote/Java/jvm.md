@@ -762,3 +762,199 @@ public static final int value=123;
 
 # 8 虚拟机字节码执行引擎
 
+## 8.1 概述
+
+执行引擎是Java虚拟机最核心的组成部分之一。“虚拟机”是一个相对于“物理机”的概念，这两种机器都有代码执行能力，其区别是物理机的执行引擎是直接建立在处理器、硬件、指令集和操作系统层面上的，而虚拟机的执行引擎则是由自己实现的，因此可以自行制定指令集与执行引擎的结构体系，并且能够执行那些不被硬件直接支持的指令集格式。
+
+在不同的虚拟机中执行引擎有不同的实现，但是具有统一外观（Facade一种设计模式），其统一外观为：输入的是字节码文件，处理过程是字节码解析的等效过程，输出的是执行结果。
+
+## 8.2 运行时栈帧结构
+
+栈帧（Stack Frame）是用于支持虚拟机进行方法调用和方法执行的数据结构，它是虚拟机运行时数据区中的虚拟机栈（Virtual MachineS tack）的栈元素。栈帧存储了方法的局部变量表、操作数栈、动态连接和方法返回地址等信息。每一个方法从调用开始至执行完成的过程，都对应着一个栈帧在虚拟机栈里面从入栈到出栈的过程。
+
+每一个栈帧都包括了局部变量表、操作数栈、动态连接、方法返回地址和一些额外的附加信息。在编译程序代码的时候，栈帧中需要多大的局部变量表，多深的操作数栈都已经完全确定了，并且写入到方法表的Code属性之中，因此一个栈帧需要分配多少内存，不会受到程序运行期变量数据的影响，而仅仅取决于具体的虚拟机实现。
+
+一个线程中的方法调用链可能会很长，很多方法都同时处于执行状态。对于执行引擎来说，在活动线程中，只有位于栈顶的栈帧才是有效的，称为当前栈帧（Current Stack Frame），与这个栈帧相关联的方法称为当前方法（Current Method）。执行引擎运行的所有字节码指令都只针对当前栈帧进行操作。
+
+![1571839798882](picture\1571839798882.png)
+
+### 8.2.1 局部变量表
+
+局部变量表是一组变量值存储空间，用于存放方法参数和方法内存定义的局部变量。在Java程序编译为Class文件时，就在方法的Code属性的max_locals数据项中确定了该方法所需要分配的局部变量表的最大容量。
+
+局部变量表的容量以变量槽（Variable Slot，下称Slot）为最小单位，每个Slot都应该能存放一个boolean、byte、char、short、int、float、reference或returnAddress类型的数据，这8中数据类型，都可以使用32位或更小的物理内存来存放。
+
+### 8.2.2 操作数栈
+
+操作数栈（Operand Stack）也常称为操作栈，它是一个后入先出（Last In First Out,LIFO）栈。同局部变量表一样，操作数栈的最大深度也在编译的时候写入到Code属性的max_stacks数据项中。操作数栈的每一个元素可以是任意的Java数据类型，包括long和double。32位数据类型所占的栈容量为1，64位数据类型所占的栈容量为2。在方法执行的任何时候，操作数栈的深度都不会超过在max_stacks数据项中设定的最大值。
+
+当一个方法刚刚开始执行的时候，这个方法的操作数栈是空的，在方法的执行过程中，会有各种字节码指令往操作数栈中写入和提取内容，也就是出栈\\入栈操作。操作数栈中元素的数据类型必须与字节码指令的序列言哥匹配，在编译程序代码的时候，编译器要严格保证这一点，在类校验阶段的数据流分析中还要再次验证这一点。
+
+此外，在概念模型中，两个栈帧作为虚拟机栈的元素，是完全相互独立的。但在大多数虚拟机的实现里都会做一些优化处理，另两个栈帧出现一部分重叠。让下面栈帧的部分操作数栈与上面栈帧的部分局部变量表重叠在一起，这样在进行方法调用时候就可以共用一部分数据，无须进行额外的参数复制传递。
+
+![1571840765309](picture\1571840765309.png)
+
+### 8.2.3 动态连接
+
+每个栈帧都包含一个指向运行时常量池[1]中该栈帧所属方法的引用，持有这个引用是为了支持方法调用过程中的动态连接（DynamicLinking）。通过第6章的讲解，我们知道Class文件的常量池中存有大量的符号引用，字节码中的方法调用指令就以常量池中指向方法的符号引用作为参数。这些符号引用一部分会在类加载阶段或者第一次使用的时候就转化为直接引用，这种转化称为静态解析。另外一部分将在每一次运行期间转化为直接引用，这部分称为动态连接。
+
+### 8.2.4 方法返回地址
+
+当一个方法开始执行后，只有两种方式可以退出这个方法。第一种是执行引擎遇到任意一个方法返回的字节码指令，这时候可能会有返回值传递给上层的方法调用者（调用当前方法的方法称为调用者），是否有返回值和返回值得类型将根据遇到何种方法返回值指令来决定，这种退出方法的方式称为正常完成出口。
+
+另外一种退出方式是，在方法执行过程中遇到了异常，并且这个异常没有在方法体内得到处理，只要在本方法的异常列表中没有搜索到匹配的异常处理器，就会导致方法退出，这种退出方法称为异常完成出口。一个方法使用异常完成出口的方式退出，是不会给它的上层调用者产生任何返回值。
+
+无论采用何种退出方式，在方法退出之后，都需要返回到方法被调用的位置，程序才能继续执行，方法返回时可能需要在栈帧中保存一些信息，用来帮助恢复它的上层方法的执行状态。一般来说，方法正常退出时，调用者的PC计数器的值可以作为返回地址，栈帧中很可能会保存这个计数器值。而方法异常退出时，返回地址是要通过异常处理器表来确定的，栈帧中一般不会保存这部分信息。方法退出的过程实际上就等同于把当前栈帧出栈，因此退出时可能执行的操作有：恢复上层方法的局部变量表和操作数栈，把返回值（如果有的话）压入调用者栈帧的操作数栈中，调整PC计数器的值以指向方法调用指令后面的一条指令等。
+
+### 8.2.5 附加信息
+
+虚拟机规范允许具体的虚拟机实现增加一些规范里没有描述的信息到栈帧之中，例如与调试相关的信息，这部分信息完全取决于具体的虚拟机实现，这里不再详述。在实际开发中，一般会把动态连接、方法返回地址与其他附加信息全部归为一类，称为栈帧信息。
+
+## 8.3 方法调用
+
+方法调用阶段唯一的任务就是确定被调用方法的版本（即调用哪一个方法），暂时还不涉及方法内部的具体运行过程。Class文件的编译过程中不包含传统编译中的连接步骤，一切方法调用在Class文件里面存储的都只是符号引用，而不是方法在实际运行时内存布局中的入口地址（相当于之前说的直接引用）。这个特性给Java带来了更强大的动态扩展能力，但也使得Java方法调用过程变得相对复杂起来，需要在类加载期间，甚至到运行期间才能确定目标方法的直接引用。
+
+### 8.3.1 解析
+
+所有方法调用中的目标方法在Class文件里面都是一个常量池中的符号引用，在类加载的解析阶段，会将其中的一部分符号引用转化为直接引用，这种解析能成立的前提是：方法在程序真正运行之前就有一个可确定的调用版本，并且这个方法的调用版本在运行期是不可改变的。换句话说，调用目标在程序代码写好、编译器进行编译时就必须确定下来。这类方法的调用称为解析（Resolution）。
+
+在Java语言中符合“编译期可知，运行期不可变”这个要求的方法，主要包括静态方法和私有方法两大类，前者与类型直接关联，后者在外部不可被访问，这两种方法各自的特点决定了它们都不可能通过继承或别的方式重写其他版本，因此它们都适合在类加载阶段进行解析。
+
+与之相对性的是，在Java虚拟机里面提供了5条方法调用字节码指令，分别如下：
+
+1. invokestatic:调用静态方法
+2. invokespecial:调用实例构造器\<init>方法、私有方法和父类方法
+3. invokevirtual:调用所有的虚方法
+4. invokeinterface:调用接口方法，会在运行时再确定一个实现此接口的对象
+5. invokedynamic:现在运行时动态解析出调用点限定符所引用的方法，然后再执行该方法，在此之前的4条调用指令，分派逻辑是固化在Java虚拟机内部的，而invokedynamic指令的分派罗技是由用户所设定的引导方法决定的。
+
+只要能被invokestatic和invokespecial指令调用的方法，都可以在解析阶段中确定唯一的调用版本，符合这个条件的有静态方法、私有方法、实例构造器、父类方法4类，它们在类加载的时候就会把符号引用解析为该方法的直接引用。这些方法可以称为非虚方法，与之相反，其他方法称为虚方法（除去final方法，后文会提到）。
+
+Java中的非虚方法除了使用invokestatic、invokespecial调用的方法之外还有一种，就是被final修饰的方法。虽然final方法是使用invokevirtual指令来调用的，但是由于它无法被覆盖，没有其他版本，所以也无须对方法接收者进行多态选择，又或者说多态选择的结果肯定是唯一的。在Java语言规范中明确说明了final方法是一种非虚方法。
+
+### 8.3.2 分派
+
+解析调用一定是个静态的过程，在编译期间就完全确定，在类装载的解析阶段就会把涉及的符号引用全部转变为可确定的直接引用，不会延迟到运行期再去完成。而分派（Dispatch）调用则可能是静态的也可能是动态的，根据分派依据的宗量数[1]可分为单分派和多分派。这两类分派方式的两两组合就构成了静态单分派、静态多分派、动态单分派、动态多分派4种分派组合情况。
+
+1.静态分派
+
+```java
+public class StaticDispatch {
+    static abstract class Human{}
+    static class Man extends Human{}
+    static class Woman extends Human{}
+    public void sayHello(Human guy){
+        System.out.println("hello, guy!");
+    }
+    public void sayHello(Man guy){
+        System.out.println("hello, gentleman!");
+    }
+    public void sayHello(Woman guy){
+        System.out.println("hello, lady!");
+    }
+
+    public static void main(String[] args) {
+        Human man=new Man();
+        Human woman=new Woman();
+        StaticDispatch staticDispatch=new StaticDispatch();
+        staticDispatch.sayHello(man);
+        staticDispatch.sayHello(woman);
+    }
+}
+// 输出结果
+hello, guy!
+hello, guy!
+```
+
+上面代码中的Human成为变量的静态类型，或者叫做外观类型，后面的Man则称为变量的实际类型，静态类型和实际类型在程序中都可以发生一些变化，区别是静态类型的变化仅仅在使用时发生，变量本身的静态类型不会被改变，并且最终的静态类型实在编译期可知的，而实际类型变化的结果在运行期才可确定，编译器在编译程序的时候并不知道一个对象的实际类型是什么。因此上面的代码中在编译期就确定了使用哪一个重载版本就是Human中的方法。
+
+所有依赖静态类型来定位方法执行版本的分派动作称为静态分派。静态分派的典型应用就是方法重载。静态分派发生在编译阶段，因此确定静态分派的动作实际上不是由虚拟机来执行的。另外，编译器虽然能确定出方法的重载版本，但在很多情况下这个重载版本并不是**唯一的**，往往只能确定一个**更加合适的**版本。
+
+此外，解析与分派这两者之间的关系并不是二选一的排他关系，它们是在不同层次上去筛选、确定目标方法的过程。例如，前面说过，静态方法会在类加载期就进行解析，而静态方法显然也是可以拥有重载版本的，选择重载版本的过程就是通过静态分派完成的。
+
+2.动态分派
+
+动态分派和多态性的另外一个重要体现--重写有这很密切的关联。
+
+```java
+public class DynamicDispatch {
+    static abstract class Human{
+        protected abstract void sayHello();
+    }
+    static class Man extends Human{
+        @Override
+        protected void sayHello() {
+            System.out.println("man say hello!");
+        }
+    }
+    static class Woman extends Human{
+        @Override
+        protected void sayHello() {
+            System.out.println("woman say hello!");
+        }
+    }
+
+    public static void main(String[] args) {
+        Human man=new Man();
+        Human woman=new Woman();
+        man.sayHello();
+        woman.sayHello();
+        man=new Woman();
+        man.sayHello();
+    }
+}
+// 输出
+man say hello!
+woman say hello!
+woman say hello!
+```
+
+此段代码中通过实际类型来执行相应的方法。
+
+```java
+// 使用javap -c <full class name>对代码进行反汇编
+public class com.korov.springboot.staticdispatch.DynamicDispatch {
+  public com.korov.springboot.staticdispatch.DynamicDispatch();
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+       4: return
+
+  public static void main(java.lang.String[]);
+    Code:
+       0: new           #2                  // class com/korov/springboot/staticdispatch/DynamicDispatch$Man
+       3: dup
+       4: invokespecial #3                  // Method com/korov/springboot/staticdispatch/DynamicDispatch$Man."<init>":()V
+       7: astore_1
+       8: new           #4                  // class com/korov/springboot/staticdispatch/DynamicDispatch$Woman
+      11: dup
+      12: invokespecial #5                  // Method com/korov/springboot/staticdispatch/DynamicDispatch$Woman."<init>":()V
+      15: astore_2
+      16: aload_1
+      17: invokevirtual #6                  // Method com/korov/springboot/staticdispatch/DynamicDispatch$Human.sayHello:()V
+      20: aload_2
+      21: invokevirtual #6                  // Method com/korov/springboot/staticdispatch/DynamicDispatch$Human.sayHello:()V
+      24: new           #4                  // class com/korov/springboot/staticdispatch/DynamicDispatch$Woman
+      27: dup
+      28: invokespecial #5                  // Method com/korov/springboot/staticdispatch/DynamicDispatch$Woman."<init>":()V
+      31: astore_1
+      32: aload_1
+      33: invokevirtual #6                  // Method com/korov/springboot/staticdispatch/DynamicDispatch$Human.sayHello:()V
+      36: return
+}
+```
+
+0~15行的字节码是准备动作，作用是建立man和woman的内存空间、调用Man和Woman类型的实例构造器，将这两个实例的引用存放在第1、2个局部变量表Slot之中，这个动作也对应了代码中的两个new。
+
+接下来的16~21句是关键部分，16、20两句分别把刚刚创建的两个对象的引用压到栈顶，这两个对象是将要执行的sayHello()方法的所有者，称为接收者（Receiver）；17和21句是方法调用指令，这两条调用指令单从字节码角度来看，无论是指令（都是invokevirtual）还是参数（都是常量池中第22项的常量，注释显示了这个常量是Human.sayHello()的符号引用）完全一样的，但是这两句指令最终执行的目标方法并不相同。原因就需要从invokevirtual指令的多态查找过程开始说起，invokevirtual指令的运行时解析过程大致分为以下几个步骤：
+
+1. 找到操作数栈顶的第一个元素所指向的对象的实际类型，记作C。
+2. 如果在类型C中找到与常量中的描述符和简单名称都相符的方法，则进行访问权限校验，如果通过则返回这个方法的直接引用，查找过程结束；如果不通过，则返回java.lang.IllegalAccessError异常。
+3. 否则，按照继承关系从下往上依次对C的各个父类进行第2步的搜索和验证过程。
+4. 如果始终没有找到合适的方法，则抛出java.lang.AbstractMethodError异常。
+
+由于invokevirtual指令执行的第一步就是在运行期确定接收者的实际类型，所以两次调用中的invokevirtual指令把常量池中的类方法符号引用解析到了不同的直接引用上，这个过程就是Java语言中方法重写的本质。我们把这种在运行期根据实际类型确定方法执行版本的分派过程称为动态分派。
+
+3.单分排与多分派
+
+方法的接收者与方法的参数统称为方法的宗量。根据分派基于多少种宗量，可以将分派划分为单分派和多分派。单分派是根据一个宗量对目标方法进行选择，多分派则是根据多于一个宗量对目标方法进行选择。
