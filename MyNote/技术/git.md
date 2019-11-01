@@ -911,3 +911,13 @@ $ git rebase master server
 #### 3.6.5变基vs合并
 
 总的原则是，只对尚未推送或分享给别人的本地修改执行变基操作清理历史，从不对已推送至别处的提交执行变基操作，这样，你才能享受到两种方式带来的便利。
+
+
+
+# 4.问题处理
+
+## 4.1 git bash中文被转义
+
+在git bash界面右击Options...->Text 将Locale设置为zh_CN，将Character set设置为UTF-8。
+
+git bash中设置全局变量 `git config --global core.quotepath false` 
