@@ -303,3 +303,170 @@ public class BoundedHashSet<T> {
 栅栏（Barrier）类似于闭锁，它能阻塞一组线程直到某个事件发生。栅栏与闭锁的关键区别在于，所有线程必须同时到达栅栏位置，才能继续执行。闭锁用于等待事件，而栅栏用于等待其他线程。
 
 CyclicBarrier可以使一定数量的参与方反复的在栅栏位置汇集，它在并行迭代算法中非常有用。这种算法通常将一个问题拆分成一系列相互独立的子问题。当线程到达栅栏位置时将调用await方法，这个方法将阻塞直到所有线程都到达栅栏位置。如果所有线程都到达了栅栏位置，那么栅栏将打开，此时所有线程都被释放，而栅栏将被重置以便下次使用。如果对await的调用超时，或者await阻塞的线程被中断，那么栅栏就被认为是打破了，所有阻塞的await调用都将终止并抛出BrokenBarrierException。如果成功的通过栅栏，那么await将为每个线程返回一个唯一的到达索引号，我们可以利用这些索引来选举产生一个领导线程，并在下一次迭代中由该领到线程执行一些特殊的工作。
+
+在模拟程序中通常需要使用栅栏，例如某个步骤中的计算可以并行执行，但必须等到该步骤中的所有计算都执行完毕才能进入下一个步骤。
+
+```java
+public class CellularAutomata {
+    private final Board mainBoard;
+    private final CyclicBarrier barrier;
+    private final Worker[] workers;
+
+    public CellularAutomata(Board board) {
+        this.mainBoard = board;
+        int count = Runtime.getRuntime().availableProcessors();
+        this.barrier = new CyclicBarrier(count, new Runnable() {　　//
+            @Override
+            public void run() {
+                mainBoard.commitNewValues();
+            }
+        });
+        this.workers = new Worker[count];
+        for (int i = 0; i < count; i++) {
+            workers[i] = new Worker(mainBoard.getSubBoard(count, i));
+        }
+    }
+
+    public void start() {
+        for (int i = 0; i < workers.length; i++) {
+            new Thread(workers[i]).start();
+        }
+        mainBoard.waitForConvergence();
+    }
+
+    private class Worker implements Runnable {
+        private final Board board;
+        public Worker(Board board) {
+            this.board = board;
+        }
+        public void run() {
+            while (!board.hasConverged()) {
+                for (int x = 0; x < board.getMaxX(); x++) {
+                    for (int y = 0; y < board.getMaxY; y++) {
+                        board.setNewValue(x, y, computeValue(x, y));
+                    }
+                }
+                try {
+                    barrier.await();　　//
+                } catch (InterruptedException e) {
+                    return;
+                } catch (BrokenBarrierException e) {
+                    return;
+                }
+            }
+        }
+    }
+}
+```
+
+ CellularAutomata 中给出了如何通过栅栏来计算细胞的自动化模拟，例如 Conway 的生命游戏。在把模拟过程并行化，为每个元素（在这个实例中相当于一个细胞）分配一个独立的线程是不现实的，因为这将会产生过多的线程，而在协调这些线程上导致德开销将降低计算性能。合理的做法是：将问题分解成一定数量的子问题，为每个子问题分配一个线程来进行求解，之后再将所有的结果合并起来。 
+
+另一种形式的栅栏是Exchanger，它是一种两方栅栏，各方在栅栏位置上交换数据。当两方执行不对称的操作时，Exchanger会非常有用，例如当一个线程向缓冲区写入数据，而另一个线程从缓冲区中读取数据。这些线程可以使用Exchanger来汇合，并将满的缓冲区与空的缓冲区交换。当两个线程通过Exchanger交换对象时，这种交换就把这两个对象安全地发布给另一方。
+
+## 5.6 构建高效且可伸缩的结果缓存
+
+```java
+public class Memoizer<A, V> implements Computable<A, V> {
+    private final ConcurrentMap<A, Future<V>> cache = new ConcurrentHashMap<>();
+    private final Computable<A, V> computable;
+
+    public Memoizer(Computable<A, V> computable) {
+        this.computable = computable;
+    }
+
+    @Override
+    public V compute(A arg) throws InterruptedException {
+        while (true) {
+            Future<V> future = cache.get(arg);
+            if (future == null) {
+                Callable<V> eval = new Callable<V>() {
+                    @Override
+                    public V call() throws Exception {
+                        return computable.compute(arg);
+                    }
+                };
+                FutureTask<V> futureTask = new FutureTask<>(eval);
+                future = cache.putIfAbsent(arg, futureTask);
+                if (future == null) {
+                    future = futureTask;
+                    futureTask.run();
+                }
+            }
+            try {
+                return future.get();
+            } catch (CancellationException e) {
+                cache.remove(arg, future);
+            } catch (ExecutionException e) {
+                System.out.println("debug!");
+            }
+        }
+    }
+}
+```
+
+上面代码中Computable<A, V>接口中声明了一个函数Computable，有一个其实现类需要较长的时间来计算数据。将用于缓存值得Map重新定义为ConcurrentHashMap<A,Future\<V>>，Memoizer会首先检查某个相应的计算是否已经开始，如果还没有启动，那么就创建一个FutureTask，并注册到Map中，然后启动计算：如果已经启动，那么等待现有计算的结果。结果可能很快会得到，也可能还在运算过程中。
+
+# 6 任务执行
+
+# 6.1 在线程中执行任务
+
+当围绕“任务执行”来设计应用程序结构时，第一步就是要找出清晰的任务边界。在理想情况下，各个任务之间是相互独立的：任务并不依赖于其他任务的状态、结果或边界效应。独立性有助于实现并发，因为如果存在足够多的处理资源，那么这些独立的任务都可以并行执行。为了在调度与负载均衡等过程中实现更高的灵活性，每项任务还应该表示应用程序的一小部分处理能力。
+
+## 6.2 Executor框架
+
+任务是一组罗技工作单元，而线程则是使人物异步执行的机制。
+
+Executor是一个借口，但他却为灵活且强大的异步任务执行框架提供了基础，该框架能支持多种不同类型的任务执行策略。它提供了一种标准的方法将任务的提交过程与执行过程解耦开来，并用Runnable来表示任务。
+
+Executor基于生产者-消费者模式，提交任务的操作相当于生产者（生成待完成的工作单元），执行任务的线程则相当于消费者（执行完成这些工作单元）。
+
+### 6.2.1 基于Executor的Web服务器
+
+```java
+public class TaskExecutionWebServer {
+    private static final int NTHREADS = 100;
+    private static final Executor exec = Executors.newFixedThreadPool(NTHREADS);
+
+    public static void main(String[] args) throws IOException {
+        ServerSocket socket = new ServerSocket(80);
+        while (true) {
+            Socket connection = socket.accept();
+            Runnable task = new Runnable() {
+                @Override
+                public void run() {
+                    TaskExecutionWebServer.handleRequest(connection);
+                }
+            };
+            exec.execute(task);
+        }
+    }
+
+    private static void handleRequest(Socket connection) {
+        System.out.println("connection is resolving!");
+    }
+}
+```
+
+以上代码监控本机的80端口，每次有一个请求就会创建一个线程来做相应的处理，上线是100个线程。
+
+### 6.2.2 执行策略
+
+通过将任务的提交与执行解耦开来，从而无须太大的困难就可以为某种类型的任务指定和修改执行策略。在执行策略中定义了任务执行的“what,where,when,how”等方面，包括：
+
+- 在什么（what）线程中执行任务
+- 任务按照什么（what）顺序执行（FIFO，LIFO，优先级）
+- 有多少个（How Many）任务能并发执行
+- 在队列中有多少个（How Many）任务在等待执行
+- 如果系统由于过载而需要拒绝一个任务，那么应该选择哪一个（which）任务？另外如何（How）通知应用程序有任务被拒绝
+- 在执行一个任务之前或之后，应该进行哪些（what）动作
+
+各种执行策略都是一种资源管理工具，最佳策略取决于可用的计算资源以及对服务质量的需求。通过限制并发任务的数量，可以确保应用程序不会由于资源耗尽而失败，或者由于在稀缺资源上发生竞争而严重影响性能。通过间个任务的提交与任务的执行策略分离开来，有助与在部署阶段选择与可用硬件资源最匹配的执行策略。
+
+每当看到下面这种形式的代码时：new Thread(runnable).start()并且你希望获得一种更灵活的执行策略时，请考虑使用Executor来代替Thread。
+
+### 6.2.3 线程池
+
+从子买呢含义来看，是指管理一组同构工作线程的资源池。线程池是与工作队列密切相关的，其中在工作队列中保存了所有等待执行的任务。工作者线程的任务很简单：从工作队列中获取一个任务，执行任务，然后返回线程池并等待下一个任务。
+
+在线程池中执行任务比为每个任务分配一个线程优势更多。通过重用现有的线程而不是创建新线程，可以在处理多个请求时分摊在线程创建和销毁过程中产生的巨大开销。另一个额外的好处是，当请求到达时，工作线程通常已经存在，因此不会由于等待创建线程而延迟任务的执行，从而提高了响应性。通过适当调整线程池的大小，可以创建足够多的线程以便使处理器保持忙碌状态，同时还可以防止过多线程相互竞争资源而使应用程序耗尽内存或失败。
+
