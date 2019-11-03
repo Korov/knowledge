@@ -447,7 +447,7 @@ public class TaskExecutionWebServer {
 }
 ```
 
-以上代码监控本机的80端口，每次有一个请求就会创建一个线程来做相应的处理，上线是100个线程。
+以上代码监控本机的80端口，每次有一个请求就会创建一个线程来做相应的处理，上线是100个线程。使用了一个带有有界线程池的Executor。通过execute方法将任务提交到工作队列中，工作线程反复地从工作队列中取出任务并执行他们。
 
 ### 6.2.2 执行策略
 
@@ -476,3 +476,30 @@ public class TaskExecutionWebServer {
 - newCachedThreadPool：创建一个可缓存的线程池，如果线程池的当前规模超过了处理需求时，那么将回收空闲的线程，而当需求增加时，则可以添加新的线程，线程池的规模不存在任何限制。
 - newSingleThreadPool：是一个单线程的Executor，它创建单个工作者线程来执行任务，如果这个线程异常结束，会创建另一个线程来替代。它能确保依照任何任务在队列中的顺序来串行执行。
 - newScheduledThreadPool：创建一个固定长度的线程池，而且以延迟或定时的方式来执行任务，类似于Timer。
+
+### 6.2.4 Executor的生命周期
+
+为了解决执行服务的生命周期问题，Executor扩展了ExecutorService接口，添加了一些用于生命周期管理的方法（同时还有一些用于任务提交的便利方法）。
+
+ExecutorService的生命周期有3中状态：**运行**、**关闭**和**终止**。ExecutorService在初始创建时处于运行状态。**shutdown**方法将执行平缓的关闭过程：不再接受新的任务，同时等待已经提交的任务执行完成--包括那些还未开始执行的任务。**shutdownNow**方法将执行粗暴的关闭过程：它将尝试取消所有运行中的任务，并且不再启动队列中尚未开始执行的任务。
+
+在ExecutorService管壁厚提交的任务将由“拒绝执行处理器”来处理，它会抛弃任务，或者使得execute方法抛出一个未检查的RejectedExecutionException。等待所有任务都完成后，ExecutorService将转入终止状态。可以调用**awaitTermination**来等待ExecutorService到达终止状态，或者通过调用isTerminated来轮询executorService是否已经终止。通常在调用awaitTermination之后会立即调用shutdown，从而产生同步关闭ExecutorService的效果。
+
+### 6.2.5 延迟任务与周期任务
+
+如果要构建自己的调度服务，那么可以使用DelayQueue，它实现了BlockingQueue，并为ScheduledThreadPoolExecutor提供调度功能。DelayQueue管理着一组Delayed对象。每个Delayed对象都有一个相应的延迟时间：在DelayQueue中，只有某个元素逾期后，才能从DelayQueue中执行take操作。从DelayQueue中返回的对象将根据他们的延迟时间进行排序。
+
+## 6.3 找出可利用的并行性
+
+Executor框架帮助指定执行策略，但如果要使用Executor，必须将任务表述为一个Runnable。在大多数服务器应用程序中都存在一个明显的任务边界：单个客户请求。
+
+本节中我们将开发一些不同版本的组件，并且每个版本都实现了额不同成都的并发性。
+
+### 6.3.2 携带结果的任务Callable与Future
+
+Executor框架使用Runnable作为其基本的任务表示形式。Runnable是一种很大局限的抽象，虽然run能写入到日志文件或者将结果放入某个共享的数据结构，但它不能返回一个值或抛出一个受检查的异常。
+
+对于那些存在延迟的计算Callable是一种更好的抽象：它认为主入口点将返回一个值，并可能抛出一个异常。在Executor中包含了一些辅助方法能将其他类型的任务封装为一个Callable。
+
+Runnable和Callable描述的都是抽象的计算任务。这些任务通常是由范围的，即都有一个明确的起始点，并且最终会结束。Executor执行的任务有4个生命周期阶段：创建、提交、开始和完成。由于有些任务可能要执行很长的时间，因此通常希望能够取消这些任务。在Executor框架中，已提交但尚未开始的任务可以取消，但对于那些已经开始执行的任务，只有当他们能响应中断时，才能取消。取消一个已经完成的任务不会有任何影响。
+
