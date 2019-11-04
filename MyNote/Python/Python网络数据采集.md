@@ -210,11 +210,22 @@ Python的csv库可以非常简单地修改CSV文件，甚至从零开始创建�
 ```Python
 import pymysql
 
+#cursor不支持%d传参，整数也按照%s传
 conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', password='root123', db='test')
 cur = conn.cursor()
 cur.execute("USE test")
+#增加
+cur.execute("insert into test(`id`, `name`, `age`) VALUES (%s,%s,%s)", ('6', 'name3', '40'))
+conn.commit()
+#更新
+cur.execute("update test set name=%s where id=%s", ('name6', '6'))
+conn.commit()
+#查询
 cur.execute("SELECT * FROM test")
-print(cur.fetchone())
+print(cur.fetchall())
+#删除
+cur.execute("delete from test where id=%s", ('6'))
+conn.commit()
 cur.close()
 conn.close()
 ```
@@ -231,4 +242,14 @@ LLATE utf8mb4_unicode_ci;
 ```
 
 执行上面的设置可以让MySQL支持Unicode字符。
+
+### 5.4 Email
+
+Python有两个包可以发送邮件：smtplib和email。
+
+## 第六章 读取文档
+
+互联网并不是一个HTML页面的集合。它是一个信息集合，而HTML文件只是展示信息的一个框架而已。如果我恩的爬虫不能读取其他类型的文件，包括纯文本、PDF、图像、视频、邮件等，我们将会失去很大一部分数据。
+
+本章重点介绍文档处理的相关内容，包括把文件下载到文件夹里，以及读取文档并提取数据。我们还会介绍文档的不同编码类型，让程序可以读取非英文的HTML页面。
 
