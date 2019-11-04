@@ -503,3 +503,173 @@ Executor框架使用Runnable作为其基本的任务表示形式。Runnable是�
 
 Runnable和Callable描述的都是抽象的计算任务。这些任务通常是由范围的，即都有一个明确的起始点，并且最终会结束。Executor执行的任务有4个生命周期阶段：创建、提交、开始和完成。由于有些任务可能要执行很长的时间，因此通常希望能够取消这些任务。在Executor框架中，已提交但尚未开始的任务可以取消，但对于那些已经开始执行的任务，只有当他们能响应中断时，才能取消。取消一个已经完成的任务不会有任何影响。
 
+**Future**表示一个任务的生命周期，并提供了相应的方法判断是否已经完成或取消，以及获取任务的结果和取消任务等。在Future规范中包含的隐含意义是，任务的生命周期只能前进，不能后退，当某个任务完成后，它就永远停留在“完成”状态上。
+
+**get**方法的行为取决于任务的状态（尚未开始、正在运行、已完成）。如果任务已经完成，那么get会立即返回或者抛出一个Exception，如果任务没有完成，那么get将阻塞并直到任务完成。如果任务抛出了异常，那么get将该异常封装为ExecutionException并重新抛出。如果任务被取消，那么将抛出CancellationException。如果get抛出了ExecutionException，那么可以通过getCause来获得被封装的初始异常。
+
+### 6.3.3 示例：使用Future实现页面渲染器
+
+为了使页面渲染器实现更高的并发性，首先将渲染过程分解为两个任务，一个是渲染所有的文本，另一个是下载所有的图像。
+
+Callable和Future有助于表示这些协同任务之间的交互。Renderer中创建了一个Callable来下载所有的图像，并将其提交到一个ExecutorService。这将返回一个描述任务执行情况的Future。当主任务需要图像时，它会等待Futrue.get的调用结果。如果幸运的话，当开始请求时所有的图像就已经下载完成了，即使没有，至少图像的下载任务也已经提前开始了。
+
+```Java
+public abstract class FutureRenderer {
+    private final ExecutorService executorService = Executors.newCachedThreadPool();
+
+    void renderPage(CharSequence source) {
+        List<ImageInfo> imageInfos = scanForImageInfo(source);
+        Callable<List<ImageData>> task = new Callable<List<ImageData>>() {
+            @Override
+            public List<ImageData> call() throws Exception {
+                List<ImageData> result = new ArrayList<>();
+                for (ImageInfo imageInfo : imageInfos) {
+                    result.add(imageInfo.downloadImage());
+                }
+                return result;
+            }
+        };
+        Future<List<ImageData>> future = executorService.submit(task);
+        renderText(source);
+
+        try {
+            List<ImageData> imageData = future.get();
+            for (ImageData data : imageData) {
+                renderImage(data);
+            }
+        } catch (InterruptedException e) {
+            // Re-assert the thread's interrupted status
+            Thread.currentThread().interrupt();
+            // We don't need the result, so cancel the task too
+            future.cancel(true);
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+    }
+
+    interface ImageData {
+    }
+
+    interface ImageInfo {
+        ImageData downloadImage();
+    }
+
+    abstract void renderText(CharSequence s);
+
+    abstract List<ImageInfo> scanForImageInfo(CharSequence s);
+
+    abstract void renderImage(ImageData i);
+}
+```
+
+### 6.3.4 CompletionService：Executor与BlockingQueue
+
+CompletionService将Executor和BlockingQueue的功能融合在一起。你可以将Callable任务提交给它来执行，然后使用类似于队列操作的take和poll等方法来获得已完成的结果，而这些结果会在完成时将被封装为Future。ExecutorCompletionService实现了CompletionService，并将计算部分委托给一个Executor。
+
+ExecutorCompletionService的实现非常简单。在构造函数中创建一个BlockingQueue来保存计算完成的结果。当计算完成时，调用Future-Task中的done方法。当提交某个任务时，该任务将首先包装为一个QueueingFuture，这是FutureTask的一个子类，然后再改写子类的done方法，并将结果放入BlockingQueue中。take和poll方法委托给了BlockingQueue，这些方法会在得出结果之前阻塞。
+
+### 6.3.5 示例：使用CompletionService实现页面渲染器
+
+可以通过CompletionService从两个方面来提高页面渲染器的性能：缩短总运行时间以及提高响应性。为每一幅图像的下载都创建一个独立任务，并在线程池中执行他们，从而将串行的下载过程转换为并行的过程。此外，通过从CompletionService中获取结果以及使每张图片在下载完成后立刻显示出来，能使用户获得一个更加动态和更高响应性的用户界面。
+
+```java
+public abstract class Renderer {
+    private final ExecutorService executorService;
+
+    public Renderer(ExecutorService executorService) {
+        this.executorService = executorService;
+    }
+
+    void renderPage(CharSequence source) {
+        List<ImageInfo> infos = scanForImageInfo(source);
+        CompletionService<ImageData> completionService = new ExecutorCompletionService<>(executorService);
+        for (ImageInfo imageInfo : infos) {
+            completionService.submit(new Callable<ImageData>() {
+                @Override
+                public ImageData call() throws Exception {
+                    return imageInfo.downloadImage();
+                }
+            });
+        }
+        renderText(source);
+
+        try {
+            for (int t = 0, n = infos.size(); t < n; t++) {
+                Future<ImageData> future = completionService.take();
+                ImageData imageData = future.get();
+                renderImage(imageData);
+            }
+        } catch (InterruptedException | ExecutionException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    abstract void renderText(CharSequence s);
+
+    abstract List<ImageInfo> scanForImageInfo(CharSequence s);
+
+    abstract void renderImage(ImageData i);
+}
+```
+
+多个ExecutorCompletionService可以共享一个Executor，因此可以创建一个对于特定计算私有，又能共享一个公共Executor的ExecutorCompletionService。因此，CompletionService的作用就相当于一组计算句柄，这与Future作为单个计算的句柄是非常类似的。通过记录提交给CompletionService的任务数量，并计算出已经获得的已完成结果的数量，即使使用一个共享的Executor，也能知道已经获得了所有任务结果的时间。
+
+### 6.3.6 为人物设置时限
+
+如果某个任务无法再指定时间内完成，那么将不再需要他的结果，此时可以放弃这个任务。
+
+在支持时间限制的Future.get中支持这种需求：当结果可用时，它将立即返回，如果在指定时限内没有计算出结果，那么间将抛出TimeoutException。
+
+在使用限时任务时需要注意，当这些任务超时后应该立即停止，从而避免为继续计算一个不再使用的寄过而浪费计算资源。
+
+下面代码示例：在生成的页面中包括响应用户请求的内容以及从广告服务器上获得的广告。它将获取广告的任务提交给一个Executor，然后计算剩余的文本页面内容，最后等待广告信息，直到超出指定的时间。如果geit超时，那么将取消广告获取任务，并转而使用默认的广告信息。
+
+```java
+public class RenderWithTimeBudget {
+    private static final Ad DEFAULT_AD = new Ad();
+    private static final long TIME_BUDGET = 1000;
+    private static final ExecutorService exec = Executors.newCachedThreadPool();
+
+    Page renderPageWithAd() throws InterruptedException {
+        long endNanos = System.nanoTime() + TIME_BUDGET;
+        Future<Ad> f = exec.submit(new FetchAdTask());
+        // Render the page while waiting for the ad
+        Page page = renderPageBody();
+        Ad ad;
+        try {
+            // Only wait for the remaining time budget
+            long timeLeft = endNanos - System.nanoTime();
+            ad = f.get(timeLeft, NANOSECONDS);
+        } catch (ExecutionException e) {
+            ad = DEFAULT_AD;
+        } catch (TimeoutException e) {
+            ad = DEFAULT_AD;
+            f.cancel(true);
+        }
+        page.setAd(ad);
+        return page;
+    }
+
+    Page renderPageBody() { return new Page(); }
+
+
+    static class Ad {
+    }
+
+    static class Page {
+        public void setAd(Ad ad) { }
+    }
+
+    static class FetchAdTask implements Callable<Ad> {
+        @Override
+        public Ad call() {
+            return new Ad();
+        }
+    }
+
+}
+```
+
+### 6.3.7 示例：旅行预订门户网站
+
+如下示例使用了支持限时的invokeAll，将多个任务提交到一个ExecutorService并获得结果。InvokeAll方法的参数为一组任务，并返回一组Future。这两个集合有这相同的结构。invokeAll按照任务集合中迭代器的顺序将所有的Future添加到返回的集合中，从而使调用者能将各个Future与器表示的Callable关联起来。当所有任务都执行完毕时，或者调用线程被中断时，又或者超过指定时限时，invokeAll将返回。当超过指定时限后，任何还未完成的任务都会被取消。当invokeAll返回后，每个任务要么正常地完成，要么被取消，而客户端代码可以调用get或isCancelled来判断究竟是何种情况。
