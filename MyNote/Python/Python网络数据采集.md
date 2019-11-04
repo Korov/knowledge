@@ -181,3 +181,54 @@ Scrapy是处理网路数据采集相关问题的利器。它可以自动收集�
 - PUT：用来更新一个对象或信息
 - DELETE：用于删除一个对象
 
+#### 4.1.2 验证
+
+通常API验证的方法都是用类似令牌（token）方式调用，每次API调用都会把令牌传递到服务器上。这种令牌要么是用户注册的时候分配给用户，要么就是在用户调用的时候才提供，可能是长期固定的值，也可能是频繁变化的，通过服务器对用户名和密码的组合处理后生成。
+
+## 第五章 存储数据
+
+urllib.request.urlretrieve可以根据文件的URL下载文件：
+
+```Python
+from urllib.request import urlretrieve
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+html = urlopen("http://www.pythonscraping.com")
+bsObj = BeautifulSoup(html)
+imageLocation = bsObj.find("a", {"id": "logo"}).find("img")["src"]
+urlretrieve (imageLocation, "logo.jpg")
+```
+
+这段程序从http://pythonscraping.com下载logo图片，然后再程序运行的文件夹里保存为logo.jpg文件。
+
+Python的csv库可以非常简单地修改CSV文件，甚至从零开始创建一个CSV文件。
+
+### 5.3 MySQL
+
+使用pymysql整合Python和MySQL。
+
+```Python
+import pymysql
+
+conn = pymysql.connect(host='127.0.0.1', port=3306, user='root', password='root123', db='test')
+cur = conn.cursor()
+cur.execute("USE test")
+cur.execute("SELECT * FROM test")
+print(cur.fetchone())
+cur.close()
+conn.close()
+```
+
+此程序中有两个对象：链接对象（conn）和光标对象（cur）。
+
+```MySQL
+ALTER DATABASE scraping CHARACTER SET = utf8mb4 COLLATE = utf8mb4_unicode_ci;
+ALTER TABLE pages CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+ALTER TABLE pages CHANGE title title VARCHAR(200) CHARACTER SET utf8mb4 COLLATE
+utf8mb4_unicode_ci;
+ALTER TABLE pages CHANGE content content VARCHAR(10000) CHARACTER SET utf8mb4 CO
+LLATE utf8mb4_unicode_ci;
+```
+
+执行上面的设置可以让MySQL支持Unicode字符。
+
