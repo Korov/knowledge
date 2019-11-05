@@ -519,3 +519,109 @@ cleanFile("text_2.jpg", "text_2_clean.png")
 
 经典的Python爬虫在使用urllib标准库时，都会发送如下的请求头：
 
+| 属性            | 内容              |
+| --------------- | ----------------- |
+| Accept-Encoding | identity          |
+| User-Agent      | Python-urllib/3.4 |
+
+```Python
+import requests
+from bs4 import BeautifulSoup
+
+session = requests.Session()
+headers = {"User-Agent":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit 537.36 (KHTML, like Gecko) Chrome","Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"}
+url = "https://www.whatismybrowser.com/detect/what-http-headers-is-my-browser-sending"
+req = session.get(url, headers=headers)
+
+bsObj = BeautifulSoup(req.text, "lxml")
+print(bsObj.find("table",{"class":"table-striped"}).get_text)
+```
+
+设置请求头，通常真正重要的参数就是User-Agent。无论你在做什么项目，一定要记得把User-Agent属性设置成不容易引起怀疑的内容，不要用Python-urllib/3.4。另外，如果你正在处理一个警觉性非常高的网站，就要注意那些经常用却很少检查的请求头，比如Accept-Language属性，也许它正是那个网站判断你是个人类访问者的关键。
+
+#### 12.1.2 处理cookie
+
+网站会用cookie跟踪你的访问过程，如果发现了爬虫异常行为就会中断你的访问，比如特别快速地填写表单，或者浏览大量页面。虽然这些行为可以通过关闭并重新连接或者改变IP地址来伪装（更多信息请参见第14章），但是如果cookie暴露了你的身份，再多努力也是白费。
+
+查看cookie，还可以调用delete_cookie()、add_cookie()和delete_all_cookies()方法来处理cookie。
+
+```Python
+from selenium import webdriver
+driver = webdriver.PhantomJS(executable_path='<Path to Phantom JS>')
+driver.get("http://pythonscraping.com")
+driver.implicitly_wait(1)
+print(driver.get_cookies())
+savedCookies = driver.get_cookies()
+driver2 = webdriver.PhantomJS(executable_path='<Path to Phantom JS>')
+driver2.get("http://pythonscraping.com")
+driver2.delete_all_cookies()
+for cookie in savedCookies:
+driver2.add_cookie(cookie)
+driver2.get("http://pythonscraping.com")
+driver.implicitly_wait(1)
+print(driver2.get_cookies())from selenium import webdriver
+driver = webdriver.PhantomJS(executable_path='<Path to Phantom JS>')
+driver.get("http://pythonscraping.com")
+driver.implicitly_wait(1)
+print(driver.get_cookies())
+```
+
+在这个例子中，第一个webdriver获得了一个网站，打印cookie并把它们保存到变量savedCookies里。第二个webdriver加载同一个网站（技术提示：必须首先加载网站，这样Selenium才能知道cookie属于哪个网站，即使加载网站的行为对我们没任何用处），删除所有的cookie，然后替换成第一个webdriver得到的cookie。当再次加载这个页面时，两组cookie的时间戳、源代码和其他信息应该完全一致。从GoogleAnalytics的角度看，第二个webdriver现在和第一个webdriver完全一样。
+
+### 12.2 问题检查表
+
+如果你一直被网站封杀却找不到原因，那么这里有个检查列表，可以帮你诊断一下问题出在哪里
+
+- 首先，如果你从网络服务器收到的页面是空白的，缺少信息，或其遇到他不符合你预期的情况（或者不是你在浏览器上看到的内容），有可能是因为网站创建页面的JavaScript执行有问题
+- 如果你准备向网站提交表单或发出POST请求，记得检查一下页面的内容，看看你想提交的每个字段是不是都已经填好，而且格式也正确
+- 如果你已经登录网站却不能保持登录状态，或者网站上出现了其他的“登录状态”异常，请检查你的cookie。确认在加载每个页面时cookie都被正确调用，而且你的cookie在每次发起请求时都发送到了网站上
+- 如果你在客户端遇到了HTTP错误，尤其是403禁止访问错误，这可能说明网站已经把你的IP当作机器人了，不再接受你的任何请求。你要么等待你的IP地址从网站黑名单里移除，要么就换个IP地址。如果你确定自己并没有被封杀，那么再检查下面的内容：确认你的爬虫在网站上的速度不是特别快；修改你的请求头；确认你没有点击或访问任何人类用户通常不能点击或接入的信息；
+
+## 第十三章 用爬虫测试网站
+
+### 13.1 Python单元测试
+
+Python的单元测试模块unittest。只要先导入模块然后继承unittest.TestCase类就可以实现下面的功能：
+
+- 为每个单元测试的开始和结束提供setUp和tearDown函数
+- 提供不同类型的“断言”语句让测试成功或失败
+- 把所有以test_开头的函数当做单元测试运行，忽略不带test_的函数
+
+```Python
+import unittest
+class TestAddition(unittest.TestCase):
+def setUp(self):
+print("Setting up the test")
+def tearDown(self):
+print("Tearing down the test")
+def test_twoPlusTwo(self):
+total = 2+2
+self.assertEqual(4, total)
+if __name__ == '__main__':
+unittest.main()
+```
+
+### 13.2 Selenium单元测试
+
+Selenium不要求单元测试必须是类的一个函数，它的“断言”语句也不需要括号，而且测试通过的话不会有提示，只有当测试失败时才会产生信息提示：
+
+```Python
+from selenium import webdriver
+
+
+driver = webdriver.PhantomJS(executable_path='/Users/ryan/Documents/pythonscraping/code/headless/phantomjs-1.9.8-macosx/bin/phantomjs')
+driver.get("http://en.wikipedia.org/wiki/Monty_Python")
+assert "Monty Python" in driver.title
+print("Monty Python was in the title")
+driver.close()
+```
+
+## 第十四章 远程采集
+
+启用远程平台的人通常有两个目的：对更大计算能力和灵活性的需求，以及对可变IP地址的需求。
+
+### 14.1 Tor代理服务器
+
+通过不同服务器构成多个层把客户端包在最里面。数据进入网络之前会被加密，因此任何服务器都不能偷取通信数据。
+
+PySocks：是一个非常简单的Python代理服务器通信模块，它可以和Tor配合使用。
