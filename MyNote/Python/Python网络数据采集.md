@@ -253,3 +253,269 @@ Python有两个包可以发送邮件：smtplib和email。
 
 本章重点介绍文档处理的相关内容，包括把文件下载到文件夹里，以及读取文档并提取数据。我们还会介绍文档的不同编码类型，让程序可以读取非英文的HTML页面。
 
+Python中对读取的文档使用UTF-8进行解析**str(value,'utf-8')**；
+
+用BeautifulSoup和Python3.x对文档进行UTF-8编码，如下所示：
+
+```Python
+from urllib.request import urlopen
+from bs4 import BeautifulSoup
+
+html = urlopen("http://en.wikipedia.org/wiki/Python_(programming_language)")
+bsObj = BeautifulSoup(html, "html.parser")
+content = bsObj.find("div", {"id":"mw-content-text"}).get_text()
+content = bytes(content, "UTF-8")
+content = content.decode("UTF-8")
+print(content)
+```
+
+### 6.3 读取CSV
+
+```Python
+from urllib.request import urlopen
+from io import StringIO
+import csv
+
+data = urlopen("http://pythonscraping.com/files/MontyPythonAlbums.csv").read().decode('ascii', 'ignore')
+dataFile = StringIO(data)
+csvReader = csv.reader(dataFile)
+
+for row in csvReader:
+	print("The album \""+row[0]+"\" was released in "+str(row[1]))
+```
+
+### 6.4 PDF
+
+```Python
+from pdfminer.pdfinterp import PDFResourceManager, process_pdf
+from pdfminer.converter import TextConverter
+from pdfminer.layout import LAParams
+from io import StringIO
+from urllib.request import urlopen
+
+def readPDF(pdfFile):
+    rsrcmgr = PDFResourceManager()
+    retstr = StringIO()
+    laparams = LAParams()
+    device = TextConverter(rsrcmgr, retstr, laparams=laparams)
+
+    process_pdf(rsrcmgr, device, pdfFile)
+    device.close()
+
+    content = retstr.getvalue()
+    retstr.close()
+    return content
+
+pdfFile = urlopen("http://pythonscraping.com/pages/warandpeace/chapter1.pdf")
+outputString = readPDF(pdfFile)
+print(outputString)
+pdfFile.close()
+```
+
+### 6.5 微软Word和.docx
+
+```Python
+from zipfile import ZipFile
+from urllib.request import urlopen
+from io import BytesIO
+from bs4 import BeautifulSoup
+
+wordFile = urlopen("http://pythonscraping.com/pages/AWordDocument.docx").read()
+wordFile = BytesIO(wordFile)
+document = ZipFile(wordFile)
+xml_content = document.read('word/document.xml')
+
+wordObj = BeautifulSoup(xml_content.decode('utf-8'), "lxml-xml")
+textStrings = wordObj.findAll("w:t")
+for textElem in textStrings:
+    closeTag = ""
+    try:
+        style = textElem.parent.previousSibling.find("w:pStyle")
+        if style is not None and style["w:val"] == "Title":
+            print("<h1>")
+            closeTag = "</h1>"
+    except AttributeError: #不打印标签
+        pass 
+    print(textElem.text)
+    print(closeTag)
+```
+
+此代码将一个远程Word文档读成一个二进制文件对象（BytesIO与本章之前用的StringIO类似），再用Python的标准库zipfile解压（所有的.docx文件为了节省空间都进行过压缩），然后读取这个解压文件，就变成XML了。
+
+# 第二部分 高级数据采集
+
+用BeautifulSoup和Python3.x对文档进行UTF-8编码，如下所示：这部分内容就是要帮你分析原始数据，获取隐藏在数据背后的故事——网站的真实故事其实都隐藏在JavaScript、登录表单和网站反抓取措施的背后。
+
+通过这部分内容的学习，你将掌握如何用网络爬虫测试网站，自动化处理，以及通过更多的方式接入网络。最后你将学到一些数据采集的工具，帮助你在不同的环境中收集和操作任意类型的网络数据，深入互联网的每个角落。
+
+## 第七章 数据清洗
+
+本章将介绍一些工具和技术，通过改变代码的编写方式，帮你从源头控制数据零乱的问题，并且对已经进入数据库的数据进行清洗。
+
+n-gram：将一段字符串分割成成对的数组，例如Python programming language分割成2-gram是Python programming，programming language。
+
+但是其中还有凌乱的数据，用正则先把换行符变成空格，把连续的多个空格替换成一个空格，把Unicode字符过滤掉。把内容转换成UTF-8格式以消除转义字符。
+
+另外处理数据的规则：
+
+- 剔除单字符的“单词”，除非这个字符是i或a
+- 剔除维基百科的引用标记
+- 剔除标点符号
+
+数据标准化：电话号码会有不同的格式，因此间各不同的格式统一，有助于查看数据
+
+对存储后的数据再进行清洗可以使用OpenRefine，看这个软件类似于Excel啊。
+
+## 第八章 自然语言处理
+
+在这一章里，我们将尝试探索英语这个复杂的主题。
+
+使用n-gram将一篇文章清洗出来之后，去掉那些is啊什么的，这些常用的没有意义的单词，然后将频率最高的单词获取出来，找出这些单词所在的语句，基本就可以用这些语句总结这篇文章的主旨了。
+
+### 8.2 马尔可夫模型
+
+将整个字符串中的单词进行处理，然后得出马尔可夫链组成的句子。这个句子只是根据前后单词出现的概率进行设置的，可能是一个没有任务意义的句子。
+
+### 8.3 自然语言工具包
+
+本章主要讨论对文本中所有单词的统计分析。哪些单词使用得最频繁？哪些单词用得最少？一个单词后面跟着哪几个单词？这些单词是如何组合在一起的？我们应该做却还没做的事情，是理解每个单词的具体含义。
+
+自然语言工具包（Natural Language Toolkit，NLTK）用于识别和标记英语文本中各个词的词性。
+
+自然语言工具包将上面所说的文本处理方式进行了整合和加强，使得处理数据更快更方便。
+
+NLTK一个基本功能就是识别句子中各个词的词性。识别这个单词是符号、介词、动词还是其他的词性。pos_tag函数。
+
+NLTK用英语的上下文无关文法（contextfreegrammar）识别词性。上下文无关文法基本上可以看成一个规则集合，用一个有序的列表确定一个词后面可以跟哪些词。NLTK的上下文无关文法确定的是一个词性后面可以跟哪些词性。无论什么时候，只要遇到像“dust”这样一个含义不明确的单词，NLTK都会用上下文无关文法的规则来判断，然后确定一个合适的词性。
+
+## 第九章 穿越网页表单与登录窗口进行采集
+
+本章将重点介绍POST方法，即把信息推送给网络服务器进行存储和分析。
+
+### 9.1 Python Request库
+
+擅长处理那些复杂HTTP请求、cookie、header等内容的Python第三方库。
+
+```Python
+import requests
+#post中需要传输的数据使用一个字典进行封装，也就是用chrome浏览器看到的form data数据
+params = {'firstname': 'Ryan', 'lastname': 'Mitchell'}
+r = requests.post("http://pythonscraping.com/files/processing.php", data=params)
+print(r.text)
+```
+
+### 9.4 提交文件和图像
+
+```Python
+import requests
+files = {'uploadFile': open('../files/Python-logo.png', 'rb')}
+r = requests.post("http://pythonscraping.com/pages/processing2.php",
+files=files)
+print(r.text)
+```
+
+需要注意，这里提交给表单字段uploadFile的值不是一个简单的字符串了，而是一个用open函数打开的Python文件对象。在这个例子中，我提交了一个保存在我电脑上的图像文件，文件路径是相对这个Python程序所在位置的../files/Python-logo.png。
+
+### 9.5 处理登录和cookie
+
+一旦网站验证了你的登录权证，它就会将它们保存在你的浏览器的cookie中，里面通常包含一个服务器生成的令牌、登录有效时限和状态跟踪信息。网站会把这个cookie当作信息验证的证据，在你浏览网站的每个页面时出示给服务器。
+
+```Python
+import requests
+session = requests.Session()
+params = {'username': 'username', 'password': 'password'}
+s = session.post("http://pythonscraping.com/pages/cookies/welcome.php", params)
+print("Cookie is set to:")
+print(s.cookies.get_dict())
+print("-----------")
+print("Going to profile page...")
+s = session.get("http://pythonscraping.com/pages/cookies/profile.php")
+print(s.text)
+```
+
+会话（session）对象（调用requests.Session()获取）会持续跟踪会话信息，像cookie、header，甚至包括运行HTTP协议的信息，比如HTTPAdapter（为HTTP和HTTPS的链接会话提供统一接口）。
+
+**HTTP基本接入认证**
+
+```Python
+import requests
+from requests.auth import AuthBase
+from requests.auth import HTTPBasicAuth
+auth = HTTPBasicAuth('ryan', 'password')
+r = requests.post(url="http://pythonscraping.com/pages/auth/login.php", auth=
+auth)
+print(r.text)
+```
+
+虽然这看着像是一个普通的POST请求，但是有一个HTTPBasicAuth对象作为auth参数传递到请求中。显示的结果将是用户名和密码验证成功的页面（如果验证失败，就是一个拒绝接入页面）。
+
+## 第十章 采集javascript
+
+### Selenium
+
+Selenium可以让浏览器自动加载页面，获取需要的数据，甚至页面截屏，或者判断网站上某些动作是否发生。
+
+Selenium自己不带浏览器，它需要与第三方浏览器结合在一起使用。如果你在Firefox上运行Selenium，可以直接看到一个Firefox窗口被打开，进入网站，然后执行你在代码中设置的动作。
+
+```Python
+from selenium import webdriver
+import time
+driver = webdriver.PhantomJS(executable_path='')
+driver.get("http://pythonscraping.com/pages/javascript/ajaxDemo.html")
+time.sleep(3)
+print(driver.find_element_by_id('content').text)
+driver.close()
+```
+
+这段代码用PhantomJS库创建了一个新的SeleniumWebDriver，首先用WebDriver加载页面，然后暂停执行3秒钟，再查看页面获取（希望已经加载完成的）内容。
+
+## 第十一章 图像识别与文字处理
+
+将图像翻译成文字一般被称为光学文字识别（Optical Character Recognition，OCR）。可以实现OCR的底层库并不多，目前很多库都是使用共同的几个底层OCR库，或者是在上面进行定制。这类OCR系统有时会变得非常复杂，所有我建议你在实践这一章的代码示例之前先阅读下一节的内容。
+
+虽然有很多库可以进行图像处理，但在这里我们只重点介绍两个库：Pillow和Tesseract。
+
+### 11.1 Tesseract
+
+Tesseract是目前公认最优秀、最精确的开源OCR系统。
+
+Tesseract是一个Python的命令行工具,安装之后，要用tesseract命令在Python的外面运行。
+
+### 11.2 NumPy
+
+NumPy是一个非常强大的库，具有大量线性代数以及大规模科学计算的方法。因为NumPy可以用数学方法把图片表示成巨大的像素数组，所以它可以流畅地配合Tesseract完成任务。
+
+### 11.3 处理格式规范的文字
+
+```shell
+#将图片识别成文字
+$tesseract text.tif textoutput | cat textoutput.txt
+```
+
+若图片中包含背景色，那么数据处理就会大打折扣。可以先试用Pillow库对图片进行预处理，创建一个阈值过滤器来去掉渐变的背景色，只把文字留下来
+
+```Python
+from PIL import Image
+import subprocess
+def cleanFile(filePath, newFilePath):
+    image = Image.open(filePath)
+# 对图片进行阈值过滤，然后保存
+    image = image.point(lambda x: 0 if x<143 else 255)
+    image.save(newFilePath)
+# 调用系统的tesseract命令对图片进行OCR识别
+    subprocess.call(["tesseract", newFilePath, "output"])
+# 打开文件读取结果
+    outputFile = open("output.txt", 'r')
+    print(outputFile.read())
+    outputFile.close()
+cleanFile("text_2.jpg", "text_2_clean.png")
+```
+
+## 第十二章 避开采集陷阱
+
+### 12.1 让网络机器人看起来像人类用户
+
+#### 12.1.1 修改请求头
+
+经典的Python爬虫在使用urllib标准库时，都会发送如下的请求头：
+
