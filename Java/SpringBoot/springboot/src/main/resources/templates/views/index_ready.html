@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta name="keywords" content="MySpringboot 基于角色的权限管理">
+    <meta name="description" content="MySpringboot 基于角色的权限管理">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html"/>
+    <![endif]-->
+    <title>MySpringboot 基于角色的权限管理</title>
+    <link th:href="@{favicon.ico}" rel="stylesheet"/>
+    <link th:href="@{/css/bootstrap.css}" rel="stylesheet"/>
+    <link th:href="@{/css/font-awesome.css}" rel="stylesheet"/>
+    <link th:href="@{/css/animate.css}" rel="stylesheet"/>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
+    <style type="text/css">
+        .nav > li:hover .dropdown-menu {display: block;}
+    </style>
+
+</head>
+<body class="fixed-sidebar full-height-layout gray-bg" style="overflow: hidden" ><!--th:classappend="${@configService.selectConfigByKey('sys.index.skinName')}"-->
+<div id="wrapper">
+    <!--左侧导航开始-->
+    <nav class="navbar-default navbar-static-side" role="navigation">
+        <div class="nav-close">
+            <i class="fa fa-times-circle"></i>
+        </div>
+        <div class="sidebar-collapse">
+            <ul class="nav" id="side-menu">
+                <li class="nav-header">
+                    <div class="dropdown profile-element"> <span>
+                         <img th:src="(${user.avatar} == '') ? '/img/profile.jpg' : '/profile/' + ${user.avatar}" alt="image" class="img-circle" height="60" width="60"/></span>
+                        <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                          <span class="clear"><span class="block m-t-xs"><strong class="font-bold">[[${user.userName}]]</strong></span>
+                         <span class="text-muted text-xs block"><span>[[${user.dept.deptName}]]</span> <b class="caret"></b></span> </span> </a>
+                        <ul class="dropdown-menu animated fadeInRight m-t-xs">
+                            <li><a class="menuItem" th:href="@{/system/user/profile}">个人信息</a></li>
+                            <li class="divider"></li>
+                            <li><a th:href="@{logout}">退出</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <li class="active">
+                    <a href="index_ready.html"><i class="fa fa-home"></i> <span class="nav-label">主页</span> <span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li class="active"><a class="menuItem" th:href="@{/system/main}">了解Spring Boot+Apache Shiro</a></li>
+                    </ul>
+                </li>
+                <li th:each="menu : ${menus}">
+                    <a href="#">
+                        <i class="fa fa fa-bar-chart-o" th:class="${menu.icon}"></i>
+                        <span class="nav-label" th:text="${menu.menuName}">一级菜单</span>
+                        <span class="fa arrow"></span>
+                    </a>
+                    <ul class="nav nav-second-level collapse">
+                        <li th:each="cmenu : ${menu.children}">
+                            <a class="menuItem" th:text="${cmenu.menuName}" th:href="@{${cmenu.url}}">二级菜单</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!--左侧导航结束-->
+</div>
+</body>
+</html>

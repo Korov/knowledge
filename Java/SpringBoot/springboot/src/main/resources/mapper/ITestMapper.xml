@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.korov.springboot.mapper.ITestMapper">
+    <resultMap id="BaseResultMap" type="com.korov.springboot.entity.TestEntity">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="username" property="userName" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+		user_id, username
+	</sql>
+    <select id="queryAllTest" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from user
+    </select>
+    <select id="queryNameEmail" resultType="java.util.HashMap">
+		SELECT NICKNAME,EMAIL FROM tbl_user
+	</select>
+</mapper>

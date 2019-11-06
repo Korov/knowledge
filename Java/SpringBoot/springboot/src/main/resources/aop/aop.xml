@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <!-- 启动AspectJ 自动代理 -->
+    <aop:aspectj-autoproxy/>
+
+    <!-- bean，注入到aspect 切面中 -->
+    <bean id="criticismEngine" class="com.korov.springboot.aspect.aspectj.CriticismEngineImpl">
+        <property name="criticismPool">
+            <list>
+                <value>good</value>
+                <value>better</value>
+                <value>bad</value>
+                <value>worst</value>
+            </list>
+        </property>
+    </bean>
+    <aop:aspectj-autoproxy/>
+    <!-- factory-method="aspectOf"：
+    并不是由Spring 创建的bean，而是由AspectJ 在运行期创建的；
+    所有的AspectJ 切面都提供了一个静态的aspectOf() 方法，该方法返回切面的一个单例 -->
+    <bean class="com.korov.springboot.aspect.aspectj.CriticAspect" factory-method="aspectOf">
+        <property name="criticismEngine" ref="criticismEngine"/>
+    </bean>
+
+</beans>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phoneInfo>2019-07-222019-07-22
+    <brand name="小米">
+        <type name="小米8"/>
+        <type name="小米9"/>
+        <type name="小米MIX"/>
+    </brand>
+    <brand name="iphone">
+        <type name="iphoneX"/>
+        <type name="iphoneXs"/>
+        <type name="iphone7"/>
+    </brand>
+    <brand name="华为">
+        <type name="p20"/>
+        <type name="p30"/>
+        <type name="P30pro"/>
+    </brand>
+<brand name="魅族"><type name="16 pro"/></brand><brand name="魅族"><type name="16 pro"/></brand><brand name="魅族"><type name="s16"/></brand></phoneInfo>

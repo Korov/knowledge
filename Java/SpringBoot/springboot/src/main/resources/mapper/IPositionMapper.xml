@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.korov.springboot.mapper.IPositionMapper">
+    <resultMap id="BaseResultMap" type="com.korov.springboot.entity.PositionEntity">
+        <id column="post_id" jdbcType="INTEGER" property="postId"/>
+        <result column="post_code" jdbcType="VARCHAR" property="postCode"/>
+        <result column="post_name" jdbcType="VARCHAR" property="postName"/>
+        <result column="post_sort" jdbcType="INTEGER" property="postSort"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="remark" jdbcType="VARCHAR" property="remark"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tbl_position
+    where post_id = #{postId,jdbcType=INTEGER}
+  </delete>
+    <insert id="insert" parameterType="com.korov.springboot.entity.PositionEntity" useGeneratedKeys="true"
+            keyProperty="postId">
+    insert into tbl_position (post_id, post_code, post_name, 
+      post_sort, status, create_by, 
+      create_time, update_by, update_time, 
+      remark)
+    values (#{postId,jdbcType=INTEGER}, #{postCode,jdbcType=VARCHAR}, #{postName,jdbcType=VARCHAR}, 
+      #{postSort,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createBy,jdbcType=VARCHAR}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{remark,jdbcType=VARCHAR})
+  </insert>
+    <insert id="insertAll" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="postId">
+        insert into tbl_position (post_id, post_code, post_name,
+        post_sort, status, create_by,
+        create_time, update_by, update_time,
+        remark)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{postId,jdbcType=INTEGER}, #{postCode,jdbcType=VARCHAR}, #{postName,jdbcType=VARCHAR},
+            #{postSort,jdbcType=INTEGER}, #{status,jdbcType=INTEGER}, #{createBy,jdbcType=VARCHAR},
+            #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP},
+            #{remark,jdbcType=VARCHAR})
+        </foreach>
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.korov.springboot.entity.PositionEntity">
+    update tbl_position
+    set post_code = #{postCode,jdbcType=VARCHAR},
+      post_name = #{postName,jdbcType=VARCHAR},
+      post_sort = #{postSort,jdbcType=INTEGER},
+      status = #{status,jdbcType=INTEGER},
+      create_by = #{createBy,jdbcType=VARCHAR},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      update_by = #{updateBy,jdbcType=VARCHAR},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      remark = #{remark,jdbcType=VARCHAR}
+    where post_id = #{postId,jdbcType=INTEGER}
+  </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select post_id, post_code, post_name, post_sort, status, create_by, create_time, 
+    update_by, update_time, remark
+    from tbl_position
+    where post_id = #{postId,jdbcType=INTEGER}
+  </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+    select post_id, post_code, post_name, post_sort, status, create_by, create_time, 
+    update_by, update_time, remark
+    from tbl_position
+  </select>
+    <select id="selectPage" resultMap="BaseResultMap">
+        select post_id, post_code, post_name, post_sort, status, create_by, create_time,
+        update_by, update_time, remark
+        from tbl_position
+        <if test="pageNum>=0 and pageSize>=0">limit #{pageNum,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER} </if>
+    </select>
+</mapper>

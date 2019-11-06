@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.korov.springboot.mapper.IUserMapper">
+    <resultMap id="BaseResultMap" type="com.korov.springboot.entity.UserEntity">
+        <id column="USER_ID" jdbcType="INTEGER" property="userId"/>
+        <result column="LOGIN_NAME" jdbcType="VARCHAR" property="loginName"/>
+        <result column="LOGIN_PASSWORD" jdbcType="VARCHAR" property="loginPassword"/>
+        <result column="NICKNAME" jdbcType="VARCHAR" property="nickName"/>
+        <result column="EMAIL" jdbcType="VARCHAR" property="email"/>
+        <result column="PHONE" jdbcType="VARCHAR" property="phone"/>
+        <result column="SEX" jdbcType="VARCHAR" property="sex"/>
+        <result column="HEAD_PORTRAIT" jdbcType="VARCHAR" property="headPortrait"/>
+        <result column="USER_TYPE" jdbcType="CHAR" property="userType"/>
+        <result column="STATUS" jdbcType="INTEGER" property="status"/>
+        <result column="REFUSE_DESC" jdbcType="VARCHAR" property="refuseDesc"/>
+        <result column="LOGIN_IP" jdbcType="VARCHAR" property="loginIp"/>
+        <result column="LOGIN_DATE" jdbcType="TIMESTAMP" property="loginDate"/>
+        <result column="CREATER" jdbcType="VARCHAR" property="creater"/>
+        <result column="CREATE_TIME" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="UPDATE_BY" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="UPDATE_TIME" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from tbl_user
+        where USER_ID = #{userId,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.korov.springboot.entity.UserEntity" useGeneratedKeys="true"
+            keyProperty="userId">
+        insert into tbl_user (USER_ID, LOGIN_NAME, LOGIN_PASSWORD,
+                              NICKNAME, EMAIL, PHONE,
+                              SEX, HEAD_PORTRAIT, USER_TYPE,
+                              STATUS, REFUSE_DESC, LOGIN_IP,
+                              LOGIN_DATE, CREATER, CREATE_TIME,
+                              UPDATE_BY, UPDATE_TIME)
+        values (#{userId,jdbcType=INTEGER}, #{loginName,jdbcType=VARCHAR}, #{loginPassword,jdbcType=VARCHAR},
+                #{nickName,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR},
+                #{sex,jdbcType=VARCHAR}, #{headPortrait,jdbcType=VARCHAR}, #{userType,jdbcType=CHAR},
+                #{status,jdbcType=INTEGER}, #{refuseDesc,jdbcType=VARCHAR}, #{loginIp,jdbcType=VARCHAR},
+                #{loginDate,jdbcType=TIMESTAMP}, #{creater,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+                #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertAll" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="userId">
+        insert into tbl_user (USER_ID, LOGIN_NAME, LOGIN_PASSWORD,
+        NICKNAME, EMAIL, PHONE,
+        SEX, HEAD_PORTRAIT, USER_TYPE,
+        STATUS, REFUSE_DESC, LOGIN_IP,
+        LOGIN_DATE, CREATER, CREATE_TIME,
+        UPDATE_BY, UPDATE_TIME)
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{item.userId,jdbcType=INTEGER}, #{item.loginName,jdbcType=VARCHAR},
+            #{item.loginPassword,jdbcType=VARCHAR},
+            #{item.nickName,jdbcType=VARCHAR}, #{item.email,jdbcType=VARCHAR}, #{item.phone,jdbcType=VARCHAR},
+            #{item.sex,jdbcType=VARCHAR}, #{item.headPortrait,jdbcType=VARCHAR}, #{item.userType,jdbcType=CHAR},
+            #{item.status,jdbcType=INTEGER}, #{item.refuseDesc,jdbcType=VARCHAR}, #{item.loginIp,jdbcType=VARCHAR},
+            #{item.loginDate,jdbcType=TIMESTAMP}, #{item.creater,jdbcType=VARCHAR},
+            #{item.createTime,jdbcType=TIMESTAMP},
+            #{item.updateBy,jdbcType=VARCHAR}, #{item.updateTime,jdbcType=TIMESTAMP})
+        </foreach>
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.korov.springboot.entity.UserEntity">
+        update tbl_user
+        set LOGIN_NAME     = #{loginName,jdbcType=VARCHAR},
+            LOGIN_PASSWORD = #{loginPassword,jdbcType=VARCHAR},
+            NICKNAME       = #{nickName,jdbcType=VARCHAR},
+            EMAIL          = #{email,jdbcType=VARCHAR},
+            PHONE          = #{phone,jdbcType=VARCHAR},
+            SEX            = #{sex,jdbcType=VARCHAR},
+            HEAD_PORTRAIT  = #{headPortrait,jdbcType=VARCHAR},
+            USER_TYPE      = #{userType,jdbcType=CHAR},
+            STATUS         = #{status,jdbcType=INTEGER},
+            REFUSE_DESC    = #{refuseDesc,jdbcType=VARCHAR},
+            LOGIN_IP       = #{loginIp,jdbcType=VARCHAR},
+            LOGIN_DATE     = #{loginDate,jdbcType=TIMESTAMP},
+            CREATER        = #{creater,jdbcType=VARCHAR},
+            CREATE_TIME    = #{createTime,jdbcType=TIMESTAMP},
+            UPDATE_BY      = #{updateBy,jdbcType=VARCHAR},
+            UPDATE_TIME    = #{updateTime,jdbcType=TIMESTAMP}
+        where USER_ID = #{userId,jdbcType=INTEGER}
+    </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select USER_ID,
+               LOGIN_NAME,
+               LOGIN_PASSWORD,
+               NICKNAME,
+               EMAIL,
+               PHONE,
+               SEX,
+               HEAD_PORTRAIT,
+               USER_TYPE,
+               STATUS,
+               REFUSE_DESC,
+               LOGIN_IP,
+               LOGIN_DATE,
+               CREATER,
+               CREATE_TIME,
+               UPDATE_BY,
+               UPDATE_TIME
+        from tbl_user
+        where USER_ID = #{userId,jdbcType=INTEGER}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select USER_ID,
+               LOGIN_NAME,
+               LOGIN_PASSWORD,
+               NICKNAME,
+               EMAIL,
+               PHONE,
+               SEX,
+               HEAD_PORTRAIT,
+               USER_TYPE,
+               STATUS,
+               REFUSE_DESC,
+               LOGIN_IP,
+               LOGIN_DATE,
+               CREATER,
+               CREATE_TIME,
+               UPDATE_BY,
+               UPDATE_TIME
+        from tbl_user
+    </select>
+    <select id="selectPage" resultMap="BaseResultMap">
+        select USER_ID,
+        LOGIN_NAME,
+        LOGIN_PASSWORD,
+        NICKNAME,
+        EMAIL,
+        PHONE,
+        SEX,
+        HEAD_PORTRAIT,
+        USER_TYPE,
+        STATUS,
+        REFUSE_DESC,
+        LOGIN_IP,
+        LOGIN_DATE,
+        CREATER,
+        CREATE_TIME,
+        UPDATE_BY,
+        UPDATE_TIME
+        from tbl_user
+        <if test="pageNum>=0 and pageSize>=0">limit #{pageNum,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER} </if>
+    </select>
+    <select id="selectByUsername" resultMap="BaseResultMap">
+        select USER_ID,
+               LOGIN_NAME,
+               LOGIN_PASSWORD,
+               NICKNAME,
+               EMAIL,
+               PHONE,
+               SEX,
+               HEAD_PORTRAIT,
+               USER_TYPE,
+               STATUS,
+               REFUSE_DESC,
+               LOGIN_IP,
+               LOGIN_DATE,
+               CREATER,
+               CREATE_TIME,
+               UPDATE_BY,
+               UPDATE_TIME
+        from tbl_user
+        where LOGIN_NAME = #{name,jdbcType=VARCHAR}
+    </select>
+</mapper>
