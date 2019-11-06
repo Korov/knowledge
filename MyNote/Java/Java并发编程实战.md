@@ -672,4 +672,113 @@ public class RenderWithTimeBudget {
 
 ### 6.3.7 示例：旅行预订门户网站
 
-如下示例使用了支持限时的invokeAll，将多个任务提交到一个ExecutorService并获得结果。InvokeAll方法的参数为一组任务，并返回一组Future。这两个集合有这相同的结构。invokeAll按照任务集合中迭代器的顺序将所有的Future添加到返回的集合中，从而使调用者能将各个Future与器表示的Callable关联起来。当所有任务都执行完毕时，或者调用线程被中断时，又或者超过指定时限时，invokeAll将返回。当超过指定时限后，任何还未完成的任务都会被取消。当invokeAll返回后，每个任务要么正常地完成，要么被取消，而客户端代码可以调用get或isCancelled来判断究竟是何种情况。
+如下示例使用了支持限时的invokeAll，将多个任务提交到一个ExecutorService并获得结果。InvokeAll方法的参数为一组任务，并返回一组Future。这两个集合有这相同的结构。invokeAll按照任务集合中迭代器的顺序将所有的Future添加到返回的集合中，从而使调用者能将各个Future与其表示的Callable关联起来。当所有任务都执行完毕时，或者调用线程被中断时，又或者超过指定时限时，invokeAll将返回。当超过指定时限后，任何还未完成的任务都会被取消。当invokeAll返回后，每个任务要么正常地完成，要么被取消，而客户端代码可以调用get或isCancelled来判断究竟是何种情况。
+
+```Java
+public class TimeBudget {
+    private static ExecutorService exec = Executors.newCachedThreadPool();
+
+    public List<TravelQuote> getRankedTravelQuotes(TravelInfo travelInfo, Set<TravelCompany> companies,
+                                                   Comparator<TravelQuote> ranking, long time, TimeUnit unit)
+            throws InterruptedException {
+        List<QuoteTask> tasks = new ArrayList<QuoteTask>();
+        for (TravelCompany company : companies) {
+            tasks.add(new QuoteTask(company, travelInfo));
+        }
+
+        List<Future<TravelQuote>> futures = exec.invokeAll(tasks, time, unit);
+
+        List<TravelQuote> quotes =
+                new ArrayList<TravelQuote>(tasks.size());
+        Iterator<QuoteTask> taskIter = tasks.iterator();
+        for (Future<TravelQuote> f : futures) {
+            QuoteTask task = taskIter.next();
+            try {
+                quotes.add(f.get());
+            } catch (ExecutionException e) {
+                quotes.add(task.getFailureQuote(e.getCause()));
+            } catch (CancellationException e) {
+                quotes.add(task.getTimeoutQuote(e));
+            }
+        }
+
+        Collections.sort(quotes, ranking);
+        return quotes;
+    }
+
+}
+
+class QuoteTask implements Callable<TravelQuote> {
+    private final TravelCompany company;
+    private final TravelInfo travelInfo;
+
+    public QuoteTask(TravelCompany company, TravelInfo travelInfo) {
+        this.company = company;
+        this.travelInfo = travelInfo;
+    }
+
+    TravelQuote getFailureQuote(Throwable t) {
+        return null;
+    }
+
+    TravelQuote getTimeoutQuote(CancellationException e) {
+        return null;
+    }
+
+    @Override
+    public TravelQuote call() throws Exception {
+        return company.solicitQuote(travelInfo);
+    }
+}
+
+interface TravelCompany {
+    TravelQuote solicitQuote(TravelInfo travelInfo) throws Exception;
+}
+
+interface TravelQuote {
+}
+
+interface TravelInfo {
+}
+```
+
+# 7 取消与关闭
+
+要使任务和线程能安全、快速、可靠的停止下来，并不是一件容易的事。Java没有提供任何机制来安全地终止线程。但他提供了中断（Interruption），这是一种协作机制，能够使一个线程终止另一个线程的当前工作。
+
+本章将给出各种实现取消和中断的机制，以及如何编写任务和服务，使他们额能对取消请求做出响应。
+
+## 7.1 任务取消
+
+如果外部代码能在某个操作正常完成之前将其置入“完成”状态，那么这个操作就可以称为可取消的（Cancellable）。取消某个操作的原因很多：用户请求取消、有时间限制的操作、应用程序事件、错误、关闭。
+
+在Java中没有一种安全的抢占式方法来停止线程，因此也就没有安全的抢占式方法来停止任务。只有一些写作式的机制，使请求取消的任务和代码都遵循一种协商好的协议。
+
+其中一种协作机制能设置某个“已请求取消（Cancellation Requested）”标志，而任务将定期地查看该标志。如果设置了这个标志，那么任务将提前结束。
+
+```Java
+public class PrimeGenerator implements Runnable {
+    private final List<BigInteger> primes = new ArrayList<>();
+    private volatile boolean cancelled;
+
+    @Override
+    public void run() {
+        BigInteger p = BigInteger.ONE;
+        while (!cancelled) {
+            p = p.nextProbablePrime();
+            synchronized (this) {
+                primes.add(p);
+            }
+        }
+    }
+
+    public void cancel() {
+        cancelled = true;
+    }
+
+    public synchronized List<BigInteger> get() {
+        return new ArrayList<>(primes);
+    }
+}
+```
+
