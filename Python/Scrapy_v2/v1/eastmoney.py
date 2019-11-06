@@ -2,7 +2,7 @@ import json
 from urllib.request import urlopen
 
 import pymysql
-from pymysql import ProgrammingError
+from pymysql import ProgrammingError, DataError
 
 i = 1
 
@@ -37,7 +37,7 @@ def insert(url, charset):
         Personnel = text["Personnel"]
         Licostaff = text["Licostaff"]
         Maincontent = text["Maincontent"]
-        sql = "INSERT INTO eastmoney VALUES('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')".format(
+        sql = "INSERT INTO eastmoney(ChangePercent, Close, CompanyCode, CompanyName, OrgCode, OrgName, OrgSum, SCode, SName, NoticeDate,StartDate,EndDate, Place, Description, Orgtype, OrgtypeName, Personnel, Licostaff, Maincontent) VALUES('{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}','{}')".format(
             ChangePercent, Close, CompanyCode, CompanyName, OrgCode, OrgName, OrgSum, SCode, SName, NoticeDate,
             StartDate,
             EndDate, Place, Description, Orgtype, OrgtypeName, Personnel, Licostaff, Maincontent)
@@ -47,20 +47,20 @@ def insert(url, charset):
     conn.close()
 
 
-# url = "http://data.eastmoney.com/DataCenter_V3/jgdy/xx.ashx?pagesize=50&page={}&js=var%20PWQSnUVC&param=&sortRule=-1&sortType=0&rt=52".format(
-#     3)
-# insert(url)
+# url = "http://data.eastmoney.com/DataCenter_V3/jgdy/xx.ashx?pagesize=1000&page={}&js=var%20PWQSnUVC&param=&sortRule=-1&sortType=0&rt=52".format(
+#     1)
+# insert(url, 'gbk')
 
 error = set();
-i = 6595
-while i <= 7322:
+i = 1
+while i <= 367:
     # time.sleep(1)
-    url = "http://data.eastmoney.com/DataCenter_V3/jgdy/xx.ashx?pagesize=50&page={}&js=var%20PWQSnUVC&param=&sortRule=-1&sortType=0&rt=52".format(
+    url = "http://data.eastmoney.com/DataCenter_V3/jgdy/xx.ashx?pagesize=1000&page={}&js=var%20PWQSnUVC&param=&sortRule=-1&sortType=0&rt=52".format(
         i)
-    i = i + 1
     try:
         insert(url, 'gbk')
-    except (UnicodeDecodeError, ProgrammingError):
+    except (UnicodeDecodeError, ProgrammingError, DataError):
         error.add(str(i))
     print(i)
+    i = i + 1
     print("error:" + ",".join(error))
