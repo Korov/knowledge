@@ -1169,3 +1169,72 @@ ExecutorService提供了两种关闭方法：使用shutdown正常关闭，以及
 对于系统的资源，例如文件句柄或套接字句柄，当不再需要他们时，必须显式地交还给操作系统。为了实现这个功能，垃圾回收器对那些定义了finalize方法的对象会进行特殊处理：在回收器释放他们后，调用他们的finalize方法，从而保证一些持久化的资源被释放。
 
 **避免使用终结器**
+
+# 8 线程池的使用
+
+第6章介绍了任务执行框架，它不仅能简化任务与线程的生命周期管理，而且还能提供一种简单灵活的方式将任务的提交与任务的执行策略解耦开来。第7张介绍了在实际应用程序中使用任务执行框架时出现的一些与服务生命周期相关的细节问题。本章将介绍对线程池进行配置与调优的一些高级选项，并分析在使用任务执行框架时需要注意的各种危险，以及一些使用Executor的高级示例。
+
+## 8.1 在任务与执行策略之间的隐性耦合
+
+并非所有的任务都能适用所有的执行策略包括：
+
+- 依赖性任务
+- 使用线程封闭机制的任务
+- 对响应时间敏感的任务
+- 使用ThreadLocal的任务
+
+只有当任务都是同类型的并且相互独立时，线程池的性能才能达到最佳。如果将运行时间较长的与运行时间较短的任务混合在一起，那么除非线程池很大，否则将可能造成“拥塞”。如果提交的任务依赖于其他任务，那么除非线程池无限大，否则将可能造成死锁。
+
+### 8.1.1 线程饥饿死锁
+
+在线程池中，如果任务依赖于其他任务，那么可能产生死锁。线程池中的任务需要无限等待一些必须由池中其他任务才能提供的资源或条件，例如某个等待任务的返回值或执行结果，那么除非线程池足够大，否则将发生线程饥饿死锁。
+
+RenderPageTask想Executor提交了两个任务来获取页眉和页脚，并等待获取结果。此线程就会经常发生死锁。
+
+```Java
+public class RenderPageTask implements Callable<String> {
+        @Override
+        public String call() throws Exception {
+            Future<String> header;
+            Future<String> footer;
+            header = executorService.submit(new LoadFileTask("header.html"));
+            footer = executorService.submit(new LoadFileTask("footer.html"));
+            String page = renderBody();
+            // Will deadlock -- task waiting for result of subtask
+            return header.get() + page + footer.get();
+        }
+
+        private String renderBody() {
+            // Here's where we would actually render the page
+            return "";
+        }
+    }
+```
+
+## 8.2 设置线程池的大小
+
+线程池的理想大小取决于被提交任务的类型以及所部署系统的特性。在代码中通常不会固定线程池的大小，而应该通过某种配置机制来提供，或根据Runtime.availableProcessors来动态计算。
+
+![image-20191109154236619](picture\image-20191109154236619.png)
+
+## 8.3 配置ThreadPoolExecutor
+
+### 8.3.1 线程的创建与销毁
+
+线程池的基本大小（Core Pool Size）、最大大小（Maximum Pool Size）以及存活时间等因素共同负责线程的创建与销毁。基本大小也就是线程池的目标大小，即在没有任务执行时线程池的大小。线程池的最大大小表示可同时活动的线程数量的上限。如果某个线程的空闲时间超过了存活时间，那么将被标记为可回收的，并且当线程池的当前大小超过了基本大小时，这个线程将被终止。
+
+newFixedThreadPool工厂方法将线程池的基本大小和最大大小设置为参数中的指定值，而且创建的线程池不会超时。newCachedThreadPool工厂方法将线程池的最大大小设置为Integer.MAX_VALUE，而将基本大小设置为0，并将超时设置为1分钟。
+
+### 8.3.2 管理队列任务
+
+ThreadPoolExecutor允许提供一个BlockingQueue来保存等待执行的任务。基本的任务排队方法有3种：无界队列、有界队列和同步移交。
+
+对于非常大的或者无界的线程池，可以通过使用SynchronousQueue来避免任务排队，以及直接将任务从生产者移交给工作者线程。SynchronousQueue不是一个真正地队列，而是一种在线程之间进行移交的机制。要建一个元素放入SynchronousQueue中，必须有另一个线程正在等待接受这个元素。如果没有线程正在等待，并且线程池的当前大小小于最大值，那么ThreadPoolExecutor将创建一个新的线程，否则根据饱和策略，这个任务将被拒绝。
+
+### 8.3.3 饱和策略
+
+当有界队列被填满后，饱和策略开始发挥作用。ThreadPoolExecutor的饱和策略可以通过调用setRejectedExceutionHandler来修改。JDK提供了集中不同的RejectedExecutionHandler实现：
+
+**中止（Abort）**策略是默认的饱和策略，该策略将会抛出未检查的RejectedExecutionException。当新提交的任务无法保存到队列中等待执行时，“抛弃（Discard）”策略会悄悄抛弃该任务。“抛弃最旧的（Discard-Oldest）”策略则会抛弃下一个将被执行的任务，然后尝试重新提交新的任务。
+
+**“调用者运行（Caller-Runs）”**策略实现了一种调节机制，它会将某些任务回退到调用者，从而降低新任务的流量。它不会在线程池的某个线程中执行新提交的任务，而是在一个调用了execute的线程中执行该任务。
