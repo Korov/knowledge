@@ -577,4 +577,3 @@ AOP配置元素                              用 途
 ## 4.5注入AspectJ切面
 
 已经在springboot中实践，需要先安装aspectj环境，然后编译器选择ajc编译器，好像和lombok的日志注解冲突，需要手动修改
-
