@@ -11,6 +11,11 @@ public class VoidTest {
 
     @Test
     public void test() throws Exception {
-        System.out.printf("i am %s", "aaa");
+        for (int i = 0; i < 34; i++) {
+            System.out.println(i);
+            if (i == 4) {
+                break;
+            }
+        }
     }
 }

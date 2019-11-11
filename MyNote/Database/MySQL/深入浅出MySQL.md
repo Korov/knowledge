@@ -527,3 +527,674 @@ HASH 索引有一些重要的特征需要在使用的时候特别注意，如下
 - 只能使用整个关键字来搜索一行
 
 而对于BTREE 索引，当使用>、<、>=、<=、BETWEEN、!=或者<>，或者LIKE 'pattern'（其中'pattern'不以通配符开始）操作符时，都可以使用相关列上的索引。
+
+# 11 视图
+
+## 11.1 什么是视图
+
+视图是一种虚拟存在的表，对于使用视图的用户来说基本上是透明的。视图并不在数据库中实际存在的，**行和列数据来自定时视图的查询中使用的表，并且是在使用视图时动态生成的**。
+
+视图相对于普通的表的优势主要包括以下几项：
+
+- 简单：使用视图的用户完全不需要关心后面对应的表的结构、关联条件和筛选条件，对用户来说已经是过滤好的复合条件的结果集。
+- 安全：使用视图的用户只能访问他们被允许查询的结果集，对表的权限管理并不能限制到某个行某个列，但是通过视图就可以简单的实现。
+- 数据独立：一旦视图的结构确定了，可以屏蔽表结构变化对用户的影响，源表增加列对视图没有影响；源表修改列名，则可以通过修改视图来解决，不会造成对访问者的影响。
+
+## 11.2 视图操作
+
+视图的操作包括创建或者修改视图、删除视图，以及查看视图定义。
+
+### 11.2.1 创建或者修改视图
+
+创建视图需要有CREATE VIEW 的权限，并且对于查询涉及的列有SELECT 权限。如果使用CREATE OR REPLACE 或者ALTER 修改视图，那么还需要该视图的DROP 权限。创建视图的语法为：
+
+```sql
+CREATE [OR REPLACE] [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]
+VIEW view_name [(column_list)]
+AS select_statement
+[WITH [CASCADED | LOCAL] CHECK OPTION]
+```
+
+修改视图的语法为：
+
+```sql
+ALTER [ALGORITHM = {UNDEFINED | MERGE | TEMPTABLE}]
+VIEW view_name [(column_list)]
+AS select_statement
+[WITH [CASCADED | LOCAL] CHECK OPTION]
+```
+
+视图的可更新性和视图中查询的定义有关系，以下类型的视图是不可更新的：
+
+- 包含以下关键字的SQL 语句：聚合函数（SUM、MIN、MAX、COUNT 等）、DISTINCT、GROUPBY、HAVING、UNION 或者UNION ALL。
+- 常量视图
+- SELECT 中包含子查询
+- JOIN
+- FROM 一个不能更新的视图
+- WHERE 字句的子查询引用了FROM 字句中的表
+
+WITH [CASCADED | LOCAL] CHECK OPTION 决定了是否允许更新数据使记录不再满足视图的条件。LOCAL 是只要满足本视图的条件就可以更新。CASCADED 则是必须满足所有针对该视图的所有视图的条件才可以更新
+
+**修改视图中的数据会同步修改源表中的数据。**
+
+### 11.2.2 删除视图
+
+DROP VIEW [IF EXISTS] view_name [, view_name] ...[RESTRICT | CASCADE]
+
+# 12 存储过程和函数
+
+## 12.1 什么事存储过程和函数
+
+存储过程和函数是事先经过编译并存储在数据库中的一段SQL语句的集合，调用存储过程和函数可以简化应用开发人员的很多工作，减少数据再数据库和应用服务器之间的传输，对于提高数据处理的效率是有好处的。
+
+存储过程和函数的区别在于函数必须有返回值，而存储过程没有，存储过程的参数可以使用IN、OUT、INOUT 类型，而函数的参数只能是IN 类型的。如果有函数从其他类型的数据库迁移到MySQL，那么就可能因此需要将函数改造成存储过程。
+
+## 12.2 存储过程和函数的相关操作
+
+### 12.2.1 创建、修改存储过程或者函数
+
+创建、修改存储过程或者函数的语法：
+
+```sql
+CREATE PROCEDURE sp_name ([proc_parameter[,...]])
+[characteristic ...] routine_body
+CREATE FUNCTION sp_name ([func_parameter[,...]])
+RETURNS type
+[characteristic ...] routine_body
+proc_parameter:
+[ IN | OUT | INOUT ] param_name type
+func_parameter:
+param_name type
+type:
+Any valid MySQL data type
+characteristic:
+LANGUAGE SQL
+| [NOT] DETERMINISTIC
+| { CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }
+| SQL SECURITY { DEFINER | INVOKER }
+| COMMENT 'string'
+routine_body:
+Valid SQL procedure statement or statements
+ALTER {PROCEDURE | FUNCTION} sp_name [characteristic ...]
+characteristic:
+{ CONTAINS SQL | NO SQL | READS SQL DATA | MODIFIES SQL DATA }
+| SQL SECURITY { DEFINER | INVOKER }
+| COMMENT 'string'
+```
+
+调用过程的语法如下：
+
+```sql
+CALL sp_name([parameter[,...]])
+```
+
+删除存储过程或者函数
+
+```sql
+DROP {PROCEDURE | FUNCTION} [IF EXISTS] sp_name
+```
+
+查看存储过程或者函数
+
+```sql
+-- 查看存储过程或者函数的状态
+SHOW {PROCEDURE | FUNCTION} STATUS [LIKE 'pattern']
+-- 查看存储过程或者函数的定义
+SHOW CREATE {PROCEDURE | FUNCTION} sp_name
+-- 通过查看information_schema. Routines 了解存储过程和函数的信息
+select * from routines where ROUTINE_NAME = 'film_in_stock' \G
+```
+
+变量的使用:
+
+```sql
+-- 定义变量
+DECLARE var_name[,...] type [DEFAULT value]
+-- 变量赋值
+SET var_name = expr [, var_name = expr] ...
+```
+
+定义条件和处理：
+
+```sql
+-- 条件的定义
+DECLARE condition_name CONDITION FOR condition_value
+condition_value:
+SQLSTATE [VALUE] sqlstate_value
+| mysql_error_code
+-- 条件的处理
+DECLARE handler_type HANDLER FOR condition_value[,...] sp_statement
+handler_type:
+CONTINUE
+| EXIT
+| UNDO
+condition_value:
+SQLSTATE [VALUE] sqlstate_value
+| condition_name
+| SQLWARNING
+| NOT FOUND
+| SQLEXCEPTION
+| mysql_error_code
+```
+
+光标的使用：
+
+```sql
+-- 声明光标
+DECLARE cursor_name CURSOR FOR select_statement
+OPEN cursor_name
+FETCH cursor_name INTO var_name [, var_name] ...
+CLOSE cursor_name
+```
+
+流程控制：可以使用IF、CASE、LOOP、LEAVE、ITERATE、REPEAT 及WHILE 语句进行流程的控制
+
+```sql
+-- IF 语句
+IF search_condition THEN statement_list
+[ELSEIF search_condition THEN statement_list] ...
+[ELSE statement_list]
+END IF
+-- CASE 语句
+CASE case_value
+WHEN when_value THEN statement_list
+[WHEN when_value THEN statement_list] ...
+[ELSE statement_list]
+END CASE
+Or:
+CASE
+WHEN search_condition THEN statement_list
+[WHEN search_condition THEN statement_list] ...
+[ELSE statement_list]
+END CASE
+-- LOOP 语句
+[begin_label:] LOOP
+statement_list
+END LOOP [end_label]
+-- LEAVE 语句用来从标注的流程构造中退出，就像Java中的break。
+-- ITERATE 语句必须用在循环中，作用是跳过当前循环的剩下的语句，直接进入下一轮循环，Java中的continue
+-- REPEAT 语句
+[begin_label:] REPEAT
+statement_list
+UNTIL search_condition
+END REPEAT [end_label]
+-- WHILE 语句
+[begin_label:] WHILE search_condition DO
+statement_list
+END WHILE [end_label]
+```
+
+# 13 触发器
+
+## 13.1 创建触发器
+
+```sql
+CREATE TRIGGER trigger_name trigger_time trigger_event
+ON tbl_name FOR EACH ROW trigger_stmt
+```
+
+trigger_time 是触发器的触发时间，可以是BEFORE 或者AFTER，BEFORE 的含义指在检查约束前触发，而AFTER 是在检查约束后触发。而trigger_event 就是触发器的触发事件，可以是INSERT、UPDATE 或者DELETE。对同一个表相同触发时间的相同触发事件，只能定义一个触发器。
+
+删除触发器：
+
+```sql
+DROP TRIGGER [schema_name.]trigger_name
+```
+
+# 14 事务控制和锁定语句
+
+## 14.1 LOCK TABLE 和UNLOCK TABLE
+
+LOCK TABLES 可以锁定用于当前线程的表。如果表被其他线程锁定，则当前线程会等待，直到可以获取所有锁定为止。UNLOCK TABLES 可以释放当前线程获得的任何锁定。当前线程执行另一个LOCK TABLES 时，或当与服务器的连接被关闭时，所有由当前线程锁定的表被隐含地解锁，具体语法如下：
+
+```sql
+LOCK TABLES
+tbl_name [AS alias] {READ [LOCAL] | [LOW_PRIORITY] WRITE}
+[, tbl_name [AS alias] {READ [LOCAL] | [LOW_PRIORITY] WRITE}] ...
+UNLOCK TABLES
+```
+
+## 14.2 事务控制
+
+MySQL 通过SET AUTOCOMMIT、START TRANSACTION、COMMIT 和ROLLBACK 等语句支持本地事务，具体语法如下。
+
+```sql
+START TRANSACTION | BEGIN [WORK]
+COMMIT [WORK] [AND [NO] CHAIN] [[NO] RELEASE]
+ROLLBACK [WORK] [AND [NO] CHAIN] [[NO] RELEASE]
+SET AUTOCOMMIT = {0 | 1}
+```
+
+- START TRANSACTION 或BEGIN 语句可以开始一项新的事务
+- COMMIT 和ROLLBACK 用来提交或者回滚事务。
+- CHAIN 和RELEASE 子句分别用来定义在事务提交或者回滚之后的操作，CHAIN 会立即启动一个新事物，并且和刚才的事务具有相同的隔离级别，RELEASE 则会断开和客户端的连接。
+- SET AUTOCOMMIT 可以修改当前连接的提交方式，如果设置了SET AUTOCOMMIT=0，
+  则设置之后的所有事务都需要通过明确的命令进行提交或者回滚
+
+![image-20191111163123622](picture\image-20191111163123622.png)
+
+![image-20191111163557535](picture\image-20191111163557535.png)
+
+在同一个事务中，最好不使用不同存储引擎的表，否则ROLLBACK 时需要对非事务类型的表进行特别的处理，因为COMMIT、ROLLBACK 只能对事务类型的表进行提交和回滚。
+
+在事务中可以通过定义SAVEPOINT，指定回滚事务的一个部分，但是不能指定提交事务的一个部分。对于复杂的应用，可以定义多个不同的SAVEPOINT，满足不同的条件时，回滚不同的SAVEPOINT。需要注意的是，如果定义了相同名字的SAVEPOINT，则后面定义的SAVEPOINT 会覆盖之前的定义。对于不再需要使用的SAVEPOINT，可以通过RELEASESAVEPOINT 命令删除SAVEPOINT，删除后的SAVEPOINT，不能再执行ROLLBACK TO SAVEPOINT命令。
+
+## 14.3 分布式事务的使用
+
+### 14.3.1 分布式事务的原理
+
+在MySQL 中，使用分布式事务的应用程序涉及一个或多个资源管理器和一个事务管理器。
+
+- 资源管理器（RM）用于提供通向事务资源的途径。数据库服务器是一种资源管理器。该管理器必须可以提交或回滚由RM 管理的事务。例如，多台MySQL 数据库作为多台资源管理器或者几台Mysql 服务器和几台Oracle 服务器作为资源管理器。
+- 事务管理器（TM）用于协调作为一个分布式事务一部分的事务。TM 与管理每个事务的RMs 进行通讯。一个分布式事务中各个单个事务均是分布式事务的“分支事务”。分布式事务和各分支通过一种命名方法进行标识。
+
+要执行一个分布式事务，必须知道这个分布式事务涉及到了哪些资源管理器，并且把每个资源管理器的事务执行到事务可以被提交或回滚时。根据每个资源管理器报告的有关执行情况的内容，这些分支事务必须作为一个原子性操作全部提交或回滚。要管理一个分布式事务，必须要考虑任何组件或连接网络可能会故障。
+
+用于执行分布式事务的过程使用两阶段提交，发生时间在由分布式事务的各个分支需要进行的行动已经被执行之后。
+
+- 在第一阶段，所有的分支被预备好。即它们被TM 告知要准备提交。通常，这意味着用于管理分支的每个RM 会记录对于被稳定保存的分支的行动。分支指示是否它们可以这么做。这些结果被用于第二阶段。
+- 在第二阶段，TM 告知RMs 是否要提交或回滚。如果在预备分支时，所有的分支指
+  示它们将能够提交，则所有的分支被告知要提交。如果在预备时，有任何分支指示它将不能
+  提交，则所有分支被告知回滚。
+
+# 15 SQL中的安全问题
+
+## 15.1 SQL注入简介
+
+SQL Injection 就是利用某些数据库的外部接口将用户数据插入到实际的数据库操作语言（SQL）当中，从而达到入侵数据库乃至操作系统的目的。它的产生主要是由于程序对用户输入的数据没有进行严格的过滤，导致非法数据库查询语句的执行。
+
+## 15.2 应用开发中可以采取的对应措施
+
+### 15.2.1 PrepareStatement+Bind-variable
+
+```Java
+String sql = "select * from users u where u.id = ? and u.password = ?";
+preparedstatement ps = connection.preparestatement(sql);
+ps.setint(1,id);
+ps.setstring(2,pwd);
+resultset rs = ps.executequery();
+```
+
+# 16 SQLMode及相关问题
+
+SQL Mode 定义了MySQL 应支持的SQL 语法、数据校验等，这样可以更容易地在不同的环境中使用MySQL。
+
+## 16.1 MySQL SQL Mode 简介
+
+- 通过设置SQL Mode，可以完成不同严格程度的数据校验，有效地保障数据准确性。
+- 通过设置SQL Mode 为ANSI 模式，来保证大多数SQL 符合标准的SQL 语法,这样应用在不同数据库之间进行迁移时，则不需要对业务SQL 进行较大的修改。
+- 在不同数据库之间进行数据迁移之前，通过设置SQL Mode 可以使MySQL 上的数据更方便地迁移到目标数据库中。
+
+在MySQL 5.0 上， 查询默认的SQL Mode （ sql_mode 参数） 为： REAL_AS_FLOAT、PIPES_AS_CONCAT、ANSI_QUOTES、GNORE_SPACE 和ANSI。在这种模式下允许插入超过字段长度的值， 只是在插入后， MySQL 会返回一个warning 。通过修改sql_mode 为STRICT_TRANS_TABLES（严格模式）实现了数据的严格校验，使错误数据不能插入表中，从而保证了数据的准确性，具体实现如下。
+
+查看SQL Mode命令：select @@sql_mode;
+
+## 16.2 常用的SQL Mode
+
+| sql_mode            | 描述                                                         |
+| ------------------- | ------------------------------------------------------------ |
+| ANSI                | 等同于REAL_AS_FLOAT、PIPES_AS_CONCAT、ANSI_QUOTES、IGNORE_SPACE 和ANSI组合模式，这种模式使语法和行为更符合标准的SQL |
+| STRICT_TRANS_TABLES | STRICT_TRANS_TABLES 适用于事务表和非事务表，它是严格模式，不允许非法日期，也不允许超过字段长度的值插入字段中，对于插入不正确的值给出错误而不是警告 |
+| TRADITIONAL         | TRADITIONAL 模式等同于STRICT_TRANS_TABLES、STRICT_ALL_TABLES、NO_ZERO_IN_DATE、NO_ZERO_DATE、ERROR_FOR_DIVISION_BY_ZERO、TRADITIONAL和NO_AUTO_CREATE_USER 组合模式，所以它也是严格模式，对于插入不正确的值是给出错误而不是警告。可以应用在事务表和非事务表，用在事务表时，只要出现错误就会立即回滚 |
+
+# 17 常用sql技巧和常见问题
+
+## 17.1 正则表达式的使用
+
+| 序列   | 序列说明                      |
+| ------ | ----------------------------- |
+| ^      | 在字符串的开始处进行匹配      |
+| $      | 在字符串的末尾处进行匹配      |
+| .      | 匹配任意单个字符，包括换行符  |
+| [...]  | 匹配出括号内的任意字符        |
+| [^...] | 匹配不出括号内的任意字符      |
+| a*     | 匹配零个或多个a（包括空串）   |
+| a+     | 匹配1 个或多个a（不包括空串） |
+| a?     | 匹配1 个或零个a               |
+| a1\|a2 | 匹配a1 或a2                   |
+| a(m)   | 匹配m 个a                     |
+| a(m,)  | 匹配m 个或更多个a             |
+| a(m,n) | 匹配m 到n 个a                 |
+| a(,n)  | 匹配0 到n 个a                 |
+| (...)  | 将模式元素组成单一元素        |
+
+## 17.3  利用GROUP BY 的WITH ROLLUP 子句做统计
+
+GROUP BY对数据进行统计，而WITH ROLLUP是对group by之后的数据再次进行统计，就像Excel一样。
+
+```MySQL
+mysql> select year, country, product, sum(profit) from sales group by year, country, product
+with rollup;
++------+---------+---------+-------------+
+| year | country | product | sum(profit) |
++------+---------+---------+-------------+
+| 2004 | china | tnt1 | 2001 |
+| 2004 | china | tnt2 | 2002 |
+| 2004 | china | tnt3 | 2003 |
+| 2004 | china | | 6006 |
+| 2004 | | | 6006 |
+| 2005 | china | tnt1 | 4011 |
+| 2005 | china | tnt2 | 4013 |
+| 2005 | china | tnt3 | 4015 |
+| 2005 | china | | 12039 |
+| 2005 | | | 12039 |
+| 2006 | china | tnt1 | 2010 |
+| 2006 | china | tnt2 | 2011 |
+| 2006 | china | tnt3 | 2012 |
+| 2006 | china | | 6033 |
+| 2006 | | | 6033 |
+| NULL | | | 24078 |
++------+---------+---------+-------------+
+```
+
+## 17.5 数据库名、表名大小写问题
+
+在MySQL 中，数据库对应操作系统下的数据目录。数据库中的每个表至少对应数据库目录中的一个文件（也可能是多个，这取决于存储引擎）。因此，所使用操作系统的大小写敏感性决定了数据库名和表名的大小写敏感性。在大多数UNIX 环境中，由于操作系统对大小写的敏感性导致了数据库名和表名对大小写敏感性，而在Windows 中由于操作系统本身对大小写不敏感，因此在Windows 下MySQL 数据库名和表名对大小写也不敏感。
+
+列、索引、存储子程序和触发器名在任何平台上对大小写不敏感。默认情况下，表别名在UNIX 中对大小写敏感，但在Windows 或Mac OS X 中对大小写不敏感。
+
+# 18 SQL优化
+
+## 18.1 优化SQL语句的一般步骤
+
+### 18.1.1 通过show status命令了解各种SQL的执行频率
+
+显示当前session中所有统计信息：
+
+```sql
+mysql> show status like 'Com_%';
++-------------------------------------+-------+
+| Variable_name                       | Value |
++-------------------------------------+-------+
+| Com_admin_commands                  | 0     |
+| Com_assign_to_keycache              | 0     |
+| Com_alter_db                        | 0     |
+| Com_alter_event                     | 0     |
+| Com_alter_function                  | 0     |
+| Com_alter_instance                  | 0     |
+| Com_alter_procedure                 | 0     |
+| Com_alter_resource_group            | 0     |
+| Com_alter_server                    | 0     |
+| Com_alter_table                     | 0     |
+| Com_alter_tablespace                | 0     |
+| Com_alter_user                      | 0     |
+| Com_alter_user_default_role         | 0     |
+| Com_analyze                         | 0     |
+| Com_begin                           | 0     |
+| Com_binlog                          | 0     |
+| Com_call_procedure                  | 0     |
+| Com_change_db                       | 1     |
+```
+
+Com_xxx 表示每个xxx 语句执行的次数，我们通常比较关心的是以下几个统计参数。
+
+Innodb_rows_read：select 查询返回的行数。
+Innodb_rows_inserted：执行INSERT 操作插入的行数。
+Innodb_rows_updated：执行UPDATE 操作更新的行数。
+Innodb_rows_deleted：执行DELETE 操作删除的行数。
+
+Connections：试图连接MySQL 服务器的次数。
+Uptime：服务器工作时间。
+Slow_queries：慢查询的次数。
+
+### 18.1.2 定位执行效率较低的SQL语句
+
+可以通过以下两种方式定位执行效率较低的SQL 语句。
+
+- 通过慢查询日志定位那些执行效率较低的SQL 语句，用--log-slow-queries[=file_name]选项启动时，mysqld 写一个包含所有执行时间超过long_query_time 秒的SQL 语句的日志文件。具体可以查看本书第26 章中日志管理的相关部分。
+- 慢查询日志在查询结束以后才纪录，所以在应用反映执行效率出现问题的时候查询慢查询日志并不能定位问题，可以使用show processlist 命令查看当前MySQL 在进行的线程，包括线程的状态、是否锁表等，可以实时地查看SQL 的执行情况，同时对一些锁表操作进行优化。
+
+### 18.1.3 通过EXPLAIN分析低效SQL的执行计划
+
+通过以上步骤查询到效率低的SQL 语句后，可以通过EXPLAIN 或者DESC 命令获取MySQL如何执行SELECT 语句的信息，包括在SELECT 语句执行过程中表如何连接和连接的顺序
+
+```sql
+mysql> explain select * from test \G;
+*************************** 1. row ***************************
+           id: 1
+  select_type: SIMPLE
+        table: test
+   partitions: NULL
+         type: ALL
+possible_keys: NULL
+          key: NULL
+      key_len: NULL
+          ref: NULL
+         rows: 5
+     filtered: 100.00
+        Extra: NULL
+1 row in set, 1 warning (0.00 sec)
+```
+
+- select_type：表示SELECT 的类型，常见的取值有SIMPLE（简单表，即不使用表连接或者子查询）、PRIMARY（主查询，即外层的查询）、UNION（UNION 中的第二个或者后面的查询语句）、SUBQUERY（子查询中的第一个SELECT）等。
+- table：输出结果集的表
+- type：表示表的连接类型，性能由好到差的连接类型为system（表中仅有一行，即常量表）、const（单表中最多有一个匹配行，例如primary key 或者unique index）、eq_ref（对于前面的每一行，在此表中只查询一条记录，简单来说，就是多表连接中使用primary key或者unique index）、re（f 与eq_ref类似，区别在于不是使用primarykey 或者unique index，而是使用普通的索引）、ref_or_null（与ref 类似，区别在于条件中包含对NULL 的查询）、index_merge(索引合并优化)、unique_subquery（in的后面是一个查询主键字段的子查询）、index_subquery（与unique_subquery 类似，区别在于in 的后面是查询非唯一索引字段的子查询）、range（单表中的范围查询）、index（对于前面的每一行，都通过查询索引来得到数据）、all（对于前面的每一行，都通过全表扫描来得到数据）。
+- possible_keys：表示查询时，可能使用的索引。
+- key：表示实际使用的索引
+- key_len：索引字段的长度
+- rows：扫描行的数量
+- Extra：执行情况的说明和描述
+
+### 18.1.4 确定问题并采取相应的优化措施
+
+经过以上步骤，基本就可以确认问题出现的原因。此时用户可以根据情况采取相应的措施，进行优化提高执行的效率。
+
+## 18.2 索引问题
+
+MySQL 中索引的存储类型目前只有两种（BTREE 和HASH），具体和表的存储引擎相关：MyISAM 和InnoDB 存储引擎都只支持BTREE 索引；MEMORY/HEAP 存储引擎可以支持HASH和BTREE 索引。
+
+**存在索引但不是用索引**
+
+- 如果MySQL 估计使用索引比全表扫描更慢，则不使用索引
+- 如果使用MEMORY/HEAP 表并且where 条件中不使用“=”进行索引列，那么不会用到索引。heap 表只有在“=”的条件下才会使用索引。
+- 用or 分割开的条件，如果or 前的条件中的列有索引，而后面的列中没有索引，那么涉及到的索引都不会被用到
+- 如果不是索引列的第一部分，即where中的条件不是索引中的第一列
+- 如果like 是以％开始
+- 如果列类型是字符串，那么一定记得在where 条件中把字符常量值用引号引起来，否则的话即便这个列上有索引，MySQL 也不会用到的，因为，MySQL 默认把输入的常量值进行转换以后才进行检索
+
+### 18.2.3 查看索引使用情况
+
+如果索引正在工作，Handler_read_key 的值将很高，这个值代表了一个行被索引值读的次数，很低的值表明增加索引得到的性能改善不高，因为索引并不经常使用
+
+## 18.3 两个简单实用的优化方法
+
+### 18.3.1 定期分析表和检查表
+
+ANALYZE [LOCAL | NO_WRITE_TO_BINLOG] TABLE tbl_name [, tbl_name] ...
+
+```MySQL
+mysql> analyze table test;
++-----------+---------+----------+----------+
+| Table     | Op      | Msg_type | Msg_text |
++-----------+---------+----------+----------+
+| test.test | analyze | status   | OK       |
++-----------+---------+----------+----------+
+1 row in set (0.03 sec)
+
+mysql> check table test;
++-----------+-------+----------+----------+
+| Table     | Op    | Msg_type | Msg_text |
++-----------+-------+----------+----------+
+| test.test | check | status   | OK       |
++-----------+-------+----------+----------+
+1 row in set (0.00 sec)
+```
+
+### 18.3.2 定期优化表
+
+OPTIMIZE [LOCAL | NO_WRITE_TO_BINLOG] TABLE tbl_name [, tbl_name] ...
+
+```MySQL
+mysql> optimize table test;
++-----------+----------+----------+-------------------------------------------------------------------+
+| Table     | Op       | Msg_type | Msg_text                                                          |
++-----------+----------+----------+-------------------------------------------------------------------+
+| test.test | optimize | note     | Table does not support optimize, doing recreate + analyze instead |
+| test.test | optimize | status   | OK                                                                |
++-----------+----------+----------+-------------------------------------------------------------------+
+2 rows in set (0.25 sec)
+```
+
+需要先修改存储引擎在优化。
+
+## 18.4 常用SQL 的优化
+
+### 18.4.1 大批量插入数据
+
+当用load 命令导入数据的时候，适当的设置可以提高导入的速度。
+对于MyISAM 存储引擎的表，可以通过以下方式快速的导入大量的数据。
+
+```MySQL
+ALTER TABLE tbl_name DISABLE KEYS;
+loading the data
+ALTER TABLE tbl_name ENABLE KEYS;
+```
+
+DISABLE KEYS 和ENABLE KEYS 用来打开或者关闭MyISAM 表非唯一索引的更新。在导入大量的数据到一个非空的MyISAM 表时，通过设置这两个命令，可以提高导入的效率。对于导入大量数据到一个空的MyISAM 表，默认就是先导入数据然后才创建索引的，所以不用进行设置。
+
+可以有以下几种方式提高InnoDB表的导入效率：
+
+- 因为InnoDB 类型的表是按照主键的顺序保存的，所以将导入的数据按照主键的顺序排列，可以有效地提高导入数据的效率。
+- 在导入数据前执行SET UNIQUE_CHECKS=0，关闭唯一性校验，在导入结束后执行SET UNIQUE_CHECKS=1，恢复唯一性校验，可以提高导入的效率。
+- 如果应用使用自动提交的方式，建议在导入前执行SET AUTOCOMMIT=0，关闭自动提交，导入结束后再执行SET AUTOCOMMIT=1，打开自动提交，也可以提高导入的效率。
+
+### 18.4.2 优化INSERT 语句
+
+- 如果同时从同一客户插入很多行，尽量使用多个值表的INSERT 语句，这种方式将大大缩减客户端与数据库之间的连接、关闭等消耗，使得效率比分开执行的单个INSERT 语句快(在一些情况中几倍)
+- 如果从不同客户插入很多行，能通过使用INSERT DELAYED 语句得到更高的速度。DELAYED 的含义是让INSERT 语句马上执行，其实数据都被放在内存的队列中，并没有真正写入磁盘，这比每条语句分别插入要快的多；LOW_PRIORITY 刚好相反，在所有其他用户对表的读写完后才进行插入；
+- 将索引文件和数据文件分在不同的磁盘上存放（利用建表中的选项）
+- 如果进行批量插入，可以增加bulk_insert_buffer_size 变量值的方法来提高速度，但是，这只能对MyISAM 表使用；
+- 当从一个文本文件装载一个表时，使用LOAD DATA INFILE。这通常比使用很多INSERT 语句快20 倍。
+
+### 18.4.3 优化GROUP BY 语句
+
+GROUP BY 后加上ORDER BY NULL禁止排序。
+
+### 18.4.5 优化嵌套查询
+
+有些情况下，子查询可以被更有效率的连接（JOIN）替代，连接（JOIN）之所以更有效率一些，是因为MySQL 不需要在内存中创建临时表来完成这个逻辑上的需要两个步骤的查询工作。
+
+### 18.4.6 MySQL 如何优化OR 条件
+
+对于含有OR 的查询子句，如果要利用索引，则OR 之间的每个条件列都必须用到索引；如果没有索引，则应该考虑增加索引。
+
+### 18.4.7 使用SQL 提示
+
+#### 1. USE INDEX
+
+在查询语句中表名的后面，添加USE INDEX 来提供希望MySQL 去参考的索引列表，就可以让MySQL 不再考虑其他可用的索引。
+
+```MySQL
+mysql> explain select * from sales2 use index (ind_sales2_id) where id = 3\G;
+*************************** 1. row ***************************
+id: 1
+select_type: SIMPLE
+table: sales2
+type: ref
+possible_keys: ind_sales2_id
+key: ind_sales2_id
+key_len: 5
+ref: const
+rows: 1
+Extra: Using where
+1 row in set (0.00 sec).
+```
+
+#### 2．IGNORE INDEX
+
+如果用户只是单纯地想让MySQL 忽略一个或者多个索引，则可以使用IGNORE INDEX 作为HINT。
+
+```MySQL
+explain select * from sales2 ignore index (ind_sales2_id) where id = 3\G;
+```
+
+#### 3．FORCE INDEX
+
+为强制MySQL 使用一个特定的索引，可在查询中使用FORCE INDEX 作为HINT。
+
+```MySQL
+mysql> explain select * from sales2 force index (ind_sales2_id) where id > 0
+```
+
+# 19 优化数据库对象
+
+## 19.1 优化表的数据类型
+
+在MySQL 中，可以使用函数PROCEDURE ANALYSE()对当前应用的表进行分析，该函数可以对数据表中列的数据类型提出优化建议，用户可以根据应用的实际情况酌情考虑是否实施优化。
+
+## 19.2 通过拆分提高表的访问效率
+
+第一种方法是垂直拆分，即把主码和一些列放到一个表，然后把主码和另外的列放到另一个表中
+
+第二种方法是水平拆分，即根据一列或多列数据的值把数据行放到两个独立的表中
+
+## 19.3 逆规范化
+
+满足范式的表会产生很多关系，对于查询很不利，适当逆规范化可以减少这些关系，加快查询速度。
+
+## 19.4 使用中间表提高统计查询速度
+
+对于数据量较大的表，在其上进行统计查询通常会效率很低，并且还要考虑统计查询是否会对在线的应用产生负面影响。通常在这种情况下，使用中间表可以提高统计查询的效率。
+
+# 21 优化MySQL Server
+
+## 21.1 查看MySQL Server 参数
+
+MySQL 服务启动后，我们可以用SHOW VARIABLES 和SHOW STATUS 命令查看MySQL 的服务器静态参数值和动态运行状态信息。
+
+## 21.2 影响MySQL 性能的重要参数
+
+这些参数分为两部分，前两节介绍的参数“key_buffer_size”和“table_cache”仅仅适用于MyISAM 存储引擎；后面几节介绍的也仅仅适用于InnoDB 存储引擎，这些参数很容易辨认，因为它们都是以“innodb_”开始。
+
+### 21.2.1 key_buffer_size 的设置
+
+从以上定义可以看出，这个参数是用来设置索引块（Index Blocks）缓存的大小，它被所有线程共享，此参数只适用于MyISAM 存储引擎
+
+### 21.2.2 table_cache 的设置
+
+这个参数表示数据库用户打开表的缓存数量。每个连接进来，都会至少打开一个表缓存。因此，table_cache 与max_connections 有关，例如，对于200 个并行运行的连接，应该让表的缓存至少有200×N，这里N 是可以执行的查询的一个联接中表的最大数量。此外，还需要为临时表和文件保留一些额外的文件描述符。
+
+### 21.2.3 innodb_buffer_pool_size 的设置
+
+这个参数定义了InnoDB 存储引擎的表数据和索引数据的最大内存缓冲区大小。和MyISAM 存储引擎不同，MyISAM 的key_buffer_size 只缓存索引键，而innodb_buffer_pool_size却是同时为数据块和索引块做缓存，这个特性和Oracle 是一样的。这个值设得越高，访问表中数据需要的磁盘I/O 就越少。在一个专用的数据库服务器上，可以设置这个参数达机器物理内存大小的80%。尽管如此，还是建议用户不要把它设置得太大，因为对物理内存的竞争可能在操作系统上导致内存调度。
+
+### 21.2.4 innodb_flush_log_at_trx_commit 的设置
+
+这个参数是用来控制缓冲区中的数据写入到日志文件以及日志文件数据刷新到磁盘的操作时机。对这个参数的设置可以对数据库在性能与数据安全之间进行折中。
+
+- 当这个参数是0 的时候，日志缓冲每秒一次地被写到日志文件，并且对日志文件做向磁盘刷新的操作，但是在一个事务提交不做任何操作。
+- 当这个参数是1 的时候，在每个事务提交时，日志缓冲被写到日志文件，并且对日志文件做向磁盘刷新的操作。
+- 当这个参数是2 的时候，在每个事务提交时，日志缓冲被写到日志文件，但不对日志文件做向磁盘刷新的操作，对日志文件每秒向磁盘做一次刷新操作。
+
+innodb_flush_log_at_trx_commit 参数的默认值是1，也是最安全的设置，即每个事务提交的时候都会从log buffer 写到日志文件，而且会实际刷新磁盘，但是这样性能有一定的损失。
+
+### 21.2.5 innodb_additional_mem_pool_size 的设置
+
+这个参数是InnoDB 存储引擎用来存储数据库结构和其他内部数据结构的内存池的大小，其默认值是1MB。应用程序里的表越多，则需要在这里分配越多的内存。如果InnoDB 用光了这个池内的内存，则InnoDB 开始从操作系统分配内存，并且往MySQL 错误日志写警告信息。没有必要给这个缓冲池分配非常大的空间，在应用相对稳定的情况下，这个缓冲池的大小也相对稳定，系统默认值是1MB。
+
+### 21.2.6 innodb_lock_wait_timeout 的设置
+
+MySQL 可以自动地监测行锁导致的死锁并进行相应的处理，但是对于表锁导致的死锁不能自动的监测，所以该参数主要被用于在出现类似情况的时候等待指定的时间后回滚。系统默认值是50 秒，用户可以根据应用的需要进行调整。
+
+### 21.2.7 innodb_support_xa 的设置
+
+通过该参数设置是否支持分布式事务，默认值是ON 或者1，表示支持分布式事务。如果确认应用中不需要使用分布式事务，则可以关闭这个参数，减少磁盘刷新的次数并获得更好的InnoDB 性能。
+
+### 21.2.8 innodb_log_buffer_size 的设置
+
+从参数名称可以显而易见看出，含义是日志缓存的大小。默认的设置在中等强度写入负载以及较短事务的情况下，一般都可以满足服务器的性能要求。如果存在更新操作峰值或者负载较大，就应该考虑加大它的值了。如果它的值设置太高了，可能会浪费内存，因为它每秒都会刷新一次，因此无需设置超过1 秒所需的内存空间。通常设置为8～16MB 就足够了。越小的系统它的值越小。系统默认值是1MB。
+
+### 21.2.9 innodb_log_file_size 的设置
+
+该参数含义是一个日志组（log group）中每个日志文件的大小。此参数在高写入负载尤其是大数据集的情况下很重要。这个值越大则性能相对越高，但是带来的副作用是，当系统灾难时恢复时间会加大。系统默认值是5MB。
+
+# 27 备份与恢复
+
+## 27.1 备份/恢复策略
+
+ 备份指定的数据库，或者此数据库中某些表。
+shell> mysqldump [options] db_name [tables]
+ 备份指定的一个或多个数据库。
+shell> mysqldump [options] ---database DB1 [DB2 DB3...]
+ 备份所有数据库。
+shell> mysqldump [options] --all--database
