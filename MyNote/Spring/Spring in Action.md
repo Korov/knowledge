@@ -91,6 +91,35 @@ public static void main(String[] args) {
 
 [^这里使用了Spring的AOP配置命名空间把Minstrel bean声明为一个切面。首先，需要把Minstrel声明为一个bean，然后在<aop:aspect>元素中引用该bean。为了进一步定义切面，声明（使用<aop:before>）在embarkOnQuest()方法执行前调用Minstrel的singBeforeQuest()方法。这种方式被称为前置通知，同时声明（使用<aop:after>）在embarkQuest()方法执行后调用singAfterQuest()方法，这种方式被称为后置通知。]: 
 
+
+
+## 1.2 容纳你的bean
+
+Spring容器负责创建对象，装配他们，配置他们并管理他们的整个生命周期，从生存到死亡。
+
+### 1.2.1 使用应用上下文
+
+Spring自带了多种类型的应用上下文：
+
+- AnnotationConfigApplicationContext：从一个或多个基于Java的配置类中加载Spring应用上下文
+- AnnotationConfigWebApplicationContext：从一个或多个基于Java的配置类中加载Spring Web应用上下文
+- ClassPathXmlApplicationContext：从类路径下的一个或多个XML配置文件中加载上下文定义，把应用上下文的定义文件作为类资源
+- FileSystemXmlapplicationcontext：从文件系统的一个或多个XML配置文件中加载上下文定义
+- XmlWebApplicationContext：从Web应用下的一个或多个XML配置文件中加载上下文定义。
+
+### 1.2.2 bean的生命周期
+
+1. Spring对bean进行实例化
+2. Spring将值和bean的引用注入到bean对应的属性中
+3. 如果bean实现了BeanNameAware接口，Spring将bean的ID传递给setBeanName()方法
+4. 如果bean实现了BeanFactoryAware接口，Spring将调用setBeanFactory()方法，将BeanFactory容器实例传入
+5. 如果bean实现ApplicationContextAware接口，Spring将调用setApplicationContext()方法，将bean所在的应用上下文的引用传进来
+6. 如果bean实现了BeanPostProcessor接口，Spring将调用他们的postProcessBeforeInitialization()方法
+7. 如果bean实现了InitializingBean接口，Spring将调用他们的afterPropertiesSet()方法。类似的，如果bean使用init-method声明了初始化方法，该方法也会被调用
+8. 如果bean实现了BeanPostProcessor接口，Spring将调用他们的postProcessAfterInitization()方法
+9. 此时，bean已经准备就绪，可以被应用程序使用了，他们将一直驻留在应用上下文中，知道该应用上下文被销毁
+10. 如果bean实现了DisposableBean接口，Spring将调用destroy()接口方法。同样，如果bean使用destroy-method声明了销毁方法，该方法也会被调用。
+
 # 2.装配bean
 
 ## 2.1spring配置的可选方案
