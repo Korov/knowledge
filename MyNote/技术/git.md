@@ -923,9 +923,9 @@ $ git rebase master server
 
 
 
-# 4.问题处理
+## 4.问题处理
 
-## 4.1 git bash中文被转义
+### 4.1 git bash中文被转义
 
 在git bash界面右击Options...->Text 将Locale设置为zh_CN，将Character set设置为UTF-8。
 
