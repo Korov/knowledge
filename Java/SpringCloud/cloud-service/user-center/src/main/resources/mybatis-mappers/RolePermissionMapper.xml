@@ -15,7 +15,7 @@
 		</where>
 	</delete>
 
-	<select id="findPermissionsByRoleIds" resultType="SysPermission">
+	<select id="findPermissionsByRoleIds" resultType="com.cloud.model.user.SysPermission">
 		select p.* from
 		sys_permission p
 		inner join sys_role_permission rp on

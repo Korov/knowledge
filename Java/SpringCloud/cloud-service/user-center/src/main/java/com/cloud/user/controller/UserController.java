@@ -8,6 +8,10 @@ import com.cloud.model.user.LoginAppUser;
 import com.cloud.model.user.SysRole;
 import com.cloud.user.feign.SmsClient;
 import com.cloud.user.service.AppUserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.Set;
 
+@Api(value = "用户接口", tags = "用户接口的描述信息")
 @Slf4j
 @RestController
 public class UserController {
@@ -48,6 +53,11 @@ public class UserController {
         return appUserService.findUsers(params);
     }
 
+    @ApiOperation(value = "查询用户信息", notes = "根据用户id查询用户信息")
+//    此注解是用来测试用的，swagger ui访问此接口的时候会将此注解中的参数同时传递过来
+//    @ApiImplicitParams({
+//            @ApiImplicitParam(name = "User ID", dataType = "String", paramType = "query")
+//    })
     @PreAuthorize("hasAuthority('back:user:query')")
     @GetMapping("/users/{id}")
     public AppUser findUserById(@PathVariable Long id) {

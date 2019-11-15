@@ -16,7 +16,7 @@
 		<include refid="where" />
 	</select>
 
-	<select id="findData" resultType="SysRole">
+	<select id="findData" resultType="com.cloud.model.user.SysRole">
 		select * from sys_role t
 		<include refid="where" />
 		order by t.id desc
