@@ -43,6 +43,8 @@ stupefied_albattani : 容器名
 ```bash
 #docker进入容器的方式
 docker run -it mysql:8.0.11 /bin/bash
+#重启容器
+docker restart 容器名称或者容器id
 ```
 
 # 2 dockerfile
