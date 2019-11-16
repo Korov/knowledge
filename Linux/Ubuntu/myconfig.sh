@@ -10,6 +10,8 @@ add-apt-repository "deb [arch=amd64] https://mirrors.ustc.edu.cn/docker-ce/linux
 sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys BA300B7755AFCFAE
 sudo add-apt-repository 'deb http://typora.io linux/'
 
+sudo add-apt-repository "deb https://download.sublimetext.com/ apt/stable/"
+
 echo "update system"
 apt-get update -y
 apt-get upgrade -y
@@ -50,6 +52,9 @@ echo "install google chrome"
 wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb 
 sudo dpkg -i google-chrome*
 sudo apt-get install -f
+
+echo "install sublime text"
+sudo apt-get install sublime-text
 
 echo "install idea 2019.1"
 sudo tar -xvf ideaIU-2019.1-jbr11.tar.gz
