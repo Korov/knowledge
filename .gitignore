@@ -1,7 +1,12 @@
 /**/target
 /**/lib
+/**/out
+/**/build
 /**/logs
 *.iml
+*.iws
+*.ipr
 /**/.idea
+/**/.gradle
 *.log
 ~$*.docx
