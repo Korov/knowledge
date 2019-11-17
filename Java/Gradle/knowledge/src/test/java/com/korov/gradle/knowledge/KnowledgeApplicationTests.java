@@ -1,10 +1,10 @@
-package com.korov.knowledge;
+package com.korov.gradle.knowledge;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class KnowledgeApplicationTests {
+public class KnowledgeApplicationTests {
 
     @Test
     void contextLoads() {

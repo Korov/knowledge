@@ -1,0 +1,14 @@
+server:
+  port: 80
+spring:
+  #数据源
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/knowledge?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true
+    username: root
+    password: root123
+
+#mybatis
+mybatis:
+  mapper-locations: classpath*:mapper/*Mapper.xml #mapper文件路径
+  type-aliases-package: com.korov.gradle.knowledge.model   #来指明和数据库映射的实体的所在包。
