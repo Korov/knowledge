@@ -21,7 +21,6 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'mysql:mysql-connector-java'
-    runtimeOnly 'com.alibaba:druid:1.1.21'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
@@ -32,6 +31,7 @@ dependencies {
 test {
     useJUnitPlatform()
 }
+
 
 //所有项目共用的设置父类设置，子类直接继承
 allprojects {
