@@ -8,23 +8,35 @@ group 'com.korov.gradle'
 version '1.0-SNAPSHOT'
 sourceCompatibility = '11'
 
+//jar依赖从哪里获取mavenLocal()先从本地找，找不到mavenCentral()从中央仓库下载
 repositories {
     mavenLocal()
     mavenCentral()
 }
 
+//依赖关系
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.1'
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'mysql:mysql-connector-java'
+    runtimeOnly 'com.alibaba:druid:1.1.21'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
         exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
     }
 }
 
+// 测试类使用
 test {
     useJUnitPlatform()
+}
+
+//所有项目共用的设置父类设置，子类直接继承
+allprojects {
+    //设置项目字符集为UTF-8
+    tasks.withType(JavaCompile) {
+        options.encoding = 'UTF-8'
+    }
 }
