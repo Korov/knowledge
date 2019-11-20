@@ -14,7 +14,8 @@ public class TimedRunTest {
         PrimeProducer producer = new PrimeProducer(queue);
         try {
             System.out.printf("main Thread:%s is start, time:%s\n", Thread.currentThread().getName(), System.currentTimeMillis());
-            timedRun(producer, 0, TimeUnit.MILLISECONDS);
+            // 在指定时间内运行一个Runnable
+            timedRun(producer, 100, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
             System.out.printf("main Thread:%s is interrupted, time:%s\n", Thread.currentThread().getName(), System.currentTimeMillis());
         }

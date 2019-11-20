@@ -1,33 +1,21 @@
 package com.korov.gradle.knowledge.accumulation.Thread.Thread1;
 
 public class ObjectLock {
-    private static final Object lock = new Object();
+    private static int value = 0;
 
-    static class ThreadA implements Runnable {
+    static class MyThread implements Runnable {
         @Override
         public void run() {
-            synchronized (ObjectLock.lock) {
-                for (int i = 0; i < 100; i++) {
-                    System.out.println("Thread A " + i);
-                }
-            }
-        }
-    }
-
-    static class ThreadB implements Runnable {
-        @Override
-        public void run() {
-            synchronized (ObjectLock.lock) {
-                for (int i = 0; i < 100; i++) {
-                    System.out.println("Thread B " + i);
-                }
+            while (ObjectLock.value < 100) {
+                System.out.println(java.lang.Thread.currentThread().getName() + ": " + ObjectLock.value++);
             }
         }
     }
 
     public static void main(String[] args) throws InterruptedException {
-        new Thread(new ThreadA()).start();
-        Thread.sleep(10);
-        new Thread(new ThreadB()).start();
+        new Thread(new MyThread(), "MyThread1").start();
+        new Thread(new MyThread(), "MyThread2").start();
+        new Thread(new MyThread(), "MyThread3").start();
+        new Thread(new MyThread(), "MyThread4").start();
     }
 }

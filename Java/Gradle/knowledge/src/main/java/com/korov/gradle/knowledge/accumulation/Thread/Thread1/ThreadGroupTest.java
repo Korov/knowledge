@@ -4,23 +4,24 @@ package com.korov.gradle.knowledge.accumulation.Thread.Thread1;
 public class ThreadGroupTest {
     public static void main(String[] args) {
         test1();
+        groupTest();
     }
 
     private static void test1() {
         Thread testThread = new Thread(() -> {
-            System.out.println("testThread当前线程组名字：" +
+            System.out.println("testThread Thread Group name:" +
                     Thread.currentThread().getThreadGroup().getName());
-            System.out.println("testThread线程名字：" +
+            System.out.println("testThread Thread name:" +
                     Thread.currentThread().getName());
-            System.out.println("testThread线程优先级：" +
+            System.out.println("testThread Thread Priority:" +
                     Thread.currentThread().getPriority());
         });
 
         testThread.start();
-        System.out.println("执行main方法线程名字：" + Thread.currentThread().getName());
+        System.out.println("exex main:" + Thread.currentThread().getName());
     }
 
-    public static void groupTest() {
+    private static void groupTest() {
         ThreadGroup threadGroup = new ThreadGroup("t1");
         threadGroup.setMaxPriority(6);
         Thread thread = new Thread(threadGroup, "thread");

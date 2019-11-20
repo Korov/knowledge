@@ -2,7 +2,7 @@ package com.korov.gradle.knowledge.accumulation.Thread.Latch;
 
 import java.util.concurrent.CountDownLatch;
 
-class TestHarness {
+class LatchTask {
     static long timeTasks(int threadNumber, Runnable task) throws InterruptedException {
         CountDownLatch startGate = new CountDownLatch(1);
         CountDownLatch endGate = new CountDownLatch(threadNumber);
