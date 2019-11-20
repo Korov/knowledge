@@ -1258,6 +1258,8 @@ public class RenderPageTask implements Callable<String> {
 
 ## 8.3 配置ThreadPoolExecutor
 
+**Executors创建线程池就是使用ThreadPoolExecutor实现的**
+
 ### 8.3.1 线程的创建与销毁
 
 线程池的基本大小（Core Pool Size）、最大大小（Maximum Pool Size）以及存活时间等因素共同负责线程的创建与销毁。基本大小也就是线程池的目标大小，即在没有任务执行时线程池的大小。线程池的最大大小表示可同时活动的线程数量的上限。如果某个线程的空闲时间超过了存活时间，那么将被标记为可回收的，并且当线程池的当前大小超过了基本大小时，这个线程将被终止。
