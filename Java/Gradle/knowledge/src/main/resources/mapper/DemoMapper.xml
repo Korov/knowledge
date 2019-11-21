@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.korov.gradle.knowledge.dao.DemoMapper">
+    <resultMap id="BaseResultMap" type="com.korov.gradle.knowledge.model.Demo">
+        <!--@mbg.generated-->
+        <result column="code" jdbcType="VARCHAR" property="code"/>
+        <result column="date" jdbcType="VARCHAR" property="date"/>
+        <result column="name" jdbcType="VARCHAR" property="name"/>
+        <result column="zhiwuleibie" jdbcType="VARCHAR" property="zhiwuleibie"/>
+        <result column="jutizhiwu" jdbcType="VARCHAR" property="jutizhiwu"/>
+        <result column="sex" jdbcType="VARCHAR" property="sex"/>
+        <result column="age" jdbcType="VARCHAR" property="age"/>
+        <result column="edu" jdbcType="VARCHAR" property="edu"/>
+        <result column="startdate" jdbcType="VARCHAR" property="startdate"/>
+        <result column="enddate" jdbcType="VARCHAR" property="enddate"/>
+        <result column="isDelete" jdbcType="VARCHAR" property="isdelete"/>
+    </resultMap>
+    <insert id="insert" parameterType="com.korov.gradle.knowledge.model.Demo">
+        <!--@mbg.generated-->
+        insert into demo (code, `date`, `name`,
+        zhiwuleibie, jutizhiwu, sex,
+        age, edu, startdate,
+        enddate, isDelete)
+        values (#{code,jdbcType=VARCHAR}, #{date,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR},
+        #{zhiwuleibie,jdbcType=VARCHAR}, #{jutizhiwu,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR},
+        #{age,jdbcType=VARCHAR}, #{edu,jdbcType=VARCHAR}, #{startdate,jdbcType=VARCHAR},
+        #{enddate,jdbcType=VARCHAR}, #{isdelete,jdbcType=VARCHAR})
+    </insert>
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT *
+        FROM demo
+    </select>
+</mapper>
