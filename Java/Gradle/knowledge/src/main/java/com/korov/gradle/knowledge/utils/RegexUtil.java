@@ -1,4 +1,4 @@
-package com.korov.springboot.util;
+package com.korov.gradle.knowledge.utils;
 
 import java.util.ArrayList;
 import java.util.List;
