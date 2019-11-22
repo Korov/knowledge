@@ -30,6 +30,7 @@ dependencies {
 // 测试类使用
 test {
     useJUnitPlatform()
+    exclude('**/daotest/')
 }
 
 

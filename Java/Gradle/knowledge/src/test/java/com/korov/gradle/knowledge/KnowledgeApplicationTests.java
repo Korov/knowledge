@@ -8,6 +8,7 @@ public class KnowledgeApplicationTests {
 
     @Test
     void contextLoads() {
+        System.out.println("start success!");
     }
 
 }
