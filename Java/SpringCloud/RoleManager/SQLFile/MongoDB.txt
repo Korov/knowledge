@@ -1,0 +1,7 @@
+show dbs;
+use test;
+db.user.insert({"id":"1","name":"ay","age":"26"});
+db.user.find();
+db.user.update({"id":"1"},{"id":"1","name":"ayupdated","age":"26"});
+show collections;
+db.user.remove({"id":"1"});

@@ -1,0 +1,11 @@
+spring:
+  application:
+    #对应config server所获取的配置文件
+    name: provider
+  cloud:
+    config:
+      #uri: http://192.168.106.141:3001/
+      uri: http://localhost:3001/
+      profile: dev
+      #指定Git仓库的分支，对应config server所获取的配置文件的label
+      label: master
