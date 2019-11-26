@@ -130,3 +130,10 @@ Redis可以存储键与5种不同数据结构类型之间的映射，这5种数�
 
 以下几个命令可以将元素从一个列表移动到另一个列表，或者阻塞执行命令的客户端直到有其他客户端给列表添加元素为止
 
+| 命令       | 描述                                                         | 示例                                  |
+| ---------- | ------------------------------------------------------------ | ------------------------------------- |
+| BLPOP      | 从第一个非空列表中弹出位于最左端的元素，或者在timeout秒之内阻塞并等待可弹出的元素出现 | blpop key [key ...] timeout           |
+| BRPOP      | 从第一个非空列表中弹出位于最右端的元素，或者在timeout秒之内阻塞并等待可弹出的元素出现 | brpop key [key ...] timeout           |
+| RPOPLPUSH  | 从source（key值）列表中弹出位于最右端的元素，然后将这个元素推入destination列表的最左端，并向用户返回这个元素 | rpoplpush source destination          |
+| BRPOPLPUSH | 从source（key值）列表中弹出位于最右端的元素，然后将这个元素推入destination列表的最左端，并向用户返回这个元素；如果source为空，那么在timeout秒之内阻塞并等待可弹出的元素出现 | brpoplpush source destination timeout |
+
