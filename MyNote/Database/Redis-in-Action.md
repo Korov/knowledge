@@ -438,4 +438,25 @@ Redis采用类类似关系数据库的方式来实现复制，使用一个主服
 
 ## 4.5 非事务型流水线
 
+ Redis是一种基于客户端-服务端模型以及请求/响应协议的TCP服务。这意味着通常情况下一个请求会遵循以下步骤 ：
+
+1.  客户端向服务端发送一个查询请求，并监听Socket返回，通常是以阻塞模式，等待服务端响应。 
+2.  服务端处理命令，并将结果返回给客户端 
+
+ Redis 管道技术可以在服务端未响应时，客户端可以继续向服务端发送请求，并最终一次性读取所有服务端的响应。 
+
 将多条命令一起传递到Redis执行，减少交互次数，可以极大提高Redis的性能。
+
+```Python
+import redis
+import time
+#使用管道执行一串命令，速度有明显提升
+r = redis.Redis(password='xiemanrui')
+s = time.time()
+p = r.pipeline()
+for i in range(10000):
+    p.set('foo', 'bar%s' % i)
+p.execute()
+print(time.time() - s)
+```
+
