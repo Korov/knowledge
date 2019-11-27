@@ -185,3 +185,15 @@ demo.txt  ks-script-0n44nrd1  ks-script-w6m6m_20
 ```
 
 ## 3.2 CMD和ENTRYPOINT 命令
+
+cmd给出的是一个容器的默认的可执行体。也就是容器启动以后，默认的执行的命令。重点就是这个“默认”。意味着，如果docker run没有指定任何的执行命令或者dockerfile里面也没有entrypoint，那么，就会使用cmd指定的默认的执行命令执行。同时也从侧面说明了entrypoint的含义，它才是真正的容器启动以后要执行命令。
+所以这句话就给出了cmd命令的一个角色定位，它主要作用是默认的容器启动执行命令。（注意不是“全部”作用）
+
+## 3.3 Redis
+
+进入Redis docker的命令：
+
+```bash
+docker exec -it containerID redis-cli
+```
+

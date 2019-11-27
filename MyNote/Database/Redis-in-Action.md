@@ -137,3 +137,305 @@ Redis可以存储键与5种不同数据结构类型之间的映射，这5种数�
 | RPOPLPUSH  | 从source（key值）列表中弹出位于最右端的元素，然后将这个元素推入destination列表的最左端，并向用户返回这个元素 | rpoplpush source destination          |
 | BRPOPLPUSH | 从source（key值）列表中弹出位于最右端的元素，然后将这个元素推入destination列表的最左端，并向用户返回这个元素；如果source为空，那么在timeout秒之内阻塞并等待可弹出的元素出现 | brpoplpush source destination timeout |
 
+## 3.3 集合
+
+| 命令        | 描述                                                         | 示例                            |
+| ----------- | ------------------------------------------------------------ | ------------------------------- |
+| SCARD       | 返回集合包含的元素的数量                                     | scard key                       |
+| SRANDMEMBER | 从集合里面随机地返回一个或多个元素，当count为正数时，命令返回的随机元素不会重复，当count为负数时，命令返回的随机元素可能会出现重复 | srandmember key [count]         |
+| SPOP        | 随机地移除集合中的一个或多个元素，并返回被移除的元素         | spop key [count]                |
+| SMOVE       | 如果集合source包含元素Item，那么从集合source里面移除元素item，并将元素添加到集合destination中；如果item被成功移除，那么命令返回1，否则返回0。 | smove source destination member |
+
+**用于组合和处理多个集合的Redis命令**
+
+| 命令        | 描述                                                         | 示例                                  |
+| ----------- | ------------------------------------------------------------ | ------------------------------------- |
+| SDIFF       | 返回那些存在第一个集合但并不存在于其他集合中的元素           | sdiffstore key [key ...]              |
+| SDIFFSTORE  | 将那些存在第一个集合但并不存在于其他集合中的元素存储到destination中，差集 | sdiffstore destination key [key ...]  |
+| SINTER      | 返回那些同时存在于所有集合中的元素，交集                     | sinter key [key ...]                  |
+| SINTERSTORE | 将那些同时存在于所有集合的元素存储到destination，交集        | sinterstore destination key [key ...] |
+| SUNION      | 返回那些至少存在于一个集合中的元素，并集                     | sunion key [key ...]                  |
+| SUNIONSTORE | 将那些至少存在于一个集合中的元素存储到destination中，并集    | sunion destination key [key ...]      |
+
+## 3.4 散列
+
+| 命令  | 描述                           | 示例                                    |
+| ----- | ------------------------------ | --------------------------------------- |
+| HMGET | 从散列里面获取一个或多个键的值 | hmget key field [field ...]             |
+| HMSET | 为散列里面的一个或多个键设置值 | hmset key field value [field value ...] |
+| HLEN  | 返回散列包含的键值对数量       | hlen key                                |
+
+**Redis散列的更高级特性**
+
+| 命令         | 描述                               | 示例                             |
+| ------------ | ---------------------------------- | -------------------------------- |
+| HEXISTS      | 检查给定键是否存在于散列中         | hexists key field                |
+| HKEYS        | 获取散列包含的所有键               | hkeys key                        |
+| HVALS        | 获取散列包含的所有值               | hvals key                        |
+| HGETALL      | 获取散列包含的所有键值对           | hgetall key                      |
+| HINCRBY      | 将键key存储的值加上整数increment   | hincrby key field increment      |
+| HINCRBYFLOAT | 将键key存储的值加上浮点数increment | hincrbyfloat key field increment |
+
+## 3.5 有序集合
+
+| 命令    | 描述                               | 示例                         |
+| ------- | ---------------------------------- | ---------------------------- |
+| ZCARD   | 返回有序集合包含的成员数量         | zcard key                    |
+| ZINCRBY | 将member成员的分值加上increment    | zincrby key increment member |
+| ZCOUNT  | 返回分值介于min和max之间的成员数量 | zcount key min max           |
+| ZRANK   | 返回成员member在有序集合中的排名   | zrank key member             |
+| ZSCORE  | 返回成员member的分值               | zscore key member            |
+
+**有序集合的范围型数据获取命令和范围型数据删除命令，以及并集命令和交集命令**
+
+| 命令             | 描述                                                         | 示例                                                         |
+| ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| ZREVERANK        | 返回有序集合里成员member的排名，成员按照分值从大到小排列     | zrevrank key member                                          |
+| ZREVRANGE        | 返回有序集合给定排名范围内的成员，成员按照分值从大到小       | zrevrange key start stop [withscores]                        |
+| ZRANGEBYSCORE    | 返回有序集合中，分值介于min和max之间的所有成员               | zrangebyscore key min max [withscores] [limit offset count]  |
+| ZREVRANGEBYSCORE | 获取有序集合中分值介于min和max之间的所有成员，并按照分值从大到小的顺序来返回他们 | zrevrangebyscore key min max [withscores] [limit offset count] |
+| ZREMRANGEBYRANK  | 移除有序集合中排名介于start和stop之间的所有成员              | zremrangebyrank key start stop                               |
+| ZREMRANGEBYSCORE | 移除有序集合中分值介于min和max之间的所有成员                 | zremrangebyscore key min max                                 |
+| ZINTERSTORE      | 对给定的有序集合执行类似于集合的交集运算，numkeys表示对多少个集合进行交集运算，sum表示对分值进行加操作（默认） | ZINTERSTORE destination numkeys key [key ...] [WEIGHTS weight] [AGGREGATE SUM\|MIN\|MAX] |
+| ZUNIONSTORE      | 对给定的有序集合执行类似于集合的并集运算                     | ZUNIONSTORE destination numkeys key [key ...] [WEIGHTS weight] [AGGREGATE SUM\|MIN\|MAX] |
+
+## 3.6 发布于订阅
+
+发布于订阅（pub/sub）的特点是订阅者（listener）负责订阅频道（channel），发送者（publisher）负责向频道发送二进制字符串消息（binary string message）。每当有消息被发送至给定频道时，频道所有订阅者都会收到消息。
+
+| 命令         | 描述                                                         | 示例                                 |
+| ------------ | ------------------------------------------------------------ | ------------------------------------ |
+| SUBSCRIBE    | 订阅给定的一个或多个频道                                     | subscribe channel [channel ...]      |
+| UNSUBSCRIBE  | 退订给定的一个或多个频道，如果执行时没有给定任何频道，那么退订所有频道 | unsubscribe [channel [channel ...]]  |
+| PUBLISH      | 向给定频道发送消息                                           | publish channel message              |
+| PSUBSCRIBE   | 订阅与给定模式想匹配的所有频道                               | psubscribe pattern [pattern ...]     |
+| PUNSUBSCRIBE | 退订给定的模式，如果执行时没有给定任何模式，那么退订所有模式 | punsubscribe [pattern [pattern ...]] |
+
+慎用：Redis系统的稳定性不高，过多的发布，很少的订阅，可能导致内存急剧膨胀，导致性能下降，甚至Redis直接被杀死。数据传输的可靠性不高，断线的时候有可能会丢失所有断线期间发布的消息。
+
+## 3.7 其他命令
+
+### 3.7.1 排序
+
+| 命令 | 描述                                                         | 示例                                                         |
+| ---- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| SORT | 根据给定的选项，对输入列表、集合或者有序集合进行排序，然后返回或者存储排序的结果 | sort key [by pattern] [limit offset count] [get pattern [get pattern ...]] [asc\|desc] [alpha] [store destination] |
+
+ 排序默认以数字作为对象，值被解释为双精度浮点数，然后进行比较 
+
+ 因为 SORT 命令默认排序对象为数字， 当需要对字符串进行排序时， 需要显式地在 SORT 命令之后添加 `ALPHA` 修饰符： SORT website ALPHA
+
+**使用外部key进行排序**
+
+![image-20191127150824089](picture\image-20191127150824089.png)
+
+将uid存入一个list中，把name和level存入字符串中，
+
+```bash
+lpush uid 1
+set user_name_1 admin
+set user_level_1 9999
+#下面依次是2,3,4
+```
+
+```bash
+redis 127.0.0.1:6379> SORT uid
+1) "1"      # admin
+2) "2"      # jack
+3) "3"      # peter
+4) "4"      # mary
+
+redis 127.0.0.1:6379> SORT uid BY user_level_*
+1) "2"      # jack , level = 10
+2) "3"      # peter, level = 25
+3) "4"      # mary, level = 70
+4) "1"      # admin, level = 9999
+```
+
+ `user_level_*` 是一个占位符， 它先取出 `uid` 中的值， 然后再用这个值来查找相应的键 ， 比如在对 `uid` 列表进行排序时， 程序就会先取出 `uid` 的值 `1` 、 `2` 、 `3` 、 `4` ， 然后使用 `user_level_1` 、 `user_level_2` 、 `user_level_3` 和 `user_level_4` 的值作为排序 `uid` 的权重。 
+
+**GET选项**
+
+ 使用 `GET` 选项， 可以根据排序的结果来取出相应的键值 ， 比如说， 以下代码先排序 `uid` ， 再取出键 `user_name_{uid}` 的值： 
+
+```bash
+redis 127.0.0.1:6379> SORT uid GET user_name_*
+1) "admin"
+2) "jack"
+3) "peter"
+4) "mary"
+
+#组合使用BY和GET
+redis 127.0.0.1:6379> SORT uid BY user_level_* GET user_name_*
+1) "jack"       # level = 10
+2) "peter"      # level = 25
+3) "mary"       # level = 70
+4) "admin"      # level = 9999
+```
+
+将哈希表作为GET或BY的参数
+
+```bash
+HMSET user_info_1 name admin level 9999
+#等
+redis 127.0.0.1:6379> SORT uid BY user_info_*->level
+1) "2"
+2) "3"
+3) "4"
+4) "1"
+
+redis 127.0.0.1:6379> SORT uid BY user_info_*->level GET user_info_*->name
+1) "jack"
+2) "peter"
+3) "mary"
+4) "admin"
+```
+
+### 3.7.2 基于Redis事务
+
+Redis有5个命令可以让用户在不被打断的情况下对多个键执行操作，他们分别是WATCH,MULTI,EXEC,UNWATCH和DISCARD。
+
+Redis的基本事务需要用到multi和exec命令，这种事务可以让一个客户端在不被其他客户打断的情况下执行多个命令。和关系数据库那种可以在执行的过程中进行回滚的事务不同，在Redis里面，被multi和exec命令包含的所有命令会一个接一个的执行，事务中任意命令执行失败，其余的命令依然被执行，直到所有命令都执行完毕为止。当一个事务执行完毕之后，Redis才会处理其他客户端的命令。
+
+当Redis从一个客户端那里接受到multi命令时，Redis会将这个客户端之后发送的所有命令都放入到一个队列里面，直到这个客户端发送exec命令为止，然后Redis就会在不被打断的情况下，一个接一个的执行存储队列里面的命令。
+
+- DISCARD：取消事务，放弃执行事务块内的所有命令
+- UNWATCH：取消WATCH命令对所有key的监视
+- WATCH key [key ...]：监视一个或多个key，如果在事务执行之前这个key被其他命令所改动，那么事务将被打断
+
+```bash
+redis 127.0.0.1:6379> MULTI
+OK
+
+redis 127.0.0.1:6379> PING
+QUEUED
+
+redis 127.0.0.1:6379> SET greeting "hello"
+QUEUED
+
+redis 127.0.0.1:6379> DISCARD
+OK
+```
+
+
+
+### 3.7.3 键的过期时间
+
+| 命令      | 描述                                               | 示例                                 |
+| --------- | -------------------------------------------------- | ------------------------------------ |
+| PERSIST   | 移除键的过期时间                                   | persist key                          |
+| TTL       | 查看给定键距离过期还有多少秒                       | ttl key                              |
+| EXPIRE    | 让给定键在指定的秒数之后过期                       | expire key seconds                   |
+| EXPIREAT  | 将给定键的过期时间设置为给定的UNIX时间戳           | expireat key timestamp               |
+| PTTL      | 查看给定键距离过期时间还有多少毫秒                 | pttl key                             |
+| PEXPIRE   | 让给定键在指定的毫秒数之后过期                     | pexpire key milliseconds             |
+| PEXPIREAT | 将一个毫秒级精度的UNIX时间戳设置为给定键的过期时间 | pexpireat key milliseconds-timestamp |
+
+# 4 数据安全与性能保障
+
+本章主要内容：
+
+- 将数据持久化至硬盘
+- 将数据恢复至其他机器
+- 处理系统故障
+- Redis事务
+- 非实物型流水线
+- 诊断性能问题
+
+## 4.1 持久化选项
+
+Redis提供了两种不同的持久化方法来讲数据存储到硬盘里面。一种方法交**快照**，它可以将存在某一时刻的所有数据都写入硬盘里面。另一种方法叫**只追加文件**（AOF），它会在执行写命令时，将被执行的写命令复制到硬盘里面。
+
+```bash
+RDB拍配置
+1:命令格式
+save <seconds> <changes>
+ 当用户设置了多个save的选项配置，只要其中任一条满足，Redis都会触发一次BGSAVE操作，
+ 比如：900秒之内至少一次写操作、300秒之内至少发生10次写操作、60秒之内发生至少10000次写操作都会触发发生快照操作
+save 900 1(900秒之内至少一次写操作)
+save 300 10(300秒之内至少10次写操作)
+save 60 10000(60秒之内至少10000次写操作)
+*禁用RDB，save ""
+2:文件名
+dbfilename:dump.rdb(默认)
+3：写配置
+stop-writes-on-bgsave-error:yes(默认后台写错误则停止写快照文件)
+4：rdb文件是否需要压缩
+rdbcompression:yes(默认压缩)
+5：rdb校验
+rdbchecksum:yes(默认存储快照后，让redis使用CRC64校验)
+
+AOF配置
+1:开启AOF
+appendonly：no(默人不开启，修改为yes开启)
+2：文件名
+appendfilename:appendonly.aof(默认)
+3：同步持久化选项
+appendsync:(always:同步持久化、everysencond:每秒、no:不开启)
+4：rewrite
+no-appendsync-on-rewrite:no(保持数据完整性)
+auto-aof-rerite-min-size:100(基准大于1倍开始触发rewrite)
+auto-aof-rewrite-percentage:64mb（文件大于64mb触发rewrite）
+
+AOF文件会越来越大，当文件大小超过设定的域值时，redis会启动AOF的文件内容压缩，只保留可以恢复的数据的最小指令集<bgrewriteaof>
+1：原理
+主进程会fork出一条新的进程对文件重写，遍历新进程的内存数据，每条记录有一条set语句。重写aof文件的操作并没有读取旧的aof文件，而是将整个内存的数据内容用命令的方式重写了一个新的aof文件
+2:触发
+配置文件中设置了aofrewrite策略、当aof的大小超过了设定的值、当有客户端要求rewrite操作时。redis会记录上次重写的AOF的大小，默认设置当前AOF文件大小是上次的rewrite后的大小的1倍且文件大于64mb
+3:配置
+no-appendsync-on-rewrite:no(保持数据完整性)
+auto-aof-rerite-min-size:100(基准大于1倍开始触发rewrite)
+auto-aof-rewrite-percentage:64mb（文件大于64mb触发rewrite）
+
+
+RDB触发
+1：触发
+save/bgsave
+2：恢复
+将dump.rdb移到redis启动目录即可
+3：停止
+redis-cli config set save ""
+4:修复
+redis-check-dump
+**shutdown/flushall/save都会立即commit到dump.rdb，所以，一旦flushall，rdb文件就会清空内容
+
+AOF触发
+1：触发
+一旦AOF配置完成，重启就立即触发
+2:恢复
+重启redis重新加载
+3：加载
+如果aof和rdb同时存在，服务器启动，redis默认加载AOF
+4：修复
+redis-check-aof --fix appendonly.aof
+**flushall也会写入到aof文件中，一旦恢复，所有数据将被清空
+
+共享选项，这个选项决定了快照文件和AOF文件的保存位置
+dir ./  
+```
+
+## 4.2 复制
+
+Redis采用类类似关系数据库的方式来实现复制，使用一个主服务器（master）向多个从服务器（slave）发送更新，并使用从服务器来处理所有读请求。
+
+### 4.2.1 对Redis的复制相关选项进行配置
+
+当从服务器连接主服务器的时候，主服务器会执行BGSAVE操作。因此为了正确地使用复制特性，用户需要保证主服务器已经正确地设置了RDB的配置包括dir选项和dbfilename选项，并且这两个选项所指示的路径和文件对于Redis进程来说都是可写的。
+
+开启从服务器所必须的选项只有slaveof一个。如果用户在启动Redis服务器的时候，指定了一个包含slaveof host port选项的配置文件，那么Redis服务器将根据选项给顶的IP和端口号来链接主服务器。对于一个正在运行的Redis服务器，可以通过发送slaveof no one命令来让服务器终止复制操作，不再接受主服务器的数据更新；也可以通过发送slaveof host port 命令来让服务器开始复制一个新的主服务器。
+
+### 4.2.2 Redis复制的启动过程
+
+| 步骤 | 主服务器操作                                                 | 从服务器操作                                                 |
+| ---- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| 1    | 等待命令进入                                                 | 连接（或者重连接）主服务器，发送SYNC命令                     |
+| 2    | 开始执行BGSAVE，并使用缓冲区记录BGSAVE之后执行的所有写命令   | 根据配置选项来决定是继续使用现有的数据（如果有的话）来处理客户端的命令请求，还是向发送请求的客户端返回错误 |
+| 3    | BGSAVE执行完毕，向从服务器发送快照文件，并在发送期间继续使用缓冲区记录被执行的写命令 | 丢弃所有旧数据（如果有的话），开始载入主服务器发来的快照文件 |
+| 4    | 快照文件发送完毕，开始想从服务器发送存储在缓冲区里面的写命令 | 完成对快照文件的解释操作，想往常一样开始接受命令请求         |
+| 5    | 缓冲区存储的写命令发送完毕，从现在开始，每执行一个写命令，就想服务器发送相同的写命令 | 执行主服务器发来的所有存储在缓冲区里面的写命令；并从现在开始，接收并执行主服务器传来的每个写命令 |
+
+**从服务器在进行同步时，会清空自己的所有数据。**
+
+## 4.5 非事务型流水线
+
+将多条命令一起传递到Redis执行，减少交互次数，可以极大提高Redis的性能。
