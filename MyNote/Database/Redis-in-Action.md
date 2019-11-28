@@ -460,3 +460,8 @@ p.execute()
 print(time.time() - s)
 ```
 
+# 自我总结
+
+## 1.切换db
+
+每个Redis默认有16个db，通过select index切换到指定的db
