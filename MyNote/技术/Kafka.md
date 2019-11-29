@@ -177,3 +177,184 @@ producer的首要功能就是向某个topic分区发送一条消息，首先需�
 工作流程：producer首先使用一个线程（用户主线程，也就是启动producer的线程）将待发送的消息封装进一个ProducerRecord类实例，然后将其序列化之后发送给partitioner，再由后者确定了目标分区后一同发送到位于producer程序中的一块内存缓冲区中。而producer的另一个工作线程（I/O发送线程）则负责实时地从该缓冲区中提取出准备就绪的消息封装进一个批次（batch），统一发送给对应的broker。
 
 ![image-20191129164720558](picture\image-20191129164720558.png)
+
+```java
+public class ProducerTest {
+    public static void main(String[] args) {
+        Properties properties = new Properties();
+        // 以下三项必须指定
+        properties.put("bootstrap.servers", "192.168.106.143:9092");
+        properties.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+        properties.put("value.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+
+        properties.put("acks", "-1");
+        properties.put("retries", 3);
+        properties.put("batch.size", 323804);
+        properties.put("linger.ms", 10);
+        properties.put("buffer.memory", 33554432);
+        properties.put("max.block.ma", 3000);
+
+        Producer<String, String> producer = new KafkaProducer<>(properties);
+        for (int i = 0; i < 100; i++) {
+            producer.send(new ProducerRecord<>("mykafka", Integer.toString(i), Integer.toString(i)));
+        }
+        producer.close();
+    }
+}
+```
+
+- bootstrap.servers：该参数指定了一组host:port对，用于想Kafka broker服务器的连接，例如k1:9092,k2:9092,k3:9092。
+- key.serializer：被发送到broker端的任何消息的格式都必须是字节数组，因此消息的各个组件必须首先做序列化，然后才能发送到broker。该参数就是为消息的key做序列化之用的。本实例中指定了使用org.apache.kafka.common.serialization.StringSerializer做序列化，该类会将一个字符串类型转换成字节数组。也可以指定自定义的序列化类。
+- value.serializer：对消息体进行序列化，将消息的value部分转换成字节数组。可以指定做序列化的类。
+
+**构造kafkaProducer**
+
+```Java
+//此方法不需要指定key.serializer和value.serializer
+Serializer<String> keySerializer = new StringSerializer();
+        Serializer<String> valueSerializer = new StringSerializer();
+
+        Producer<String, String> producer = new KafkaProducer(properties, keySerializer, valueSerializer);
+```
+
+**4.消息发送**
+
+Kafka producer发送消息的主方法是send方法。实际上producer在底层完全实现了异步化发送，并且通过Java提供的Future同时实现了同步发送和异步发送+回调两种发送方式。
+
+### 4.2.2 producer主要参数
+
+**acks**：用于控制producer生产消息的持久性。对于producer而言，Kafka在乎的是“已提交”消息的持久性。一旦消息被成功提交，那么只要有任何一个保存了该消息的副本存活，这条消息就会别视为不会丢失的。acks有3个取值：0、1和all。
+
+0表示producer完全不理睬leader broker端的处理结果。此时producer发送消息后立即开启下一条消息的发送。此时用户无法通过回调机制感知任何发送过程中的失败，所以不确保消息会被成功发送。但此设置下producer的吞吐量最高
+
+all或-1：表示当发送消息时，leader broker不仅会将消息写入本地日志，同时还会等待ISR中所有其他副本都成功写入他们各自的本地日志后，才发送响应结果给producer。吞吐量最低
+
+1：默认参数值。producer发送消息后leader broker仅将该消息写入本地日志，然后便发送响应结果给producer，此时只要leader broker一直存活，Kafka就能够保证这条消息不丢失。
+
+**buffer.memory**：指定了producer端用于缓存消息的缓冲区大小，单位事字节，默认值是33554432（32MB）。Java版的producer启动时会首先创建一块内存缓冲区用于保存待发送的消息，然后由另一个专属线程负责从缓冲区中读取消息执行真正地发送。
+
+**compression.type**：设置producer端是否压缩消息，默认值是none。
+
+**retries**：遇到错误时重试的次数。默认为0。谨慎设置有可能造成消息的重复发送和消息乱序。另外，producer两次重试之间会停顿一段时间，以防止频繁地重试对系统带来冲击。这段时间是可以配置的，由参数retry.backoff.ms指定，默认是100毫秒。
+
+**batch.size**：producer最重要的参数之一。producer会将发往同一分区的多条消息封装进一个batch中，当batch满了的时候producer会发送batch中的所有消息。不过producer并不总是等待batch满了才发送消息，很有可能batch还有很多空闲空间时就发送batch。默认值是16384（16KB）。可以适当增大。
+
+**linger.ms**：上面提到batch未满就发送，这是一种在吞吐量和延时之间的权衡。此参数就是控制消息发送延时行为的。默认为0，表示消息需要被立即发送，无须关系batch是否已被填满。
+
+**max.request.size**：控制producer端能够发送的最大消息的大小。默认1048576字节
+
+**request.timeout.ms**：当producer发送请求给broker后，broker需要在规定的时间范围内将处理结果返回给producer，这段时间便是由该参数控制的，默认30秒。
+
+## 4.3 消息分区机制
+
+Kafka的默认partitioner会尽力确保具有相同key的所有消息都会被发送到相同的分区上；若没有指定key，则会用轮询的方式来确保消息在topic的所有分区上均匀分配。
+
+可以通过实现org.apache.kafka.clients.producer.Partitioner接口，并在构造KafkaProducer的Properties对象中设置partitioner.class参数替换分区器。
+
+## 4.4 消息序列化
+
+Kafka支持用户给broker发送各种类型的消息。它可以是一个字符串、一个整数、一个数组或是其他任意的对象类型，序列化器负载在producer发送前将消息转换成字节数组；与之相反解序列化器则用于将consumer接收到的字节数组转换成相应的兑现。
+
+## 4.5 producer拦截器
+
+对于producer而言，interceptor使得用户在消息发送前以及producer回调逻辑前有机会对消息做一些定制化需求，比如修改消息等。同时，producer允许用户指定多个interceptor按序作用于同一条消息从而形成一个拦截链。拦截器需要实现org.apache.kafka.clients.producer.ProducerInterceptor。
+
+## 4.6 无消息丢失配置
+
+producer端通过一个io线程将缓存中的数据发送到broker，若此时producer崩溃则缓存中的数据会丢失。此外若同时发送record1和record2,record1因为某些原因发送失败，并且设置了重试机制，那么就可能造成record2先发送record1后发送，乱序现象。
+
+解决办法：
+
+- block.on.buffer.full=true：新版本已经被max.block.ms替代可以不用设置此参数，内存缓冲区被填满时producer处于阻塞状态并停止接收新的消息而不是抛出异常
+- acks=all or -1
+- retries = Integer.MAX_VALUE
+- max.in.flight.requests.per.connection=1：防止topic同分区下的消息乱序问题。其实际效果是限制了producer在单个broker连接上能够发送的未响应请求的数量。
+- 使用带回调机制的send发送消息，KafkaProducer.send(record,callback)
+- Callback逻辑中显示的立即关闭producer，使用close(0)：处理消息乱序问题，失败后立即关闭，不再发送此消息
+- unclean.leader.election.enable=false
+- replication.factor=3
+- min.insync.factor=2：设置某条消息至少被写入到ISR中的多少个副本才算成功。
+- replication.factor>min.insync.replicas
+- enable.auto.commit=false
+
+## 4.8 多线程处理
+
+两种基本的使用方法：
+
+- 多线程单KafkaProducer实例
+- 多线程多KafkaProducer实例
+
+**多线程单KafkaProducer实例**：全局构造一个KafkaProducer实例，然后再多个线程中共享使用。KafkaProducer是线程安全的。
+
+**多线程多KafkaProducer实例**：每个producer主线程都构造一个KafkaProducer实例，并且保证此实例在该线程中封闭。
+
+![image-20191130015150689](picture\image-20191130015150689.png)
+
+# 5 consumer开发
+
+### 5.1.1 消费者
+
+两类：消费者组，独立消费者。消费者组是由多个消费者实例构成一个整体进行消费的，而独立消费者则单独执行消费操作。
+
+### 5.1.2 消费者组
+
+定义：消费者组使用一个消费者组名标记自己，topic的每条消息都只会被发送到每个订阅他的消费者组的一个消费者实例上。
+
+消费者组是用于实现高伸缩性、高容错性和consumer机制。组内多个consumer实例可以同时读取Kafka消息，而且一旦有某个consumer挂了，consumer group会立即将已崩溃的consumer负责的分区转交给其他consumer来负责，从而保证整个group可以继续工作，不会丢失数据--重平衡机制（rebalance）。
+
+rebalance本质上是一种协议，规定了一个consumer group下所有consumer如何达成一致来分配订阅topic的所有分区。例如某个消费者组有20个消费者实例，此消费者组订阅了一个具有100个分区的topic，那么正常情况下，消费者组平均会为每个consumer分配5个分区，这个过程叫做rebalance。
+
+### 5.1.3 位移（offset）
+
+这里的offset指的是consumer端的offset，与分区日志中的offset是不同的含义。每个consumer实例都会为它消费的分区维护自己的位置信息来记录当前消费了多少条消息。
+
+### 5.1.4 位移提交
+
+consumer客户端需要定期地向Kafka集群汇报自己消费数据的进度，这一过程被称为位移提交（offset commit）。
+
+## 5.2 构建consumer
+
+```Java
+public class ConsumerTest {
+    public static void main(String[] args) {
+        String topicName = "mykafka1";
+        String groupId = "mykafkagroup";
+        Properties properties = new Properties();
+        // 以下四项必须指定
+        properties.put("bootstrap.servers", "192.168.106.143:9092");
+        properties.put("group.id", groupId);
+        properties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+        properties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
+
+        properties.put("enable.auto.commit", "true");
+        properties.put("auto.commit.interval.ms", "1000");
+        properties.put("auto.offset.reset", "earliest");
+        properties.put("auto.offset.reset", "earliest");
+
+        // 创建消费者实例
+        KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
+        // 订阅topic
+        consumer.subscribe(Arrays.asList(topicName));
+        try {
+            while (true) {
+                ConsumerRecords<String, String> records = consumer.poll(Duration.ofSeconds(1000));
+                records.forEach(record ->
+                        System.out.printf("offset = %d, key = %s, value = %s\n",
+                                record.offset(), record.key(), record.value()));
+            }
+        } finally {
+            consumer.close();
+        }
+    }
+
+}
+```
+
+### 5.2.3 consumer主要参数
+
+**session.timeout.ms**：消费组协调者（group coordinator）检测失败的时间，某个消费者实例崩溃了之后coordinator会在相应时间内感应到并做出相应处理。
+
+**max.poll.interval.ma**：consumer处理逻辑最大时间。指consumer完成整个处理所用的时间
+
+
+

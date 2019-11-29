@@ -217,8 +217,6 @@ vi /opt/kafka_2.12-2.2.0/config/server.properties
 ![image-20191129181514247](picture\image-20191129181514247.png)
 
 ```bash
-docker restart kafka
-
 #进入Kafka
 docker exec -it kafka /bin/sh
 #进入Kafka的bin目录下
