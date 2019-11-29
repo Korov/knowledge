@@ -137,3 +137,43 @@ broker端参数需要在Kafka目录下的config/server.properties文件中进行
 - zookeeper.connect：非常重要的参数，此参数没有默认值，是必须要设置的。该参数也可以是一个CSV（comma-separated values）列表，例如：zk1:2181,zk2:2181,zk3:2181。如果要使用一套zookeeper环境管理多套Kafka集群，那么设置该参数的时候就必须指定zookeeper的chroot，例如：zk1:2181,zk2:2181,zk3:2181/kafka_cluster1，结尾的/kafka_cluster1就是chroot，他是可选的配置，如果不指定则默认使用zookeeper的根路径。在实际使用中，配置chroot可以起到很好的隔离效果。这样管理Kafka集群将变得更加容易。
 - listeners：broker监听器的CSV列表，格式是`[协议]://[主机名]:[端口],[[协议]://[主机名]:[端口]]`该参数主要用于客户端连接broker使用，可以认为是broker端开放给clients的监听端口。如果不指定主机名，则表示绑定默认网卡；如果主机名是0.0.0.0，则表示绑定所有网卡。Kafka当前支持的协议类型包括PLAINTEXT、SSL及SASL_SSL等。对于新版本的Kafka，建议配置listeners就够了，host.name和port已经过时。
 - advertised.listeners：与listeners类似，用于发布给clients的监听器，不过该参数主要用于IaaS环境，比如云上的机器通常都配有多块网卡（私网网卡和公网网卡）。对于这种机器，用户可以设置该参数绑定公网IP供外部clients使用，然后配置上面的listeners来绑定私网IP供broker间通信使用。当然不设置也是可以的，只是云上的机器很容易出现clients无法获取数据的问题。
+- unclean.leader.election.enable：是否开启unclean leader选举。当ISR变空并且leader宕机了，若此参数设置为false则不允许从剩下存活的非ISR副本中选择一个当leader。如果允许会造成消息数据的丢失。默认为false
+- delete.topic.enable：是否允许Kafka删除topic。
+- log.retention.{hours|minutes|ms}：设置消息数据的留存时间。如果同时设置，优先选取ms的设置，minutes次之，hours最后。默认的留存时间是7天。当前较新版本的Kafka会根据消息的时间戳信息进行留存与否的判断。对于没有时间戳的老版本信息格式，Kafka会根据日志文件的最近修改时间进行判断。
+- log.retention.bytes：设置Kafka集群要为每个消息日志保存多大的数据。对于大小超过该参数的分区日志而言，Kafka会自动清理该分区的过期日志段文件。默认值为-1，表示Kafka永远不会根据消息日志文件总大小来删除日志。
+- min.insync.replicas：该参数其实与producer端的acks参数配合使用。acks=-1表示producer端寻求最高等级的持久化保证，而此参数也只有在acks=-1时才有意义。它指定了broker端必须成功响应clients消息发送的最少副本数。假如broker端无法满足该条件，则clients的消息发送并不会被视为成功。它与acks配合使用可以令Kafka集群达成最高等级的消息持久化。-1为全部副本都写入才成功。
+- num.network.threads：控制了一个broker在后台用于处理网络请求的线程数，默认是3。
+- num.io.threads：控制broker端实际处理网络请求的线程数，默认是8，即Kafka broker默认创建8个线程以轮询方式不停的监听转发过来的网络请求并进行实时处理。
+- message.max.bytes：broker能够接收的最大消息大小，默认是977KB。
+
+### 3.5.2 topic级别参数
+
+所谓的topic级别，是指覆盖broker端全局参数。每个topic都可以设置自己的参数值。
+
+- delete.retention.ms：每个topic可以设置自己的日志留存时间以覆盖全局默认值
+- max.message.bytes：覆盖全局的message.max.bytes，即为每个topic指定不同的最大消息尺寸
+- retention.bytes：覆盖全局的log.retention.bytes，每个topic设置不同的日志留存尺寸。
+
+### 3.5.3 GC参数
+
+根据用户机器选择合适的垃圾收集器。同时因为Kafka broker主要使用的是堆外内存，因此并不需要为JVM分配太多的内存。
+
+### 3.5.5 OS参数
+
+主要针对Linux系统
+
+- 文件描述符限制：Kafka会频繁的创建并修改文件系统中的文件，包括消息的日志文件、索引文件及各种元数据管理文件等。大致数量为分区数\*（分区总大小/日志段大小）\*3。
+- Socket缓冲区大小：指的是OS级别的缓冲区大小。若是内网则Kafka将其自己的参数设置为64KB足够使用，但对于跨地区的数据传输而言需要同时增加Kafka和OS中的Socket缓存，建议大于等于128KB
+- 最好使用Ext4或XFS文件系统：XFS的写入时间大约是160毫秒，而使用Ext4大约是250毫秒
+- 关闭swap：具体命令为sysctl vm.swappiness=<一个较小的数>，即大幅降低对swap空间的使用，以免极大地拉低性能。
+- 设置更长的flush时间：Kafka依赖OS页缓存的“刷盘”功能实现消息真正写入物理磁盘，默认的刷盘间隔是5秒。建议增加至2分钟
+
+# 4 producer开发
+
+producer的首要功能就是向某个topic分区发送一条消息，首先需要通过分区器（partitioner）确定向topic的哪个分区写入消息。Kafka producer提供了一个默认的分区器，对于每条待发送的消息而言，如果该消息制订了key那么分区器会根据key的哈希值来选择目标分区，若没有指定key则分区器使用轮询的方式确认分区目标（可以最大限度的确保消息在所有分区上的均匀性）。用户也可以跳过分区器直接指定要发送到的分区。用户也可以自己实现分区策略。
+
+确认了目标分区后，producer要做的第二件事就是寻找这个分区对应的leader。
+
+工作流程：producer首先使用一个线程（用户主线程，也就是启动producer的线程）将待发送的消息封装进一个ProducerRecord类实例，然后将其序列化之后发送给partitioner，再由后者确定了目标分区后一同发送到位于producer程序中的一块内存缓冲区中。而producer的另一个工作线程（I/O发送线程）则负责实时地从该缓冲区中提取出准备就绪的消息封装进一个批次（batch），统一发送给对应的broker。
+
+![image-20191129164720558](picture\image-20191129164720558.png)

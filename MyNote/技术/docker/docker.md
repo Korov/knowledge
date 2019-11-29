@@ -32,12 +32,12 @@ docker rmi `docker images -q`;
 ```
 
 ```bash
-docker logs -f -t --since="2019-05-04" --tail=100 flamboyant_swirles
+docker logs -f -t --since="2019-05-04" --tail=100 container_name
 --since : 此参数指定了输出日志开始日期，即只输出指定日期之后的日志。
 -f : 查看实时日志
 -t : 查看日志产生的日期
 -tail=10 : 查看最后的10条日志。
-stupefied_albattani : 容器名
+container_name : 容器名
 ```
 
 ```bash
@@ -203,17 +203,18 @@ docker exec -it containerID redis-cli
 docker load -i kafka.tar;
 docker load -i zookeeper.tar;
 docker run -d --name zookeeper -p 2181:2181 -t wurstmeister/zookeeper;
-docker run -d --name kafka --publish 9092:9092 --link zookeeper --env KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 --env KAFKA_ADVERTISED_HOST_NAME=192.168.106.143 --env KAFKA_ADVERTISED_PORT=9092 --volume /etc/localtime:/etc/localtime wurstmeister/kafka;
+docker run -d --name kafka --publish 9092:9092 --link zookeeper --env KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 --env KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 --env KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://192.168.106.143:9092 --volume /etc/localtime:/etc/localtime wurstmeister/kafka;
 ```
 
 以上启动Kafka，接下来需要进入Kafka的docker修改文件
 
 ```bash
+#修改上面的启动参数之后不用修改了
 docker exec -it kafka /bin/sh
 vi /opt/kafka_2.12-2.2.0/config/server.properties
 ```
 
-![image-20191128215658125](picture\image-20191128215658125.png)
+![image-20191129181514247](picture\image-20191129181514247.png)
 
 ```bash
 docker restart kafka
