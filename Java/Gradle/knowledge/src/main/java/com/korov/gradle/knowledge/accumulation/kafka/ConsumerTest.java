@@ -14,7 +14,7 @@ public class ConsumerTest {
         Properties properties = new Properties();
         // 以下四项必须指定
         properties.put("bootstrap.servers", "192.168.106.143:9092");
-        properties.put("group.id", groupId);
+        properties.put("group.id", groupId);//消费者所属群组
         properties.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
         properties.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 

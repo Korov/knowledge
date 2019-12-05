@@ -1279,3 +1279,15 @@ ThreadPoolExecutor允许提供一个BlockingQueue来保存等待执行的任务�
 **中止（Abort）**策略是默认的饱和策略，该策略将会抛出未检查的RejectedExecutionException。当新提交的任务无法保存到队列中等待执行时，“抛弃（Discard）”策略会悄悄抛弃该任务。“抛弃最旧的（Discard-Oldest）”策略则会抛弃下一个将被执行的任务，然后尝试重新提交新的任务。
 
 **“调用者运行（Caller-Runs）”**策略实现了一种调节机制，它会将某些任务回退到调用者，从而降低新任务的流量。它不会在线程池的某个线程中执行新提交的任务，而是在一个调用了execute的线程中执行该任务。
+
+
+
+# 个人总结
+
+## 1 线程安全的集合类
+
+ConcurrentHashMap和HashTable，ConcurrentHashMap的加锁粒度更细，HashTable每个操作都加了重量级锁synchronized。
+
+CopyOnWriteArrayList和CopyOnWriteArraySet它们是加了写锁的ArrayList和ArraySet，锁住的是整个对象，但读操作可以并发执行
+
+除此之外还有ConcurrentSkipListMap、ConcurrentSkipListSet、ConcurrentLinkedQueue、ConcurrentLinkedDeque等

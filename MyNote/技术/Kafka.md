@@ -300,9 +300,13 @@ producer端通过一个io线程将缓存中的数据发送到broker，若此时p
 
 定义：消费者组使用一个消费者组名标记自己，topic的每条消息都只会被发送到每个订阅他的消费者组的一个消费者实例上。
 
-消费者组是用于实现高伸缩性、高容错性和consumer机制。组内多个consumer实例可以同时读取Kafka消息，而且一旦有某个consumer挂了，consumer group会立即将已崩溃的consumer负责的分区转交给其他consumer来负责，从而保证整个group可以继续工作，不会丢失数据--重平衡机制（rebalance）。
+一个群组里的消费者订阅的是同一个主题，每个消费者接收主题一部分分区的消息。
+
+消费者组是用于实现高伸缩性、高容错性的consumer机制。组内多个consumer实例可以同时读取Kafka消息，而且一旦有某个consumer挂了，consumer group会立即将已崩溃的consumer负责的分区转交给其他consumer来负责，从而保证整个group可以继续工作，不会丢失数据--重平衡机制（rebalance）。
 
 rebalance本质上是一种协议，规定了一个consumer group下所有consumer如何达成一致来分配订阅topic的所有分区。例如某个消费者组有20个消费者实例，此消费者组订阅了一个具有100个分区的topic，那么正常情况下，消费者组平均会为每个consumer分配5个分区，这个过程叫做rebalance。
+
+一个topic下的一个分区只能被消费者组中的一个实例消费，若消费者组的消费者数量多于分区数量则消费者空闲。
 
 ### 5.1.3 位移（offset）
 
@@ -355,6 +359,18 @@ public class ConsumerTest {
 **session.timeout.ms**：消费组协调者（group coordinator）检测失败的时间，某个消费者实例崩溃了之后coordinator会在相应时间内感应到并做出相应处理。
 
 **max.poll.interval.ma**：consumer处理逻辑最大时间。指consumer完成整个处理所用的时间
+
+**auto.offset.reset**：指定了消费者在读取一个没有偏移量（offset）的分区或者偏移量无效的情况下（因消费者长时间失效，包含偏移量的记录已经过时井被删除）该作何处理，默认值是 `latest`。earliest指定从最早的位移开始消费，这里最早的位移不一定是0；latest：指定从罪行位移处开始消费；none：指定如果未发现位移信息或位移越界，则抛出异常。
+
+**enable.auto.commit**：指定了消费者是否自动提交偏移量，默认值是 `true`，自动提交。设为 `false` 可以程序自己控制何时提交偏移量。如果设为 `true`，需要通过配置 `auto.commit.interval.ms` 属性来控制提交的频率。
+
+**fetch.max.bytes**：consumer端单次获取数据的最大字节数。
+
+**max.poll.records**：控制单次poll调用返回的最大消息数。默认500。
+
+**heartbeat.interval.ms**：设置一个较低的值，让group下的其他consumer能够更快地感知新一轮rebalance开启了。
+
+**connections.max.idle.ms**：Kafka定期关闭空闲Socket，默认9分钟。
 
 
 
