@@ -9,6 +9,5 @@ public class MyTest {
         Set set = new TreeSet();
         Object object = new Object();
         System.out.println(object.getClass());
-        Servlet
     }
 }
