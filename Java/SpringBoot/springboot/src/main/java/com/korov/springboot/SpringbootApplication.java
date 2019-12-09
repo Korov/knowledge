@@ -29,7 +29,7 @@ public class SpringbootApplication {
      * 同一个类声明两个bean实例
      * @return
      */
-    @Bean(name = "aaa")
+    @Bean(name = "singleBean1")
     public SingleBean singleBean1 ()
     {
         return new SingleBean();
