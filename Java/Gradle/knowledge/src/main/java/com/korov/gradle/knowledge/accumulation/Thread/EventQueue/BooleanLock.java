@@ -1,4 +1,4 @@
-package com.korov.gradle.knowledge.accumulation.Thread.Thread2;
+package com.korov.gradle.knowledge.accumulation.Thread.EventQueue;
 
 import java.util.ArrayList;
 import java.util.Collections;

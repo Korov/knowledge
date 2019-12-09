@@ -1,4 +1,4 @@
-package com.korov.gradle.knowledge.accumulation.Thread.Thread;
+package com.korov.gradle.knowledge.accumulation.Thread.Singleton;
 
 
 /**

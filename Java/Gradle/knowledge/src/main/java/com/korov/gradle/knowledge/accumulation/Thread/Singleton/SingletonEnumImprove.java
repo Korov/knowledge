@@ -1,4 +1,4 @@
-package com.korov.gradle.knowledge.accumulation.Thread.Thread;
+package com.korov.gradle.knowledge.accumulation.Thread.Singleton;
 
 /**
  * 增加了懒汉特性，能够实现单实例，懒加载以及高性能的特点

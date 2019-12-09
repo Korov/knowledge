@@ -1,4 +1,4 @@
-package com.korov.gradle.knowledge.accumulation.Thread.Thread1;
+package com.korov.gradle.knowledge.accumulation.Thread.saleticket;
 
 
 public class ThreadGroupTest {

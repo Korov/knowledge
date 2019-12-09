@@ -1,4 +1,4 @@
-package com.korov.gradle.knowledge.accumulation.Thread.Thread1;
+package com.korov.gradle.knowledge.accumulation.Thread.saleticket;
 
 /**
  * 使用synchronized关键字实现同步

@@ -1,4 +1,4 @@
-package com.korov.gradle.knowledge.accumulation.Thread.Thread2;
+package com.korov.gradle.knowledge.accumulation.Thread.EventQueue;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

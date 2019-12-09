@@ -1,4 +1,4 @@
-package com.korov.gradle.knowledge.accumulation.Thread.Thread2;
+package com.korov.gradle.knowledge.accumulation.Thread.EventQueue;
 
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
