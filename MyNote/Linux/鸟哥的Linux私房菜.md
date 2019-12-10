@@ -207,7 +207,7 @@ rmdir -p test1/test2
 ```bash
 echo $PATH
 #在PATH添加路径,在原有的PATH之后再加一个/root到PATH中
-PATH="${PATH}:/root"
+export PATH="${PATH}:/root"
 ```
 
 - 不同身份使用者预设的PATH不同，默认能够随意执行的指令也不同
@@ -215,6 +215,18 @@ PATH="${PATH}:/root"
 - 使用绝对路径或相对路径直接指定某个指令的文件名来执行，会比搜寻PATH来的正确
 - 指令应该要放置到正确地目录下，执行才会比较方便
 - 本目录最好不要放到PATH中
+
+export PATH=...只对当前的shell有用关闭时候消失，编辑/etc/profile文件添加export PATH="$PATH:/NEW_PATH"，此方法是针对所有用户，个人电脑推荐。编辑~/.bashrc文件，添加export PATH="$PATH:/NEW_PATH"。
+
+/etc/profile : 在登录时,操作系统定制用户环境时使用的第一个文件 ,此文件为系统的每个用户设置环境信息,当用户第一次登录时,该文件被执行。
+
+/etc /environment : 在登录时操作系统使用的第二个文件, 系统在读取你自己的profile前,设置环境文件的环境变量。
+
+~/.profile : 在登录时用到的第三个文件 是.profile文件,每个用户都可使用该文件输入专用于自己使用的shell信息,当用户登录时,该文件仅仅执行一次!默认情况下,他设置一些环境变量,执行用户的.bashrc文件。
+
+/etc/bashrc : 为每一个运行bash shell的用户执行此文件.当bash shell被打开时,该文件被读取.
+
+~/.bashrc : 该文件包含专用于你的bash shell的bash信息,当登录时以及每次打开新的shell时,该该文件被读取。
 
 ## 6.2 文件与目录管理
 
