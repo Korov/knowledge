@@ -20,10 +20,10 @@ public class NIOClient implements Runnable {
 
     public static void main(String[] args) {
         // 种多个线程发起Socket客户端连接请求
-        for (int i = 0; i < 10; i++) {
-            NIOClient c = new NIOClient();
-            c.init();
-            new Thread(c).start();
+        for (int i = 0; i < 1; i++) {
+            NIOClient client = new NIOClient();
+            client.init();
+            new Thread(client).start();
         }
     }
 

@@ -9,7 +9,18 @@ import java.util.Iterator;
 
 public class NIOServer {
 
+    /**
+     * Buffer是同步非阻塞IO包括
+     * ByteBuffe、CharBuffer、 ShortBuffer、IntBuffer、LongBuffer、FloatBuffer、DoubleBuffer
+     * 对数据的读取和写入都要通过channel。
+     */
     private ByteBuffer readBuffer;
+    /**
+     * 多路复用器Selector
+     * 提供选择已经就绪的任务的能力：Selector会不断轮询注册在其上的Channel，如果
+     * 某个Channel上面发生读或者写事件，这个Channel就处于就绪状态，会被Selector轮询
+     * 出来，然后通过SelectionKey可以获取就绪Channel集合，进行后续的IO操作
+     */
     private Selector selector;
 
     public static void main(String[] args) {

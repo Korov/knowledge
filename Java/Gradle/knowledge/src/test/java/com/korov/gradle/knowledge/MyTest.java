@@ -1,5 +1,9 @@
 package com.korov.gradle.knowledge;
 
+import com.korov.gradle.knowledge.utils.RegexUtil;
+
+import java.util.List;
+
 public class MyTest {
     public static void main(String[] args) {
         String string = "abcedf";
@@ -9,5 +13,8 @@ public class MyTest {
             stringBuilder.append(chars[i - 1]);
         }
         System.out.println(stringBuilder.toString());
+
+        List<String> values = RegexUtil.finds("No\\.\\d+", "fefNo.13,,No.46");
+        values.forEach(System.out::println);
     }
 }

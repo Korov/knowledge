@@ -1291,3 +1291,4 @@ EnumMap是一个键类型为枚举类型的映射。它可以直接且高效地�
 EnumMap<Weekday, Employee> personInCharge = new EnumMap<>(Weekday.class);
 ```
 
+1.9
