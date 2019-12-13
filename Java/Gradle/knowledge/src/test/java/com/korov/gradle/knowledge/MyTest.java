@@ -25,6 +25,5 @@ public class MyTest {
         }
         stringList.stream().forEach(System.out::println);
         Collections.unmodifiableList(stringList);
-        Collections.sy
     }
 }
