@@ -1120,6 +1120,14 @@ spring 有五大隔离级别，默认值为 ISOLATION_DEFAULT（使用数据库�
 
 SpringBoot是一个构建在Spring框架顶部的项目。它提供了一个更简单、更快捷的方法来设置、配置和运行简单和基于web的应用程序。
 
+## SpringBoot常用的starter
+
+1、spring-boot-starter-web(嵌入Tomcat和web开发需要的servlet和jsp支持)
+2、spring-boot-starter-data-jpa(数据库支持)
+3、spring-boot-starter-data-Redis(Redis支持)
+4、spring-boot-starter-data-solr(solr搜索应用框架支持)
+5、mybatis-spring-boot-starter(第三方mybatis集成starter)
+
 ## 为什么要用 spring boot？
 
 配置简单、独立运行、自动装配、无代码生成和xml配置、提供应用监控、易上手、提升开发效率。
@@ -1130,6 +1138,17 @@ spring boot 核心的两个配置文件：
 
 - bootstrap (. yml 或者 . properties)：boostrap 由父 ApplicationContext 加载的，比 applicaton 优先加载，且 boostrap 里面的属性不能被覆盖
 - application (. yml 或者 . properties)：用于 spring boot 项目的自动化配置
+
+## SpringBoot自动配置原理：
+
+1、@EnableAutoConfiguration这个注解会"猜"你将如何配置spring，前提是你已经添加了jar依赖项，如果spring-boot-starter-web已经添加Tomcat和SpringMVC，这个注释就会自动假设您在开发一个web应用程序并添加相应的spring配置，会自动去maven中读取每个starter中的spring.factories文件，该文件里配置了所有需要被创建spring容器中bean
+2、在main方法中加上@SpringBootApplication和@EnableAutoConfiguration
+
+## SpringBoot starter工作原理：
+
+1、SpringBoot在启动时扫描项目依赖的jar包，寻找包含spring.factories文件的jar
+2、根据spring.factories配置加载AutoConfigure
+3、根据@Conditional注解的条件，进行自动配置并将bean注入到Spring Context
 
 ##  spring boot 配置文件有哪几种类型？它们有什么区别？
 
@@ -1152,6 +1171,25 @@ spring boot 核心的两个配置文件：
 
 spring cloud 是一系列框架的有序集合。它利用 spring boot 的开发便利性巧妙地简化了分布式系统基础设施的开发，如服务发现注册、配置中心、消息总线、负载均衡、断路器、数据监控等，都可以用 spring boot 的开发风格做到一键启动和部署。
 
+## Springcloud解决那些问题：
+
+配置管理、（注册中心eureka、zk）、服务发现、服务注册、断路器、路由策略、全局锁、分布式会话、客户端调用、接口网关（zuul）、服务管理系统
+
+## SpringBoot与Springcloud：
+
+1>、SpringBoot简化了xml配置，快速整合框架
+2>、Springcloud是一套微服务解决方案—RPC远程调用
+3>、关系Springcloud依赖与SpringBoot（web组件用的SpringMVC），为什么Springcloud会依赖与SpringBoot？因为Springcloud写接口就是SpringMVC接口
+4>、SpringBootproperties和yml中可以使用${random}设置一些随机值
+
+## 服务的调用：
+
+rest、feign（均使用httpclient技术），负载均衡ribbon
+
+## 服务调用的原理：
+
+服务首先注册到注册中心eureka中(注册一个名字通过名字调用)负载均衡ribbon，先去注册中心取到对应的服务，然后交给我ribbon
+
 ## spring cloud 断路器的作用是什么
 
 在分布式架构中，断路器模式的作用也是类似的，当某个服务单元发生故障（类似用电器发生短路）之后，通过断路器的故障监控（类似熔断保险丝），向调用方返回一个错误响应，而不是长时间的等待。这样就不会使得线程因调用故障服务被长时间占用不释放，避免了故障在分布式系统中的蔓延。
@@ -1163,6 +1201,97 @@ Feign：基于动态代理机制，根据注解和选择的机器，拼接请求
 Ribbon：实现负载均衡，从一个服务的多台机器中选择一台
 Hystrix：提供线程池，不同的服务走不同的线程池，实现了不同服务调用的隔离，避免了服务雪崩的问题
 Zuul：网关管理，由 Zuul 网关转发请求给对应的服务
+
+## springcloud如何实现服务注册与发现
+
+服务发布时指定对应的服务名(IP地址和端口号)，将服务注册到注册中心(eureka和zookeeper)，但是这一切是Springcloud自动实现的，只需要在SpringBoot的启动类上加上@EnableDisscoveryClient注解，同一服务修改端口就可以启动多个实例调用方法：传递服务名称通过注册中心获取所有的可用实例，通过负载均衡策略(Ribbon和Feign)调用对应的服务
+
+## Ribbon和Feign的区别
+
+- 启动类使用的注解不同，Ribbon使用的是@RibbonClient，Feign使用的是@EnableFeignClients
+- 服务的指定位置不同，Ribbon是在@RibbonClient注解上声明，Feign则是在定义抽象方法的接口中使用@FeignClient声明
+- 调用方式不同，Ribbon需要自己构建http请求，模拟http请求然后使用RestTemplate发送给其他服务，步骤比较繁琐。Feign则是在Ribbon的基础上进行了一次改进，采用接口调用的方式，将需要调用的其他服务的方法定义成抽象方法即可，不需要自己构建http请求，不过要注意的是抽象方法的注解、方法签名要和提供方的完全一致。
+
+## 雪崩效应
+
+分布式系统中的服务通信依赖于网络，网络不好，必然会对分布式系统带来很大的影响。在分布式系统中，服务之间相互依赖，如果一个服务之间出现了故障或者网络延迟，在高并发的情况下，会导致线程阻塞，在很短的时间内该服务的线程资源会消耗殆尽，最终使得该服务不可用。由于服务的相互依赖，可能会导致整个系统的不可用，这就是“雪崩效应”。为了防止此类事件的发生，分布式系统必然要采取相应的措施，如熔断机制（Springcloud采用的是Hystrix）
+
+## Eureka基础架构
+
+1>、服务注册中心：Eureka提供的服务端，提供服务注册与发现的功能
+1>>、失效剔除：对于那些非正常下线的服务实例（内存溢出、网络故障导致的），服务注册中心不能收到“服务下线”的请求，为了将这些无法提供服务的实例从服务列表中剔除，Eureka Server在启动的时候会创建一个定时任务，默认每隔一段时间（默认60s）将当前清单中超时（默认90s）没有续约的服务剔除出去。
+2>>、自我保护：Eureka Server 在运行期间，会统计心跳失败的比例在15分钟之内是否低于85%，如果出现低于的情况（生产环境由于网络不稳定会导致），Eureka Server会降当前的实例注册信息保护起来，让这些实例不过期，尽可能保护这些注册信息，但是在这保护期间内实例出现问题，那么客户端就很容易拿到实际上已经不存在的服务实例，会出现调用失败的情况，所以客户端必须有容错机制，比如可以使用请求重试、断路器等机制。
+在本地进行开发时可以使用 eureka.server.enable-self-preseervation=false参数来关闭保护机制，以确保注册中心可以将不可用的实例剔除。
+2>、服务提供者：提供服务的应用，可以是SpringBoot应用也可以是其他的技术平台且遵循Eureka通信机制的应用。他将自己提供的服务注册到Eureka，以供其他应用发现，（如：service层）
+1>>、服务注册：服务提供者在启动的时候会通过发送Rest请求的方式将自己注册到Eureka Server（服务注册中心）中，同时带上自身服务的一些元数据，Eureka Server 接收到这个Rest请求后，将元数据存储在一个双层结构Map中，第一层的key是服务名，第二层key是具体服务的实例名
+2>>、服务同步：若有两个或两个以上的Eureka Server（服务注册中心）时，他们之间是互相注册的，当服务提供者发送注册请求到一个服务注册中心时，它会将该请求转发到集群中相连的其他注册中心，从而实现注册中心间的服务同步，这样服务提供者的服务信息可以通过任意一台服务中心获取到
+3>>、服务续约：在注册完服务之后，服务提供者会维护一个心跳来持续告诉Eureka Server：“我还活着”，以防止Eureka Server的“剔除任务”将该服务实例从服务列表中排除出去。配置：eureka.instance.lease-renewal-in-seconds=30(续约任务的调用间隔时间，默认30秒，也就是每隔30秒向服务端发送一次心跳，证明自己依然存活)，eureka.instance.lease-expiration-duration-in-seconds=90(服务失效时间，默认90秒，也就是告诉服务端，如果90秒之内没有给你发送心跳就证明我“死”了，将我剔除)
+3>、服务消费者：消费者应用从服务注册中心获取服务列表，从而使消费者可以知道去何处调用其所需要的服务，如：Ribbon实现消费方式、Feign实现消费方式
+1>>、获取服务：当启动服务消费者的时候，它会发送一个Rest请求给注册中心，获取上面注册的服务清单，Eureka Server会维护一份只读的服务清单来返回给客户端，并且每三十秒更新一次
+2>>、服务调用：在服务消费者获取到服务清单后，通过服务名可以获得具体提供服务的实例名和该实例的元信息，采用Ribbon实现负载均衡
+3>>、服务下线：当服务实例进行正常的关闭操作时，它会触发一个服务下线的Rest请求给Eureka Server，告诉服务注册中心“我要下线了”。服务端接收到请求之后，将该服务状态设置为下线，并把下线时间传播出去。
+
+## Eureka和zookeeper都可以提供服务注册与发现的功能，两者的区别
+
+Zookeeper保证了CP(C：一致性，P：分区容错性)，Eureka保证了AP(A：高可用，P：分区容错)
+1、Zookeeper-----当向注册中心查询服务列表时，我们可以容忍注册中心返回的是几分钟以前的信息，但不能容忍直接down掉不可用的。也就是说服务注册功能对高可用性要求比较高，但是zk会出现这样的一种情况，当master节点因为网络故障与其他节点失去联系时，剩余的节点会重新选leader。问题在于，选取leader的时间过长(30~120s)，且选取期间zk集群都不可用，这样就会导致选取期间注册服务瘫痪。在云部署的环境下，因网络问题使得zk集群失去master节点是较大概率会发生的事，虽然服务最终恢复，但是漫长的选择时间导致的注册长期不可用是不能容忍的
+2、Eureka则看明白这一点，因此再设计的优先保证了高可用性。Eureka各个节点都是平等的，几个节点挂掉不会影响到正常节点的工作，剩余的节点依然可以提供注册和查询服务。而Eureka的客户端再向某个Eureka注册时如果发现连接失败，则会自动切换至其他节点，只要有一台Eureka还在，就能保证注册服务的可用(保证可用性)，只不过查到的信息可能不是最新的(不保证一致性)。除此之外Eureka还有一种自我保护机制，如果在15分钟内超过85%的节点都没有正常心跳，那么Eureka就认为客户端与注册中心出现了网络故障，此时就会出现以下几种情况：
+1>、Eureka不再从注册列表移除因为长时间没收到心跳而应该过期的服务
+2>、Eureka仍然能够接受新服务的注册和查询请求，但是不会被同步到其它节点上(保证当前节点可用)
+3>、当网络稳定时，当前实例新的注册信息会被同步到其它节点中
+Eureka还有客户端缓存功能(Eureka分为客户端程序和服务器端程序两个部分，客户端程序负责向外提供注册与发现服务接口)。所以即便Eureka集群中所有节点都失效，或者发生网络分隔故障导致客户端不能访问任何一台Eureka服务器；Eureka服务的消费者任然可以通过Eureka客户端缓存来获取所有的服务注册信息。甚至最极端的环境下，所有正常的Eureka节点都不对请求产生响应也没有更好的服务器解决方案来解决这种问题时；得益于Eureka的客户端缓存技术，消费者服务仍然可以通过Eureka客户端查询与获取注册服务信息，这点很重要，因此Eureka可以很好的应对网络故障导致部分节点失去联系的情况，而不像Zookeeper那样使整个注册服务瘫痪。
+
+## CAP理论
+
+1、Consistency：指数据的强一致性。如果写入某个数据成功，之后读取，读到的都是新写入的数据；如果写入失败，读到的都不是写入失败的数据。
+2、Availability：指服务的可用性
+3、Partition-tolerance：指分区容错
+
+## Ribbon和Nginx的区别
+
+Nginx性能好，但Ribbon可以剔除不健康节点，Nginx剔除比较麻烦，Ribbon是客户端负载均衡，Nginx是服务端负载均衡
+
+## 服务注册与发现
+
+服务注册就是向服务注册中心注册一个服务实例，服务提供者将自己的服务信息（服务名、IP地址等）告知注册中心。服务发现是服务消费另一个服务时，注册中心将服务的实例返回给服务消费者，一个服务既是服务提供者又是服务消费者。
+服务注册中心健康检查机制，当一个服务实例注册成功以后，会定时向注册中心发送一个心跳证明自己可用，若停止发送心跳证明服务不可用将会别剔除。若过段时间继续想注册中心提供心跳，将会重新加入服务注册中心列表中。
+
+## 服务的负载均衡
+
+为什么要用：微服务是将业务代码拆分为很多小的服务单元，服务之间的相互调用通过HTTP协议来调用，为了保证服务的高可用，服务单元往往都是集群化部署的，那么消费者该调用那个服务提供者的实例呢？
+介绍：服务消费者集成负载均衡组件，该组件会向服务消费者获取服务注册列表信息，并隔一段时间重新刷新获取列表。当服务消费者消费服务时，负载均衡组件获取服务提供者所有实例的注册信息，并通过一定的负载均衡策略（可以自己配置）选择一个服务提供者实例，向该实例进行服务消费，这样就实现了负载均衡。
+
+## 微服务
+
+微服务就是将工程根据不同的业务规则拆分成微服务，部署在不同的服务器上，服务之间相互调用，java中有的微服务有dubbo(只能用来做微服务)、springcloud( 提供了服务的发现、断路器等)。\
+
+## 微服务的特点
+
+按业务划分为一个独立运行的程序，即服务单元
+服务之间通过HTTP协议相互通信
+自动化部署
+可以用不同的编程语言
+可以用不同的存储技术
+服务集中化管理
+微服务是一个分布式系统
+
+## 微服务的优势
+
+1、将一个复杂的业务拆分为若干小的业务，将复杂的业务简单化，新人只需要了解他所接管的服务的代码，减少了新人的学习成本。
+2、由于微服务是分布式服务，服务于服务之间没有任何耦合。微服务系统的微服务单元具有很强的横向拓展能力。
+3、服务于服务之间采用HTTP网络通信协议来通信，单个服务内部高度耦合，服务与服务之间完全独立，无耦合。这使得微服务可以采用任何的开发语言和技术来实现，提高开发效率、降低开发成本。
+4、微服务是按照业务进行拆分的，并有坚实的服务边界，若要重写某一业务代码，不需了解所以业务，重写简单。
+5、微服务的每个服务单元是独立部署的，即独立运行在某个进程中，微服务的修改和部署对其他服务没有影响。
+6、微服务在CAP理论中采用的AP架构，具有高可用分区容错特点。高可用主要体现在系统7x24不间断服务，他要求系统有大量的服务器集群，从而提高系统的负载能力。分区容错也使得系统更加健壮。
+
+## 微服务的不足
+
+1、微服务的复杂度：构建一个微服务比较复杂，服务与服务之间通过HTTP协议或其他消息传递机制通信，开发者要选出最佳的通信机制，并解决网络服务差时带来的风险。
+2、分布式事物：将事物分成多阶段提交，如果一阶段某一节点失败仍会导致数据不正确。如果事物涉及的节点很多，某一节点的网络出现异常会导致整个事务处于阻塞状态，大大降低数据库的性能。
+3、服务划分：将一个完整的系统拆分成很多个服务，是一件非常困难的事，因为这涉及了具体的业务场景
+4、服务部署：最佳部署容器Docker
+
+
 
 # MyBatis
 
@@ -1472,3 +1601,508 @@ zookeeper 的核心是原子广播，这个机制保证了各个 server 之间�
 ## 说一下 zookeeper 的通知机制
 
 客户端端会对某个 znode 建立一个 watcher 事件，当该 znode 发生变化时，这些客户端会收到 zookeeper 的通知，然后客户端可以根据 znode 变化来做出业务上的改变。
+
+# Linux
+
+## 怎么清屏？怎么退出当前命令？怎么执行睡眠？怎么查看当前用户 id？查看指定帮助用什么命令？
+
+清屏： clear
+退出当前命令： ctrl+c 彻底退出
+执行睡眠 ： ctrl+z 挂起当前进程fg 恢复后台
+查看当前用户 id： ”id“：查看显示目前登陆账户的 uid 和 gid 及所属分组及用户名
+查看指定帮助： 如 man adduser 这个很全 而且有例子； adduser --help 这个告诉你一些常用参数； info adduesr；
+
+## Ls 命令执行什么功能？ 可以带哪些参数，有什么区别？
+
+ls 执行的功能： 列出指定目录中的目录，以及文件
+哪些参数以及区别： a 所有文件l 详细信息，包括大小字节数，可读可写可执行的权限等
+
+## 用什么命令对一个文件的内容进行统计
+
+wc 命令 - c 统计字节数 - l 统计行数 - w 统计字数
+
+## 终端是哪个文件夹下的哪个文件？黑洞文件是哪个文件夹下的哪个命令？
+
+终端 /dev/tty
+
+黑洞文件 /dev/null
+
+## Grep 命令有什么用？ 如何忽略大小写？ 如何查找不含该串的行?
+
+是一种强大的文本搜索工具，它能使用正则表达式搜索文本，并把匹 配的行打印出来。
+grep [stringSTRING] filename grep [^string] filename
+
+## 建立软链接(快捷方式)，以及硬链接的命令
+
+软链接： ln -s slink source
+硬链接： ln link source
+
+## 怎么使一个命令在后台运行?
+
+一般都是使用 & 在命令结尾来让程序自动运行。(命令后可以不追加空格)
+
+## 哪个命令专门用来查看后台任务? 
+
+job -l
+
+## 把后台任务调到前台执行使用什么命令?把停下的后台任务在后台执行起来用什么命令?
+
+把后台任务调到前台执行 fg
+
+把停下的后台任务在后台执行起来 bg
+
+## 终止进程用什么命令? 带什么参数? 
+
+kill [-s <信息名称或编号>][程序] 或 kill [-l <信息编号>] 
+
+kill-9 pid
+
+## 搜索文件用什么命令? 格式是怎么样的? 
+
+find <指定目录> <指定条件> <指定动作>
+
+whereis 加参数与文件名
+
+locate 只加文件名
+
+find 直接搜索磁盘，较慢。
+
+find / -name "string*"
+
+## 使用什么命令查看用过的命令列表
+
+history
+
+## 使用什么命令查看磁盘使用空间？ 空闲空间呢?
+
+df -hl
+
+## 使用什么命令查看 ip 地址及接口信息
+
+ifconfig
+
+## 查看各类环境变量用什么命令
+
+查看所有 env
+查看某个，如 home： env $HOME
+
+## 查找命令的可执行文件是去哪查找的? 怎么对其进行设置及添加?
+
+whereis [-bfmsu][-B <目录>...][-M <目录>...][-S <目录>...][文件...]
+
+补充说明：whereis 指令会在特定目录中查找符合条件的文件。这些文件的烈性应属于原始代码，二进制文件，或是帮助文件。
+
+> -b  只查找二进制文件。
+>
+> -B<目录> 只在设置的目录下查找二进制文件。 -f 不显示文件名前的路径名称。
+> -m  只查找说明文件。
+> -M<目录> 只在设置的目录下查找说明文件。 -s 只查找原始代码文件。
+> -S<目录> 只在设置的目录下查找原始代码文件。 -u 查找不包含指定类型的文件。
+> which 指令会在 PATH 变量指定的路径中，搜索某个系统命令的位置，并且返回第一个搜索结果。
+> -n 指定文件名长度，指定的长度必须大于或等于所有文件中最长的文件名。
+> -p 与-n 参数相同，但此处的包括了文件的路径。 -w 指定输出时栏位的宽度。
+> -V  显示版本信息
+
+## 通过什么命令查找执行命令?
+
+which 只能查可执行文件
+
+whereis 只能查二进制文件、说明文档，源文件等
+
+## 怎么对命令进行取别名
+
+alias la='ls -a'
+
+## 如果一个linux新手想要知道当前系统支持的所有命令的列表，他需要怎么做
+
+使用命令compgen ­-c，可以打印出所有支持的命令列表
+
+## 如果你的助手想要打印出当前的目录栈，你会建议他怎么做
+
+dirs
+
+## 你的系统目前有许多正在运行的任务，在不重启机器的条件下，有什么方法可以把所有正在运行的进程移除呢？
+
+使用linux命令 ’disown -r ’可以将所有正在运行的进程移除。
+
+## bash shell 中的hash 命令有什么作用？
+
+linux命令’hash’管理着一个内置的哈希表，记录了已执行过的命令的完整路径, 用该命令可以打印出你所使用过的命令以及执行的次数。
+
+## 使用哪一个命令可以查看自己文件系统的磁盘空间配额呢？
+
+使用命令repquota 能够显示出一个文件系统的配额信息
+
+【附】只有root用户才能够查看其它用户的配额。
+
+## 如何看当前Linux系统有几颗物理CPU和每颗CPU的核数
+
+```bash
+[root@localhost ~]# cat /proc/cpuinfo|grep -c 'physical id'
+1
+[root@localhost ~]# cat /proc/cpuinfo|grep -c 'processor'
+1
+```
+
+## 查看系统负载有两个常用的命令，是哪两个？这三个数值表示什么含义呢？
+
+```bash
+[root@localhost ~]# w
+ 07:02:07 up 2 days, 10:38,  2 users,  load average: 3.32, 2.48, 1.22
+USER     TTY      FROM             LOGIN@   IDLE   JCPU   PCPU WHAT
+root     tty1                      16Nov19 15days  2:56   0.00s xinit /etc/X11/
+root     pts/0    :0               07:00    7.00s 26.63s  0.05s w
+[root@localhost ~]# uptime
+ 07:02:55 up 2 days, 10:39,  2 users,  load average: 3.60, 2.73, 1.36
+```
+
+其中load average即系统负载，三个数值分别表示一分钟、五分钟、十五分钟内系统的平均负载，即平均任务数
+
+## vmstat r, b, si, so, bi, bo 这几列表示什么含义呢
+
+vmstat是Virtual Meomory Statistics（虚拟内存统计）的缩写，可对操作系统的虚拟内存、进程、CPU活动进行监控。是对系统的整体情况进行统计，不足之处是无法对某个进程进行深入分析。
+
+```bash
+[root@localhost ~]# vmstat
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 1  0 1486020  71408     36 304676   58   64  1167    77    7   74  6  3 91  0  0
+```
+
+r即running，表示正在跑的任务数
+
+b即blocked，表示被阻塞的任务数
+
+si表示有多少数据从交换分区读入内存
+
+so表示有多少数据从内存写入交换分区
+
+bi表示有多少数据从磁盘读入内存
+
+bo表示有多少数据从内存写入磁盘
+
+简记：i --input，进入内存
+
+o --output，从内存出去
+
+s --swap，交换分区
+
+b --block，块设备，磁盘
+
+单位都是KB
+
+## linux系统里，您知道buffer和cache如何区分吗
+
+buffer和cache都是内存中的一块区域，当CPU需要写数据到磁盘时，由于磁盘速度比较慢，所以CPU先把数据存进buffer，然后CPU去执行其他任务，buffer中的数据会定期写入磁盘；当CPU需要从磁盘读入数据时，由于磁盘速度比较慢，可以把即将用到的数据提前存入cache，CPU直接从Cache中拿数据要快的多。
+
+## 使用top查看系统资源占用情况时，哪一列表示内存占用呢
+
+```bash
+top - 07:09:13 up 2 days, 10:45,  2 users,  load average: 2.45, 2.59, 1.76
+Tasks: 245 total,   1 running, 244 sleeping,   0 stopped,   0 zombie
+%Cpu(s): 19.5 us,  7.4 sy,  0.0 ni, 72.7 id,  0.0 wa,  0.0 hi,  0.3 si,  0.0 st
+KiB Mem :   995892 total,    71460 free,   596932 used,   327500 buff/cache
+KiB Swap:  2097148 total,   700412 free,  1396736 used.   130548 avail Mem 
+
+   PID USER      PR  NI    VIRT    RES    SHR S %CPU %MEM     TIME+ COMMAND     
+  6631 polkitd   20   0  616328   1828    944 S  8.7  0.2  72:47.20 polkitd     
+  6582 dbus      20   0   70972   2120    564 S  8.0  0.2  65:03.88 dbus-daemon 
+ 16348 root      20   0  396516   1440    764 S  6.0  0.1  47:36.45 accounts-d+ 
+ 16450 root      20   0  456788    988    588 S  2.0  0.1  15:39.87 gsd-account 
+ 16295 root      20   0 3079676 134216  12160 S  0.7 13.5   7:10.61 gnome-shell 
+ 62200 polkitd   20   0 1561428   7632    864 S  0.7  0.8   1:27.28 mongod      
+```
+
+VIRT虚拟内存用量
+
+RES物理内存用量
+
+SHR共享内存用量
+
+%MEM内存用量
+
+## 如何实时查看网卡流量为多少？如何查看历史网卡流量？
+
+sar -n DEV#查看网卡流量，默认10分钟更新一次
+
+sar -n DEV 1 10#一秒显示一次，一共显示10次
+
+sar -n DEV -f /var/log/sa/sa22#查看指定日期的流量日志
+
+## 如何查看当前系统都有哪些进程
+
+ps -aux 或者ps -elf
+
+## ps 查看系统进程时，有一列为STAT， 其含义
+
+D不可中断，R正在运行，T停止或被追踪，W进入内存交换，X死掉的进程，<高优先级，n低优先级，s包含子进程，+位于后台的进程组S表示正在休眠；Z表示僵尸进程
+
+## 如何查看系统都开启了哪些端口
+
+```bash
+[root@localhost ~]# netstat -lnp
+Active Internet connections (only servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    
+tcp        0      0 0.0.0.0:111             0.0.0.0:*               LISTEN      1/systemd           
+tcp        0      0 0.0.0.0:6000            0.0.0.0:*               LISTEN      16078/X             
+tcp        0      0 192.168.122.1:53        0.0.0.0:*               LISTEN      7831/dnsmasq        
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      7498/sshd           
+tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN      7495/cupsd          
+tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN      7837/master xxxxxxxxxx netstat -lnp[root@localhost ~]# netstat -lnpActive Internet connections (only servers)Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name    tcp        0      0 0.0.0.0:111             0.0.0.0:*               LISTEN      1/systemd           tcp        0      0 0.0.0.0:6000            0.0.0.0:*               LISTEN      16078/X             tcp        0      0 192.168.122.1:53        0.0.0.0:*               LISTEN      7831/dnsmasq        tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN      7498/sshd           tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN      7495/cupsd          tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN      7837/master bash
+```
+
+## 如何查看网络连接状况
+
+```bash
+[root@localhost ~]# netstat -an
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State      
+tcp        0      0 0.0.0.0:111             0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:6000            0.0.0.0:*               LISTEN     
+tcp        0      0 192.168.122.1:53        0.0.0.0:*               LISTEN     
+tcp        0      0 0.0.0.0:22              0.0.0.0:*               LISTEN     
+tcp        0      0 127.0.0.1:631           0.0.0.0:*               LISTEN     
+tcp        0      0 127.0.0.1:25            0.0.0.0:*               LISTEN     
+tcp        0      0 172.17.0.1:40358        172.17.0.7:9092         CLOSE_WAIT 
+tcp6       0      0 :::5672                 :::*                    LISTEN     
+```
+
+## 想修改ip，需要编辑哪个配置文件，修改完配置文件后，如何重启网卡，使配置生效
+
+/etc/sysconfig/network-scripts/ifcft-eth0（如果是eth1文件名为ifcft-eth1），内容如下：
+
+DEVICE=eth0
+
+HWADDR=00:0C:29:06:37:BA
+
+TYPE=Ethernet
+
+UUID=0eea1820-1fe8-4a80-a6f0-39b3d314f8da
+
+ONBOOT=yes
+
+NM_CONTROLLED=yes
+
+BOOTPROTO=static
+
+IPADDR=192.168.147.130
+
+NETMASK=255.255.255.0
+
+GATEWAY=192.168.147.2
+
+DNS1=192.168.147.2
+
+DNS2=8.8.8.8
+
+修改网卡后，可以使用命令重启网卡：
+
+ifdown eth0
+
+ifup eth0
+
+也可以重启网络服务：
+
+service network restart
+
+## 能否给一个网卡配置多个IP? 如果能，怎么配置？
+
+可以。
+
+cat /etc/sysconfig/network-scripts/ifcfg-eth0#查看eth0的配置
+
+DEVICE=eth0
+
+HWADDR=00:0C:29:06:37:BA
+
+TYPE=Ethernet
+
+UUID=0eea1820-1fe8-4a80-a6f0-39b3d314f8da
+
+ONBOOT=yes
+
+NM_CONTROLLED=yes
+
+BOOTPROTO=static
+
+IPADDR=192.168.147.130
+
+NETMASK=255.255.255.0
+
+GATEWAY=192.168.147.2
+
+DNS1=192.168.147.2
+
+DNS2=8.8.8.8
+
+（1）新建一个ifcfg-eth0:1文件
+
+cp /etc/sysconfig/network-scripts/ifcfg-eth0 /etc/sysconfig/network-scripts/ifcfg-eth0:1
+
+（2）修改其内容如下：vim /etc/sysconfig/network-scripts/ifcfg-eth0:1
+
+DEVICE=eth0:1
+
+HWADDR=00:0C:29:06:37:BA
+
+TYPE=Ethernet
+
+UUID=0eea1820-1fe8-4a80-a6f0-39b3d314f8da
+
+ONBOOT=yes
+
+NM_CONTROLLED=yes
+
+BOOTPROTO=static
+
+IPADDR=192.168.147.133
+
+NETMASK=255.255.255.0
+
+GATEWAY=192.168.147.2
+
+DNS1=192.168.147.2
+
+DNS2=8.8.8.8
+
+（3）重启网络服务：
+
+service network restart
+
+## 如何查看某个网卡是否连接着交换机
+
+mii-tool eth0 或者 mii-tool eth1
+
+## 如何查看当前主机的主机名，如何修改主机名？要想重启后依旧生效，需要修改哪个配 置文件呢？
+
+查看主机名：hostname
+
+centos6.5
+
+修改主机名：hostname centos6.5-1
+
+永久生效需要修改配置文件：vim /etc/sysconfig/network
+
+NETWORKING=yes
+
+HOSTNAME=centos6.5-1
+
+## 设置DNS需要修改哪个配置文件
+
+（1）在文件 /etc/resolv.conf 中设置DNS
+
+（2）在文件 /etc/sysconfig/network-scripts/ifcfg-eth0 中设置DNS
+
+## 使用iptables 写一条规则：把来源IP为192.168.1.101访问本机80端口的包直接拒绝
+
+iptables -I INPUT -s 192.168.1.101 -p tcp --dport 80 -j REJECT
+
+## 要想把iptable的规则保存到一个文件中如何做？如何恢复？
+
+使用iptables-save重定向到文件中：iptables-save > 1.ipt
+
+使用iptables-restore反重定向回来：iptables-restore < 1.ipt
+
+## 如何备份某个用户的任务计划
+
+将/var/spool/cron/目录下指定用户的任务计划拷贝到备份目录cron_bak/下即可
+
+cp /var/spool/cron/rachy /tmp/bak/cron_bak/
+
+## 任务计划格式中，前面5个数字分表表示什么含义
+
+依次表示：分、时、日、月、周
+
+## 如何可以把系统中不用的服务关掉
+
+（1）使用可视化工具：ntsysv
+
+（2）使用命令：chkconfig servicename off
+
+## 如何让某个服务（假如服务名为 nginx）只在3,5两个运行级别开启，其他级别关闭
+
+先关闭所有运行级别：chkconfig nginx off
+
+然后打开35运行级别：chkconfig --level 35 nginx on
+
+## rsync 同步命令中，下面两种方式有什么不同呢
+
+(1) rsync -av  /dira/  ip:/dirb/
+
+(2) rsync -av  /dira/  ip::dirb
+
+答：(1)前者是通过ssh方式同步的
+
+(2)后者是通过rsync服务的方式同步的
+
+## rsync 同步时，如果要同步的源中有软连接，如何把软连接的目标文件或者目录同步
+
+同步源文件需要加-L选项
+
+## 某个账号登陆linux后，系统会在哪些日志文件中记录相关信息
+
+用户身份验证过程记录在/var/log/secure中，登录成功的信息记录在/var/log/wtmp。
+
+## 网卡或者硬盘有问题时，我们可以通过使用哪个命令查看相关信息
+
+使用命令dmesg
+
+## 分别使用xargs和exec实现这样的需求，把当前目录下所有后缀名为.txt的文件的权限修改为777
+
+（1）find ./ -type f -name "*.txt" |xargs chmod 777
+
+（2）find ./ -type f -name "*.txt" -exec chmod 777 {} ;
+
+## 有一个脚本运行时间可能超过2天，如何做才能使其不间断的运行，而且还可以随时观察脚本运行时的输出信息
+
+使用screen工具
+
+## 在Linux系统下如何按照下面要求抓包：只过滤出访问http服务的，目标ip为192.168.0.111，一共抓1000个包，并且保存到1.cap文件中
+
+tcpdump -nn -s0 host 192.168.0.111 and port 80 -c 1000 -w 1.cap
+
+## rsync 同步数据时，如何过滤出所有.txt的文件不同步
+
+加上--exclude选项：--exclude=“*.txt”
+
+## rsync同步数据时，如果目标文件比源文件还新，则忽略该文件，如何做
+
+保留更新使用-u或者--update选项
+
+## 想在Linux命令行下访问某个网站，并且该网站域名还没有解析，如何做
+
+在/etc/hosts文件中增加一条从该网站域名到其IP的解析记录即可，或者使用curl -x
+
+## 自定义解析域名的时候，我们可以编辑哪个文件？是否可以一个ip对应多个域名？是否一个域名对应多个ip
+
+编辑 /etc/hosts ,可以一个ip对应多个域名，不可以一个域名对多个ip
+
+## 我们可以使用哪个命令查看系统的历史负载（比如说两天前的）
+
+sar -q -f /var/log/sa/sa22  #查看22号的系统负载
+
+## 在Linux下如何指定dns服务器，来解析某个域名
+
+使用dig命令：dig @DNSip  domain.com
+
+如：dig @8.8.8.8 www.baidu.com#使用谷歌DNS解析百度
+
+## 使用rsync同步数据时，假如我们采用的是ssh方式，并且目标机器的sshd端口并不是默认的22端口，那我们如何做
+
+rsync "--rsh=ssh -p 10022"或者rsync -e "ssh -p 10022"
+
+## rsync同步时，如何删除目标数据多出来的数据，即源上不存在，但目标却存在的文件或者目录
+
+加上--delete选项
+
+## 使用free查看内存使用情况时，哪个数值表示真正可用的内存量
+
+free列第二行的值
+
+## 有一天你突然发现公司网站访问速度变的很慢很慢，你该怎么办呢
+
+可以从两个方面入手分析：分析系统负载，使用w命令或者uptime命令查看系统负载，如果负载很高，则使用top命令查看CPU，MEM等占用情况，要么是CPU繁忙，要么是内存不够，如果这二者都正常，再去使用sar命令分析网卡流量，分析是不是遭到了攻击。一旦分析出问题的原因，采取对应的措施解决，如决定要不要杀死一些进程，或者禁止一些访问等。
+
+## rsync使用服务模式时，如果我们指定了一个密码文件，那么这个密码文件的权限应该设置成多少才可以
+
+600或400
