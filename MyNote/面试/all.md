@@ -428,6 +428,7 @@ synchronized锁一旦被一个线程持有，其他试图获取该锁的线程�
 ## CopyOnWriteArrayList
 
 CopyOnWriteArrayList :  写时加锁，当添加一个元素的时候，将原来的容器进行copy，复制出一个新的容器，然后在新的容器里面写，写完之后再将原容器的引用指向新的容器，而读的时候是读旧容器的数据，所以可以进行并发的读，但这是一种弱一致性的策略。  
+
  使用场景：CopyOnWriteArrayList适合使用在读操作远远大于写操作的场景里，比如缓存。
 
 ## java里的阻塞队列
