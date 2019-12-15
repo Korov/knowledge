@@ -217,7 +217,7 @@ Collections.unmodifiableSet(List);
 
 ## 什么是 java 序列化？什么情况下需要序列化？
 
-序列化：将JAva对象转换成字节流。反序列化：将字节流转换成Java对象的过程。
+序列化：将Java对象转换成字节流。反序列化：将字节流转换成Java对象的过程。
 
 当Java对象需要在网络上传输或者持久化存储到文件中时，就需要使用序列化
 
@@ -287,7 +287,7 @@ start被用来启动新线程并且在内部调用了run，run不能。start不�
 
 Thread.yield()方法会使当前线程从运行状态变为就绪状态，把运行机会让给其他相同优先级的线程。
 
-## Java中interrupted 和 isInterruptedd方法的区别
+## Java中interrupted 和 isInterrupted方法的区别
 
 interrupted()是静态方法：内部实现是调用的当前线程的isInterrupted()，并且会重置当前线程的中断状态。isInterrupted()是实例方法，是调用该方法的对象所表示的那个线程的isInterrupted()，不会重置当前线程的中断状态。
 
@@ -354,7 +354,7 @@ synchronized与lock区别：
 - synchronized会自动释放锁，Lock需在finally中手工释放锁（unlock()方法释放锁），否则容易造成线程死锁；
 - 用synchronized关键字的两个线程1和线程2，如果当前线程1获得锁，线程2线程等待。如果线程1阻塞，线程2则会一直等待下去，而Lock锁就不一定会等待下去，如果尝试获取不到锁，线程可以不用一直等待就结束了；
 - synchronized的锁可重入、不可中断、非公平，而Lock锁可重入、可判断、可公平（两者皆可），（公平锁是指多个线程在等待同一个锁时，必须按照申请的时间顺序来依次获得锁）
-- ock锁适合大量同步的代码的同步问题，synchronized锁适合代码少量的同步问题
+- lock锁适合大量同步的代码的同步问题，synchronized锁适合代码少量的同步问题
 - synchronized可以给类、方法、代码块加锁，而lock只能给代码块加锁。
 
 ## 说一下 atomic 的原理
