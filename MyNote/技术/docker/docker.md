@@ -290,7 +290,6 @@ docker pull mysql;
 docker pull redis;
 docker pull rabbitmq;
 docker pull openjdk:8;
-docker pull openjdk:11;
 docker pull openjdk;
 docker pull mongo;
 docker pull nginx;
@@ -298,5 +297,6 @@ docker pull tomcat;
 docker pull wurstmeister/kafka;
 docker pull wurstmeister/zookeeper;
 docker pull zookeeper;
+docker pull webcenter/activemq;
 ```
 
