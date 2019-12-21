@@ -41,8 +41,10 @@ container_name : 容器名
 ```
 
 ```bash
-#docker进入容器的方式
+#docker进入镜像的方式
 docker run -it mysql:8.0.11 /bin/bash
+#进入容器命令
+docker exec -it kafka /bin/sh
 #重启容器
 docker restart 容器名称或者容器id
 ```
