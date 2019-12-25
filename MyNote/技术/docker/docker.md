@@ -386,9 +386,10 @@ git clone https://github.com/nacos-group/nacos-docker.git
 #执行nacos-docker/example中的脚本
 docker-compose -f ./cluster-hostname.yaml up
 
-#停止和启动
+#停止和启动，删除
 docker-compose -f ./cluster-hostname.yaml stop
 docker-compose -f ./cluster-hostname.yaml start
+docker-compose -f ./cluster-hostname.yaml rm
 ```
 
 启动完成后登录localhost:8848/nacos进入管理界面，默认用户名和密码为nacos/nacos

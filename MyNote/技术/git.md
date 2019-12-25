@@ -109,7 +109,8 @@ $ git init
 如果你是在一个已经存在文件的文件夹（而不是空文件夹）中初始化 Git 仓库来进行版本控制的话，你应该开始跟踪这些文件并提交。 你可通过 git add 命令来实现对指定文件的跟踪，然后执行 git commit 提交：
 
 ```bash
-$ git add *.c
+#用空格分开不同的文件
+$ git add *.c *.java
 $ git add LICENSE
 $ git commit -m 'initial project version'
 ```
