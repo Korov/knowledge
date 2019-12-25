@@ -196,6 +196,7 @@ cmd给出的是一个容器的默认的可执行体。也就是容器启动以�
 进入Redis docker的命令：
 
 ```bash
+docker run -itd --name redis -p 6379:6379 redis
 docker exec -it containerID redis-cli
 ```
 
@@ -235,11 +236,13 @@ cd /opt/kafka_*/bin
 
 ## 3.5 安装mysql
 
+安装的时候需要手动创建这些文件夹，以root身份创建文件夹和my.cnf配置文件
+
 ```bash
 #获取最新的mysql镜像
 docker pull mysql
 #启动mysql，并设置初始密码为人root123,-v为设置容器中内存的挂在路径
-docker run --name mysql --restart=always -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root123 -v /home/korov/Install/Docker/MySQL/data:/var/lib/mysql:rw -v /home/korov/Install/Docker/MySQL/log:/var/log/mysql:rw -v /home/korov/Install/Docker/MySQL/config/my.cnf:/etc/mysql/my.cnf:rw -d mysql:latest
+docker run --name mysql --restart=always -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root123 -v /home/korov/Install/Docker/MySQL/data:/var/lib/mysql:rw -v /home/korov/Install/Docker/MySQL/mysql-files:/var/lib/mysql-files:rw -v /home/korov/Install/Docker/MySQL/log:/var/log/mysql:rw -v /home/korov/Install/Docker/MySQL/config/my.cnf:/etc/mysql/my.cnf:rw -d mysql:latest
 ```
 
 my.cnf配置文件：
@@ -281,6 +284,126 @@ symbolic-links=0
 default_authentication_plugin= mysql_native_password
 ```
 
+## 3.6 安装nacos
+
+```
+docker pull nacos/nacos-server
+
+docker run --env MODE=standalone --name nacos -d -p 8848:8848 nacos/nacos-server
+```
+
+安装完成后访问localhost:8848/nacos/index.html
+
+默认账号密码是nacos/nacos
+
+## 3.7 安装Sentinel
+
+```bash
+docker pull bladex/sentinel-dashboard
+docker run --name sentinel -d -p 8858:8858 -d bladex/sentinel-dashboard
+```
+
+dashboard 地址:http://localhost:8858 (默认端口为8080)，账号和密码都是sentinel
+
+# 4 Docker Compose
+
+## 4.1 安装
+
+可以通过修改版本好来安装和升级
+
+```bash
+curl -L https://github.com/docker/compose/releases/download/1.25.0/docker-compose-`uname -s`-`uname -m` -o /usr/local/bin/docker-compose
+chmod +x /usr/local/bin/docker-compose
+```
+
+通过pip安装
+
+```bash
+apt install python3-pip
+pip3 install --upgrade pip -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+pip3 install docker-compose -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host mirrors.aliyun.com
+```
+
+设置国内 镜像源
+
+```bash
+mkdir -p ~/.pip
+touch  ~/.pip/pip.conf
+
+#内容
+[global]
+timeout = 6000
+index-url = https://mirrors.aliyun.com/pypi/simple/
+trusted-host = mirrors.aliyun.com
+```
+
+## 4.2 安装zookeeper集群
+
+### 4.2.1 创建compose文件
+
+```yml
+version: '2'
+networks:
+  zk:
+services:
+  zookeeper1:
+    image: zookeeper
+    container_name: zk1.cloud
+    networks:
+        - zk
+    ports:
+        - "2181:2181"
+    environment:
+      ZOO_MY_ID: 1
+      ZOO_SERVERS: server.1=0.0.0.0:2888:3888 server.2=zk2.cloud:2888:3888 server.3=zk3.cloud:2888:3888
+  zookeeper2:
+    image: zookeeper
+    container_name: zk2.cloud
+    networks:
+        - zk
+    ports:
+        - "2182:2181"
+    environment:
+      ZOO_MY_ID: 2
+      ZOO_SERVERS: server.1=zk1.cloud:2888:3888 server.2=0.0.0.0:2888:3888 server.3=zk3.cloud:2888:3888
+  zookeeper3:
+    image: zookeeper
+    container_name: zk3.cloud
+    networks:
+        - zk
+    ports:
+        - "2183:2181"
+    environment:
+      ZOO_MY_ID: 3
+      ZOO_SERVERS: server.1=zk1.cloud:2888:3888 server.2=zk2.cloud:2888:3888 server.3=0.0.0.0:2888:3888
+```
+
+这个配置文件会告诉 Docker 分别运行三个 zookeeper 镜像, 并分别将本地的 2181, 2182, 2183 端口绑定到对应的容器的2181端口上.
+ZOO_MY_ID 和 ZOO_SERVERS 是搭建 ZK 集群需要设置的两个环境变量, 其中 ZOO_MY_ID 表示 ZK 服务的 id, 它是1-255 之间的整数, 必须在集群中唯一. ZOO_SERVERS 是ZK 集群的主机列表
+
+接着我们在 docker-compose.yml 当前目录下运行:
+
+```bash
+COMPOSE_PROJECT_NAME=zk_test docker-compose up
+```
+
+## 4.3 创建nacos集群
+
+```bash
+#获取最新的示例文件
+git clone https://github.com/nacos-group/nacos-docker.git
+
+#执行nacos-docker/example中的脚本
+docker-compose -f ./cluster-hostname.yaml up
+
+#停止和启动，删除
+docker-compose -f ./cluster-hostname.yaml stop
+docker-compose -f ./cluster-hostname.yaml start
+docker-compose -f ./cluster-hostname.yaml rm
+```
+
+启动完成后登录localhost:8848/nacos进入管理界面，默认用户名和密码为nacos/nacos
+
 # 个人总结
 
 常用docker镜像：
@@ -290,7 +413,6 @@ docker pull mysql;
 docker pull redis;
 docker pull rabbitmq;
 docker pull openjdk:8;
-docker pull openjdk:11;
 docker pull openjdk;
 docker pull mongo;
 docker pull nginx;
@@ -298,5 +420,6 @@ docker pull tomcat;
 docker pull wurstmeister/kafka;
 docker pull wurstmeister/zookeeper;
 docker pull zookeeper;
+docker pull webcenter/activemq;
 ```
 
