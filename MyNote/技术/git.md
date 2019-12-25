@@ -648,11 +648,31 @@ $ git config --global alias.st status
 
 Git 的分支，其实本质上仅仅是指向提交对象的可变指针。 Git 的默认分支名字是 master。 在多次提交操作之后，你其实已经有一个指向最后那个提交对象的 master 分支。 它会在每次的提交操作中自动向前移动。
 
+```bash
+#显示所有的分支
+korov@korov-PC:~/git/github/seata$ git branch --all
+* 1.0.0     # 左侧的*代表当前所在分支
+  develop
+  master
+  remotes/origin/0.7.1
+  remotes/origin/0.8.0
+  remotes/origin/0.8.1
+  remotes/origin/0.9.0
+  remotes/origin/1.0.0
+  remotes/origin/HEAD -> origin/develop
+  remotes/origin/at_plugin
+  remotes/origin/develop
+  remotes/origin/feature_spring_support
+  remotes/origin/fix_repeated_rollback
+  remotes/origin/master
+  remotes/origin/multi-primar
+```
+
+
+
 ### 3.2分支创建
 
 ```bash
-#显示所有的分支
-$ git branch --all
 $ git branch testing
 ```
 
@@ -699,8 +719,9 @@ $ git checkout -b hotfix
 ![1569953946167](picture\1569953353677.png)
 
 ```bash
-#合并
+#切换到master分支
 $ git checkout master
+#讲hotfix分支上面的修改合并到master分支，merge的作用是将目标分支合并到当前分支中
 $ git merge hotfix
 #问题修复完成后将hotfix删除之后切回iss53分支继续工作
 $ git branch -d hotfix
@@ -786,7 +807,7 @@ To https://github.com/schacon/simplegit
 * [new branch] serverfix -> serverfix
 ```
 
-这里有些工作被简化了。 Git 自动将 serverfix 分支名字展开为refs/heads/serverfix:refs/heads/serverfix，那意味着，“推送本地的 serverfix分支来更新远程仓库上的 serverfix 分支。”你也可以运行 git push origin serverfix:serverfix，它会做同样的事 - 相当于它说，“推送本地的 serverfix 分支，将其作为远程仓库的 serverfix 分支” 可以通过这种格式来推送本地分支到一个命名不相同的远程分支。 如果并不想让远程仓库上的分支叫做 serverfix，可以运行 git push origin serverfix:awesomebranch 来将本地的 serverfix 分支推送到远程仓库上的 awesomebranch分支
+这里有些工作被简化了。 Git 自动将 serverfix 分支名字展开为refs/heads/serverfix:refs/heads/serverfix，那意味着，“推送本地的 serverfix分支来更新远程仓库上的 serverfix 分支。”**你也可以运行 git push origin serverfix:serverfix，它会做同样的事 - 相当于它说，“推送本地的 serverfix 分支，将其作为远程仓库的 serverfix 分支” 可以通过这种格式来推送本地分支到一个命名不相同的远程分支。** 如果并不想让远程仓库上的分支叫做 serverfix，可以运行 git push origin serverfix:awesomebranch 来将本地的 serverfix 分支推送到远程仓库上的 awesomebranch分支
 
 下一次其他协作者从服务器上抓取数据时，他们会在本地生成一个远程分支 origin/serverfix，指向服务器的 serverfix 分支的引用。要特别注意的一点是当抓取到新的远程跟踪分支时，本地不会自动生成一份可编辑的副本（拷贝）。 换一句话说，这种情况下，不会有一个新的 serverfix 分支 - 只有一个不可以修改的 origin/serverfix 指针。
 
