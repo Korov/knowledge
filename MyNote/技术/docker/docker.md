@@ -296,6 +296,15 @@ docker run --env MODE=standalone --name nacos -d -p 8848:8848 nacos/nacos-server
 
 默认账号密码是nacos/nacos
 
+## 3.7 安装Sentinel
+
+```bash
+docker pull bladex/sentinel-dashboard
+docker run --name sentinel -d -p 8858:8858 -d bladex/sentinel-dashboard
+```
+
+dashboard 地址:http://localhost:8858 (默认端口为8080)，账号和密码都是sentinel
+
 # 4 Docker Compose
 
 ## 4.1 安装
