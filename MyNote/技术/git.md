@@ -651,6 +651,8 @@ Git 的分支，其实本质上仅仅是指向提交对象的可变指针。 Git
 ### 3.2分支创建
 
 ```bash
+#显示所有的分支
+$ git branch --all
 $ git branch testing
 ```
 
