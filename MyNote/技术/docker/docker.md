@@ -196,6 +196,7 @@ cmd给出的是一个容器的默认的可执行体。也就是容器启动以�
 进入Redis docker的命令：
 
 ```bash
+docker run -itd --name redis -p 6379:6379 redis
 docker exec -it containerID redis-cli
 ```
 
