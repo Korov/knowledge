@@ -283,6 +283,18 @@ symbolic-links=0
 default_authentication_plugin= mysql_native_password
 ```
 
+## 3.6 安装nacos
+
+```
+docker pull nacos/nacos-server
+
+docker run --env MODE=standalone --name nacos -d -p 8848:8848 nacos/nacos-server
+```
+
+安装完成后访问localhost:8848/nacos/index.html
+
+默认账号密码是nacos/nacos
+
 # 4 Docker Compose
 
 ## 4.1 安装
@@ -365,7 +377,21 @@ ZOO_MY_ID 和 ZOO_SERVERS 是搭建 ZK 集群需要设置的两个环境变量, 
 COMPOSE_PROJECT_NAME=zk_test docker-compose up
 ```
 
+## 4.3 创建nacos集群
 
+```bash
+#获取最新的示例文件
+git clone https://github.com/nacos-group/nacos-docker.git
+
+#执行nacos-docker/example中的脚本
+docker-compose -f ./cluster-hostname.yaml up
+
+#停止和启动
+docker-compose -f ./cluster-hostname.yaml stop
+docker-compose -f ./cluster-hostname.yaml start
+```
+
+启动完成后登录localhost:8848/nacos进入管理界面，默认用户名和密码为nacos/nacos
 
 # 个人总结
 
