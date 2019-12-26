@@ -11,6 +11,7 @@
     <modules>
         <module>provider</module>
         <module>consumer</module>
+        <module>sentinel</module>
     </modules>
 
     <properties>
@@ -90,6 +91,11 @@
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
                 <version>0.9.1</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alibaba.csp</groupId>
+                <artifactId>sentinel-core</artifactId>
+                <version>1.7.1</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
