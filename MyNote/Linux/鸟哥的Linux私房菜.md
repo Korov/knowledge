@@ -632,3 +632,10 @@ groupadd新增群组，groupmod修改群组属性，groupdel删除群组，gpass
 **htop**命令显示了每个进程的内存实时使用率。它提供了所有进程的常驻内存大小、程序总内存大小、共享库大小等的报告。列表可以水平及垂直滚动，此命令感觉更实用一些。
 
 **ps**命令可以实时的显示各个进程的内存使用情况：ps aux --sort -rss，之后使用kill -9 PID杀死相应的进程
+
+## 2 切换java版本
+
+```bash
+sudo update-alternatives --config java
+```
+

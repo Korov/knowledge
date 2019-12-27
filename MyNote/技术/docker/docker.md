@@ -305,6 +305,26 @@ docker run --name sentinel -d -p 8858:8858 -d bladex/sentinel-dashboard
 
 dashboard 地址:http://localhost:8858 (默认端口为8080)，账号和密码都是sentinel
 
+## 3.8 安装seata
+
+```bash
+docker pull seataio/seata-server
+docker run --name seata-server -p 8091:8091 seataio/seata-server:latest
+#指定自定义配置文件启动
+docker run --name seata-server \
+        -p 8091:8091 \
+        -e SEATA_CONFIG_NAME=file:/root/seata-config/registry \
+        -v /PATH/TO/CONFIG_FILE:/root/seata-config  \
+        seataio/seata-server
+#指定seata-server IP启动
+docker run --name seata-server \
+        -p 8091:8091 \
+        -e SEATA_IP=192.168.1.1 \
+        seataio/seata-server
+```
+
+
+
 # 4 Docker Compose
 
 ## 4.1 安装
@@ -403,6 +423,25 @@ docker-compose -f ./cluster-hostname.yaml rm
 ```
 
 启动完成后登录localhost:8848/nacos进入管理界面，默认用户名和密码为nacos/nacos
+
+## 4.4 安装seata
+
+docker-compose.yaml配置文件
+
+```yaml
+version: "3"
+services:
+  seata-server:
+    image: seataio/seata-server
+    hostname: seata-server
+    ports:
+      - "8091:8091"
+    environment:
+      - SEATA_PORT=8091
+      - STORE_MODE=file
+```
+
+
 
 # 个人总结
 
