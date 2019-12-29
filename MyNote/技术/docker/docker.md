@@ -49,6 +49,16 @@ docker exec -it kafka /bin/sh
 docker restart 容器名称或者容器id
 ```
 
+## 查看容器所有信息
+
+此命令可以查看此容器的所有信息
+
+```bash
+docker inspect 容器名
+```
+
+
+
 # 2 dockerfile
 
 Dockerfile 由一行行命令语句组成， 并且支持以＃开头的注释行。
@@ -311,7 +321,7 @@ dashboard 地址:http://localhost:8858 (默认端口为8080)，账号和密码�
 
 ```bash
 docker pull seataio/seata-server
-docker run --name seata-server -p 8091:8091 seataio/seata-server:latest
+docker run --net example_default --link nacos1:nacos --name seata-server -p 8091:8091 seataio/seata-server:latest
 #指定自定义配置文件启动
 docker run --name seata-server \
         -p 8091:8091 \
@@ -344,12 +354,43 @@ CMD /seata-server/bin/seata-server.sh
 
 2.生成镜像并启动
 
-```
+```bash
 #使用nacos作为配置中心的时候需要执行配置文件，需要github下载源码，并编译，在distribution中找到nacos-config.sh，执行完毕之后nacos配置中心会多出很多配置文件
 ./nacos-config.sh 127.0.0.1
 #首先需要去github上下载相应的包
 docker build -f Dockerfile -t seata-server:1.0 .
 
+#启动docker ,需要使用--link使两个容器可以通信，--link 容器名:别名  。如下所示就可以在次容器中使用 ping nacos通信
+docker run --name seata-server --net example_default --link nacos1:nacos --restart always \
+        -p 8091:8091 \
+        -v /home/korov/Install/Docker/seata/conf/registry.conf:/seata-server/conf/registry.cnf:rw  \
+        -v /home/korov/Install/Docker/seata/conf/file.conf:/seata-server/conf/file.cnf:rw  \
+        -v /home/korov/Install/Docker/seata/conf/logback.xml:/seata-server/conf/logback.xml:rw  \
+        -v /home/korov/Install/Docker/seata/logs/seata:/seata-server/logs/seata:rw  \
+        seata-server:1.0
+        
+ 
+ #配置文件
+ registry {
+  # file 、nacos 、eureka、redis、zk、consul、etcd3、sofa
+  type = "nacos"
+
+  nacos {
+    serverAddr = "nacos"
+    namespace = "public"
+    cluster = "default"
+  }
+}
+
+config {
+  # file、nacos 、apollo、zk、consul、etcd3
+  type = "nacos"
+
+  nacos {
+    serverAddr = "nacos"
+    namespace = "public"
+  }
+}
 ```
 
 
