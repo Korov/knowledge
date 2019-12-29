@@ -72,7 +72,7 @@ Dockerfile中的指令及说明
 - ENTRYPOINT：指定镜像的默认入口命令，不会被替换，会追加
 - ONBUILD：创建子镜像时指定自动执行的操作指令，触发器
 - LABEL：为生成的镜像添加元数据标签信息
-- VOLUME：创建一个数据卷挂载点
+- VOLUME：创建一个数据卷挂载点，这里只是声明该挂载点，可以在run的时候使用-v指定，如果run的时候没有制定，则会在/var/lib/docker/volumes目录下创建一个目录来绑定匿名卷。
 - USER：指定运行容器时的用户名或UID
 - STOPSIGNAL：指定退出的信号值
 - HEALTHCHECK：配置所启动容器如何进行健康检查
@@ -196,7 +196,7 @@ cmd给出的是一个容器的默认的可执行体。也就是容器启动以�
 进入Redis docker的命令：
 
 ```bash
-docker run -itd --name redis -p 6379:6379 redis
+docker run -itd --restart always --name redis -p 6379:6379 redis
 docker exec -it containerID redis-cli
 ```
 
@@ -300,12 +300,14 @@ docker run --env MODE=standalone --name nacos -d -p 8848:8848 nacos/nacos-server
 
 ```bash
 docker pull bladex/sentinel-dashboard
-docker run --name sentinel -d -p 8858:8858 -d bladex/sentinel-dashboard
+docker run --restart always --name sentinel -d -p 8858:8858 -d bladex/sentinel-dashboard
 ```
 
 dashboard 地址:http://localhost:8858 (默认端口为8080)，账号和密码都是sentinel
 
 ## 3.8 安装seata
+
+以下为官方推荐方法，但是不能注册nacos
 
 ```bash
 docker pull seataio/seata-server
@@ -313,7 +315,7 @@ docker run --name seata-server -p 8091:8091 seataio/seata-server:latest
 #指定自定义配置文件启动
 docker run --name seata-server \
         -p 8091:8091 \
-        -e SEATA_CONFIG_NAME=file:/root/seata-config/registry \
+        -e SEATA_CONFIG_NAME=file:/home/korov/Install/Docker/seata/conf/registry \
         -v /PATH/TO/CONFIG_FILE:/root/seata-config  \
         seataio/seata-server
 #指定seata-server IP启动
@@ -321,6 +323,33 @@ docker run --name seata-server \
         -p 8091:8091 \
         -e SEATA_IP=192.168.1.1 \
         seataio/seata-server
+```
+
+我自己做的image
+
+1.创建dockerfile
+
+```dockerfile
+FROM openjdk:8
+MAINTAINER korov<korov9@163.com>
+RUN cd /
+RUN mkdir seata-server
+WORKDIR /seata-server
+
+COPY seata-server /seata-server
+
+EXPOSE 8091
+CMD /seata-server/bin/seata-server.sh
+```
+
+2.生成镜像并启动
+
+```
+#使用nacos作为配置中心的时候需要执行配置文件，需要github下载源码，并编译，在distribution中找到nacos-config.sh，执行完毕之后nacos配置中心会多出很多配置文件
+./nacos-config.sh 127.0.0.1
+#首先需要去github上下载相应的包
+docker build -f Dockerfile -t seata-server:1.0 .
+
 ```
 
 

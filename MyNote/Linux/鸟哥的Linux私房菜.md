@@ -639,3 +639,10 @@ groupadd新增群组，groupmod修改群组属性，groupdel删除群组，gpass
 sudo update-alternatives --config java
 ```
 
+## 3 查看端口占用
+
+```bash
+netstat -a | grep 8080
+kill -9 pid
+```
+
