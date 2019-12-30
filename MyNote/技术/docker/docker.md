@@ -488,49 +488,97 @@ innobackupex --user=root --password=abc123456 --copy-back /data/backup/full/2018
 
 #### 2 Replication
 
-创建两个配置文件
-
-主服务器配置文件my-m.cnf
-
-```
-[mysqld]
-log-bin = mysql-bin
-server-id = 1
-sql_mode = NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
+```bash
+docker pull docker.io/cytopia/mysql-8.0
+#在/home下建一个文件夹
+mkdir /home/wen
 ```
 
-从服务器配置文件my-s.cnf
+在主服务器建一个master.my.cnf
 
 ```
-[mysqld]
-log-bin = mysql-bin
-server-id = 2
-sql_mode = NO_ENGINE_SUBSTITUTION,STRICT_TRANS_TABLES
+[client]
+ socket = /var/sock/mysqld/mysqld.sock
+ [mysql]
+ socket = /var/sock/mysqld/mysqld.sock
+ [mysqld]
+ skip-host-cache
+ skip-name-resolve
+ datadir = /var/lib/mysql
+ user = mysql
+ port = 3306
+ bind-address = 0.0.0.0
+ socket = /var/sock/mysqld/mysqld.sock
+ pid-file = /var/run/mysqld/mysqld.pid
+ general_log_file = /var/log/mysql/query.log
+ slow_query_log_file = /var/log/mysql/slow.log
+ log-error = /var/log/mysql/error.log
+ log-bin=mysql-bin
+ server-id=1
+ !includedir /etc/my.cnf.d/
+ !includedir /etc/mysql/conf.d/
+ !includedir /etc/mysql/docker-default.d/
 ```
 
-启动镜像
+在从服务器建一个slave.my.cnf，内容如下
+
+```
+[client]
+ socket = /var/sock/mysqld/mysqld.sock
+ [mysql]
+ socket = /var/sock/mysqld/mysqld.sock
+ [mysqld]
+ skip-host-cache
+ skip-name-resolve
+ datadir = /var/lib/mysql
+ user = mysql
+ port = 3306
+ bind-address = 0.0.0.0
+ socket = /var/sock/mysqld/mysqld.sock
+ pid-file = /var/run/mysqld/mysqld.pid
+ general_log_file = /var/log/mysql/query.log
+ slow_query_log_file = /var/log/mysql/slow.log
+ log-error = /var/log/mysql/error.log
+ log-bin=mysql-bin
+ server-id=2
+ !includedir /etc/my.cnf.d/
+ !includedir /etc/mysql/conf.d/
+ !includedir /etc/mysql/docker-default.d/
+```
+
+这里他们的server-id要区分开
+
+启动主从服务器
 
 ```bash
-docker run -d -e MYSQL_ROOT_PASSWORD=root123 --name mysql-m -v /home/docker/my-m.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf  -p 3307:3306 mysql:5.6
+docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=abcd123 -p  3307:3306 -v /etc/localtime:/etc/localtime:ro -v  /home/wen/master.my.cnf:/etc/my.cnf docker.io/cytopia/mysql-8.0
 
-docker run -d -e MYSQL_ROOT_PASSWORD=root123 --name mysql-s -v /home/docker/my-s.cnf:/etc/mysql/mysql.conf.d/mysqld.cnf  -p 3308:3306 mysql:5.6
-
-#进入主容器，并创建用户和授权
-docker exec -it mysql-m /bin/bash
-#以下命令为在容器中执行
-mysql -uroot -p
-create user 'test'@'192.168.99.100' identified by '123456';
-GRANT REPLICATION SLAVE ON *.* to 'test'@'%' identified by '123456';
-#执行命令:show master status，记录file属性和Position属性，如上图
-#退出主容器
-
-#进入副容器，并进入mysql，master_log_file为上面的file，master_log_pos为上面的position
-change master to master_host='192.168.99.100',master_user='test',master_password='123456',master_log_file='mysql-bin.000004',master_log_pos=478,master_port=3307;
-
-start slaves;
+docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=abcd123 -p  3306:3306 -v /etc/localtime:/etc/localtime:ro -v  /home/wen/slave.my.cnf:/etc/my.cnf docker.io/cytopia/mysql-8.0
 ```
 
+使用数据库连接工具进行连接，先连接主服务器的数据库依次执行
 
+```MySQL 
+GRANT REPLICATION SLAVE ON *.* TO 'root'@'%';
+flush privileges;
+show master status;#可以看到主数据库的状态
+```
+
+切换到从数据库，依次执行
+
+```mysql
+CHANGE MASTER TO
+ MASTER_HOST='172.31.27.67',
+ MASTER_PORT=3307,
+ MASTER_USER='root',
+ MASTER_PASSWORD='abcd123',
+ MASTER_LOG_FILE='mysql-bin.000003',
+ MASTER_LOG_POS=6143;
+#MASTER_LOG_FILE和MASTER_LOG_POS分别对应上面主服务器中show master status显示的file属性和Position属性
+start slave;
+show slave status;
+#其中Slave_IO_Running,Slave_SQL_Running必须为Yes，表示同步成功，否则执行，stop slave;将之前的动作重新执行一遍。之后我们在主库做的SQL语句执行，会同步到从库中来。
+```
 
 ## 3.6 安装nacos
 
