@@ -560,10 +560,10 @@ jps-l
 ```bash
 #格式 interval和count代表查询间隔和次数，如果省略这两个参数说明只查询一次
 jstat[option vmid[interval[s|ms][count]]]
-#lvmid格式
+#lvmid与vmid，如果是本地虚拟机进程，vmid与lvmid是一致的，如果时远程虚拟机，那么vmid格式应当是
 [protocol:][//]lvmid[@hostname[:port]/servername]
-#假设需要每250毫秒查询一次进程2764垃圾收集状况，一共查询20次，那命令应当是：
-jstat-gc 2764 250 20
+#参数interval和count代表查询间隔和次数，如果省略这两个参数，说明只查询一次。假设需要每250毫秒查询一次进程2764垃圾收集状况，一共查询20次，那命令应当是：
+jstat -gc 2764 250 20
 ```
 
 ### 4.1.3 HSDIS：JIT生成代码反编汇
