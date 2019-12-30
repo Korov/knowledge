@@ -360,7 +360,7 @@ CMD /seata-server/bin/seata-server.sh
 #首先需要去github上下载相应的包
 docker build -f Dockerfile -t seata-server:1.0 .
 
-#启动docker ,需要使用--link使两个容器可以通信，--link 容器名:别名  。如下所示就可以在次容器中使用 ping nacos通信
+#启动docker ,需要使用--link使两个容器可以通信，--link 容器名:别名  。如下所示就可以在此容器中使用 ping nacos通信
 docker run --name seata-server --net example_default --link nacos1:nacos --restart always \
         -p 8091:8091 \
         -v /home/korov/Install/Docker/seata/conf/registry.conf:/seata-server/conf/registry.cnf:rw  \
@@ -436,6 +436,8 @@ services:
 **每个服务都必须通过image指令指定镜像或build指令（需要Dockerfile）等来自动构建生成镜像。如果使用build指令，在Dockerfile中设置的选项（例如CMD、EXPOSE）将自动被获取，无须在docker-compose.yml中再次设置**
 
 ## 4.0 docker compose使用
+
+同一个docker compose文件中的服务时可以通过服务的名称进行相互link的。要link外部的话就需要使用external_links。
 
 ### 4.0.1 常用命令
 
@@ -646,7 +648,7 @@ docker-compose kill [options] [SERVICE...]`
 `docker-compose version`
 打印版本信息。
 
-### docker-compose模板文件
+### 4.0.2 docker-compose模板文件
 
 Docker-Compose标准模板文件应该包含version、services、networks 三大部分，最关键的是services和networks两个部分
 
@@ -1134,7 +1136,7 @@ services:
 
 # 个人总结
 
-常用docker镜像：
+## 常用docker镜像：
 
 ```sh
 docker pull mysql;
@@ -1151,3 +1153,8 @@ docker pull zookeeper;
 docker pull webcenter/activemq;
 ```
 
+## --link参数
+
+启动docker ,需要使用--link使两个容器可以通信，--link 容器名:别名  。可以在此容器中使用 ping nacos通信。
+
+每个容器都有自己的IP，是通过主机的docker0进行拓扑的，使用--link则会直接链接到此容器的IP上不会通过主机进行映射。这个让我更深入了解容器是一个单独的虚拟机。
