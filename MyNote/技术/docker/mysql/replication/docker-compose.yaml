@@ -1,28 +1,41 @@
 version: "3"
 services:
   mysql-master:
-    build:
-      context: ./
-      dockerfile: master/Dockerfile
+    container_name: mysql-master
+    image: mysql
     environment:
       - "MYSQL_ROOT_PASSWORD=root123"
-      - "MYSQL_DATABASE=replicas_db"
-    links:
-      - mysql-slave
+    volumes:
+      - ./master/data:/var/lib/mysql:rw
+      - ./master/mysql-files:/var/lib/mysql-files:rw
+      - ./master/log:/var/log/mysql:rw
+      - /etc/localtime:/etc/localtime:ro
+      - ./master/config/my.cnf:/etc/mysql/my.cnf:rw
     ports:
       - "3306:3306"
     restart: always
     hostname: mysql-master
+    networks:
+      - mysql
   mysql-slave:
-    build:
-      context: ./
-      dockerfile: slave/Dockerfile
+    container_name: mysql-slave
+    image: mysql
     environment:
       - "MYSQL_ROOT_PASSWORD=root123"
-      - "MYSQL_DATABASE=replicas_db"
-    links:
-      - mysql-master
+    volumes:
+      - ./slave/data:/var/lib/mysql:rw
+      - ./slave/mysql-files:/var/lib/mysql-files:rw
+      - ./slave/log:/var/log/mysql:rw
+      - /etc/localtime:/etc/localtime:ro
+      - ./slave/config/my.cnf:/etc/mysql/my.cnf:rw
     ports:
       - "3307:3306"
     restart: always
     hostname: mysql-slave
+    links:
+      - mysql-master
+    networks:
+      - mysql
+networks:
+   mysql:
+    driver: bridge

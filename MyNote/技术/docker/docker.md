@@ -254,7 +254,12 @@ cd /opt/kafka_*/bin
 #获取最新的mysql镜像
 docker pull mysql
 #启动mysql，并设置初始密码为人root123,-v为设置容器中内存的挂在路径
-docker run --name mysql --restart=always -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root123 -v /home/korov/Install/Docker/MySQL/data:/var/lib/mysql:rw -v /home/korov/Install/Docker/MySQL/mysql-files:/var/lib/mysql-files:rw -v /home/korov/Install/Docker/MySQL/log:/var/log/mysql:rw -v /home/korov/Install/Docker/MySQL/config/my.cnf:/etc/mysql/my.cnf:rw -d mysql:latest
+docker run --name mysql --restart=always -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root123 \
+-v /home/korov/Install/Docker/MySQL/data:/var/lib/mysql:rw \
+-v /home/korov/Install/Docker/MySQL/mysql-files:/var/lib/mysql-files:rw \
+-v /home/korov/Install/Docker/MySQL/log:/var/log/mysql:rw \
+-v /home/korov/Install/Docker/MySQL/config/my.cnf:/etc/mysql/my.cnf:rw \
+-d mysql:latest
 ```
 
 my.cnf配置文件：
@@ -567,11 +572,12 @@ show master status;#可以看到主数据库的状态
 切换到从数据库，依次执行
 
 ```mysql
+GRANT REPLICATION SLAVE ON *.* TO 'root'@'%';
 CHANGE MASTER TO
- MASTER_HOST='172.31.27.67',
- MASTER_PORT=3307,
+ MASTER_HOST='mysql-master',
+ MASTER_PORT=3306,
  MASTER_USER='root',
- MASTER_PASSWORD='abcd123',
+ MASTER_PASSWORD='root123',
  MASTER_LOG_FILE='mysql-bin.000003',
  MASTER_LOG_POS=6143;
 #MASTER_LOG_FILE和MASTER_LOG_POS分别对应上面主服务器中show master status显示的file属性和Position属性
