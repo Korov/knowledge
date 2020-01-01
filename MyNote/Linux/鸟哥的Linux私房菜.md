@@ -646,3 +646,9 @@ netstat -a | grep 8080
 kill -9 pid
 ```
 
+## 4 linux开放1024以下的端口号
+
+```bash
+sudo ufw allow 80/tcp
+```
+
