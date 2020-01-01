@@ -255,10 +255,10 @@ cd /opt/kafka_*/bin
 docker pull mysql
 #启动mysql，并设置初始密码为人root123,-v为设置容器中内存的挂在路径
 docker run --name mysql --restart=always -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root123 \
--v /home/korov/Install/Docker/MySQL/data:/var/lib/mysql:rw \
--v /home/korov/Install/Docker/MySQL/mysql-files:/var/lib/mysql-files:rw \
--v /home/korov/Install/Docker/MySQL/log:/var/log/mysql:rw \
--v /home/korov/Install/Docker/MySQL/config/my.cnf:/etc/mysql/my.cnf:rw \
+-v "%PWD"/MySQL/data:/var/lib/mysql:rw \
+-v "%PWD"MySQL/mysql-files:/var/lib/mysql-files:rw \
+-v "%PWD"/MySQL/log:/var/log/mysql:rw \
+-v "%PWD"/MySQL/config/my.cnf:/etc/mysql/my.cnf:rw \
 -d mysql:latest
 ```
 
