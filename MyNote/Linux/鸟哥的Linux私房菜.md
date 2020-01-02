@@ -648,7 +648,13 @@ kill -9 pid
 
 ## 4 linux开放1024以下的端口号
 
-```bash
-sudo ufw allow 80/tcp
+
+```
+# 例如开启80端口，可以将80端口转发到8080端口
+tables -t nat -A PREROUTING -p tcp –dport 80 -j REDIRECT –to-ports 8080
+iptables -t nat -A OUTPUT -p tcp -d 127.0.0.1 –dport 80 -j REDIRECT –to-ports 8080
+#删除，重启之后此设置也会失效
+iptables -t nat -F PREROUTING
+iptables -t nat -F OUTPUT
 ```
 
