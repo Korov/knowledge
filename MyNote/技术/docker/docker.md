@@ -246,61 +246,6 @@ cd /opt/kafka_*/bin
 
 ## 3.5 mysql
 
-### 3.5.1 安装单个MySQL
-
-安装的时候需要手动创建这些文件夹，以root身份创建文件夹和my.cnf配置文件
-
-```bash
-#获取最新的mysql镜像
-docker pull mysql
-#启动mysql，并设置初始密码为人root123,-v为设置容器中内存的挂在路径
-docker run --name mysql --restart=always -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root123 \
--v "%PWD"/MySQL/data:/var/lib/mysql:rw \
--v "%PWD"MySQL/mysql-files:/var/lib/mysql-files:rw \
--v "%PWD"/MySQL/log:/var/log/mysql:rw \
--v "%PWD"/MySQL/config/my.cnf:/etc/mysql/my.cnf:rw \
--d mysql:latest
-```
-
-my.cnf配置文件：
-
-```
- 
-# Copyright (c) 2017, Oracle and/or its affiliates. All rights reserved.
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; version 2 of the License.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301 USA
-
-#
-# The MySQL  Server configuration file.
-#
-# For explanations see
-# http://dev.mysql.com/doc/mysql/en/server-system-variables.html
-
-[mysqld]
-pid-file        = /var/run/mysqld/mysqld.pid
-socket          = /var/run/mysqld/mysqld.sock
-datadir         = /var/lib/mysql
-secure-file-priv= NULL
-# Disabling symbolic-links is recommended to prevent assorted security risks
-symbolic-links=0
-
-# Custom config should go here
-!includedir /etc/mysql/conf.d/
-
-default_authentication_plugin= mysql_native_password
-```
-
 ### 3.5.2 安装MySQL集群
 
 两种集群方式：
