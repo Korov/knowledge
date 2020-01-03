@@ -1468,3 +1468,11 @@ docker pull webcenter/activemq;
 启动docker ,需要使用--link使两个容器可以通信，--link 容器名:别名  。可以在此容器中使用 ping nacos通信。
 
 每个容器都有自己的IP，是通过主机的docker0进行拓扑的，使用--link则会直接链接到此容器的IP上不会通过主机进行映射。这个让我更深入了解容器是一个单独的虚拟机。
+
+## 创建一个network
+
+```bash
+docker network create --driver bridge --subnet 172.19.0.0/16 br17219
+```
+
+驱动为bridge，名称为br17219。

@@ -25,9 +25,14 @@ $ /tmp/install.sh
 能在执行书中的范例时，会遇到各种莫名其妙的“权限不足”（Permission Denied）错误。
 要查看你的 SELinux 处于什么模式，可以通过执行 sestatus 命令的结果得知。要将 SELinux 设为宽容模式，只需执行 sudo setenforce 0。
 
-### 2.1.2 不shiyongsudo命令执行docker
+### 2.1.2 不使用sudo命令执行docker
 
-将用户放进docker用户组中`$ sudo usermod -aG docker $USER`。之后注销再登入，并重启docker。
+```bash
+sudo groupadd docker     #添加docker用户组
+sudo gpasswd -a $USER docker     #将登陆用户加入到docker用户组中
+newgrp docker     #更新用户组
+docker ps    #测试docker命令是否可以使用sudo正常使用
+```
 
 # 第三章 迈出第一步
 
