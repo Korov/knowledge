@@ -954,3 +954,10 @@ $ git rebase master server
 在git bash界面右击Options...->Text 将Locale设置为zh_CN，将Character set设置为UTF-8。
 
 git bash中设置全局变量 `git config --global core.quotepath false` 
+
+## 4.2 git记住用户名和密码
+
+```bash
+git config --global credential.helper store
+```
+
