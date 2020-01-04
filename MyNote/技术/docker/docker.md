@@ -216,10 +216,16 @@ docker exec -it containerID redis-cli
 docker load -i kafka.tar;
 docker load -i zookeeper.tar;
 docker run -d --name zookeeper -p 2181:2181 -t wurstmeister/zookeeper;
-docker run -d --name kafka --publish 9092:9092 --link zookeeper --env KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 --env KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092 --env KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://192.168.106.143:9092 --volume /etc/localtime:/etc/localtime wurstmeister/kafka;
+docker run -d --name kafka --publish 9092:9092 --link zookeeper \
+--env KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 \
+--env KAFKA_ADVERTISED_HOST_NAME=localhost \
+--env KAFKA_ADVERTISED_PORT=9092 \
+--volume /etc/localtime:/etc/localtime wurstmeister/kafka;
 ```
 
 以上启动Kafka，接下来需要进入Kafka的docker修改文件
+
+KAFKA_LISTENERS是内网使用的，KAFKA_ADVERTISED_LISTENERS外网使用的时候才配置，配置的是宿主机的ip加端口
 
 ```bash
 #修改上面的启动参数之后不用修改了
@@ -235,110 +241,13 @@ docker exec -it kafka /bin/sh
 #进入Kafka的bin目录下
 cd /opt/kafka_*/bin
 #创建一个topic，并设置partition的数量为1
-./kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic mykafka
+./opt/kafka_*/bin/kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic test
 #查看创建的topic
-./kafka-topics.sh --describe --zookeeper zookeeper:2181 --topic mykafka
+./opt/kafka_*/bin/kafka-topics.sh --describe --zookeeper zookeeper:2181 --topic test
 #创建一个生产者发送消息
-./kafka-console-producer.sh --broker-list localhost:9092 --topic mykafka
+./opt/kafka_*/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
 #创建一个消费者接受消息
-./kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic mykafka --from-beginning
-```
-
-## 3.5 mysql
-
-#### 2 Replication
-
-```bash
-docker pull docker.io/cytopia/mysql-8.0
-#在/home下建一个文件夹
-mkdir /home/wen
-```
-
-在主服务器建一个master.my.cnf
-
-```
-[client]
- socket = /var/sock/mysqld/mysqld.sock
- [mysql]
- socket = /var/sock/mysqld/mysqld.sock
- [mysqld]
- skip-host-cache
- skip-name-resolve
- datadir = /var/lib/mysql
- user = mysql
- port = 3306
- bind-address = 0.0.0.0
- socket = /var/sock/mysqld/mysqld.sock
- pid-file = /var/run/mysqld/mysqld.pid
- general_log_file = /var/log/mysql/query.log
- slow_query_log_file = /var/log/mysql/slow.log
- log-error = /var/log/mysql/error.log
- log-bin=mysql-bin
- server-id=1
- !includedir /etc/my.cnf.d/
- !includedir /etc/mysql/conf.d/
- !includedir /etc/mysql/docker-default.d/
-```
-
-在从服务器建一个slave.my.cnf，内容如下
-
-```
-[client]
- socket = /var/sock/mysqld/mysqld.sock
- [mysql]
- socket = /var/sock/mysqld/mysqld.sock
- [mysqld]
- skip-host-cache
- skip-name-resolve
- datadir = /var/lib/mysql
- user = mysql
- port = 3306
- bind-address = 0.0.0.0
- socket = /var/sock/mysqld/mysqld.sock
- pid-file = /var/run/mysqld/mysqld.pid
- general_log_file = /var/log/mysql/query.log
- slow_query_log_file = /var/log/mysql/slow.log
- log-error = /var/log/mysql/error.log
- log-bin=mysql-bin
- server-id=2
- !includedir /etc/my.cnf.d/
- !includedir /etc/mysql/conf.d/
- !includedir /etc/mysql/docker-default.d/
-```
-
-这里他们的server-id要区分开
-
-启动主从服务器
-
-```bash
-docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=abcd123 -p  3307:3306 -v /etc/localtime:/etc/localtime:ro -v  /home/wen/master.my.cnf:/etc/my.cnf docker.io/cytopia/mysql-8.0
-
-docker run -d --name mysql -e MYSQL_ROOT_PASSWORD=abcd123 -p  3306:3306 -v /etc/localtime:/etc/localtime:ro -v  /home/wen/slave.my.cnf:/etc/my.cnf docker.io/cytopia/mysql-8.0
-```
-
-使用数据库连接工具进行连接，先连接主服务器的数据库依次执行
-
-```MySQL 
-GRANT REPLICATION SLAVE ON *.* TO 'root'@'%';
-flush privileges;
-show master status;#可以看到主数据库的状态
-```
-
-切换到从数据库，依次执行
-
-```mysql
-GRANT REPLICATION SLAVE ON *.* TO 'root'@'%';
-CHANGE MASTER TO
- MASTER_HOST='mysql-master',
- MASTER_PORT=3306,
- MASTER_USER='root',
- MASTER_PASSWORD='root123',
- MASTER_LOG_FILE='mysql-bin.000003',
- MASTER_LOG_POS=6143;
-#MASTER_LOG_FILE和MASTER_LOG_POS分别对应上面主服务器中show master status显示的file属性和Position属性
-start slave;
-show slave status;
-#其中Slave_IO_Running,Slave_SQL_Running必须为Yes，表示同步成功，否则执行，stop slave;将之前的动作重新执行一遍。之后我们在主库做的SQL语句执行，会同步到从库中来。
+./opt/kafka_*/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
 ```
 
 ## 3.6 安装nacos
@@ -1093,56 +1002,6 @@ touch  ~/.pip/pip.conf
 timeout = 6000
 index-url = https://mirrors.aliyun.com/pypi/simple/
 trusted-host = mirrors.aliyun.com
-```
-
-## 4.2 安装zookeeper集群
-
-### 4.2.1 创建compose文件
-
-```yml
-version: '2'
-networks:
-  zk:
-services:
-  zookeeper1:
-    image: zookeeper
-    container_name: zk1.cloud
-    networks:
-        - zk
-    ports:
-        - "2181:2181"
-    environment:
-      ZOO_MY_ID: 1
-      ZOO_SERVERS: server.1=0.0.0.0:2888:3888 server.2=zk2.cloud:2888:3888 server.3=zk3.cloud:2888:3888
-  zookeeper2:
-    image: zookeeper
-    container_name: zk2.cloud
-    networks:
-        - zk
-    ports:
-        - "2182:2181"
-    environment:
-      ZOO_MY_ID: 2
-      ZOO_SERVERS: server.1=zk1.cloud:2888:3888 server.2=0.0.0.0:2888:3888 server.3=zk3.cloud:2888:3888
-  zookeeper3:
-    image: zookeeper
-    container_name: zk3.cloud
-    networks:
-        - zk
-    ports:
-        - "2183:2181"
-    environment:
-      ZOO_MY_ID: 3
-      ZOO_SERVERS: server.1=zk1.cloud:2888:3888 server.2=zk2.cloud:2888:3888 server.3=0.0.0.0:2888:3888
-```
-
-这个配置文件会告诉 Docker 分别运行三个 zookeeper 镜像, 并分别将本地的 2181, 2182, 2183 端口绑定到对应的容器的2181端口上.
-ZOO_MY_ID 和 ZOO_SERVERS 是搭建 ZK 集群需要设置的两个环境变量, 其中 ZOO_MY_ID 表示 ZK 服务的 id, 它是1-255 之间的整数, 必须在集群中唯一. ZOO_SERVERS 是ZK 集群的主机列表
-
-接着我们在 docker-compose.yml 当前目录下运行:
-
-```bash
-COMPOSE_PROJECT_NAME=zk_test docker-compose up
 ```
 
 ## 4.3 创建nacos集群
