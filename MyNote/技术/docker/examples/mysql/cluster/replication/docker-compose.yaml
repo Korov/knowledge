@@ -16,7 +16,8 @@ services:
     restart: always
     hostname: mysql-master
     networks:
-      - mysql
+      net_mysql:
+        ipv4_address: 172.20.0.2
   mysql-slave:
     container_name: mysql-slave
     image: mysql
@@ -35,7 +36,9 @@ services:
     links:
       - mysql-master
     networks:
-      - mysql
+      net_mysql:
+        ipv4_address: 172.20.0.3
 networks:
-   mysql:
-    driver: bridge
+   net_mysql:
+    external:
+      name: net_mysql
