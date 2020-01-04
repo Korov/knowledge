@@ -955,7 +955,7 @@ $ git rebase master server
 
 git bash中设置全局变量 `git config --global core.quotepath false` 
 
-## 4.2 git记住用户名和密码
+### 4.2 git记住用户名和密码
 
 ```bash
 git config --global credential.helper store
