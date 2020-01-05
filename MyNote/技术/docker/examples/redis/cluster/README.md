@@ -25,6 +25,19 @@ Redis集群中每个redis实例（可能一台机部署多个实例）会使用�
 修改redis.conf文件权限,否则后面写入访问密码到文件的时候会提示Permission denied
 
 ```bash
+chown -R root redis1/config
+chgrp -R root redis1/config
+chown -R root redis2/config
+chgrp -R root redis2/config
+chown -R root redis3/config
+chgrp -R root redis3/config
+chown -R root redis4/config
+chgrp -R root redis4/config
+chown -R root redis5/config
+chgrp -R root redis5/config
+chown -R root redis6/config
+chgrp -R root redis6/config
+
 #创建网络
 docker network rm redis_net
 docker network create --driver bridge --subnet 172.22.0.0/16 net_redis
