@@ -11,8 +11,8 @@ services:
       - ./redis1/data:/data
       - ./redis1/config/redis.conf:/usr/local/etc/redis/redis.conf
     networks:
-      redis_net:
-        ipv4_address: 172.21.0.2
+      net_redis:
+        ipv4_address: 172.22.0.2
        
   node2:
     image: redis
@@ -25,8 +25,8 @@ services:
       - ./redis2/data:/data
       - ./redis2/config/redis.conf:/usr/local/etc/redis/redis.conf
     networks:
-      redis_net:
-        ipv4_address: 172.21.0.3
+      net_redis:
+        ipv4_address: 172.22.0.3
        
        
   node3:
@@ -40,8 +40,8 @@ services:
       - ./redis3/data:/data
       - ./redis3/config/redis.conf:/usr/local/etc/redis/redis.conf
     networks:
-      redis_net:
-        ipv4_address: 172.21.0.4
+      net_redis:
+        ipv4_address: 172.22.0.4
 
   node4:
     image: redis
@@ -54,8 +54,8 @@ services:
       - ./redis4/data:/data
       - ./redis4/config/redis.conf:/usr/local/etc/redis/redis.conf
     networks:
-      redis_net:
-        ipv4_address: 172.21.0.5
+      net_redis:
+        ipv4_address: 172.22.0.5
 
   node5:
     image: redis
@@ -68,8 +68,8 @@ services:
       - ./redis5/data:/data
       - ./redis5/config/redis.conf:/usr/local/etc/redis/redis.conf
     networks:
-      redis_net:
-        ipv4_address: 172.21.0.6
+      net_redis:
+        ipv4_address: 172.22.0.6
 
   node6:
     image: redis
@@ -82,10 +82,10 @@ services:
       - ./redis6/data:/data
       - ./redis6/config/redis.conf:/usr/local/etc/redis/redis.conf
     networks:
-      redis_net:
-        ipv4_address: 172.21.0.7
+      net_redis:
+        ipv4_address: 172.22.0.7
 
 networks:
-  redis_net:
+  net_redis:
     external:
-      name: redis_net
+      name: net_redis

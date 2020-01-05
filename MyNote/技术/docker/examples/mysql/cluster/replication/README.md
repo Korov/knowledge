@@ -185,6 +185,11 @@ docker pull mysql
 启动主从服务器（注意启动之前要确保my.cnf的权限是644，否则会被忽略，卡了我一天）
 
 ```bash
+chown -R root master/config
+chgrp -R root master/config
+chown -R root slave/config
+chgrp -R root slave/config
+
 #创建一个MySQL使用的网络
 docker network create --driver bridge --subnet 172.20.0.0/16 net_mysql
 docker run --name mysql-master --net net_mysql --restart=always -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root123 \

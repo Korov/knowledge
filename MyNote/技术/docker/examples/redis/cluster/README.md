@@ -27,10 +27,10 @@ Redis集群中每个redis实例（可能一台机部署多个实例）会使用�
 ```bash
 #创建网络
 docker network rm redis_net
-docker network create --driver bridge --subnet 172.21.0.0/16 redis_net
+docker network create --driver bridge --subnet 172.22.0.0/16 net_redis
 
 #后台启动
 docker-compose -f docker-compose.yaml up -d
 #创建集群
-docker run --net redis_net --rm -it zvelo/redis-trib create --replicas 1 ip:6061 ip:6062 ip:6063 ip:6064 ip:6065 ip:6066
+docker run --net net_redis --rm -it zvelo/redis-trib create --replicas 1 ip:6061 ip:6062 ip:6063 ip:6064 ip:6065 ip:6066
 ```
