@@ -45,5 +45,5 @@ docker network create --driver bridge --subnet 172.22.0.0/16 net_redis
 #后台启动
 docker-compose -f docker-compose.yaml up -d
 #创建集群
-docker run --net net_redis --rm -it zvelo/redis-trib create --replicas 1 ip:6061 ip:6062 ip:6063 ip:6064 ip:6065 ip:6066
+docker run --net net_redis --rm -it zvelo/redis-trib create --replicas 1 172.22.0.2:6061 172.22.0.3:6062 172.22.0.4:6063 172.22.0.5:6064 172.22.0.6:6065 172.22.0.7:6066
 ```

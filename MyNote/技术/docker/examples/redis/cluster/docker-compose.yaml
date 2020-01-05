@@ -10,6 +10,8 @@ services:
     volumes:
       - ./redis1/data:/data
       - ./redis1/config/redis.conf:/usr/local/etc/redis/redis.conf
+    command:
+      redis-server /usr/local/etc/redis/redis.conf
     networks:
       net_redis:
         ipv4_address: 172.22.0.2
@@ -19,11 +21,13 @@ services:
     container_name: redis-node2
     restart: always
     ports:
-      - 6062:6062
-      - 16062:16062
+      - 6062:6061
+      - 16062:16061
     volumes:
       - ./redis2/data:/data
       - ./redis2/config/redis.conf:/usr/local/etc/redis/redis.conf
+    command:
+      redis-server /usr/local/etc/redis/redis.conf
     networks:
       net_redis:
         ipv4_address: 172.22.0.3
@@ -34,11 +38,13 @@ services:
     container_name: redis-node3
     restart: always
     ports:
-      - 6063:6063
-      - 16063:16063
+      - 6063:6061
+      - 16063:16061
     volumes:
       - ./redis3/data:/data
       - ./redis3/config/redis.conf:/usr/local/etc/redis/redis.conf
+    command:
+      redis-server /usr/local/etc/redis/redis.conf
     networks:
       net_redis:
         ipv4_address: 172.22.0.4
@@ -48,11 +54,13 @@ services:
     container_name: redis-node4
     restart: always
     ports:
-      - 6064:6064
-      - 16064:16064
+      - 6064:6061
+      - 16064:16061
     volumes:
       - ./redis4/data:/data
       - ./redis4/config/redis.conf:/usr/local/etc/redis/redis.conf
+    command:
+      redis-server /usr/local/etc/redis/redis.conf
     networks:
       net_redis:
         ipv4_address: 172.22.0.5
@@ -62,11 +70,13 @@ services:
     container_name: redis-node5
     restart: always
     ports:
-      - 6065:6065
-      - 16065:16065
+      - 6065:6061
+      - 16065:16061
     volumes:
       - ./redis5/data:/data
       - ./redis5/config/redis.conf:/usr/local/etc/redis/redis.conf
+    command:
+      redis-server /usr/local/etc/redis/redis.conf
     networks:
       net_redis:
         ipv4_address: 172.22.0.6
@@ -76,11 +86,13 @@ services:
     container_name: redis-node6
     restart: always
     ports:
-      - 6066:6066
-      - 16066:16066
+      - 6066:6061
+      - 16066:16061
     volumes:
       - ./redis6/data:/data
       - ./redis6/config/redis.conf:/usr/local/etc/redis/redis.conf
+    command:
+      redis-server /usr/local/etc/redis/redis.conf
     networks:
       net_redis:
         ipv4_address: 172.22.0.7
