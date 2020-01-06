@@ -1,4 +1,4 @@
-package com.korov.springboot.config;
+package com.korov.springboot.annotation.ReadOnly;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

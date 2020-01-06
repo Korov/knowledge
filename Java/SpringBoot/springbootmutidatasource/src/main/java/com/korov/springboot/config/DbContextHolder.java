@@ -11,15 +11,15 @@ import org.slf4j.LoggerFactory;
  * @author fxb
  * @date 2018-08-31
  */
-class DbContextHolder {
+public class DbContextHolder {
 
     private static Logger log = LoggerFactory.getLogger(DbContextHolder.class);
-    static final String MASTER = "master";
-    static final String SLAVE = "slave";
+    public static final String MASTER = "master";
+    public static final String SLAVE = "slave";
 
     private static ThreadLocal<String> contextHolder = new ThreadLocal<>();
 
-    static void setDbType(String dbType) {
+    public static void setDbType(String dbType) {
         if (dbType == null) {
             log.error("dbType为空");
             throw new NullPointerException();
@@ -32,7 +32,7 @@ class DbContextHolder {
         return contextHolder.get() == null ? MASTER : contextHolder.get();
     }
 
-    static void clearDbType() {
+    public static void clearDbType() {
         contextHolder.remove();
     }
 }
