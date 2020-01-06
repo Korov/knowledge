@@ -1,11 +1,11 @@
-package com.korov.springboot.mapper;
+package com.korov.springboot.mapper.slave;
 
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 import java.util.Map;
 
-public interface IAssistMapper {
+public interface AssistMapper {
 
     // 用户角色关系表
     int insertUserRole(@Param("userId") Integer userId, @Param("roleId") Integer roleId);

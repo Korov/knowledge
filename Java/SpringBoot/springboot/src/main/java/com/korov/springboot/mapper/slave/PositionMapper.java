@@ -1,11 +1,11 @@
-package com.korov.springboot.mapper;
+package com.korov.springboot.mapper.slave;
 
 import com.korov.springboot.entity.PositionEntity;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface IPositionMapper {
+public interface PositionMapper {
     int deleteByPrimaryKey(Integer postId);
 
     int insert(PositionEntity record);

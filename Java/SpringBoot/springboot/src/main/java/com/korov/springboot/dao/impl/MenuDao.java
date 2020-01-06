@@ -2,7 +2,7 @@ package com.korov.springboot.dao.impl;
 
 import com.korov.springboot.dao.IMenuDao;
 import com.korov.springboot.entity.MenuEntity;
-import com.korov.springboot.mapper.IMenuMapper;
+import com.korov.springboot.mapper.master.IMenuMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

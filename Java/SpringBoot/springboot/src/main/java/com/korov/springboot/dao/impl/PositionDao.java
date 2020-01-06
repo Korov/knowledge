@@ -2,7 +2,7 @@ package com.korov.springboot.dao.impl;
 
 import com.korov.springboot.dao.IPositionDao;
 import com.korov.springboot.entity.PositionEntity;
-import com.korov.springboot.mapper.IPositionMapper;
+import com.korov.springboot.mapper.master.IPositionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

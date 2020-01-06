@@ -1,11 +1,11 @@
-package com.korov.springboot.mapper;
+package com.korov.springboot.mapper.slave;
 
 import com.korov.springboot.entity.RoleEntity;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface IRoleMapper {
+public interface RoleMapper {
     int deleteByPrimaryKey(Integer roleId);
 
     int insert(RoleEntity record);

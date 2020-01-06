@@ -1,7 +1,6 @@
 package com.korov.springboot;
 
 import com.korov.springboot.mutilbean.SingleBean;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -15,7 +14,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  * @author korov9
  */
 @SpringBootApplication
-@MapperScan("com.korov.springboot.mapper")
 @EnableTransactionManagement // 开启事务管理
 @EnableAsync
 @EnableAspectJAutoProxy
@@ -27,17 +25,16 @@ public class SpringbootApplication {
 
     /**
      * 同一个类声明两个bean实例
+     *
      * @return
      */
     @Bean(name = "singleBean1")
-    public SingleBean singleBean1 ()
-    {
+    public SingleBean singleBean1() {
         return new SingleBean();
     }
 
     @Bean
-    public SingleBean singleBean2 ()
-    {
+    public SingleBean singleBean2() {
         return new SingleBean();
     }
 }

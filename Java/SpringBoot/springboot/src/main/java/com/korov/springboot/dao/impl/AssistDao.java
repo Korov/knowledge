@@ -1,7 +1,7 @@
 package com.korov.springboot.dao.impl;
 
 import com.korov.springboot.dao.IAssistDao;
-import com.korov.springboot.mapper.IAssistMapper;
+import com.korov.springboot.mapper.master.IAssistMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

@@ -2,7 +2,7 @@ package com.korov.springboot.dao.impl;
 
 import com.korov.springboot.dao.IGroupDao;
 import com.korov.springboot.entity.GroupEntity;
-import com.korov.springboot.mapper.IGroupMapper;
+import com.korov.springboot.mapper.master.IGroupMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

@@ -2,7 +2,7 @@ package com.korov.springboot.dao.impl;
 
 import com.korov.springboot.dao.IDepartmentDao;
 import com.korov.springboot.entity.DepartmentEntity;
-import com.korov.springboot.mapper.IDepartmentMapper;
+import com.korov.springboot.mapper.master.IDepartmentMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

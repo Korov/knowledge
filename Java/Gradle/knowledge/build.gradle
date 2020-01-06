@@ -21,6 +21,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'mysql:mysql-connector-java'
+    compile 'com.alibaba:druid:1.1.21'
     compile group: 'org.springframework.kafka', name: 'spring-kafka'
     annotationProcessor 'org.projectlombok:lombok'
     compile 'org.springframework.boot:spring-boot-devtools'

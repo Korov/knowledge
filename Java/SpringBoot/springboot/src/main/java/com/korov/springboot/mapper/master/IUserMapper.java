@@ -1,4 +1,4 @@
-package com.korov.springboot.mapper;
+package com.korov.springboot.mapper.master;
 
 import com.korov.springboot.entity.UserEntity;
 import org.apache.ibatis.annotations.Param;

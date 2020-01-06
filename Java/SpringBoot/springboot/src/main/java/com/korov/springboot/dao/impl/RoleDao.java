@@ -2,7 +2,7 @@ package com.korov.springboot.dao.impl;
 
 import com.korov.springboot.dao.IRoleDao;
 import com.korov.springboot.entity.RoleEntity;
-import com.korov.springboot.mapper.IRoleMapper;
+import com.korov.springboot.mapper.master.IRoleMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

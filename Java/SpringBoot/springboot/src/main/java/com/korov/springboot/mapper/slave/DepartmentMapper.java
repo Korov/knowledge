@@ -1,11 +1,11 @@
-package com.korov.springboot.mapper;
+package com.korov.springboot.mapper.slave;
 
 import com.korov.springboot.entity.DepartmentEntity;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface IDepartmentMapper {
+public interface DepartmentMapper {
     int deleteByPrimaryKey(Integer deptId);
 
     int insert(DepartmentEntity record);

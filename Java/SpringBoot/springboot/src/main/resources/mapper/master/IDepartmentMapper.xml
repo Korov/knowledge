@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.korov.springboot.mapper.master.IDepartmentMapper">
+    <resultMap id="BaseResultMap" type="com.korov.springboot.entity.DepartmentEntity">
+        <id column="dept_id" jdbcType="INTEGER" property="deptId"/>
+        <result column="parent_id" jdbcType="INTEGER" property="parentId"/>
+        <result column="dept_name" jdbcType="VARCHAR" property="deptName"/>
+        <result column="order_num" jdbcType="INTEGER" property="orderNum"/>
+        <result column="leader" jdbcType="VARCHAR" property="leader"/>
+        <result column="phone" jdbcType="VARCHAR" property="phone"/>
+        <result column="email" jdbcType="VARCHAR" property="email"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="create_by" jdbcType="VARCHAR" property="createBy"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_by" jdbcType="VARCHAR" property="updateBy"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from tbl_department
+        where dept_id = #{deptId,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.korov.springboot.entity.DepartmentEntity" useGeneratedKeys="true"
+            keyProperty="deptId">
+        insert into tbl_department (dept_id, parent_id, dept_name,
+                                    order_num, leader, phone,
+                                    email, status, create_by,
+                                    create_time, update_by, update_time)
+        values (#{deptId,jdbcType=INTEGER}, #{parentId,jdbcType=INTEGER}, #{deptName,jdbcType=VARCHAR},
+                #{orderNum,jdbcType=INTEGER}, #{leader,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR},
+                #{email,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{createBy,jdbcType=VARCHAR},
+                #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP})
+    </insert>
+    <insert id="insertAll" parameterType="java.util.List" useGeneratedKeys="true" keyProperty="deptId">
+        insert into tbl_department (dept_id, parent_id, dept_name,
+        order_num, leader, phone,
+        email, status, create_by,
+        create_time, update_by, update_time
+        )
+        values
+        <foreach collection="list" item="item" index="index" separator=",">
+            (#{deptId,jdbcType=INTEGER}, #{parentId,jdbcType=INTEGER}, #{deptName,jdbcType=VARCHAR},
+            #{orderNum,jdbcType=INTEGER}, #{leader,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR},
+            #{email,jdbcType=VARCHAR}, #{status,jdbcType=INTEGER}, #{createBy,jdbcType=VARCHAR},
+            #{createTime,jdbcType=TIMESTAMP}, #{updateBy,jdbcType=VARCHAR}, #{updateTime,jdbcType=TIMESTAMP}
+            )
+        </foreach>
+    </insert>
+    <update id="updateByPrimaryKey" parameterType="com.korov.springboot.entity.DepartmentEntity">
+        update tbl_department
+        set parent_id   = #{parentId,jdbcType=INTEGER},
+            dept_name   = #{deptName,jdbcType=VARCHAR},
+            order_num   = #{orderNum,jdbcType=INTEGER},
+            leader      = #{leader,jdbcType=VARCHAR},
+            phone       = #{phone,jdbcType=VARCHAR},
+            email       = #{email,jdbcType=VARCHAR},
+            status      = #{status,jdbcType=INTEGER},
+            create_by   = #{createBy,jdbcType=VARCHAR},
+            create_time = #{createTime,jdbcType=TIMESTAMP},
+            update_by   = #{updateBy,jdbcType=VARCHAR},
+            update_time = #{updateTime,jdbcType=TIMESTAMP}
+        where dept_id = #{deptId,jdbcType=INTEGER}
+    </update>
+    <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+        select dept_id,
+               parent_id,
+               dept_name,
+               order_num,
+               leader,
+               phone,
+               email,
+               status,
+               create_by,
+               create_time,
+               update_by,
+               update_time
+        from tbl_department
+        where dept_id = #{deptId,jdbcType=INTEGER}
+    </select>
+    <select id="selectAll" resultMap="BaseResultMap">
+        select dept_id,
+               parent_id,
+               dept_name,
+               order_num,
+               leader,
+               phone,
+               email,
+               status,
+               create_by,
+               create_time,
+               update_by,
+               update_time
+        from tbl_department
+    </select>
+    <select id="selectPage" resultMap="BaseResultMap">
+        select dept_id, parent_id, dept_name, order_num, leader, phone, email, status, create_by,
+        create_time, update_by, update_time
+        from tbl_department
+        <if test="pageNum>=0 and pageSize>=0">limit #{pageNum,jdbcType=INTEGER},#{pageSize,jdbcType=INTEGER}</if>
+    </select>
+</mapper>

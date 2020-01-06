@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.korov.springboot.mapper.IDepartmentMapper">
+<mapper namespace="com.korov.springboot.mapper.slave.DepartmentMapper">
     <resultMap id="BaseResultMap" type="com.korov.springboot.entity.DepartmentEntity">
         <id column="dept_id" jdbcType="INTEGER" property="deptId"/>
         <result column="parent_id" jdbcType="INTEGER" property="parentId"/>

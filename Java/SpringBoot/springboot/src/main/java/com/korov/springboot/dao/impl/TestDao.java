@@ -2,7 +2,7 @@ package com.korov.springboot.dao.impl;
 
 import com.korov.springboot.dao.ITestDao;
 import com.korov.springboot.entity.TestEntity;
-import com.korov.springboot.mapper.ITestMapper;
+import com.korov.springboot.mapper.master.ITestMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 

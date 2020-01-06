@@ -1,11 +1,11 @@
-package com.korov.springboot.mapper;
+package com.korov.springboot.mapper.slave;
 
 import com.korov.springboot.entity.MenuEntity;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface IMenuMapper {
+public interface MenuMapper {
     int deleteByPrimaryKey(Integer menuId);
 
     int insert(MenuEntity record);

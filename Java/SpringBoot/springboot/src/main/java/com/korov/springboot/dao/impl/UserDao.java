@@ -2,7 +2,7 @@ package com.korov.springboot.dao.impl;
 
 import com.korov.springboot.dao.IUserDao;
 import com.korov.springboot.entity.UserEntity;
-import com.korov.springboot.mapper.IUserMapper;
+import com.korov.springboot.mapper.master.IUserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
