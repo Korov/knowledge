@@ -27,13 +27,19 @@ public class UserService implements IUserService {
         return userDao.deleteByPrimaryKey(userId);
     }
 
+    /**
+     * 此方法开启了事务，全部完成之后才会提交到数据库中，否则回滚
+     *
+     * @param record
+     * @return
+     */
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public int insert(UserEntity record) {
         Map<String, Integer> countMap = new HashMap<>(1);
         int userCount = 0;
         List<List<Integer>> results = new ArrayList<>();
-        results.add(new ArrayList<Integer>());
+        results.add(new ArrayList<>());
         addReleation(results.get(0), record);
 
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
@@ -60,7 +66,7 @@ public class UserService implements IUserService {
 
         userCount = userDao.insertAll(records);
         for (int i = 0; i < records.size(); i++) {
-            results.add(new ArrayList<Integer>());
+            results.add(new ArrayList<>());
             addReleation(results.get(i), records.get(i));
         }
         return userCount;
