@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.korov.springboot.mapper.IAssistMapper">
+    <!--用户角色关系表-->
+    <insert id="insertUserRole" parameterType="java.lang.Integer">
+        insert into tbl_user_role (user_id, role_id)
+        values (#{userId,jdbcType=INTEGER}, #{roleId,jdbcType=INTEGER})
+    </insert>
+    <delete id="deleteUserRole" parameterType="java.lang.Integer">
+        delete
+        from tbl_user_role
+        where user_id = #{userId,jdbcType=INTEGER}
+          and role_id = #{roleId,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteUserRoleByRoleId" parameterType="java.lang.Integer">
+        delete
+        from tbl_user_role
+        where role_id = #{roleId,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteUserRoleByUserId" parameterType="java.lang.Integer">
+        delete
+        from tbl_user_role
+        where user_id = #{userId,jdbcType=INTEGER}
+    </delete>
+    <update id="updateUserRole" parameterType="java.lang.Integer">
+        update tbl_user_role
+        set user_id=#{newUserId,jdbcType=INTEGER},
+            role_id=#{newRoleId,jdbcType=INTEGER}
+        where user_id = #{oldUserId,jdbcType=INTEGER}
+          and role_id = #{oldRoleId,jdbcType=INTEGER}
+    </update>
+    <select id="selectUserRole" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select user_id as userId, role_id as roleId
+        from tbl_user_role
+        where user_id = #{userId,jdbcType=INTEGER}
+          and role_id = #{roleId,jdbcType=INTEGER}
+    </select>
+    <select id="selectUserRoleByUserId" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select user_id as userId, role_id as roleId
+        from tbl_user_role
+        where user_id = #{userId,jdbcType=INTEGER}
+    </select>
+    <select id="selectUserRoleByRoleId" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select user_id as userId, role_id as roleId
+        from tbl_user_role
+        where role_id = #{roleId,jdbcType=INTEGER}
+    </select>
+
+    <!--用户用户组关系表-->
+    <insert id="insertUserGroup" parameterType="java.lang.Integer">
+        insert into tbl_user_group (user_id, group_id)
+        values (#{userId,jdbcType=INTEGER}, #{groupId,jdbcType=INTEGER})
+    </insert>
+    <delete id="deleteUserGroup" parameterType="java.lang.Integer">
+        delete
+        from tbl_user_group
+        where user_id = #{userId,jdbcType=INTEGER}
+          and group_id = #{groupId,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteUserGroupByUserId" parameterType="java.lang.Integer">
+        delete
+        from tbl_user_group
+        where user_id = #{userId,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteUserGroupByGroupId" parameterType="java.lang.Integer">
+        delete
+        from tbl_user_group
+        where group_id = #{groupId,jdbcType=INTEGER}
+    </delete>
+    <update id="updateUserGroup" parameterType="java.lang.Integer">
+        update tbl_user_group
+        set user_id=#{newUserId,jdbcType=INTEGER},
+            group_id=#{newGroupId,jdbcType=INTEGER}
+        where user_id = #{oldUserId,jdbcType=INTEGER}
+          and group_id = #{oldGroupId,jdbcType=INTEGER}
+    </update>
+    <select id="selectUserGroup" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select user_id as userId, group_id as groupId
+        from tbl_user_group
+        where user_id = #{userId,jdbcType=INTEGER}
+          and group_id = #{groupId,jdbcType=INTEGER}
+    </select>
+    <select id="selectUserGroupByUserId" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select user_id as userId, group_id as groupId
+        from tbl_user_group
+        where user_id = #{userId,jdbcType=INTEGER}
+    </select>
+    <select id="selectUserGroupByGroupId" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select user_id as userId, group_id as groupId
+        from tbl_user_group
+        where group_id = #{groupId,jdbcType=INTEGER}
+    </select>
+
+    <!--用户组角色关系表-->
+    <insert id="insertGroupRole" parameterType="java.lang.Integer">
+        insert into tbl_role_group (group_id, role_id)
+        values (#{groupId,jdbcType=INTEGER}, #{roleId,jdbcType=INTEGER})
+    </insert>
+    <delete id="deleteGroupRole" parameterType="java.lang.Integer">
+        delete
+        from tbl_role_group
+        where group_id = #{groupId,jdbcType=INTEGER}
+          and role_id = #{roleId,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteGroupRoleByGroupId" parameterType="java.lang.Integer">
+        delete
+        from tbl_role_group
+        where group_id = #{groupId,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteGroupRoleByRoleId" parameterType="java.lang.Integer">
+        delete
+        from tbl_role_group
+        where role_id = #{roleId,jdbcType=INTEGER}
+    </delete>
+    <update id="updateGroupRole" parameterType="java.lang.Integer">
+        update tbl_role_group
+        set group_id=#{newGroupId,jdbcType=INTEGER},
+            role_id=#{newRoleId,jdbcType=INTEGER}
+        where group_id = #{oldGroupId,jdbcType=INTEGER}
+          and role_id = #{oldRoleId,jdbcType=INTEGER}
+    </update>
+    <select id="selectGroupRole" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select group_id as groupId, role_id as roleId
+        from tbl_role_group
+        where group_id = #{groupId,jdbcType=INTEGER}
+          and role_id = #{roleId,jdbcType=INTEGER}
+    </select>
+    <select id="selectGroupRoleByGroupId" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select group_id as groupId, role_id as roleId
+        from tbl_role_group
+        where group_id = #{groupId,jdbcType=INTEGER}
+    </select>
+    <select id="selectGroupRoleByRoleId" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select group_id as groupId, role_id as roleId
+        from tbl_role_group
+        where role_id = #{roleId,jdbcType=INTEGER}
+    </select>
+
+    <!--角色菜单关系表-->
+    <insert id="insertRoleMenu" parameterType="java.lang.Integer">
+        insert into tbl_role_menu (role_id, menu_id)
+        values (#{roleId,jdbcType=INTEGER}, #{menuId,jdbcType=INTEGER})
+    </insert>
+    <delete id="deleteRoleMenu" parameterType="java.lang.Integer">
+        delete
+        from tbl_role_menu
+        where role_id = #{roleId,jdbcType=INTEGER}
+          and menu_id = #{menuId,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteRoleMenuByRoleId" parameterType="java.lang.Integer">
+        delete
+        from tbl_role_menu
+        where role_id = #{roleId,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteRoleMenuByMenuId" parameterType="java.lang.Integer">
+        delete
+        from tbl_role_menu
+        where menu_id = #{menuId,jdbcType=INTEGER}
+    </delete>
+    <update id="updateRoleMenu" parameterType="java.lang.Integer">
+        update tbl_role_menu
+        set role_id=#{newRoleId,jdbcType=INTEGER},
+            menu_id=#{newMenuId,jdbcType=INTEGER}
+        where role_id = #{oldRoleId,jdbcType=INTEGER}
+          and menu_id = #{oldMenuId,jdbcType=INTEGER}
+    </update>
+    <select id="selectRoleMenu" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select role_id as roleId, menu_id as menuId
+        from tbl_role_menu
+        where role_id = #{roleId,jdbcType=INTEGER}
+          and menu_id = #{menuId,jdbcType=INTEGER}
+    </select>
+    <select id="selectRoleMenuByRoleId" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select role_id as roleId, menu_id as menuId
+        from tbl_role_menu
+        where role_id = #{roleId,jdbcType=INTEGER}
+    </select>
+    <select id="selectRoleMenuByMenuId" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select role_id as roleId, menu_id as menuId
+        from tbl_role_menu
+        where menu_id = #{menuId,jdbcType=INTEGER}
+    </select>
+
+    <!--用户职位关系表-->
+    <insert id="insertUserPosition" parameterType="java.lang.Integer">
+        insert into tbl_user_position (user_id, post_id)
+        values (#{userId,jdbcType=INTEGER}, #{postId,jdbcType=INTEGER})
+    </insert>
+    <delete id="deleteUserPosition" parameterType="java.lang.Integer">
+        delete
+        from tbl_user_position
+        where user_id = #{userId,jdbcType=INTEGER}
+          and post_id = #{postId,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteUserPositionByUserId" parameterType="java.lang.Integer">
+        delete
+        from tbl_user_position
+        where user_id = #{userId,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteUserPositionByPostId" parameterType="java.lang.Integer">
+        delete
+        from tbl_user_position
+        where post_id = #{postId,jdbcType=INTEGER}
+    </delete>
+    <update id="updateUserPosition" parameterType="java.lang.Integer">
+        update tbl_user_position
+        set user_id=#{newUserId,jdbcType=INTEGER},
+            post_id=#{newPostId,jdbcType=INTEGER}
+        where user_id = #{oldUserId,jdbcType=INTEGER}
+          and post_id = #{oldPostId,jdbcType=INTEGER}
+    </update>
+    <select id="selectUserPosition" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select user_id as userId, post_id as postId
+        from tbl_user_position
+        where user_id = #{userId,jdbcType=INTEGER}
+          and post_id = #{postId,jdbcType=INTEGER}
+    </select>
+    <select id="selectUserPositionByUserId" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select user_id as userId, post_id as postId
+        from tbl_user_position
+        where user_id = #{userId,jdbcType=INTEGER}
+    </select>
+    <select id="selectUserPositionByPostId" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select user_id as userId, post_id as menuId
+        from tbl_user_position
+        where post_id = #{postId,jdbcType=INTEGER}
+    </select>
+
+    <!--职位部门关系表-->
+    <insert id="insertDepartmentPosition" parameterType="java.lang.Integer">
+        insert into tbl_department_position (dept_id, post_id)
+        values (#{deptId,jdbcType=INTEGER}, #{postId,jdbcType=INTEGER})
+    </insert>
+    <delete id="deleteDepartmentPosition" parameterType="java.lang.Integer">
+        delete
+        from tbl_department_position
+        where dept_id = #{deptId,jdbcType=INTEGER}
+          and post_id = #{postId,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteDepartmentPositionByDeptId" parameterType="java.lang.Integer">
+        delete
+        from tbl_department_position
+        where dept_id = #{deptId,jdbcType=INTEGER}
+    </delete>
+    <delete id="deleteDepartmentPositionByPostId" parameterType="java.lang.Integer">
+        delete
+        from tbl_department_position
+        where post_id = #{postId,jdbcType=INTEGER}
+    </delete>
+    <update id="updateDepartmentPosition" parameterType="java.lang.Integer">
+        update tbl_department_position
+        set dept_id=#{newDeptId,jdbcType=INTEGER},
+            post_id=#{newPostId,jdbcType=INTEGER}
+        where dept_id = #{oldDeptId,jdbcType=INTEGER}
+          and post_id = #{oldPostId,jdbcType=INTEGER}
+    </update>
+    <select id="selectDepartmentPosition" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select dept_id as deptId, post_id as postId
+        from tbl_department_position
+        where dept_id = #{deptId,jdbcType=INTEGER}
+          and post_id = #{postId,jdbcType=INTEGER}
+    </select>
+    <select id="selectDepartmentPositionByDeptId" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select dept_id as deptId, post_id as postId
+        from tbl_department_position
+        where dept_id = #{deptId,jdbcType=INTEGER}
+    </select>
+    <select id="selectDepartmentPositionByPostId" parameterType="java.lang.Integer" resultType="java.util.Map">
+        select dept_id as deptId, post_id as postId
+        from tbl_department_position
+        where post_id = #{postId,jdbcType=INTEGER}
+    </select>
+</mapper>
