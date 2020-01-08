@@ -21,3 +21,15 @@ docker exec -it kafka1 /bin/sh
 ./opt/kafka_*/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test1 --from-beginning
 ```
 
+参数详解：
+
+```yml
+     #外部访问kafka的host，需要设置为宿主机的IP
+     KAFKA_ADVERTISED_HOST_NAME: 192.168.31.88
+     #宿主机映射到的端口
+      KAFKA_ADVERTISED_PORT: 9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://192.168.31.88:9093
+      #内部容器之间传输的端口
+      KAFKA_LISTENERS: PLAINTEXT://kafka2:9092
+```
+
