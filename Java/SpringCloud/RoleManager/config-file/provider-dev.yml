@@ -1,5 +1,5 @@
 server:
-  port: 80010
+  port: 8001
 
 #Development Environment
 logging:
