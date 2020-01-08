@@ -63,7 +63,7 @@ management:
       show-details: always  #总是显示详细信息
     web:
       exposure:
-        include: bus-refresh,info,hystrix.stream  #表示打开相应的端点
+        include: *  #表示打开相应的端点   bus-refresh,info,hystrix.stream
 
 eureka:
   client: #客户端注册进eureka服务列表内
