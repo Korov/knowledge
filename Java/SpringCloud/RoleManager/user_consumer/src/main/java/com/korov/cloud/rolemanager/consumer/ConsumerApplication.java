@@ -19,6 +19,7 @@ import java.util.List;
 @SpringBootApplication//(exclude = DataSourceAutoConfiguration.class)
 @EnableEurekaClient
 @EnableCircuitBreaker
+// 负载均衡设置，对于korov-provider使用自定义的负载均衡算法
 @RibbonClient(name = "korov-provider", configuration = MySelfRule.class)
 public class ConsumerApplication {
     public static void main(String[] args) {
