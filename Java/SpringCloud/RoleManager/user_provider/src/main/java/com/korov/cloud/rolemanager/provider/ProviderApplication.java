@@ -1,11 +1,9 @@
 package com.korov.cloud.rolemanager.provider;
 
-import org.springframework.amqp.core.Queue;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.client.circuitbreaker.EnableCircuitBreaker;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
-import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
 @EnableEurekaClient
@@ -28,8 +26,8 @@ public class ProviderApplication {
 //        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
 //        return bean;
 //    }
-    @Bean
-    public Queue userQueue() {
-        return new Queue("user");
-    }
+//    @Bean
+//    public Queue userQueue() {
+//        return new Queue("user");
+//    }
 }

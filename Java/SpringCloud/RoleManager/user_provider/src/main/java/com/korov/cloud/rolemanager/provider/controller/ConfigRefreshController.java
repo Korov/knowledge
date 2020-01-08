@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RefreshScope
 public class ConfigRefreshController {
-    @Value("info.app.name")
+    @Value("${info.app.name}")
     private String appName;
 
     @GetMapping("/profile")
