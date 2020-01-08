@@ -19,7 +19,7 @@ spring:
   datasource:
     type: com.alibaba.druid.pool.DruidDataSource           # 当前数据源操作类型
     driver-class-name: com.mysql.cj.jdbc.Driver            # mysql驱动包
-    url: jdbc:mysql://192.168.106.143:3306/RoleManager?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true            # 数据库名称
+    url: jdbc:mysql://korov-linux.com:3306/RoleManager?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true            # 数据库名称
     username: root
     password: root123
     dbcp2:
@@ -42,12 +42,12 @@ spring:
       group-id: springcloud-bus
   data:
     mongodb:
-      host: 192.168.106.143
+      host: korov-linux.com
       port: 27017
       database: test
   redis:
     database: 0
-    host: 192.168.106.143
+    host: korov-linux.com
     port: 6379
     password:
     timeout: 1000
