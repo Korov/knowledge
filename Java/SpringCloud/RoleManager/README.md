@@ -8,6 +8,7 @@
 # 配置中心
 配置中心使用Spring cloud config，并整合Spring cloud bus，之前是使用RabbitMQ作为消息中间件，现在改为使用Kafka。
 windows下可能会出现授权失败，解决方案：打开凭据管理器将所有关于git的凭据删除
+http://localhost:3001/bus/refresh实现配置刷新
 ## 单机
 默认启动方式为git通过用户名和密码访问远程仓库获取配置文件端口3001
 ## 集群
