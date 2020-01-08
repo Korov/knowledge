@@ -349,6 +349,13 @@ config {
 }
 ```
 
+## 3.9 安装mongodb
+
+```bash
+docker run --name mongo -p 27017:27017 -v `pwd`/data/db:/data/db -d mongo
+#可以在最后带上--auth表明需要使用密码才可以访问
+```
+
 
 
 # 4 Docker Compose
