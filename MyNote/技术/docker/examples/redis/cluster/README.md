@@ -45,5 +45,8 @@ docker network create --driver bridge --subnet 172.22.0.0/16 net_redis
 #后台启动
 docker-compose -f docker-compose.yaml up -d
 #创建集群
-docker run --net net_redis --rm -it zvelo/redis-trib create --replicas 1 172.22.0.2:6061 172.22.0.3:6062 172.22.0.4:6063 172.22.0.5:6064 172.22.0.6:6065 172.22.0.7:6066
+docker run --net net_redis --rm -it zvelo/redis-trib create --replicas 1 172.22.0.2:6061 172.22.0.3:6061 172.22.0.4:6061 172.22.0.5:6061 172.22.0.6:6061 172.22.0.7:6061
+
+
+docker run --net net_redis --rm -it zvelo/redis-trib create --replicas 1 korov-linux.com:6061 korov-linux.com:6062 korov-linux.com:6063 korov-linux.com:6064 korov-linux.com:6065 korov-linux.com:6066
 ```
