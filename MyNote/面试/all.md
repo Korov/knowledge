@@ -1631,6 +1631,18 @@ kafka不能脱离zookeeper单独使用，因为kafka使用zookeeper管理和协�
 
 批量压缩：对多个消息进行批量压缩，加快网络IO传输速度
 
+## 为什么使用kafka
+
+缓冲和削峰：消息可以暂存在kafka中，下游服务器就可以按照自己的节奏进行慢慢处理
+
+## Kafka中的ISR、AR又代表什么？ISR的伸缩又指什么
+
+ISR:In-Sync Replicas 副本同步队列
+AR:Assigned Replicas 所有副本
+ISR是由leader维护，follower从leader同步数据有一些延迟（包括延迟时间replica.lag.time.max.ms和延迟条数replica.lag.max.messages两个维度, 当前最新的版本0.10.x中只支持replica.lag.time.max.ms这个维度），任意一个超过阈值都会把follower剔除出ISR, 存入OSR（Outof-Sync Replicas）列表，新加入的follower也会先存放在OSR中。AR=ISR+OSR。
+
+
+
 # zookeeper
 
 ## zookeeper 是什么？
