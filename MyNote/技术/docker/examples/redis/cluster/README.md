@@ -1,3 +1,5 @@
+# docker compose方法启动（无法外网访问）
+
 配置文件是最容易出问题的,这里面有一些注意事项:
 
     requirepass和masterauth不能启用
@@ -44,6 +46,13 @@ chmod 644 redis3/config/redis.conf
 chmod 644 redis4/config/redis.conf
 chmod 644 redis5/config/redis.conf
 chmod 644 redis6/config/redis.conf
+
+rm -rf redis1/data
+rm -rf redis2/data
+rm -rf redis3/data
+rm -rf redis4/data
+rm -rf redis5/data
+rm -rf redis6/data
 
 #后台启动
 docker-compose -f docker-compose.yaml up -d

@@ -9,12 +9,12 @@ spring:
     timeout: 6000ms  # 连接超时时长（毫秒）
     cluster:
       nodes:
-        - korov-linux.com:6061
-        - korov-linux.com:6062
-        - korov-linux.com:6063
-        - korov-linux.com:6064
-        - korov-linux.com:6065
-        - korov-linux.com:6066
+        - 192.168.106.141:6061
+        - 192.168.106.141:6062
+        - 192.168.106.141:6063
+        - 192.168.106.141:6064
+        - 192.168.106.141:6065
+        - 192.168.106.141:6066
     jedis:
       pool:
         max-active: 1000  # 连接池最大连接数（使用负值表示没有限制）
