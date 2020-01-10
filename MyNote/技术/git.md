@@ -430,7 +430,14 @@ pb https://github.com/paulboone/ticgit (push)
 
 ```bash
 # git fetch [remote-name]
-$ git fetch origin
+$ git fetch
+remote: Enumerating objects: 48, done.
+remote: Counting objects: 100% (48/48), done.
+remote: Compressing objects: 100% (14/14), done.
+remote: Total 27 (delta 12), reused 0 (delta 0)
+Unpacking objects: 100% (27/27), done.
+From gitee.com:korov/gitee
+   c46a7a8..de01109  master     -> origin/master
 # git fetch [remote-name] [branch-name]
 $ git fetch origin master
 ```
@@ -442,8 +449,8 @@ $ git fetch origin master
 认分支）。 运行 git pull 通常会从最初克隆的服务器上抓取数据并自动尝试合并到当前所在的分支。
 
 ```bash
-# 查看fetch后的文件与本地文件之间的差异
-$ git log -p FETCH_HEAD
+# 查看fetch后的文件与本地文件之间的差异，origin/master就fetch到本地的文件存放位置
+$ git log -p origin/master
 # 将fetch下来的文件与本地文件进行合并
 $ git merge
 ```

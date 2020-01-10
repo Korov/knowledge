@@ -14,8 +14,6 @@ public class Redis extends ApplicationTests {
 
     @Test
     public void test() {
-//        redisTemplate.opsForCluster().addSlots();
-        redisTemplate.opsForSet().intersect("key", "test");
         redisTemplate.opsForValue().set("key1", "test");
         System.out.println("The key value: " + redisTemplate.opsForValue().get("key1"));
     }
