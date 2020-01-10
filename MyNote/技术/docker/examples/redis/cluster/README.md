@@ -57,7 +57,7 @@ rm -rf redis6/data
 #后台启动
 docker-compose -f docker-compose.yaml up -d
 #创建集群，Redis容器和启动集群命令都需要使用host网络，此处的ip地址需要使用宿主机的ip
-docker run --net host --rm -it zvelo/redis-trib create --replicas 1 korov-linux.com:6061 korov-linux.com:6062 korov-linux.com:6063 korov-linux.com:6064 korov-linux.com:6065 korov-linux.com:6066
+docker run --net host --rm -it zvelo/redis-trib create --replicas 1 192.168.31.88:6061 192.168.31.88:6062 192.168.31.88:6063 192.168.31.88:6064 192.168.31.88:6065 192.168.31.88:6066
 
 进入某个Redis容器，通过`redis-cli -p 6061 -c`以集群方式进入容器set一个值之后去别的容器查看值是否存在
 ```
