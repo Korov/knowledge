@@ -8,12 +8,13 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class KafkaProducer {
-    private static Logger logger = LoggerFactory.getLogger(KafkaProducer.class);
+    private static final Logger logger = LoggerFactory.getLogger(KafkaProducer.class);
 
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
 
     public void send() {
+
         for (int i = 0; i < 5; i++) {
             kafkaTemplate.send("hello", String.valueOf(i));
         }

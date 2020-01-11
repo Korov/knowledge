@@ -9,16 +9,16 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 @Component
-public class KafkaConsumer {
-    private static final Logger logger = LoggerFactory.getLogger(KafkaConsumer.class);
+public class KafkaConsumer1 {
+    private static final Logger logger = LoggerFactory.getLogger(KafkaConsumer1.class);
 
-    @KafkaListener(topics = {"hello1"})
+    @KafkaListener(id = "test1", topics = "test-topic2", containerFactory = "kafkaListenerContainerFactory1")
+
     public void listen(ConsumerRecord<?, ?> record) throws InterruptedException {
         Optional<?> kafkaMessage = Optional.ofNullable(record.value());
         if (kafkaMessage.isPresent()) {
             Object message = kafkaMessage.get();
-            logger.info("KafkaConsumer consumer the message. record: {}, message: {}!", record, message);
+            logger.info("listen consumer the message. record: {}, message: {}!", record, message);
         }
-        Thread.sleep(50);
     }
 }

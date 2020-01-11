@@ -13,6 +13,7 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+
 public class ProviderKafka {
     public static void main(String[] args) {
         SpringApplication.run(ProviderKafka.class, args);
@@ -20,7 +21,7 @@ public class ProviderKafka {
 
     @Bean(value = "redisTemplate")
     public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
-        RedisTemplate<String, Object> template = new RedisTemplate<String, Object>();
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
         Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
         ObjectMapper om = new ObjectMapper();

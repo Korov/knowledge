@@ -1,4 +1,4 @@
-# Apache kafka实战
+# dockerApache kafka实战
 
 # 1 认识Apache Kafka
 
@@ -333,7 +333,6 @@ public class ConsumerTest {
         properties.put("enable.auto.commit", "true");
         properties.put("auto.commit.interval.ms", "1000");
         properties.put("auto.offset.reset", "earliest");
-        properties.put("auto.offset.reset", "earliest");
 
         // 创建消费者实例
         KafkaConsumer<String, String> consumer = new KafkaConsumer<>(properties);
@@ -354,6 +353,22 @@ public class ConsumerTest {
 }
 ```
 
+### 5.2.2 consumer脚本命令
+
+脚本名称为kafka-console-consumer，在Linux平台下它位于<kafka 目录>/bin下，windows平台下它位于<kafka 目录>/bin/windows下。
+
+kafka-console-consumer脚本常见的参数：
+
+- --bootstrap-servers：指定Kafka broker列表，多台broker则以逗号分割。这与Java API中的bootstrap.servers参数有相同的含义。
+- --topic：指定要消费的topic名
+- --from-beginning：是否指定从头消费，与Java API中的auto.offset.reset=earliest效果一致
+
+```sh
+bin/kafka-console-consumer.sh --bootstrap-servers localhost:9092 --topic test --from-beginning
+```
+
+
+
 ### 5.2.3 consumer主要参数
 
 **session.timeout.ms**：消费组协调者（group coordinator）检测失败的时间，某个消费者实例崩溃了之后coordinator会在相应时间内感应到并做出相应处理。
@@ -372,5 +387,149 @@ public class ConsumerTest {
 
 **connections.max.idle.ms**：Kafka定期关闭空闲Socket，默认9分钟。
 
+## 5.3 订阅topic
+
+### 5.3.1 订阅topic列表
+
+consumer group订阅topic非常简单，使用下面的语句就可以实现
+
+```java
+consuemr.subscribe(Arrays.asList("topic1", "topic2", "topic3"));
+```
+
+如果使用独立的consumer，则可以使用下面的语句实现
+
+```java
+TopicPartition topicPartition1 = new TopicPartition("topic-name", 0);
+TopicPartition topicPartition2 = new TopicPartition("topic-name", 1);
+consumer.assign(Arrays.asList(topicPartition1, topicPartition2));
+```
+
+### 5.3.2 基于正则表达式订阅topic
+
+```java
+consumer.subscribe(Pattern.compile("kafka-.*"), new ConsumerRebalanceListener()...);
+```
+
+使用基于正则表达式的订阅就必须指定ConsumerRebalanceListener。该类是一个回调接口，用户需要通过实现这个接口来实现consumer分区分配方案发生变更时的逻辑。如果用户使用的是自动提交 （enable.auto.commit=true)，则通常不需要理会这个类，使用下列的实现类就可以了
+
+```java
+consumer.subscribe(Pattern.compile("kafka-.*"), new NoOpConsumerRebalanceListener()...);
+```
+
+但是，如果用户是手动提交位移的，则至少要在ConsumerRebalanceListener实现类的onPartitionsRevoked方法中处理分区分配方案变更时的位移提交。
+
+# 7 管理Kafka集群
+
+## 7.1 集群管理
+
+### 7.1.1 启动broker
+
+在生产环境中强烈推荐使用`-daemon`参数启动服务器，代码如下
+
+```sh
+bin/kafka-server-start.sh -daemon <path>/server.properties
+```
+
+### 7.1.2 关闭broker
+
+正确关闭broker的分两种情况讨论。
+
+#### 1. 前台方式启动broker进程时
+
+所谓前台启动broker是指，在Linux中断不加nohub或-daemon参数的方式直接启动broker。关闭broker只需要在该终端上按Ctrl + C组合键发出SIGINT信号终止进程即可。Kafka broker进程会捕捉SIGINT信号并执行broker关闭逻辑。
+
+#### 2. 后台方式启动broker进程时
+
+当nohub或-daemon参数的方式直接启动broker后，需要使用Kafka的脚本停止：
+
+```sh
+bin/kafka-server-stop.sh
+```
+
+它会关闭当前机器中所有的Kafka broker进程。
+
+### 7.1.3 设置JMX端口
+
+Kafka提供了丰富的JMX指标用于实时监控集群运行的健康程度。
+
+```sh
+JMX_PORT=9997 bin/kafka-server-start.sh -daemon <path>/server.properties
+```
+
+## 7.2 topic管理
+
+### 7.2.1 创建topic
+
+Kafka创建topic的途径有4种：
+
+- 通过执行kafka-topics.sh命令工具创建
+- 通过显示发送CreateTopicsRequest请求创建topic
+- 通过发送MetadataRequest请求且broker端设置了auto.create.topics.enable为true
+- 通过向ZooKeeper的/brokers/topics路径下写入以topic名称命名的子结点。
+
+![image-20200111164237850](picture\image-20200111164237850.png)
+
+示例：创建一个topic，名为test-topic，6个分区，每个分区3个副本，同时指定该topic的日志留存时间3天
+
+```sh
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --partitions 6 --replication-factor 3 --topic test-topic --config delete.retention.ms=259200000
+```
+
+手动指定分区在集群上的分配。假设我们有一个3台broker构成的Kafka集群，broker id分别是0、1、2。现在我们创建一个topic，名为test-topic2，分区数是4，副本因子是2。我们手动分配方案如下：
+
+分区1：0、1；分区2：1、2；分区3：0、2；分区4：1、2；
+
+```sh
+bin/kafka-topics.sh --create --zookeeper localhost:2181 --topic test-topic2 --replica-assignment 0:1,1:2,0:2,1:2
+```
+
+指定--replica-assignment之后，不用再制定--partitions和--replication-factor，因为脚本可以从手动分配方案中计算出topic的分区数和副本因子数
+
+### 7.2.2 删除topic
+
+删除topic有3种方式：
+
+- 使用kafka-topics脚本
+- 构造DeleteTopicsRequest请求
+- 直接向ZooKeeper的/admin/delete_topics下写入子结点
+
+```sh
+bin/kafka-topics.sh --delete --zookeeper localhost:2181 --topic test-topic
+```
+
+### 7.2.3 查询topic列表
+
+```sh
+bin/kafka-topics.sh --zookeeper localhost:2181 --list
+```
+
+### 7.2.4 查询topic详情
+
+```sh
+bin/kafka-topics.sh --zookeeper localhost:2181 --describe --topic test-topic2
+```
+
+### 7.2.5 修改topic
+
+增加topic分区，以test-topic2为例，当前的分区数4，增加到10
+
+```sh
+bin/kafka-topics.sh --alter --zookeeper localhost:2181 --partitions 10 --topic test-topic2
+```
+
+官方不推荐使用这种方法，推荐使用kafka-config.sh。
+
+为已有topic增加一个topic级别的参数。假设我们要为上面的test-topic2设置cleanup.policy=compact
+
+```sh
+bin/kafka-config.sh --zookeeper zoo1:2181,zoo2:2181 --alter --entity-type topics --entity-name test-topic2 --add-config cleanup.policy=compact
+```
+
+## 7.4 consumer相关管理
+
+### 7.4.2 重设消费者位移
 
 
+
+# 自我总结
