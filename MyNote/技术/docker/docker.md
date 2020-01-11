@@ -1,4 +1,6 @@
-1 docker基本命令
+# 1 docker基本命令
+
+## 1.1 docker服务操作
 
 启动        systemctl start docker
 守护进程重启   sudo systemctl daemon-reload
@@ -7,7 +9,7 @@
 关闭docker   service docker stop
 关闭docker  systemctl stop docker
 
-docker images 查看镜像
+## 1.2 镜像创建和启动
 
 ```bash
 docker build -t eureka:1.0 .
@@ -21,15 +23,28 @@ docker run -d -p 7001:7001 eureka:1.0
 docker save rabbitmq:3.8-rc-alpine -o rabbitmq3.8.tar
 #从当前文件夹加载rabbitmq3.8.tar为docker中的镜像
 docker load -i rabbitmq3.8.tar
-```
 
-```bash
-docker stop `docker ps -a -q`;
-docker rm `docker ps -a -q`;
-# 停止并删除所有容器
 docker rmi `docker images -q`;
 # 删除所有镜像
 ```
+
+## 1.3 容器相关操作
+
+```bash
+# 查看正在运行的容器
+docker ps
+# 查看所有容器
+docker ps -a
+
+#重启容器
+docker restart 容器名称或者容器id
+
+docker stop `docker ps -aq`;
+docker rm `docker ps -aq`;
+# 停止并删除所有容器
+```
+
+## 1.4 查看容器日志
 
 ```bash
 docker logs -f -t --since="2019-05-04" --tail=100 container_name
@@ -40,16 +55,16 @@ docker logs -f -t --since="2019-05-04" --tail=100 container_name
 container_name : 容器名
 ```
 
+## 1.5 进入容器内部
+
 ```bash
 #docker进入镜像的方式
 docker run -it mysql:8.0.11 /bin/bash
 #进入容器命令
 docker exec -it kafka /bin/sh
-#重启容器
-docker restart 容器名称或者容器id
 ```
 
-## 查看容器所有信息
+## 1.6 查看容器所有信息
 
 此命令可以查看此容器的所有信息
 
@@ -142,6 +157,58 @@ ENTRYPOINT command param 1 param2: shell 中执行。
 此时， CMD指令指定值将作为根命令的参数。
 每个Dockerfile 中只能有一个ENTRYPOINT, 当指定多个时， 只有最后一个起效。
 在运行时， 可以被--entrypoint 参数覆盖掉， 如docker run --entrypoint。
+
+# volume和mount
+
+使用数据卷实现本地数据持久化：
+最开始 -v 或者 --volume 选项是给单独容器使用， --mount 选项是给集群服务使用。但是从 Docker 17.06 开始，也可以在单独容器上使用 --mount。通常来讲 --mount 选项也更加具体(explicit)和”啰嗦”(verbose)，最大的区别是
+
+    -v 选项将所有选项集中到一个值
+    --mount 选项将可选项分开
+
+如果需要指定 volume driver 选项，那么必须使用 --mount
+
+    -v 或 --volume: 包含三个 field，使用 : 来分割，所有值需要按照正确的顺序。第一个 field 是 volume 的名字，并且在宿主机上唯一，对于匿名 volume，第一个field通常被省略；第二个field是宿主机上将要被挂载到容器的path或者文件；第三个field可选，比如说 ro（只读）rw（读写）
+    
+    --mount: 包含多个 key-value 对，使用逗号分割。--mount 选项更加复杂，但是各个值之间无需考虑顺序。
+        type，可以为 bind（绑定数据卷，映射到主机路径下）, volume（普通数据卷，映射到主机路径下）, tmpfs（临时数据卷，只存于内存中）, 通常为 volume
+        source 也可以写成 src，对于 named volumes，可以设置 volume 的名字，对于匿名 volume，可以省略
+        destination 可以写成 dst或者 target 该值会挂载到容器
+        readonly 可选，如果使用，表示只读
+        volume-opt 可选，可以使用多次
+docker run -p 3306:3306 --name mymysql -v $PWD/conf:/etc/mysql/conf.d -v $PWD/logs:/logs -v $PWD/data:/var/lib/mysql -e 
+docker run -p 3306:3306 --name mymysql --mount source=$PWD/conf,destination=/etc/mysql/conf.d --mount source=$PWD/logs,destination=/logs --mount source=$PWD/data,destination=/var/lib/mysql -e 
+
+#创建数据卷容器，数据卷容器也是一个容器
+创建dbdata容器
+docker run it -v /dbdata --ame dbdata ubuntu
+可以在其他容器中使用--volumes-from 来挂载dbdata 容器中的数据卷，例如创建dbl 和db2 两个容器，并从dbdata 容器挂载数据卷：
+$ docker run -it --volumes-from dbdata -name dbl ubuntu
+$ docker run -it --volumes-from dbdata －口ame db2 ubuntu
+此时， 容器dbl 和db2 都挂载同一个数据卷到相同的／ dbdata 目录，三个容器任何一方在该目录下的写人，其他容器都可以看到。
+可以多次使用--volumes-from 参数来从多个容器挂载多个数据卷，还可以从其他已经挂载了容器卷的容器来挂载数据卷：
+$ docker run -d --name db3 --volumes-from dbl training/postgres
+如果删除了挂载的容器（包括dbdata 、db 工和db2 ），数据卷并不会被自动删除。如果要删除一个数据卷，必须在删除最后一个还挂载着它的容器时显式使用dock er rm -v 命令来指定同时删除关联的容器。
+
+可以利用数据卷容器对其中的数据卷进行备份、恢复，以实现数据的迁移。
+1. 备份
+使用下面的命令来备份dbdata 数据卷容器内的数据卷：
+$ docker run -volumes-from dbdata -v $ (pwd) : /backup - -name worker ubuntu tar
+cvf /backup/backup.tar /dbdata
+这个命令稍微有点复杂，具体分析下。
+首先利用ubuntu 镜像创建了一个容器worker 。使用－ -volumes-from dbdata 参数
+来让worker 容器挂载db data 容器的数据卷（ 即dbdata 数据卷）；使用-v $ (pwd) : /backup
+参数来挂载本地的当前目录到worker容器的/backup 目录。
+worker 容器启动后，使用tarcvf/backup/backup.tar /dbdata 命令将/dbdata
+下内容备份为容器内的/backup/backup.tar ，即宿主主机当前目录下的backup.tar 。
+2. 恢复
+如果要恢复数据到一个容器，可以按照下面的操作。
+首先创建一个带有数据卷的容器d bdata2:
+$ docker run -v /dbdata --name dbdata2 ubuntu /bin/bash
+然后创建另一个新的容器，挂载dbda ta2 的容器，并使用untar 解压备份文件到所挂
+载的容器卷中：
+$docker run --volumes-from dbdata2 -v $(pwd) :/backup busybox tar xvf
+/backup/backup.tar
 
 # 3 案例
 
@@ -1103,3 +1170,15 @@ docker network create --driver bridge --subnet 172.19.0.0/16 br17219
 ```
 
 驱动为bridge，名称为br17219。
+
+## docker info中出现警告
+
+```bash
+vi /etc/sysctl.conf
+添加如下内容
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+执行：
+sysctl -p
+```
+
