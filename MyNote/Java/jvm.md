@@ -1443,3 +1443,103 @@ Java语言定义了5中线程状态，在任意一个时间点，一个线程只
 
 ![image-20191027020107048](picture\image-20191027020107048.png)
 
+# 13 常用的GC参数
+
+## 13.1 与串行回收器相关的参数
+
+- -XX:+UseSerialGC:在新生代和老年代中使用串行器
+- -XX:SurvivorRatio:设置eden区大小和survivior区大小的比例
+- -XX:PretenureSizeThreshold:设置大对象直接进入老年代的阈值,当对象的大小超过这个值时,将直接在老年代分配
+- -XX:MaxTenuringThreshold:设置对象进入老年代的年龄的最大值.每一次Minor GC后,对象的年龄加1,任何大于这个年龄的对象,一定会进入老年代
+
+## 13.2 与并行GC相关的参数 
+
+-XX:+UseParNewGC:在新生代使用并行收集器
+-XX:+UseParallelOldGC:老年代使用并行回收收集器
+-XX:ParallelGCThreads:设置用于垃圾回收的线程数.通常情况下可以和CPU的数量相等,但在CPU数量较多的情况下,设置相对较小的数值也是合理的
+-XX:MaxGCPauseMillis:设置最大垃圾收集停顿时间.它的值是一个大于0的整数,收集器在工作时,会调整Java堆大小或其他参数,尽可能把停顿时间控制在MaxGCPauseMillis以内
+-XX:GCTimeRatio:设置吞吐量大小,它的值是一个0~100的整数,假设GCTimeRatio的值为N,那么系统将花费不超过1/(1+n)的时间用于垃圾收集
+-XX:UseAdaptiveSizePolicy:打开自适应GC策略,在这种模式下,新生代的大小,eden和survivior的比例,晋升老年代的对象年龄等参数都会自动调整,以达到在堆大小,吞吐量和停顿时间之间的平衡点
+
+## 13.3 与CMS回收器相关的参数
+
+-XX:+UseConcMarkSweepGC:在新生代使用并行收集器,在老年代使用CMS+串行收集器
+-XX:ParallelCMSThreads:设定CMS的线程数量
+-XX:CMSInitiatingOccupancyFraction:设置CMS收集器在老年代空间被使用多少后触发,默认为68%
+-XX:+UseCMSCompactAtFullCollection:设置CMS收集器在完成垃圾收集后是否要进行一次内存碎片的整理
+-XX:CMSFullGCsBeforeCompaction:设定进行多少次CMS垃圾回收后,进行一次内存压缩
+-XX:+CMSClassUnloadingEnabled:允许对类元数据区进行回收
+-XX:CMSInitiatingPermOccupancyFraction:当永久区占有率达到这一百分比时,启动CMS回收(前提是-XX:+CMSClassUnloadingEnabled激活了)
+-XX:UseCMSInitiatingOccupancyOnly:表示只在到达阈值的时候才进行CMS回收
+-XX:+CMSIncrementalMode:使用增量模式,比较适合单CPU.增量模式在JDK8中标记为废弃,并且在9中将彻底移除
+
+## 13.4 与G1回收器相关的参数
+
+-XX:+UseG1GC:使用G1回收器 
+ -XX:MaxGCPauseMillis:设置最大垃圾收集停顿时间 
+ -XX:GCPauseIntervalMillis:设置停顿间隔时间
+
+## 13.5 TLAB相关
+
+-XX:+UseTLAB:开启TLAB分配 
+ -XX:+PrintTLAB:打印TLAB相关分配信息 
+ -XX:TLABSize:设置TLAB大小 
+ -XX:+ResizeTLAB:自动调整TLAB大小
+
+## 13.6 其他参数
+
+-XX:+DisableExplicitGC:禁用显示GC 
+ -XX:+ExplicitGCInvokesConcurrent:使用并发方式处理显示GC
+
+| 参数名称                                  | 含义                                                       | 默认值               | 备注                                                         |
+| ----------------------------------------- | ---------------------------------------------------------- | -------------------- | ------------------------------------------------------------ |
+| -Xms                                      | 初始堆大小                                                 | 物理内存的1/64(<1GB) | 默认（MinHeapFreeRatio参数可以调整）空余堆内存小于40%时，JVM就会增大堆直到-Xmx的最大限制 |
+| -Xmx                                      | 最大堆大小                                                 | 物理内存的1/4(<1GB)  | 默认（MaxHeapFreeRatio参数可以调整）空余堆内存大于70%时，JVM就会减少堆直到-Xms的最小限制 |
+| -XX:NewSize                               | 设置年轻代大小（for 1.3/1.4）                              |                      |                                                              |
+| -XX:MaxNewSize                            | 年轻代最大值（for 1.3/1.4）                                |                      |                                                              |
+| -XX:PermSize                              | 设置持久代（perm gen）初始值                               | 物理内存的1/64       |                                                              |
+| -XX:MaxPermSize                           | 持久代最大值                                               | 物理内存的1/4        |                                                              |
+| -Xss                                      | 每个线程的堆栈大小                                         |                      | JDK5.0以后每个线程堆栈大小为1M，以前每个线程堆栈大小为256K，更具应用的线程所需内存大小进行调整。在相同物理内存下，减小这个值能生成更多的线程。但是操作系统对一个进程内的线程数还是有限制的，不能无限生成，一般在3000~5000左右。一般小的应用，如果栈不是很深，应该是128K够用的，大的应用建议使用256K。***这个选项对性能影响比较大，需要严格测试。*** |
+| -XX:ThreadStackSize                       | 每个线程的堆栈大小                                         |                      | 一般设置-Xss就可以了                                         |
+| -XX:NewRatio                              | 年轻代（包括Eden和Survivor区）与年老代的比值               |                      | -XX:NewRatio=4表示年轻代与老年代所占比值为1:4。年轻代占整个堆栈的1/5，Xms=Xmx并且设置了Xmn的情况下，该参数不需要进行设置 |
+| -XX:SurvivorRatio                         | Eden区与Survivor区的大小比值                               |                      | 设置为8，则两个Survivor区与一个Eden区的比值为2:8，           |
+| -XX:LargePageSizeInBytes                  | 内存页的大小不可设置过大，会影响Perm的大小                 |                      | =128m                                                        |
+| -XX:+UseFastAccessorMethods               | 原始类型的快速优化                                         |                      |                                                              |
+| -XX:+DisableExplicitGC                    | 关闭System.gc()                                            |                      | 这个参数需要严格的测试                                       |
+| -XX:MaxTenuringThreshold                  | 垃圾最大年龄                                               |                      | 如果设置为0的话，则年轻代对象不经过Survivor区，直接进入老年代。对于老年代比较多的应用，可以提高效率。该参数只有在串行GC时才有效 |
+| -XX:+AggressiveOpts                       | 加快编译                                                   |                      |                                                              |
+| -XX:+UseBiasedLocking                     | 锁机制的性能改善                                           |                      |                                                              |
+| -Xnoclassgc                               | 禁用垃圾回收                                               |                      |                                                              |
+| -XX:SoftRefLRUPolicyMSPerMB               | 每兆堆空闲空间中SoftReference存活时间                      | 1s                   |                                                              |
+| -XX:PretenureSizeThreshold                | 对象超过多大是直接在旧生代分配                             | 0                    | 单位字节新生代采用Parallel Scavenge GC时无效。另一种直接在旧生代分配的情况是大的数组对象，且数组中无外部引用对象 |
+| -XX:TLABWasteTargetPercent                | TLAB占Eden区的百分比                                       | 1%                   |                                                              |
+| -XX:+CollectGenOFirst                     | FullGC时是否先YGC                                          | FALSE                |                                                              |
+| -XX:+UseParallelGC                        | Full GC采用Parallel MSC                                    |                      | 使用并行垃圾收集器。此配置仅对年轻代有效。而老年代仍旧使用串行收集器 |
+| -XX:+UseParNewGC                          | 设置年轻代为并行收集器                                     |                      | 可与CMS收集同时使用                                          |
+| -XX:ParallelGCThreads                     | 并行收集器的线程数                                         |                      | 此值最好配置与处理器数目相等，同样适用于CMS                  |
+| -XX:+UseParallelOldGC                     | 老年代垃圾收集器方式为并行收集器                           |                      | Java6 出现的参数选项                                         |
+| -XX:MaxGCPauseMillis                      | 每次年轻代垃圾回收的最长时间（最大暂停时间）               |                      | 如果无法满足此时间，JVM会自动调整年轻代大小，以满足此值      |
+| -XX:UseAdaptiveSizePolicy                 | 自动选择年轻代区大小和相应的Survivor区比例                 |                      | 设置此选项后，并行收集器会自动选择年轻代区大小和相应的Survivor区比例，以达到目标系统规定的最低相应时间或者手机频率等，此值建议使用并行收集器时一直打开 |
+| -XX:GCTimeRatio                           | 设置垃圾回收时间占程序运行时间的百分比                     |                      | 公式为1/(1+n)                                                |
+| -XX:+ScavengeBeforeFullGC                 | Full GC前调用YGC                                           | TRUE                 |                                                              |
+| -XX:+UseConcMarkSweepGC                   | 使用CMS内存收集                                            |                      | 测试中配置这个以后，-XX:NewRatio的配置就会失效               |
+| -XX:+AggressiveHeap                       |                                                            |                      | 试图使用大量的物理内存，长时间大内存使用的优化，能检查计算资源（内存，处理器数量），至少需要256MB内存，大量的CPU/内存 |
+| -XX:CMSFullGCsBeforeCompaction            | 多少次后进行内存压缩                                       |                      | 由于并发收集器不对内存空间进行压缩整理，所以运行一段时间以后会产生碎片，设置此值进行碎片整理 |
+| -XX:+CMSParallelRemarkEnable              | 降低标记停顿                                               |                      |                                                              |
+| -XX:+UseCMSCompactAtFullCollection        | 在Full GC的时候，对老年代进行压缩                          |                      | CMS是不会移动内存的，因此，这个非常容易产生碎片导致内存不够用，因此，内存的压缩这个时候就会被启用。可能会影响性能，但是可以消除碎片 |
+| -XX:+UseCMSInitiatingOccupancyOnly        | 使用手动定义初始化定义开始CMS手机                          |                      | 禁止HostSpot自行触发CMS GC                                   |
+| -XX:CMSInitiatingOccupancyFraction=70     | 使用cms作为垃圾回收器，使用70%后开始CMS收集                | 92                   |                                                              |
+| -XX:CMSInitiatingPermOccupancyFraction=70 | 设置Perm GEN使用到达多少比率时触发                         | 92                   |                                                              |
+| -XX:CMSIncrementalMode                    | 设置为增量模式                                             |                      | 使用单CPU情况                                                |
+| -XX:+CMSClassUnloadingEnable              |                                                            |                      |                                                              |
+| -XX:+PrintGC                              |                                                            |                      |                                                              |
+| -XX:+PrintGCDetails                       |                                                            |                      |                                                              |
+| -XX:+PrintGCTimeStamps                    |                                                            |                      |                                                              |
+| -XX:+PrintGC:PrintGCTimeStamps            |                                                            |                      |                                                              |
+| -XX:+PrintGCApplicationStoppedTime        | 打印垃圾回收期间程序暂停的时间                             |                      |                                                              |
+| -XX:+PrintGCApplicationConcurrentTime     | 打印每次垃圾回收前，程序未中断的执行时间，可与上面会和使用 |                      |                                                              |
+| -XX:+PrintHeapAtGC                        | 打印GC前后的详细堆栈信息                                   |                      |                                                              |
+| -Xloggc:filename                          | 把相关日志信息记录到文件以便分析                           |                      |                                                              |
+| -XX:+PrintClassHistogram                  |                                                            |                      |                                                              |
+| -XX:+PrintTLAB                            | 查看TLAB空间的使用情况                                     |                      |                                                              |
+| -XX:+PrintTenuringDistribution            | 查看每次minor GC后新的存活周期的阀值                       |                      |                                                              |
