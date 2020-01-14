@@ -1,4 +1,4 @@
-package com.kafka.demo;
+package com.redis.demo;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -13,10 +13,9 @@ import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
-
-public class ProviderKafka {
+public class RedisDemo {
     public static void main(String[] args) {
-        SpringApplication.run(ProviderKafka.class, args);
+        SpringApplication.run(RedisDemo.class, args);
     }
 
     @Bean(value = "redisTemplate")

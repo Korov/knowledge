@@ -876,12 +876,28 @@ varchar(n) ：可变长度，存储的值是每个值占用的字节再加上一
 
 # Redis
 
+## redis安装
+
+```bash
+$ wget http://download.redis.io/releases/redis-2.8.17.tar.gz
+$ tar xzf redis-2.8.17.tar.gz
+$ cd redis-2.8.17
+$ make
+$ cd src
+$ ./redis-server ../redis.conf
+```
+
+## 为什么使用redis
+
+速度快，完全基于内存，使用c语言实现，网络层使用epoll解决高并发问题，是单线程的避免了不必要的上下文切换。
+
 ## redis 是什么？都有哪些使用场景？
 
 Redis是一个使用c语言开发的键值对高速缓存数据库。
 
 Redis使用场景：
 
+- 缓存
 - 记录帖子点赞数、点击数、评论数；
 - 缓存近期热帖；
 - 缓存文章详情信息；

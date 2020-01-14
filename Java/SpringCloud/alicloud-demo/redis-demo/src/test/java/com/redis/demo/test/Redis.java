@@ -1,6 +1,6 @@
-package com.kafka.demo.test;
+package com.redis.demo.test;
 
-import com.kafka.demo.ApplicationTests;
+import com.redis.demo.ApplicationTests;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,7 +14,7 @@ public class Redis extends ApplicationTests {
 
     @Test
     public void test() {
-        redisTemplate.opsForValue().set("key1", "test");
+        redisTemplate.opsForValue().set("key1", "test333");
         System.out.println("The key value: " + redisTemplate.opsForValue().get("key1"));
     }
 }

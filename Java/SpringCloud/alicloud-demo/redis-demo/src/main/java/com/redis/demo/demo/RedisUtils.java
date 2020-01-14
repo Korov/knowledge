@@ -1,4 +1,4 @@
-package com.kafka.demo.demo;
+package com.redis.demo.demo;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.*;

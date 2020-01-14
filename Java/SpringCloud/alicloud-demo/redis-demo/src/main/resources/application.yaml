@@ -1,10 +1,26 @@
 server:
-  port: 8001
+  port: 8002
 
 spring:
   application:
-    name: kafka-demo
-
+    name: redis-demo
+  redis:
+    password:    # 密码（默认为空）
+    timeout: 6000ms  # 连接超时时长（毫秒）
+    cluster:
+      nodes:
+        - korov-linux.com:6061
+        - korov-linux.com:6062
+        - korov-linux.com:6063
+        - korov-linux.com:6064
+        - korov-linux.com:6065
+        - korov-linux.com:6066
+    lettuce:
+      pool:
+        max-active: 1000  # 连接池最大连接数（使用负值表示没有限制）
+        max-wait: -1ms      # 连接池最大阻塞等待时间（使用负值表示没有限制）
+        max-idle: 10      # 连接池中的最大空闲连接
+        min-idle: 5       # 连接池中的最小空闲连接
   kafka:
     bootstrap-servers: korov-linux.com:9092,korov-linux.com:9093,korov-linux.com:9094
 

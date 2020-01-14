@@ -5,14 +5,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.korov.alicloud</groupId>
-    <artifactId>demo1</artifactId>
+    <artifactId>alicloud-demo</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>provider</module>
         <module>consumer</module>
         <module>sentinel</module>
-        <module>provider-kafka</module>
+        <module>kafka-demo</module>
+        <module>redis-demo</module>
     </modules>
 
     <properties>
