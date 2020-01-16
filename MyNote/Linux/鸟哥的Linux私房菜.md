@@ -658,3 +658,6 @@ iptables -t nat -F PREROUTING
 iptables -t nat -F OUTPUT
 ```
 
+## 5 df查看内存使用情况
+
+df -h 以G为单位查看内存使用情况

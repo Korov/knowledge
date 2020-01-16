@@ -14,11 +14,21 @@
 
 ## HashCode的作用
 
-hashcode是根据对象内容生成的一串编码，这串编码的作用就是辅助判断对象是否相等。
+hashcode是根据对象内容生成的一串编码，这串编码的可以辅助判断对象是否相等。
 
 ## Java基类Object类
 
 所有类的父类，其中方法有equal，hashcode，toString ,clone，wait和notify，notifyAll。
+
+## java中四种修饰符的限制范围
+
+public：本类，本包，不同包子类，不同包非子类
+
+protected：本类，本包，不同包子类
+
+default：本类，本包
+
+private：本类
 
 ## final和static关键字的作用
 
@@ -95,7 +105,7 @@ Collection和Map两个
 - ArrayBlockingQueue：基于数组，先进先出，线程安全，可实现制定时间的阻塞读写，并且数量可以限制
 - LinkedBlockingQueue：基于链表实现，读写各用一把锁，在高并发读写操作都多的情况下性能优于ArrayBlockingQueue。
 
-## HashMap和HashTable有什么区别
+## HashMap和HashTable，ConcurrentHashMap有什么区别
 
 **线程安全性不同**：Hashtable是线程安全的，HashMap不是线程安全的
 
@@ -110,6 +120,12 @@ Collection和Map两个
 **初始容量和每次扩充大小不同**：Hashtable默认的初始大小是11,之后每次扩充容量变为原来的2n+1，。HashMap默认初始大小为16,每次扩充容量变为原来的2倍。创建时，如果给定了容量初始值，那么Hashtable会直接使用你给定的大小，而HashMap会将其扩充为2的幂次方大小。
 
 **计算hash值的方法不同**：Hashtable直接使用对象的hashCode，HashMap会重新根据hashcode计算hash值。
+
+存储结构中ConcurrentHashMap比HashMap多出了一个类Segment，而Segment是一个可重入锁。
+ConcurrentHashMap是使用了锁分段技术来保证线程安全的。
+锁分段技术：首先将数据分成一段一段的存储，然后给每一段数据配一把锁，当一个线程占用锁访问其中一个段数据的时候，其他段的数据也能被其他线程访问。
+ConcurrentHashMap提供了与Hashtable和SynchronizedMap不同的锁机制。Hashtable中采用的锁机制是一次锁住整个hash表，从而在同一时刻只能由一个线程对其进行操作；而ConcurrentHashMap中则是一次锁住一个桶。
+ConcurrentHashMap默认将hash表分为16个桶，诸如get、put、remove等常用操作只锁住当前需要用到的桶。这样，原来只能一个线程进入，现在却能同时有16个写线程执行，并发性能的提升是显而易见的。
 
 ## HashMap的实现
 
@@ -171,6 +187,12 @@ get：
 ### HashMap为什么只允许一个key为null
 
 如果key为null，会放在第一个bucket位置，而且是在链表最前面。
+
+## HashMap在高并发下如果没有处理线程安全会有怎样的安全隐患，具体表现是什么
+
+1.多线程put时可能会导致get无限循环，具体表现为CPU使用率100%；原因：在向HashMap  put元素时，会检查HashMap的容量是否足够，如果不足，则会新建一个比原来容量大两倍的Hash表，然后把数组从老的Hash表中迁移到新的Hash表中，迁移的过程就是一个rehash()的过程，多个线程同时操作就有可能会形成循环链表，所以在使用get()时，就会出现Infinite Loop的情况。
+
+2.多线程put时可能导致元素丢失
 
 ## 如何实现数组和 List 之间的转换
 
