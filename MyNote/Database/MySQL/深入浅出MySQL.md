@@ -2,7 +2,7 @@
 
 ## 1.1 MySQL逻辑架构
 
-![image-20191110161646389](F:/MyGitHub/ChinaGitHub/gitee/MyNote/Database/MySQL/picture/image-20191110161646389.png)
+![image-20191110161646389](picture/image-20191110161646389.png)
 
 第二层中包含大多数MySQL的核心服务功能，包括查询解析、分析、优化、缓存以及所有的内置函数。所有跨存储引擎的功能都在这一层实现：存储过程、触发器、视图等。
 
@@ -34,7 +34,7 @@ InnoDB的MVCC，是通过在每行记录后面保存两个隐藏的列来实现�
 
 使用SHOW TABLE STATUS LIKE 'test'查看表信息
 
-![image-20191110164824117](F:/MyGitHub/ChinaGitHub/gitee/MyNote/Database/MySQL/picture/image-20191110164824117.png)
+![image-20191110164824117](picture/image-20191110164824117.png)
 
 Name：表名
 
@@ -118,7 +118,7 @@ SQL语句主要可以划分为以下3个类别：
 
 #### 1.创建数据库
 
-CREATE DATABASE dbname;//创建数据库
+CREATE DATABASE dbname default character set utf8 collate utf8_general_ci;//创建数据库
 
 SHOW DATABASES；// 查看当前所有的数据库
 
@@ -1305,7 +1305,7 @@ MySQL 可以自动地监测行锁导致的死锁并进行相应的处理，但�
 **备份**
 
 备份指定的数据库，或者此数据库中某些表。
-shell> mysqldump [options] db_name [tables]
+shell> mysqldump [options] db_name [tables] > /var/backup/demo.sql
 备份指定的一个或多个数据库。
 shell> mysqldump [options] ---database DB1 [DB2 DB3...]
 备份所有数据库。
@@ -1316,7 +1316,7 @@ shell> mysqldump [options] --all--database
 mysqldump的恢复很简单，将备份文件作为输入执行即可：
 
 ```shell
-mysql -uroot -p dbname < bakfile
+mysql -uroot -p [dbname] < bakfile
 ```
 
 ### 27.2.3 基于时间点恢复
