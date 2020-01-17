@@ -57,6 +57,8 @@ static修饰的方法可以不通过本类的对象即可调用，static修饰�
 4. 抽象类中的抽象方法必须由子类全部实现，否则这个子类也是抽象类。接口中的方法必须由实现类全部实现，否则这个类就是一个抽象类
 5. 接口里的方法只能声明，不能有具体的实现，这说明接口是设计的结果，抽象类时重构的结果
 
+jdk8的借口中可以有实现
+
 ## java 中 IO 流分为几种
 
 字节流和字符流，分别由四个抽象类来表示。字节流的输入输入：InputStream，OutputStream。字符流的输入输出：Reader，Writer。
@@ -241,9 +243,18 @@ Collections.unmodifiableSet(List);
 是指程序在运行状态中，对于任意一个类，都可以知道这个类的所有属性和方法；对于任意一个对象，都能够调用他的任意方法和属性。
 其原理是通过类的全限定名加载class文件，然后通过class文件创建一个完整的对象。
 
-## 什么是 java 序列化？什么情况下需要序列化？
+## 什么是 java 序列化？集中序列化方案？什么情况下需要序列化？
 
 序列化：将Java对象转换成字节流。反序列化：将字节流转换成Java对象的过程。
+
+序列化方式：
+
+- 实现Serializable接口(隐式序列化)
+- 实现Externalizable接口。(显式序列化)：Externalizable接口继承自Serializable, 我们在实现该接口时，必须实现writeExternal()和readExternal()方法，而且只能通过手动进行序列化，并且两个方法是自动调用的，因此，这个序列化过程是可控的，可以自己选择哪些部分序列化
+- 实现Serializable接口+添加writeObject()和readObject()方法。(显+隐序列化)：如果想将方式一和方式二的优点都用到的话，可以采用方式三， 先实现Serializable接口，并且添加writeObject()和readObject()方法。注意这里是添加，不是重写或者覆盖。但是添加的这两个方法必须有相应的格式。
+  - 方法必须要被private修饰  
+  - 第一行调用默认的defaultRead/WriteObject(); ----->隐式序列化非static和transient
+  - 调用read/writeObject()将获得的值赋给相应的值  --->显式序列化
 
 当Java对象需要在网络上传输或者持久化存储到文件中时，就需要使用序列化
 
@@ -252,6 +263,13 @@ Collections.unmodifiableSet(List);
 1. 某个类可以被序列化，则其子类也可以被序列化
 2. 声明为 static 和 transient 的成员变量，不能被序列化。static 成员变量是描述类级别的属性，transient 表示临时数据
 3. 反序列化读取序列化对象的顺序要保持一致
+
+## 动态代理的两种方式，以及区别
+
+**JDK动态代理**：利用反射机制生成一个实现代理接口的匿名类，在调用具体方法前调用InvokeHandler来处理。
+**CGlib动态代理**：利用ASM（开源的Java字节码编辑库，操作字节码）开源包，将代理对象类的class文件加载进来，通过修改其字节码生成子类来处理。
+
+**区别**：JDK代理只能对实现接口的类生成代理；CGlib是针对类实现代理，对指定的类生成一个子类，并覆盖其中的方法，这种通过继承类的实现方式，不能代理final修饰的类。
 
 ## 什么是动态代理？动态代理是如何实现的？动态代理有哪些应用？
 
@@ -1283,6 +1301,23 @@ spring 有五大隔离级别，默认值为 ISOLATION_DEFAULT（使用数据库�
 - 脏读 ：表示一个事务能够读取另一个事务中还未提交的数据。比如，某个事务尝试插入记录 A，此时该事务还未提交，然后另一个事务尝试读取到了记录 A。
 - 不可重复读 ：是指在一个事务内，多次读同一数据。
 - 幻读 ：指同一个事务内多次查询返回的结果集不一样。比如同一个事务 A 第一次查询时候有 n 条记录，但是第二次同等条件下查询却有 n+1 条记录，这就好像产生了幻觉。发生幻读的原因也是另外一个事务新增或者删除或者修改了第一个事务结果集里面的数据，同一个记录的数据内容被修改了，所有数据行的记录就变多或者变少了。
+
+## @transactional注解在什么情况下会失效，为什么。
+
+@Transactional注解事务的特性：
+
+- service类标签(一般不建议在接口上)上添加@Transactional，可以将整个类纳入spring事务管理，在每个业务方法执行时都会开启一个事务，不过这些事务采用相同的管理方式。
+- @Transactional 注解只能应用到 public 可见度的方法上。 如果应用在protected、private或者 package可见度的方法上，也不会报错，不过事务设置不会起作用。
+- 默认情况下，Spring会对unchecked异常进行事务回滚；如果是checked异常则不回滚。 
+  辣么什么是checked异常，什么是unchecked异常
+
+解决Transactional注解不回滚：
+
+- 检查你方法是不是public的
+- 你的异常类型是不是unchecked异常，注解上面写明异常类型即可`@Transactional(rollbackFor=Exception.class) `
+- 数据库引擎要支持事务
+- 是否开启了对注解的解析`<tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>`
+- spring是否扫描到你这个包，如下是扫描到org.test下面的包`<context:component-scan base-package="org.test" ></context:component-scan>`
 
 # springboot、springcloud
 
