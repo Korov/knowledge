@@ -1573,3 +1573,45 @@ Java语言定义了5中线程状态，在任意一个时间点，一个线程只
 | -XX:+PrintClassHistogram                  |                                                            |                      |                                                              |
 | -XX:+PrintTLAB                            | 查看TLAB空间的使用情况                                     |                      |                                                              |
 | -XX:+PrintTenuringDistribution            | 查看每次minor GC后新的存活周期的阀值                       |                      |                                                              |
+
+# 自我总结
+
+## visualGC使用
+
+![image-20200117234653523](picture/image-20200117234653523.png)
+
+### Space
+
+Space：分别代表元数据空间（jdk8之后用元数据空间代替永久代，元数据空间使用本地内存），Old老年代，Eden，S0和S1都属于新生代。
+
+### Graphs
+
+Compile Time：编译时间表示虚拟机的 JIT 编译器编译热点代码的耗时。
+
+Class Loader Time：表示 class 的 load 和 unload 时间
+
+GC Time：**125 collections** 表示自监视以来一共经历了 22 次GC, 包括 Minor GC 和 Full GC；**2.608s** 表示 gc 共花费了 2.608s；**Last Cause**: G1 Evacuation Pause 表示上次发生 gc 的原因。
+
+Eden Space：1.826G表示Eden最大可分配空间；23.000M表示当前分配空间；2.000M表示当前占用空间；125 collections， 2.608s表示当前新生代发生 GC 的次数为 125 次, 共占用时间 2.608s
+
+Survivor 0 and Survivor 1：S0 和 S1 肯定有一个是空闲的，这样才能方便执行 minor GC 的操作，但是两者的最大分配空间是相同的。并且在 minor GC 时，会发生 S0 和S1 之间的切换。Survivor 1 (1.826G, 445.000M) :220.977M 表示 S1 最大分配空间 1.826G, 当前分配空间2.000M, 已占用空间 2.000M。之所以和Eden相同是应为G1垃圾收集器只有逻辑上的分代，实际上共用内存。
+
+Old Gen：分别表示最大可分配空间1.826G；当前分配空间445.000M, 已占用空间 220.977M。发生了0次垃圾收集，垃圾收集共耗时0s。
+
+Meta space：最大可分配空间1.219G；当前分配392.867M，当前使用378.134M。
+
+### Histogram
+
+survivor区域参数跟年龄柱状图
+
+Tenuring Threshold：表示新生代年龄大于当前值则进入老年代
+
+Max Tenuring Threshold：表示新生代最大年龄值
+
+> Tenuring Threshold与Max Tenuring Threshold区别：Max Tenuring Threshold是一个最大限定，所有的新生代年龄都不能超过当前值，而Tenuring Threshold是个动态计算出来的临时值，一般情况与Max Tenuring Threshold相等，如果在Suivivor空间中，相同年龄所有对象大小的总和大于Survivor空间的一半，则年龄大于或者等于该年龄的对象就都可以直接进入老年代(如果计算出来年龄段是5，则Tenuring Threshold=5，age>=5的Suivivor对象都符合要求)，它才是新生代是否进入老年代判断的依据。
+
+Desired Survivor Size：Survivor空间大小验证阙值(默认是survivor空间的一半)，用于Tenuring Threshold判断对象是否提前进入老年代
+
+Current Survivor Size：当前survivor空间大小
+
+histogram柱状图：表示年龄段对象的存储柱状图
