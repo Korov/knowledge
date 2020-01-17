@@ -844,6 +844,10 @@ public class TestDirectByteBuffer {
 
 有一个很知名的包，**Ehcache**。Ehcache被广泛用于Spring，Hibernate缓存，并且支持堆内缓存，堆外缓存，磁盘缓存，分布式缓存。此外，Ehcache还支持多种缓存策略。
 
+## Java有没有主动触发GC的方式
+
+没有
+
 # 网络
 
 ## http的301和302有什么区别
