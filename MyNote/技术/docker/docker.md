@@ -965,7 +965,7 @@ services:
 
 ```json
 {
-    "registry-mirrors": ["https://registry.docker-cn.com","http://hub-mirror.c.163.com"]
+    "registry-mirrors": ["https://ntb32z44.mirror.aliyuncs.com"]
 }
 ```
 

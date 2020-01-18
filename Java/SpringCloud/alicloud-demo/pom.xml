@@ -14,6 +14,7 @@
         <module>sentinel</module>
         <module>kafka-demo</module>
         <module>redis-demo</module>
+        <module>fastdfs-demo</module>
     </modules>
 
     <properties>
