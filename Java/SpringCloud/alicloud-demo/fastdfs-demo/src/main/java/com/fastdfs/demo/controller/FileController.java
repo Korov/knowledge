@@ -18,7 +18,7 @@ public class FileController {
     private FastDFSClientUtil fileDfsUtil;
 
     /**
-     * 文件上传
+     * 文件上传  测试借口http://localhost:8006/swagger-ui.html
      */
     @ApiOperation(value = "上传文件", notes = "测试FastDFS文件上传")
     @RequestMapping(value = "/uploadFile", headers = "content-type=multipart/form-data", method = RequestMethod.POST)
