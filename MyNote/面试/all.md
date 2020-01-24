@@ -284,6 +284,23 @@ Collections.unmodifiableSet(List);
 
 # Java并发
 
+## Java实现多线程有哪几种方式
+
+- 继承Threads类
+- 实现Runnable接口
+- 通过Callable和FutureTask创建线程
+- 通过线程池创建线程
+
+## Callable和Future的了解
+
+- Callable接口只有一个call方法，Future有cancel，isCancelled，isDone和get方法。
+- Callable用于生成结果，Future用于获取结果
+- Future表示一个可能还没有完成的异步任务的结果，针对这个结果可以添加Callback以便在任务执行成功或失败后作出相应的操作
+- FutureTask是Runnable, Future接口的实现类。
+- RunnableFuture
+  - 这个接口同时继承Future接口和Runnable接口，在成功执行run（）方法后，可以通过Future访问执行结果。这个接口都实现类是FutureTask,一个可取消的异步计算，这个类提供了Future的基本实现，后面我们的demo也是用这个类实现，它实现了启动和取消一个计算，查询这个计算是否已完成，恢复计算结果。计算的结果只能在计算已经完成的情况下恢复。如果计算没有完成，get方法会阻塞，一旦计算完成，这个计算将不能被重启和取消，除非调用runAndReset方法。
+  - FutureTask能用来包装一个Callable或Runnable对象，因为它实现了Runnable接口，而且它能被传递到Executor进行执行。为了提供单例类，这个类在创建自定义的工作类时提供了protected构造函数。
+
 ## 并发和并行的区别
 
 并发：同一时间段，多个任务都在执行，单位时间内不一定同时执行;并行：单位时间内，多个任务同时执行。
@@ -409,6 +426,18 @@ synchronized与lock区别：
 
 jdk1.8线程池种类：newFixedThreadPool（定长线程池），newCachedThreadPool（可缓存线程池），newScheduledThreadPool（定长线程池，可执行周期性任务），newSingleThreadExecutor（单线程，线程池），newSingleThreadScheduledExecutor（单线程可执行周期性任务线程池），newWorkStealingPool（任务窃取线程池，不保证执行顺序，适合任务耗时差异较大。线程池中有多个线程队列，有的线程队列中有大量的比较耗时的任务堆积，而有的线程队列却是空的，就存在有的线程处于饥饿状态，当一个线程处于饥饿状态时，它就会去其它的线程队列中窃取任务。解决饥饿导致的效率问题）
 ThreadPoolExecutor四种线程池就是通过ThreadPoolExecutor此类的构造方法实现的。设置核心线程数量，线程存活时间，线程池可以容纳的最大线程数。线程池中的任务队列三种：SynchronousQueue,LinkedBlockingDeque,ArrayBlockingQueue。
+
+## 线程池的参数有哪些，在线程池创建一个线程的过程
+
+核心参数：
+
+- corePoolSize：核心线程数，核心线程会一直存活，即使没有任务需要执行
+- workQueue：任务队列容量（阻塞队列）。当核心线程数达到最大时，新任务会放在队列中排队等待执行。
+- maximumPoolSize：最大线程数.当线程数>=corePoolSize，且任务队列已满时。线程池会创建新线程来处理任务。当线程数=maximumPoolSize，且任务队列已满时，线程池会拒绝处理任务而抛出异常。
+- keepAliveTime：线程空闲时间。当线程空闲时间达到keepAliveTime时，线程会退出，直到线程数量=corePoolSize。如果allowCoreThreadTimeout=true，则会直到线程数量=0。
+- unit：线程存活时长大单位，结合上个参数使用
+- threadFactory：线程池创建线程的工厂
+- rejectedExecutionHandler：任务拒绝处理器。两种情况会拒绝处理任务：(1)当线程数已经达到maxPoolSize，切队列已满，会拒绝新任务。(2)当线程池被调用shutdown()后，会等待线程池里的任务执行完毕，再shutdown。如果在调用shutdown()和线程池真正shutdown之间提交任务，会拒绝新任务。线程池会调用rejectedExecutionHandler来处理这个任务。如果没有设置默认是AbortPolicy，会抛出异常。ThreadPoolExecutor类有几个内部实现类来处理这类情况：(1)AbortPolicy  丢弃任务，抛运行时异常。(2)CallerRunsPolicy 执行任务。(3)DiscardPolicy  忽视，什么都不会发生。(4)DiscardOldestPolicy  从队列中踢出最先进入队列（最后一个执行）的任务。实现RejectedExecutionHandler接口，也可自定义处理器。
 
 ## 线程池有哪些状态
 
