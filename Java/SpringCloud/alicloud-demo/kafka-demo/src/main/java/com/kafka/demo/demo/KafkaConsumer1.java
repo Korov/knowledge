@@ -12,8 +12,13 @@ import java.util.Optional;
 public class KafkaConsumer1 {
     private static final Logger logger = LoggerFactory.getLogger(KafkaConsumer1.class);
 
+    /**
+     * 会根据id生成一个消费者信息存储在kafka端
+     *
+     * @param record
+     * @throws InterruptedException
+     */
     @KafkaListener(id = "test1", topics = "test-topic2", containerFactory = "kafkaListenerContainerFactory1")
-
     public void listen(ConsumerRecord<?, ?> record) throws InterruptedException {
         Optional<?> kafkaMessage = Optional.ofNullable(record.value());
         if (kafkaMessage.isPresent()) {
