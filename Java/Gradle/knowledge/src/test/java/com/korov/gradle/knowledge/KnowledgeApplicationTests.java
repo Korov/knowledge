@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 public class KnowledgeApplicationTests {
 
     @Test
-    void contextLoads() {
+    public void contextLoads() {
         System.out.println("start success!");
     }
 

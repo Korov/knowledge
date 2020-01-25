@@ -20,4 +20,9 @@ public class ManagersServiceImpl implements ManagersService {
     public List<Managers> selectAll() {
         return dao.selectAll();
     }
+
+    @Override
+    public void insertAll(List<Managers> list) {
+        dao.insertAllResult(list);
+    }
 }
