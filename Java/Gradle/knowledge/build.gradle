@@ -22,6 +22,7 @@ dependencies {
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'mysql:mysql-connector-java'
     compile group: 'org.springframework.kafka', name: 'spring-kafka'
+    compile group: 'com.alibaba', name: 'druid-spring-boot-starter', version: '1.1.21'
     annotationProcessor 'org.projectlombok:lombok'
     compile 'org.springframework.boot:spring-boot-devtools'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {
