@@ -504,6 +504,10 @@ lock.unlock();
 
 可中断的锁获取操作允许在可取消的活动中使用。lockInterruptibly()方法能够使你获得锁的时候响应中断。
 
+### ReentrantReadWriteLock
+
+对于lock的读写锁，可以通过new ReentrantReadWriteLock()获取到一个读写锁。所谓读写锁，便是多线程之间读不互斥，读写互斥。读写锁是一种自旋锁，如果当前没有读者，也没有写者，那么写者可以立刻获得锁，否则它必须自旋在那里，直到没有任何写者或读者。如果当前没有写者，那么读者可以立即获得该读写锁，否则读者必须自旋在那里，直到写者释放该锁。
+
 ### lock实现线程间通信
 
 Condition可以替代传统的线程间通信，用await()替换wait()，用signal()替换notify()，用signalAll()替换notifyAll()。
