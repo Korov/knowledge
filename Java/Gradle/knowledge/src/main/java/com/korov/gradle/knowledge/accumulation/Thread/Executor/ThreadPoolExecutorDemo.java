@@ -5,6 +5,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * 线程池不会自己停止，需要关闭守护进程之后才会关闭线程池
+ */
 public class ThreadPoolExecutorDemo {
     public static void main(String[] args) {
 
