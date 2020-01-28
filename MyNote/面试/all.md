@@ -282,6 +282,92 @@ Collections.unmodifiableSet(List);
 实现Cloneable接口，并重写object类中的clone方法可以实现浅克隆。
 实现Serializable，通过对象的序列化和反序列化实现正真的深克隆。
 
+## 自定义注解的实现
+
+首先我们了解一下自定义注解的标准示例，注解类使用 @interface 关键字修饰，且在注解类上方声明注解相关信息，包含以下四种信息
+
+@Documented – 注解是否将包含在JavaDoc中
+
+@Retention – 什么时候使用该注解
+
+@Target – 注解用于什么地方
+
+@Inherited – 是否允许子类继承该注解
+
+ 
+
+ 1.）@Retention – 定义该注解的生命周期
+  ●   RetentionPolicy.SOURCE : 在编译阶段丢弃。这些注解在编译结束之后就不再有任何意义，所以它们不会写入字节码。@Override, @SuppressWarnings都属于这类注解。
+  ●   RetentionPolicy.CLASS : 在类加载的时候丢弃。在字节码文件的处理中有用。注解默认使用这种方式
+  ●   RetentionPolicy.RUNTIME : 始终不会丢弃，运行期也保留该注解，因此可以使用反射机制读取该注解的信息。我们自定义的注解通常使用这种方式。
+
+  2.）Target – 表示该注解用于什么地方。默认值为任何元素，表示该注解用于什么地方。可用的ElementType 参数包括
+  ● ElementType.CONSTRUCTOR: 用于描述构造器
+  ● ElementType.FIELD: 成员变量、对象、属性（包括enum实例）
+  ● ElementType.LOCAL_VARIABLE: 用于描述局部变量
+  ● ElementType.METHOD: 用于描述方法
+  ● ElementType.PACKAGE: 用于描述包
+  ● ElementType.PARAMETER: 用于描述参数
+  ● ElementType.TYPE: 用于描述类、接口(包括注解类型) 或enum声明
+
+ 3.)@Documented – 一个简单的Annotations 标记注解，表示是否将注解信息添加在java 文档中。
+
+ 4.)@Inherited – 定义该注释和子类的关系
+     @Inherited 元注解是一个标记注解，@Inherited 阐述了某个被标注的类型是被继承的。如果一个使用了@Inherited 修饰的annotation 类型被用于一个class，则这个annotation 将被用于该class 的子类。
+
+## java8新特性
+
+### 1.lambda表达式
+
+是一个可传递的代码块，可以在以后执行一次或多次。对于函数式接口，就可以提供一个lambda表达式。java.util.function包下提供了很多的函数式接口，我常用的是Function和Predicate两个接口。
+
+lambda可以访问外部变量，该变量可以不是final的但是必须是实际final变量。
+
+### 2.函数式接口
+
+对于只有一个抽象方法的接口。这种接口称为函数式接口。被声明 `@FunctionalInterface` 注解的接口应该满足函数式接口的定义。如果某个接口只有一个抽象方法，但我们并没有给该接口声明 `@FunctionalInterface` 注解，那么编译器依旧会将该接口看作是函数式接口。
+
+### 3.stream api
+
+流遵循了做什么而非怎么做。
+
+流与集合之间的差异：
+
+- 流并不存储其元素。这些元素可能存储在底层的集合中，或者是按需生成的。
+- 流的操作不会修改其源数据。例如，filter方法不会从新的流中移除元素，而是会生成一个新的流，其中不包含被过滤掉的元素
+- 流的操作是尽可能的惰性执行的。
+
+流中常用的方法：
+
+- filter：讲符合条件的数据过滤出来形成一个新的流
+- map`<R> Stream<R> map(Function<? super T, ? extends R> mapper)`：产生一个流，它包含将mapper应用于当前流中所有元素产生的结果（多个流产生的结果还是多个流）
+- flatMap`<R> Stream<R> flatMap(Function<? super T, ? extends Stream<? extends R>> mapper);`：产生一个流，通过将mapper应用于当前流中所有元素所产生 的结果链接到一起而获得的。（可以将多个流拼接成一个流）
+
+### 4.接口
+
+接口中可以定义 默认方法 default-method和静态方法 static-method的实现。
+
+如果接口声明了 default 方法，并且某类实现了该接口，那么 default 方法将会被继承。如果有一个类继承了两个不同接口的同名 default 方法，jvm 编译器是无法识别到底该使用哪个方法的，必须重写 default 方法或指定要继承接口的 default 方法。
+
+### 5.方法引用
+
+把类的静态方法或者实例的静态方法和实例方法整合成lambda表达式传递出去
+
+- `object::instanceMethod`
+- `Class::staticMethod`
+- `Class::instanceMethod`
+
+在前 2 种情况中，方法引用等价于提供方法参数的 lambda 表达式。前面已经提到，System.out::println 等价于 x -> System.out.println(x。) 类似地，Math::pow 等价于（x，y) ->Math.pow(x, y。)
+对于第 3 种情况， 第 1 个参数会成为方法的目标。例如，String::compareToIgnoreCase 等同于 (x, y) -> x.compareToIgnoreCase(y) 
+
+### 6.重复注解，并且拓宽了注解的应用场景
+
+在定义的注解上方加入`@Repeatable`就可以重复使用该注解。jdk8之后注解几乎可以使用在任何元素上：局部变量、接口类型、超类和接口实现类。
+
+### 7.增加了工具类
+
+date、time类
+
 # Java并发
 
 ## Java实现多线程有哪几种方式
@@ -1637,6 +1723,24 @@ Map<String, String> map = new LinkedHashMap<String, String>(20, 0.7F, true);
 1. 忽略这个数据不一致，在数据一致性要求不高的业务下，未必需要时时一致性
 2. 强制读主库，使用一个高可用的主库，数据库读写都在主库，添加一个缓存，提升数据读取的性能。
 3. 选择性读主库，添加一个缓存，用来记录必须读主库的数据，将哪个库，哪个表，哪个主键，作为缓存的 key,设置缓存失效的时间为主从库同步的时间，如果缓存当中有这个数据，直接读取主库，如果缓存当中没有这个主键，就到对应的从库中读取。
+
+## redis如何存储一个string的
+
+![img](picture/5064562-d0c0bdaadf49f7be.png)
+
+Redis 内部使用一个 redisObject 对象来表示所有的 key 和 value
+
+1. type ：代表一个 value 对象具体是何种数据类型。
+2. encoding ：是不同数据类型在 redis 内部的存储方式，比如：type=string 代表 value  存储的是一个普通字符串，那么对应的 encoding 可以是 raw 或者是 int，如果是 int 则代表实际 redis  内部是按数值型类存储和表示这个字符串的，当然前提是这个字符串本身可以用数值表示，比如："123" "456"这样的字符串。
+3. vm 字段：只有打开了 Redis 的虚拟内存功能，此字段才会真正的分配内存，该功能默认是关闭状态的。 Redis 使用  redisObject 来表示所有的 key/value 数据是比较浪费内存的，当然这些内存管理成本的付出主要也是为了给 Redis  不同数据类型提供一个统一的管理接口，实际作者也提供了多种方法帮助我们尽量节省内存使用。
+
+## redis部署方式
+
+主从，集群
+
+## redis哨兵模式
+
+## 一个key值如何在redis集群中找到存储在哪里
 
 # Spring
 
@@ -3112,3 +3216,17 @@ free列第二行的值
 九、模板方法
 
 定义一个操作中的算法的骨架，而将一些步骤延迟到子类中。Template Method使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。
+
+# 分布式相关
+
+## 分布式事物的控制
+
+## 分布式锁如何设计
+
+## 分布式session如何设计
+
+## dubbo的组件有哪些，各有什么作用
+
+## zookeeper的负载均衡算法有那些
+
+## dubbo是如何利用接口就可以通信的
