@@ -21,5 +21,7 @@ public class StreamDemo {
 
         newList.forEach(x -> System.out.println(x));
         stringStream.forEach(x -> System.out.println(x));
+
+        Stream<String> listValue = list.stream().peek(x -> System.out.println(x));
     }
 }

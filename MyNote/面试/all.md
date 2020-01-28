@@ -342,6 +342,12 @@ lambda可以访问外部变量，该变量可以不是final的但是必须是实
 - filter：讲符合条件的数据过滤出来形成一个新的流
 - map`<R> Stream<R> map(Function<? super T, ? extends R> mapper)`：产生一个流，它包含将mapper应用于当前流中所有元素产生的结果（多个流产生的结果还是多个流）
 - flatMap`<R> Stream<R> flatMap(Function<? super T, ? extends Stream<? extends R>> mapper);`：产生一个流，通过将mapper应用于当前流中所有元素所产生 的结果链接到一起而获得的。（可以将多个流拼接成一个流）
+- limit：产生一个流，其中包含当前流的前n个元素
+- skip：产生一个流，跳过当前流的前n个元素
+- concat：产生一个流，将流a和流b连接起来
+- distinct：产生一个流，包含当前流中所有不同的元素
+- sorted：产生一个流，对当前流排序之后产生的流
+- peek`Stream<T> peek(Consumer<? super T> action)`：产生一个流，它与当前流中的元素相同，在获取其中每个元素时，会将其传递给action处理，但是没有返回值
 
 ### 4.接口
 
