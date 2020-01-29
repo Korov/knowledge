@@ -215,6 +215,10 @@ get：
 
 **poll()和remove()的区别**：poll()和remove()都将**移除**并且返回对头，但是在poll()在队列为空时返回null，而remove()会抛出NoSuchElementException异常。
 
+## Java 中 LinkedHashMap 和 PriorityQueue 的区别是什么？
+
+PriorityQueue 保证最高或者最低优先级的的元素总是在队列头部，但是 LinkedHashMap 维持的顺序是元素插入的顺序。当遍历一个 PriorityQueue 时，没有任何顺序保证，但是 LinkedHashMap 课保证遍历顺序是元素插入的顺序。
+
 ## Iterator有什么特点
 
 1. Iterator遍历集合元素的过程中不允许线程对集合元素进行修改，否则会抛出ConcurrentModificationEception的异常。
@@ -229,6 +233,10 @@ get：
 2. ListIterator和Iterator都有hasNext()和next()方法，可以实现顺序向后遍历，但是ListIterator有hasPrevious()和previous()方法，可以实现逆向（顺序向前）遍历。
 3. ListIterator可以定位当前的索引位置，nextIndex()和previousIndex()可以实现。Iterator没有此功能。
 4. ListIterator可以通过set方法实现对象的修改，Iterator不可以
+
+## 我们能自己写一个容器类，然后使用 for-each 循环码？
+
+可以，你可以写一个自己的容器类。如果你想使用 Java 中增强的循环来遍历，你只需要实现 Iterable 接口。如果你实现 Collection 接口，默认就具有该属性。
 
 ## 怎么确保一个集合不能被修改
 
@@ -403,6 +411,54 @@ date、time类
 ## 存在两个类，B 继承 A，C 继承 B，我们能将 B 转换为 C 么？
 
 不可以，运行时会抛出ClassCastException
+
+## 哪个类包含 clone 方法？是 Cloneable 还是 Object？
+
+java.lang.Cloneable 是一个标示性接口，不包含任何方法，clone 方法在 object 类中定义。并且需要知道 clone() 方法是一个本地方法，这意味着它是由 c 或 c++ 或 其他本地语言实现的。
+
+## 我能在不进行强制转换的情况下将一个 double 值赋值给 long 类型的变量吗
+
+不行，你不能在没有强制类型转换的前提下将一个 double 值赋值给 long 类型的变量，因为 double 类型的范围比 long 类型更广，所以必须要进行强制转换。
+
+## 我们能在 Switch 中使用 String 吗？
+
+从 Java 7 开始，我们可以在 switch case 中使用字符串，但这仅仅是一个语法糖。内部实现在 switch 中使用字符串的 hash code。
+
+## 3\*0.1 == 0.3 将会返回什么？true 还是 false？
+
+false，因为有些浮点数不能完全精确的表示出来。
+
+## a = a + b 与 a += b 的区别
+
++= 隐式的将加操作的结果类型强制转换为持有结果的类型。如果两这个整型相加，如 byte、short 或者 int，首先会将它们提升到 int 类型，然后在执行加法操作。如果加法操作的结果比 a 的最大值要大，则 a+b 会出现编译错误，但是 a += b 没问题，如下：
+
+byte a = 127;
+
+byte b = 127;
+
+b = a + b; // error : cannot convert from int to byte
+
+b += a; // ok
+
+（译者注：这个地方应该表述的有误，其实无论 a+b 的值为多少，编译器都会报错，因为 a+b 操作会将 a、b 提升为 int 类型，所以将 int 类型赋值给 byte 就会编译出错）
+
+## Java 中的构造器链是什么？
+
+当你从一个构造器中调用另一个构造器，就是Java 中的构造器链。这种情况只在重载了类的构造器的时候才会出现。
+
+## Java 中的编译期常量是什么？使用它又什么风险？
+
+公共静态不可变（public static final ）变量也就是我们所说的编译期常量，这里的 public 可选的。实际上这些变量在编译时会被替换掉，因为编译器知道这些变量的值，并且知道这些变量在运行时不能改变。
+
+风险：你使用了一个内部的或第三方库中的公有编译时常量，但是这个值后面被其他人改变了，这可能会导致程序出错。
+
+## Java 中，Comparator 与 Comparable 有什么不同？
+
+Comparable 接口用于定义对象的自然顺序，而 comparator 通常用于定义用户定制的顺序。Comparable 总是只有一个，但是可以有多个 comparator 来定义对象的顺序。
+
+## 为什么在重写 equals 方法的时候需要重写 hashCode 方法
+
+因为有强制的规范指定需要同时重写 hashcode 与 equal 是方法，许多容器类，如 HashMap、HashSet 都依赖于 hashcode 与 equals 的规定。
 
 # Java并发
 
@@ -1123,6 +1179,30 @@ public class TestDirectByteBuffer {
 ## Java有没有主动触发GC的方式
 
 没有
+
+## 64 位 JVM 中，int 的长度是多数？
+
+Java 中，int 类型变量的长度是一个固定值，与平台无关，都是 32 位。意思就是说，在 32 位 和 64 位 的Java 虚拟机中，int 类型的长度是相同的。
+
+## WeakHashMap 是怎么工作的？
+
+WeakHashMap 的工作与正常的 HashMap 类似，但是使用弱引用作为 key，意思就是当 key 对象没有任何引用时，key/value 将会被回收。
+
+## JVM 选项 -XX:+UseCompressedOops 有什么作用？为什么要使用？
+
+当你将你的应用从 32 位的 JVM 迁移到 64 位的 JVM 时，由于对象的指针从 32 位增加到了 64 位，因此堆内存会突然增加，差不多要翻倍。这也会对 CPU 缓存（容量比内存小很多）的数据产生不利的影响。因为，迁移到 64 位的 JVM 主要动机在于可以指定最大堆大小，通过压缩 OOP 可以节省一定的内存。通过 -XX:+UseCompressedOops 选项，JVM 会使用 32 位的 OOP，而不是 64 位的 OOP。
+
+## 32 位 JVM 和 64 位 JVM 的最大堆内存分别是多数？
+
+理论上说上 32 位的 JVM 堆内存可以到达 2^32，即 4GB，但实际上会比这个小很多。不同操作系统之间不同，如 Windows 系统大约 1.5 GB，Solaris 大约 3GB。64 位 JVM允许指定最大的堆内存，理论上可以达到 2^64，这是一个非常大的数字，实际上你可以指定堆内存大小到 100GB。甚至有的 JVM，如 Azul，堆内存到 1000G 都是可能的。
+
+## 你能保证 GC 执行吗？
+
+不能，虽然你可以调用 System.gc() 或者 Runtime.gc()，但是没有办法保证 GC 的执行。
+
+## 怎么获取 Java 程序使用的内存？堆使用的百分比？
+
+可以通过 java.lang.Runtime 类中与内存相关方法来获取剩余的内存，总内存及最大堆内存。通过这些方法你也可以获取到堆使用的百分比及堆内存的剩余空间。Runtime.freeMemory() 方法返回剩余空间的字节数，Runtime.totalMemory() 方法总内存的字节数，Runtime.maxMemory() 返回最大内存的字节数。
 
 # 网络
 
