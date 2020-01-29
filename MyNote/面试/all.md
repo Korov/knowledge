@@ -861,6 +861,57 @@ AIO：Asynchronous IO异步非阻塞IO。线程发起IO请求，立即返回；�
 - NIO是一个请求一个线程。
 - AIO是一个有效请求一个线程。
 
+## Java 中怎么创建 ByteBuffer？
+
+| allocate(int capacity)                      | 从堆空间中分配一个容量大小为capacity的byte数组作为缓冲区的byte数据存储器 |
+| ------------------------------------------- | ------------------------------------------------------------ |
+| allocateDirect(int capacity)                | 是不使用JVM堆栈而是通过操作系统来创建内存块用作缓冲区，它与当前操作系统能够更好的耦合，因此能进一步提高I/O操作速度。但是分配直接缓冲区的系统开销很大，因此只有在缓冲区较大并长期存在，或者需要经常重用时，才使用这种缓冲区 |
+| wrap(byte[] array)                          | 这个缓冲区的数据会存放在byte数组中，bytes数组或buff缓冲区任何一方中数据的改动都会影响另一方。其实ByteBuffer底层本来就有一个bytes数组负责来保存buffer缓冲区中的数据，通过allocate方法系统会帮你构造一个byte数组 |
+| wrap(byte[] array,  int offset, int length) | 在上一个方法的基础上可以指定偏移量和长度，这个offset也就是包装后byteBuffer的position，而length呢就是limit-position的大小，从而我们可以得到limit的位置为length+position(offset) |
+
+## buffer常用方法
+
+| limit(), limit(10)等                    | 其中读取和设置这4个属性的方法的命名和jQuery中的val(),val(10)类似，一个负责get，一个负责set |
+| --------------------------------------- | ------------------------------------------------------------ |
+| reset()                                 | 把position设置成mark的值，相当于之前做过一个标记，现在要退回到之前标记的地方 |
+| clear()                                 | position = 0;limit = capacity;mark = -1; 有点初始化的味道，但是并不影响底层byte数组的内容 |
+| flip()                                  | limit = position;position = 0;mark = -1; 翻转，也就是让flip之后的position到limit这块区域变成之前的0到position这块，翻转就是将一个处于存数据状态的缓冲区变为一个处于准备取数据的状态 |
+| rewind()                                | 把position设为0，mark设为-1，不改变limit的值                 |
+| remaining()                             | return limit - position;返回limit和position之间相对位置差    |
+| hasRemaining()                          | return position < limit返回是否还有未读内容                  |
+| compact()                               | 把从position到limit中的内容移到0到limit-position的区域内，position和limit的取值也分别变成limit-position、capacity。如果先将positon设置到limit，再compact，那么相当于clear() |
+| get()                                   | 相对读，从position位置读取一个byte，并将position+1，为下次读写作准备 |
+| get(int index)                          | 绝对读，读取byteBuffer底层的bytes中下标为index的byte，不改变position |
+| get(byte[] dst, int offset, int length) | 从position位置开始相对读，读length个byte，并写入dst下标从offset到offset+length的区域 |
+| put(byte b)                             | 相对写，向position的位置写入一个byte，并将postion+1，为下次读写作准备 |
+| put(int index, byte b)                  | 绝对写，向byteBuffer底层的bytes中下标为index的位置插入byte b，不改变position |
+| put(ByteBuffer src)                     | 用相对写，把src中可读的部分（也就是position到limit）写入此byteBuffer |
+| put(byte[] src, int offset, int length) | 从src数组中的offset到offset+length区域读取数据并使用相对写写入此byteBuffer |
+
+## ByteBuffer 中的字节序是什么？
+
+java字节序：JAVA虚拟机中多字节类型数据的存放顺序，JAVA字节序也是BIG-ENDIAN。
+
+字节序分为两种：
+
+- BIG-ENDIAN—-大字节序：BIG-ENDIAN就是最低地址存放最高有效字节。
+- LITTLE-ENDIAN—-小字节序：LITTLE-ENDIAN是最低地址存放最低有效字节。
+
+ByteBuffer类中的order(ByteOrder bo) 方法可以设置 ByteBuffer 的字节序。
+
+其中的ByteOrder是枚举：
+ByteOrder BIG_ENDIAN 代表大字节序的 ByteOrder 。ByteOrder LITTLE_ENDIAN 代表小字节序的 ByteOrder 。ByteOrder nativeOrder() 返回当前硬件平台的字节序。
+
+## Java 采用的是大端还是小端？
+
+Java采用的是大端
+
+## Java 中，直接缓冲区与非直接缓冲器有什么区别
+
+非直接缓冲区：将缓冲区建立在JVM的内存中，可以通过allocate()创建
+
+直接缓冲区：将缓冲区建立在物理内存中，可以提供效率。可以通过allocateDirect()分配直接缓冲区。
+
 ## jsp和servlet有什么区别
 
 Servlet：
