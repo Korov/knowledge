@@ -843,9 +843,17 @@ Busy spin 是一种在不释放 CPU 的基础上等待事件的技术。它经�
 
 线程局部变量是局限于线程内部的变量，属于线程自身所有，不在多个线程间共享。Java 提供 ThreadLocal 类来支持线程局部变量，是一种实现线程安全的方式。但是在管理环境下（如 web 服务器）使用线程局部变量的时候要特别小心，在这种情况下，工作线程的生命周期比任何应用变量的生命周期都要长。任何线程局部变量一旦在工作完成后没有释放，Java 应用就存在内存泄露的风险。
 
-## 
+## Java 中，编写多线程程序的时候你会遵循哪些最佳实践？
 
+a）给线程命名，这样可以帮助调试。
 
+b）最小化同步的范围，而不是将整个方法同步，只对关键部分做同步。
+
+c）如果可以，更偏向于使用 volatile 而不是 synchronized。
+
+d）使用更高层次的并发工具，而不是使用 wait() 和 notify() 来实现线程间通信，如 BlockingQueue，CountDownLatch 及 Semeaphore。
+
+e）优先使用并发集合，而不是对集合进行同步。并发集合提供更好的可扩展性。
 
 # Java WEB
 
@@ -906,11 +914,45 @@ ByteOrder BIG_ENDIAN 代表大字节序的 ByteOrder 。ByteOrder LITTLE_ENDIAN 
 
 Java采用的是大端
 
+## Java 中，ByteBuffer 与 StringBuffer有什么区别
+
+两者没什么关系。
+
+ByteBuffer是Java NIO中的buffer。
+
+而StringBuffer是字符串连接用的buffer类
+
 ## Java 中，直接缓冲区与非直接缓冲器有什么区别
 
 非直接缓冲区：将缓冲区建立在JVM的内存中，可以通过allocate()创建
 
 直接缓冲区：将缓冲区建立在物理内存中，可以提供效率。可以通过allocateDirect()分配直接缓冲区。
+
+## Java 中的内存映射缓存区是什么
+
+MappedByteBuffer是java nio引入的文件内存映射方案，读写性能极高。NIO最主要的就是实现了对异步操作的支持。其中一种通过把一个套接字通道(SocketChannel)注册到一个选择器(Selector)中，不时调用后者的选择(select)方法就能返回满足的选择键(SelectionKey)，键中包含了SOCKET事件信息。这就是select模型。
+
+SocketChannel的读写是通过一个类叫ByteBuffer(java.nio.ByteBuffer)来操作的.这个类本身的设计是不错的，比直接操作byte[]方便多了. ByteBuffer有两种模式:直接/间接.间接模式最典型(也只有这么一种)的就是HeapByteBuffer，即操作堆内存 (byte[]).但是内存毕竟有限，如果我要发送一个1G的文件怎么办?不可能真的去分配1G的内存；这时就必须使用"直接"模式，即 MappedByteBuffer 文件映射.
+
+MappedByteBuffer 将文件直接映射到内存（这里的内存指的是虚拟内存，并不是物理内存）。通常，可以映射整个文件，如果文件比较大的话可以分段进行映射，只要指定文件的那个部分就可以。
+
+FileChannel提供了map方法来把文件影射为内存映像文件： MappedByteBuffer map(int mode，long position，long size); 可以把文件的从position开始的size大小的区域映射为内存映像文件，mode指出了 可访问该内存映像文件的三种方式：
+
+- READ_ONLY：试图修改得到的缓冲区将导致抛出 ReadOnlyBufferException.(MapMode.READ_ONLY)
+- READ_WRITE： 对得到的缓冲区的更改最终将传播到文件；该更改对映射到同一文件的其他程序不一定是可见的。 (MapMode.READ_WRITE)
+- PRIVATE： 对得到的缓冲区的更改不会传播到文件，并且该更改对映射到同一文件的其他程序也不是可见的；相反，会创建缓冲区已修改部分的专用副本。 (MapMode.PRIVATE)
+
+三种方法：
+
+- force()缓冲区是READ_WRITE模式下，此方法对缓冲区内容的修改强行写入文件
+- load()将缓冲区的内容载入内存，并返回该缓冲区的引用
+- isLoaded()如果缓冲区的内容在物理内存中，则返回真，否则返回假
+
+三个特性：调用信道的map()方法后，即可将文件的某一部分或全部映射到内存中，映射内存缓冲区是个直接缓冲区，继承自ByteBuffer，但相对于ByteBuffer，它有更多的优点：
+
+- 读取快
+- 写入快
+- 随时随地写入
 
 ## jsp和servlet有什么区别
 
@@ -1338,6 +1380,20 @@ TCP协议是网络通信协议中十分重要的协议，相比于UDP协议来�
 ![img](picture/jieshounianbao.png)
 
 **解决方法**：目前应用最广泛的是在消息的头部添加数据包长度，接收方根据消息长度进行接收。
+
+## socket 选项 TCP NO DELAY 是指什么
+
+TCP_NODELAY选项是用来控制是否开启Nagle算法，该算法是为了提高较慢的广域网传输效率，减小小分组的报文个数，完整描述：
+
+>该算法要求一个TCP连接上最多只能有一个未被确认的小分组，在该小分组的确认到来之前，不能发送其他小分组
+
+Negale算法是指发送的数据不会立刻发出,而是放在缓冲区内,等缓冲区满了再发出.发送完一批数据后,会等待接收方对这批数据的回应,然后再发送下一批数据.
+
+Negale算法适用于发送方需要发送大批量数据,并且接收方会及时作出回应的场合,这种算法通过减少传输数据的次数来提高通信效率.
+ 如果发送方持续发送小批量的数据,并且接收方不一定发送响应数据,那么Negale算法会使发送方运行很慢.
+ TCP_NODELAY的默认值为false,表示采用Negale算法.
+ 如果设TCP_NODELAY为true,则表示会关闭Socket的缓冲,确保数据及时发送.
+ 如果socket的底层不支持tcp_Nodelay选项,设置TCP_NODELAY会抛出异常
 
 ## OSI 的七层模型都有哪些
 
