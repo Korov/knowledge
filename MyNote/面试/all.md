@@ -460,7 +460,34 @@ Comparable 接口用于定义对象的自然顺序，而 comparator 通常用于
 
 因为有强制的规范指定需要同时重写 hashcode 与 equal 是方法，许多容器类，如 HashMap、HashSet 都依赖于 hashcode 与 equals 的规定。
 
+## 列出 5 个应该遵循的 JDBC 最佳实践
+
+1. 使用批量的操作来插入和更新数据
+2. 使用 PreparedStatement 来避免 SQL 异常，并提高性能
+3. 使用数据库连接池
+4. 通过列名来获取结果集，不要使用列的下标来获取。
+
+## 描述 Java 中的重载和重写
+
+重载和重写都允许你用相同的名称来实现不同的功能，但是重载是编译时活动，而重写是运行时活动。你可以在同一个类中重载方法，但是只能在子类中重写方法。重写必须要有继承。
+
+## OOP 中的 组合、聚合和关联有什么区别
+
+如果两个对象彼此有关系，就说他们是彼此相关联的。组合和聚合是面向对象中的两种形式的关联。组合是一种比聚合更强力的关联。组合中，一个对象是另一个的拥有者，而聚合则是指一个对象使用另一个对象。如果对象 A 是由对象 B 组合的，则 A 不存在的话，B一定不存在，但是如果 A 对象聚合了一个对象 B，则即使 A 不存在了，B 也可以单独存在。
+
 # Java并发
+
+## 在多线程环境下，SimpleDateFormat 是线程安全的吗
+
+不是，非常不幸，DateFormat 的所有实现，包括 SimpleDateFormat 都不是线程安全的，因此你不应该在多线程序中使用，除非是在对外线程安全的环境中使用，如 将 SimpleDateFormat 限制在 ThreadLocal 中。如果你不这么做，在解析或者格式化日期的时候，可能会获取到一个不正确的结果。因此，从日期、时间处理的所有实践来说，我强力推荐 joda-time 库。
+
+```java
+Date date = new Date();
+SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");
+System.out.println(simpleDateFormat.format(date));
+```
+
+
 
 ## Java实现多线程有哪几种方式
 
@@ -845,15 +872,12 @@ Busy spin 是一种在不释放 CPU 的基础上等待事件的技术。它经�
 
 ## Java 中，编写多线程程序的时候你会遵循哪些最佳实践？
 
-a）给线程命名，这样可以帮助调试。
-
-b）最小化同步的范围，而不是将整个方法同步，只对关键部分做同步。
-
-c）如果可以，更偏向于使用 volatile 而不是 synchronized。
-
-d）使用更高层次的并发工具，而不是使用 wait() 和 notify() 来实现线程间通信，如 BlockingQueue，CountDownLatch 及 Semeaphore。
-
-e）优先使用并发集合，而不是对集合进行同步。并发集合提供更好的可扩展性。
+1. 给线程命名，这样可以帮助调试
+2. 最小化同步的范围，而不是将整个方法同步，只对关键部分做同步
+3. 如果可以，更偏向于使用 volatile 而不是 synchronized。
+4. 使用更高层次的并发工具，而不是使用 wait() 和 notify() 来实现线程间通信，如 BlockingQueue，CountDownLatch 及 Semeaphore。
+5. 优先使用并发集合，而不是对集合进行同步。并发集合提供更好的可扩展性。
+6. 优先使用线程池
 
 # Java WEB
 
@@ -953,6 +977,13 @@ FileChannel提供了map方法来把文件影射为内存映像文件： MappedBy
 - 读取快
 - 写入快
 - 随时随地写入
+
+## 说出 5 条 IO 的最佳实践
+
+1. 使用有缓冲区的 IO 类，而不要单独读取字节或字符
+2. 使用 NIO 和 NIO2
+3. 在 finally 块中关闭流，或者使用 try-with-resource 语句。
+4. 使用内存映射文件获取更快的 IO。
 
 ## jsp和servlet有什么区别
 
@@ -1933,7 +1964,7 @@ Redis 分布式锁不能解决超时的问题，分布式锁有一个超时时�
 - allkeys-random：从数据集（server. db[i]. dict）中任意选择数据淘汰。
 - no-enviction（驱逐）：禁止驱逐数据。
 
-## redis过期策略有那些？LRU算法知道吗？下一下Java代码实现
+## redis过期策略有那些？LRU算法知道吗？试一试Java代码实现
 
 **过期策略**：
  定时过期(一 key 一定时器)，惰性过期：只有使用 key 时才判断 key 是否已过期，过期则清除。定期过期：前两者折中。
@@ -2044,6 +2075,10 @@ Redis 内部使用一个 redisObject 对象来表示所有的 key 和 value
 
 通过jackson或者其他框架吧java里面的对象直接转化成json对象
 
+## SpringMvc 的控制器是不是单例模式,如果是,有什么问题,怎么解决
+
+是单例模式,所以在多线程访问的时候有线程安全问题,不要用同步,会影响性能的,解方案是在控制器里面不能写字段。
+
 ## sprinmvc中中文乱码
 
 post乱码可以在web.xml中配置一个CharacterEncodingFilter过滤器。
@@ -2054,9 +2089,29 @@ get乱码：对参数进行重新编码，或者在tomcat配置文件中修改�
 
 直接在方法的形参中声明HttpServletRequest，springmvc就会自动把request对象传入。
 
-## 1.7 怎么样把ModelMap里面的数据放入Session中
+## SpringMvc 用什么对象从后台向前台传递数据的
+
+通过 ModelMap 对象,可以在这个对象里面用 put 方法,把对象加到里面,前台就可以过 el 表达式拿到
+
+## 怎么样把ModelMap里面的数据放入Session中
 
 可以在类上面加上@SessionAttributes注解,里面包含的字符串就是要放入session里面的key
+
+## SpringMvc 怎么和 AJAX 相互调用的
+
+通过 Jackson 框架就可以把 Java 里面的对象直接转化成 Js 可以识别的 Json 对象具体步骤如下 ：
+
+1）加入 Jackson.jar
+
+2）在配置文件中配置 json 的映射
+
+3）在接受 Ajax 方法里面可以直接返回 Object,List 等,但方法前面要加上@ResponseB注解
+
+当一个方法想ajax返回特殊对象，如Object，List时，需要在方法上加上@ResponseBody 注解
+
+## SpringMvc 里面拦截器是怎么写的
+
+有两种写法,一种是实现HandlerInterceptor接口，另外一种是继承适配器类，接着在接口方法当中，实现处理逻辑；然后在SpringMvc的配置文件中配置拦截器即可
 
 ## 为什么要使用spring
 
@@ -3470,6 +3525,15 @@ free列第二行的值
 九、模板方法
 
 定义一个操作中的算法的骨架，而将一些步骤延迟到子类中。Template Method使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。
+
+## 设计模式相关原则
+
+1. 单一职责原则：根据职责进行划分，一个职责一个接口
+2. 里氏替换原则：只要父类能出现的地方子类就可以出现，而且替换为子类也不会产生任何错误或异常，使用者可能根本就不需要知道是父类还是子类。
+3. 依赖倒置原则：高层模块不应该依赖底层模块，两者都应该依赖其抽象；抽象不应该依赖细节；细节应该依赖抽象
+4. 接口隔离原则：接口尽量细化，同时接口中的方法尽量少。
+5. 迪米特法则，又称最少知道原则：一个实体应当尽量少地与其他实体之间发生相互作用，使得系统功能模块相对独立
+6. 合成复用原则：尽量使用合成/聚合的方式，而不是使用继承
 
 # 分布式相关
 

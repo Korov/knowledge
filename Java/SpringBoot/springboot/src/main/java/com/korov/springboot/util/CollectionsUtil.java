@@ -1,9 +1,9 @@
 package com.korov.springboot.util;
 
-import java.util.List;
+import java.util.Collection;
 
 public class CollectionsUtil {
-    public static boolean isEmpty(List collections) {
+    public static boolean isEmpty(Collection collections) {
         if (null == collections || 0 == collections.size()) {
             return false;
         }
