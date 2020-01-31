@@ -39,13 +39,6 @@ public class QuickSort {
         List<T> largeList = new ArrayList<>(Constants.COLLECTIONSIZE);
         T tmp = list.get(list.size() / 2);
         for (T item : list) {
-//            if (item.compareTo(tmp) < 0) {
-//                sameList.add(item);
-//            } else if (item.compareTo(tmp) > 0) {
-//                largeList.add(item);
-//            } else {
-//                sameList.add(item);
-//            }
             if (item.compareTo(tmp) < 0) {
                 smallList.add(item);
             } else if (item.compareTo(tmp) > 0) {

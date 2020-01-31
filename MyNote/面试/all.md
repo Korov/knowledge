@@ -732,6 +732,32 @@ lock.unlock();
 
 Condition可以替代传统的线程间通信，用await()替换wait()，用signal()替换notify()，用signalAll()替换notifyAll()。
 
+### JAVA的AQS是否了解，它是干嘛的？
+
+抽象的队列式的同步器，AQS定义了一套多线程访问共享资源的同步器框架，许多同步类实现都依赖于它，如常用的ReentrantLock/Semaphore/CountDownLatch...。
+
+它维护了一个volatile int state（代表共享资源）和一个FIFO线程等待队列（多线程争用资源被阻塞时会进入此队列）。这里volatile是核心关键词，具体volatile的语义，在此不述。state的访问方式有三种:
+
+- getState()
+- setState()
+- compareAndSetState()
+
+　　AQS定义两种资源共享方式：Exclusive（独占，只有一个线程能执行，如ReentrantLock）和Share（共享，多个线程可同时执行，如Semaphore/CountDownLatch）。
+
+　　不同的自定义同步器争用共享资源的方式也不同。**自定义同步器在实现时只需要实现共享资源state的获取与释放方式即可**，至于具体线程等待队列的维护（如获取资源失败入队/唤醒出队等），AQS已经在顶层实现好了。自定义同步器实现时主要实现以下几种方法：
+
+- isHeldExclusively()：该线程是否正在独占资源。只有用到condition才需要去实现它。
+- tryAcquire(int)：独占方式。尝试获取资源，成功则返回true，失败则返回false。
+- tryRelease(int)：独占方式。尝试释放资源，成功则返回true，失败则返回false。
+- tryAcquireShared(int)：共享方式。尝试获取资源。负数表示失败；0表示成功，但没有剩余可用资源；正数表示成功，且有剩余资源。
+- tryReleaseShared(int)：共享方式。尝试释放资源，如果释放后允许唤醒后续等待结点返回true，否则返回false。
+
+　　以ReentrantLock为例，state初始化为0，表示未锁定状态。A线程lock()时，会调用tryAcquire()独占该锁并将state+1。此后，其他线程再tryAcquire()时就会失败，直到A线程unlock()到state=0（即释放锁）为止，其它线程才有机会获取该锁。当然，释放锁之前，A线程自己是可以重复获取此锁的（state会累加），这就是可重入的概念。但要注意，获取多少次就要释放多么次，这样才能保证state是能回到零态的。
+
+　　再以CountDownLatch以例，任务分为N个子线程去执行，state也初始化为N（注意N要与线程个数一致）。这N个子线程是并行执行的，每个子线程执行完后countDown()一次，state会CAS减1。等到所有子线程都执行完后(即state=0)，会unpark()主调用线程，然后主调用线程就会从await()函数返回，继续后余动作。
+
+　　一般来说，自定义同步器要么是独占方法，要么是共享方式，他们也只需实现tryAcquire-tryRelease、tryAcquireShared-tryReleaseShared中的一种即可。但AQS也支持自定义同步器同时实现独占和共享两种方式，如ReentrantReadWriteLock。
+
 ## 说一下 atomic 的原理
 
 自旋 + CAS（乐观锁）。在这个过程中，通过compareAndSwapInt比较更新value值，如果更新失败，重新获取旧值，然后更新
@@ -1728,6 +1754,10 @@ varchar(n) ：可变长度，存储的值是每个值占用的字节再加上一
 - 垂直分割分表。
 - 选择正确的存储引擎。
 
+## GROUP BY怎么用
+
+对于group by后面的字段可以不适用聚合函数，但是其他列需要使用聚合函数
+
 ## druid常用配置
 
 | 配置                          | 缺省值             | 说明                                                         |
@@ -1833,6 +1863,32 @@ Redis使用场景：
 ## redis 支持的数据类型有哪些
 
 string(字符串)、list(列表)、hash(字典)、set(集合)、zset(有序集合)。
+
+## Redis的数据类型及各自使用场景
+
+**1、String**
+
+这个其实没什么好说的，最常规的Set/Get操作，Value可以是String也可以是数字，一般做一些复杂的计数功能的缓存。
+
+**2、Hash**
+
+这里Value存放的是结构化的对象，比较方便的就是操作其中的某个字段。笔者在做单点登录的时候，就是用这种数据结构存储用户信息，以CookieId作为Key，设置30分钟为缓存过期时间，能很好地模拟出类似Session的效果。
+
+**3、List**
+
+使用List的数据结构，可以做简单的消息队列的功能。另外还有一个就是，可以利用Lrange命令，做基于Redis的分页功能，性能极佳，用户体验好。
+
+**4、Set**
+
+因为Set堆放的是一堆不重复值的集合，所以可以做全局去重的功能。
+
+为什么不用JVM自带的Set进行去重？因为我们的系统一般都是集群部署，使用JVM自带的Set比较麻烦，难道为了做一个全局去重，再起一个公共服务？太麻烦了。
+
+另外，就是利用交集、并集、差集等操作，可以计算共同喜好、全部的喜好、自己独有的喜好等功能。
+
+**5、Sorted Set**
+
+Sorted Set多了一个权重参数Score，集合中的元素能够按Score进行排列。可以做排行榜应用，取TOP N操作。另外，Sorted Set还可以用来做延时任务。最后一个应用就是可以做范围查找。
 
 ## redis 支持的 java 客户端都有哪些
 
@@ -2026,6 +2082,196 @@ Redis 内部使用一个 redisObject 对象来表示所有的 key 和 value
 ## redis哨兵模式
 
 ## 一个key值如何在redis集群中找到存储在哪里
+
+进入命令行：
+./redis-cli -h ip -p port
+
+查看集群节点
+cluster nodes
+
+查看key对应的slot
+cluster keyslot key
+
+查看slot和节点的对应关系
+cluster slots
+
+## 如何解决Redis并发竞争Key问题
+
+这个问题大致就是同时有多个子系统去Set一个Key。这个时候要注意什么呢？本人提前百度了一下，发现大家思考的答案基本都是推荐用Redis事务机制。但本人不推荐使用Redis的事务机制。因为我们的生产环境，基本都是Redis集群环境，做了数据分片操作。你一个事务中有涉及到多个Key操作的时候，这多个Key不一定都存储在同一个Redis-Server上。因此，Redis的事务机制，十分鸡肋。
+
+解决方法如下：
+
+如果对这个Key操作不要求顺序
+
+这种情况下，准备一个分布式锁，大家去抢锁，抢到锁就做Set操作即可，比较简单。
+
+如果对这个Key操作要求顺序
+
+假设有一个Key1，系统A需要将Key1设置为ValueA，系统B需要将Key1设置为ValueB，系统C需要将Key1设置为ValueC。期望按照Key1的Value值按照 ValueA→ValueB→ValueC的顺序变化。这种时候我们在数据写入数据库的时候，需要保存一个时间戳。假设时间戳如下：
+
+1、系统A Key 1 {ValueA  3:00}
+
+2、系统B Key 1 {ValueB  3:05}
+
+3、系统C Key 1 {ValueC  3:10}
+
+那么，假设这会系统B先抢到锁，将Key1设置为{ValueB 3:05}。接下来系统A抢到锁，发现自己的ValueA的时间戳早于缓存中的时间戳，那就不做Set操作了。以此类推。
+
+其他方法，比如利用队列，将Set方法变成串行访问也可以。总之，灵活变通。
+
+**1.在你知道必要之前不要优化**
+
+这可能是最重要的性能调整技巧之一。你应该遵循常见的最佳实践做法并尝试高效地实现用例。但是，这并不意味着在你证明必要之前，你应该更换任何标准库或构建复杂的优化。
+
+在大多数情况下，过早优化不但会占用大量时间，而且会使代码变得难以阅读和维护。更糟糕的是，这些优化通常不会带来任何好处，因为你花费大量时间来优化的是应用程序的非关键部分。
+
+那么，你如何证明你需要优化一些东西呢？
+
+首先，你需要定义应用程序代码的速度得多快，例如，为所有API调用指定最大响应时间，或者指定在特定时间范围内要导入的记录数量。在完成这些之后，你就可以测量应用程序的哪些部分太慢需要改进。然后，接着看第二个技巧。
+
+**2.使用分析器查找真正的瓶颈**
+
+在你遵循第一个建议并确定了应用程序的某些部分需要改进后，那么从哪里开始呢？
+
+你可以用两种方法来解决问题：
+
+- 查看你的代码，并从看起来可疑或者你觉得可能会产生问题的部分开始。
+- 或者使用分析器并获取有关代码每个部分的行为和性能的详细信息。
+
+希望不需要我解释为什么应该始终遵循第二种方法的原因。
+
+很明显，基于分析器的方法可以让你更好地理解代码的性能影响，并使你能够专注于最关键的部分。如果你曾使用过分析器，那么你一定记得曾经你是多么惊讶于一下就找到了代码的哪些部分产生了性能问题。老实说，我第一次的猜测不止一次地导致我走错了方向。
+
+**3.为整个应用程序创建性能测试套件**
+
+这是另一个通用技巧，可以帮助你避免在将性能改进部署到生产后经常会发生的许多意外问题。你应该总是定义一个测试整个应用程序的性能测试套件，并在性能改进之前和之后运行它。
+
+这些额外的测试运行将帮助你识别更改的功能和性能副作用，并确保不会导致弊大于利的更新。如果你工作于被应用程序若干不同部分使用的组件，如数据库或缓存，那么这一点就尤其重要。
+
+**4.首先处理最大的瓶颈**
+
+在创建测试套件并使用分析器分析应用程序之后，你可以列出一系列需要解决以提高性能的问题。这很好，但它仍然不能回答你应该从哪里开始的问题。你可以专注于速效方案，或从最重要的问题开始。这个你也必须会。
+
+速效方案一开始可能会很有吸引力，因为你可以很快显示第一个成果。但有时，可能需要你说服其他团队成员或管理层认为性能分析是值得的——因为暂时看不到效果。
+
+但总的来说，我建议首先处理最重要的性能问题。这将为你提供最大的性能改进，而且可能再也不需要去解决其中一些为了满足性能需求的问题。
+
+常见的性能调整技巧到此结束。下面让我们仔细看看一些特定于Java的技巧。
+
+工作一到五年的 Java 的工程师朋友们加入 Java 架构开发群：614478470
+ 就可以马上免费获得这套内部教材！ [点击加入](https://links.jianshu.com/go?to=https%3A%2F%2Fjq.qq.com%2F%3F_wv%3D1027%26k%3D5gMDouY)
+
+**5.使用StringBuilder以编程方式连接String**
+
+有很多不同的选项来连接Java中的String。例如，你可以使用简单的+或+ =，以及StringBuffer或StringBuilder。
+
+那么，你应该选择哪种方法？
+
+答案取决于连接String的代码。如果你是以编程方式添加新内容到String中，例如在for循环中，那么你应该使用StringBuilder。它很容易使用，并提供比StringBuffer更好的性能。但请记住，与StringBuffer相比，StringBuilder不是线程安全的，可能不适合所有用例。这个你必须清楚。
+
+你只需要实例化一个新的StringBuilder并调用append方法来向String中添加一个新的部分。在你添加了所有的部分之后，你就可以调用toString()方法来检索连接的String。
+
+下面的代码片段显示了一个简单的例子。在每次迭代期间，这个循环将i转换为一个String，并将它与一个空格一起添加到StringBuilder sb中。所以，最后，这段代码将在日志文件中写入“This is a test0 1 2 3 4 5 6 7 8 9”。
+
+
+
+```go
+StringBuilder sb = new StringBuilder(“This is a test”);
+for (int i=0; i<10; i++) {
+sb.append(i);
+sb.append(” “);
+}
+log.info(sb.toString());
+```
+
+正如在代码片段中看到的那样，你可以将String的第一个元素提供给构造方法。这将创建一个新的StringBuilder，新的StringBuilder包含提供的String和16个额外字符的容量。当你向StringBuilder添加更多字符时，JVM将动态增加StringBuilder的大小。
+
+如果你已经知道你的String将包含多少个字符，则可以将该数字提供给不同的构造方法以实例化具有定义容量的StringBuilder。这进一步提高了效率，因为它不需要动态扩展其容量。
+
+**6.使用+连接一个语句中的String**
+
+当你用Java实现你的第一个应用程序时，可能有人告诉过你不应该用+来连接String。如果你是在应用程序逻辑中连接字符串，这是正确的。字符串是不可变的，每个字符串的连接结果都存储在一个新的String对象中。这需要额外的内存，会减慢你的应用程序，特别是如果你在一个循环内连接多个字符串的话。
+
+在这些情况下，你应该遵循技巧5并使用StringBuilder。
+
+但是，如果你只是将字符串分成多行来改善代码的可读性，那情况就不一样了。
+
+
+
+```objectivec
+Query q = em.createQuery(“SELECT a.id, a.firstName, a.lastName ”
++ “FROM Author a ”
++ “WHERE a.id = :id”);
+```
+
+在这些情况下，你应该用一个简单的+来连接你的字符串。Java编译器会对此优化并在编译时执行连接。所以，在运行时，你的代码将只使用1个String，不需要连接。
+
+**7.尽可能使用基元**
+
+避免任何开销并提高应用程序性能的另一个简便而快速的方法是使用基本类型而不是其包装类。所以，最好使用int来代替Integer，使用double来代替Double。这允许JVM将值存储在堆栈而不是堆中以减少内存消耗，并作出更有效的处理。
+
+**8.试着避免BigInteger和BigDecimal**
+
+既然我们在讨论数据类型，那么我们也快速浏览一下BigInteger和BigDecimal吧。尤其是后者因其精确性而受到大家的欢迎。但是这是有代价的。
+
+BigInteger和BigDecimal比简单的long或double需要更多的内存，并且会显著减慢所有计算。所以，你如果需要额外的精度，或者数字将超过long的范围，那么最好三思而后行。这可能是你需要更改以解决性能问题的唯一方法，特别是在实现数学算法的时候。这个你了解下。
+
+**9.首先检查当前日志级别**
+
+这个建议应该是显而易见的，但不幸的是，很多程序员在写代码的时候都会大多会忽略它。在你创建调试消息之前，始终应该首先检查当前日志级别。否则，你可能会创建一个之后会被忽略的日志消息字符串。
+
+这里有两个反面例子。
+
+
+
+```dart
+// don’t do this
+log.debug(“User [” + userName + “] called method X with [” + i + “]”);
+
+// or this
+log.debug(String.format(“User [%s] called method X with [%d]”, userName, i));
+```
+
+在上面两种情况中，你都将执行创建日志消息所有必需的步骤，在不知道日志框架是否将使用日志消息的前提下。因此在创建调试消息之前，最好先检查当前的日志级别。
+
+
+
+```cpp
+// do this
+if (log.isDebugEnabled()) { 
+  log.debug(“User [” + userName + “] called method X with [” + i + “]”);
+}
+```
+
+**10.使用Apache Commons StringUtils.Replace而不是String.replace**
+
+一般来说，String.replace方法工作正常，效率很高，尤其是在使用Java 9的情况下。但是，如果你的应用程序需要大量的替换操作，并且没有更新到最新的Java版本，那么我们依然有必要查找更快和更有效的替代品。
+
+有一个备选答案是Apache Commons Lang的StringUtils.replace方法。正如Lukas Eder在他最近的一篇博客文章中所描述的，StringUtils.replace方法远胜Java 8的String.replace方法。
+
+而且它只需要很小的改动。即添加Apache Commons Lang项目的Maven依赖项到应用程序pom.xml中，并将String.replace方法的所有调用替换为StringUtils.replace方法。
+
+
+
+```bash
+// replace this
+test.replace(“test”, “simple test”);
+
+// with this
+StringUtils.replace(test, “test”, “simple test”);
+```
+
+**11.缓存昂贵的资源，如数据库连接**
+
+缓存是避免重复执行昂贵或常用代码片段的流行解决方案。总的思路很简单：重复使用这些资源比反复创建新的资源要便宜。
+
+一个典型的例子是缓存池中的数据库连接。新连接的创建需要时间，如果你重用现有连接，则可以避免这种情况。
+
+你还可以在Java语言本身找到其他例子。例如，Integer类的valueOf方法缓存了-128到127之间的值。你可能会说创建一个新的Integer并不是太昂贵，但是由于它经常被使用，以至于缓存最常用的值也可以提供性能优势。
+
+但是，当你考虑缓存时，请记住缓存实现也会产生开销。你需要花费额外的内存来存储可重用资源，因此你可能需要管理缓存以使资源可访问，以及删除过时的资源。
+
+所以，在开始缓存任何资源之前，请确保实施缓存是值得的，也就是说必须足够多地使用它们
 
 # Spring
 
@@ -2229,7 +2475,7 @@ SpringBoot是一个构建在Spring框架顶部的项目。它提供了一个更�
 
 ## 为什么要用 spring boot？
 
-配置简单、独立运行、自动装配、无代码生成和xml配置、提供应用监控、易上手、提升开发效率。
+自动配置。配置简单、独立运行、自动装配、无代码生成和xml配置、提供应用监控、易上手、提升开发效率。
 
 ## spring boot 核心配置文件是什么
 
@@ -3525,6 +3771,169 @@ free列第二行的值
 九、模板方法
 
 定义一个操作中的算法的骨架，而将一些步骤延迟到子类中。Template Method使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。
+
+### 第一种：简单工厂
+
+又叫做静态工厂方法（StaticFactory Method）模式，但不属于23种GOF设计模式之一。
+
+简单工厂模式的实质是由一个工厂类根据传入的参数，动态决定应该创建哪一个产品类。
+ spring中的BeanFactory就是简单工厂模式的体现，根据传入一个唯一的标识来获得bean对象，但是否是在传入参数后创建还是传入参数前创建这个要根据具体情况来定。如下配置，就是在 HelloItxxz 类中创建一个 itxxzBean。
+
+
+
+```xml
+<beans>
+    <bean id="singletonBean" class="com.itxxz.HelloItxxz">
+        <constructor-arg>
+            <value>Hello! 这是singletonBean!value>
+        </constructor-arg>
+   </ bean>
+
+    <bean id="itxxzBean" class="com.itxxz.HelloItxxz"
+        singleton="false">
+        <constructor-arg>
+            <value>Hello! 这是itxxzBean! value>
+        </constructor-arg>
+    </bean>
+
+</beans>
+```
+
+### 第二种：工厂方法（Factory Method）
+
+通常由应用程序直接使用new创建新的对象，为了将对象的创建和使用相分离，采用工厂模式,即应用程序将对象的创建及初始化职责交给工厂对象。
+
+一般情况下,应用程序有自己的工厂对象来创建bean.如果将应用程序自己的工厂对象交给Spring管理,那么Spring管理的就不是普通的bean,而是工厂Bean。
+
+螃蟹就以工厂方法中的静态方法为例讲解一下：
+
+
+
+```cpp
+import java.util.Random;
+public class StaticFactoryBean {
+      public static Integer createRandom() {
+           return new Integer(new Random().nextInt());
+       }
+}
+```
+
+建一个config.xm配置文件，将其纳入Spring容器来管理,需要通过factory-method指定静态方法名称
+
+
+
+```csharp
+<bean id="random"
+class="example.chapter3.StaticFactoryBean"
+factory-method="createRandom" //createRandom方法必须是static的,才能找到
+scope="prototype"
+/>
+```
+
+测试：
+
+
+
+```csharp
+public static void main(String[] args) {
+      //调用getBean()时,返回随机数.如果没有指定factory-method,会返回StaticFactoryBean的实例,即返回工厂Bean的实例
+      XmlBeanFactory factory = new XmlBeanFactory(new ClassPathResource("config.xml"));
+      System.out.println("我是IT学习者创建的实例:"+factory.getBean("random").toString());
+}
+```
+
+### 第三种：单例模式（Singleton）
+
+保证一个类仅有一个实例，并提供一个访问它的全局访问点。
+ spring中的单例模式完成了后半句话，即提供了全局的访问点BeanFactory。但没有从构造器级别去控制单例，这是因为spring管理的是是任意的java对象。
+ **核心提示点：Spring下默认的bean均为singleton，可以通过singleton=“true|false” 或者 scope=“？”来指定**
+
+### 第四种：适配器（Adapter）
+
+在Spring的Aop中，使用的Advice（通知）来增强被代理类的功能。Spring实现这一AOP功能的原理就使用代理模式（1、JDK动态代理。2、CGLib字节码生成技术代理。）对类进行方法级别的切面增强，即，生成被代理类的代理类， 并在代理类的方法前，设置拦截器，通过执行拦截器重的内容增强了代理方法的功能，实现的面向切面编程。
+
+**Adapter类接口**：Target
+
+
+
+```java
+public interface AdvisorAdapter {
+
+boolean supportsAdvice(Advice advice);
+
+      MethodInterceptor getInterceptor(Advisor advisor);
+
+}
+```
+
+**MethodBeforeAdviceAdapter类**，Adapter
+
+
+
+```java
+class MethodBeforeAdviceAdapter implements AdvisorAdapter, Serializable {
+
+      public boolean supportsAdvice(Advice advice) {
+            return (advice instanceof MethodBeforeAdvice);
+      }
+
+      public MethodInterceptor getInterceptor(Advisor advisor) {
+            MethodBeforeAdvice advice = (MethodBeforeAdvice) advisor.getAdvice();
+      return new MethodBeforeAdviceInterceptor(advice);
+      }
+}
+```
+
+说到这里，也给大家推荐一个架构交流学习群：614478470，里面会分享一些资深架构师录制的视频录像：有Spring，MyBatis，Netty源码分析，高并发、高性能、分布式、微服务架构的原理，JVM性能优化这些成为架构师必备的知识体系。还能领取免费的学习资源，相信对于已经工作和遇到技术瓶颈的码友，在这个群里会有你需要的内容。**[点击加入](https://links.jianshu.com/go?to=https%3A%2F%2Fjq.qq.com%2F%3F_wv%3D1027%26k%3D5gMDouY)**
+
+### 第五种：包装器（Decorator）
+
+在我们的项目中遇到这样一个问题：我们的项目需要连接多个数据库，而且不同的客户在每次访问中根据需要会去访问不同的数据库。我们以往在spring和hibernate框架中总是配置一个数据源，因而sessionFactory的dataSource属性总是指向这个数据源并且恒定不变，所有DAO在使用sessionFactory的时候都是通过这个数据源访问数据库。但是现在，由于项目的需要，我们的DAO在访问sessionFactory的时候都不得不在多个数据源中不断切换，问题就出现了：如何让sessionFactory在执行数据持久化的时候，根据客户的需求能够动态切换不同的数据源？我们能不能在spring的框架下通过少量修改得到解决？是否有什么设计模式可以利用呢？
+ 首先想到在spring的applicationContext中配置所有的dataSource。这些dataSource可能是各种不同类型的，比如不同的数据库：Oracle、SQL Server、MySQL等，也可能是不同的数据源：比如apache 提供的org.apache.commons.dbcp.BasicDataSource、spring提供的org.springframework.jndi.JndiObjectFactoryBean等。然后sessionFactory根据客户的每次请求，将dataSource属性设置成不同的数据源，以到达切换数据源的目的。
+ spring中用到的包装器模式在类名上有两种表现：一种是类名中含有Wrapper，另一种是类名中含有Decorator。基本上都是动态地给一个对象添加一些额外的职责。
+
+### 第六种：代理（Proxy）
+
+为其他对象提供一种代理以控制对这个对象的访问。
+
+从结构上来看和Decorator模式类似，但Proxy是控制，更像是一种对功能的限制，而Decorator是增加职责。
+ spring的Proxy模式在aop中有体现，比如JdkDynamicAopProxy和Cglib2AopProxy。
+
+### 第七种：观察者（Observer）
+
+定义对象间的一种一对多的依赖关系，当一个对象的状态发生改变时，所有依赖于它的对象都得到通知并被自动更新。
+ spring中Observer模式常用的地方是listener的实现。如ApplicationListener。
+
+### 第八种：策略（Strategy）
+
+定义一系列的算法，把它们一个个封装起来，并且使它们可相互替换。本模式使得算法可独立于使用它的客户而变化。
+
+
+
+spring中在实例化对象的时候用到Strategy模式在SimpleInstantiationStrategy中有如下代码说明了策略模式的使用情况： 
+
+![img](https:////upload-images.jianshu.io/upload_images/13317307-bc5c60f7abf983ec.png?imageMogr2/auto-orient/strip|imageView2/2/w/728/format/webp)
+
+### 第九种：模板方法（Template Method）
+
+定义一个操作中的算法的骨架，而将一些步骤延迟到子类中。Template Method使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。
+ Template Method模式一般是需要继承的。这里想要探讨另一种对Template Method的理解。spring中的JdbcTemplate，在用这个类时并不想去继承这个类，因为这个类的方法太多，但是我们还是想用到JdbcTemplate已有的稳定的、公用的数据库连接，那么我们怎么办呢？我们可以把变化的东西抽出来作为一个参数传入JdbcTemplate的方法中。但是变化的东西是一段代码，而且这段代码会用到JdbcTemplate中的变量。怎么办？那我们就用回调对象吧。在这个回调对象中定义一个操纵JdbcTemplate中变量的方法，我们去实现这个方法，就把变化的东西集中到这里了。然后我们再传入这个回调对象到JdbcTemplate，从而完成了调用。这可能是Template Method不需要继承的另一种实现方式吧。
+
+以下是一个具体的例子：
+ JdbcTemplate中的execute方法 定义一个操作中的算法的骨架，而将一些步骤延迟到子类中。Template Method使得子类可以不改变一个算法的结构即可重定义该算法的某些特定步骤。
+
+Template Method模式一般是需要继承的。这里想要探讨另一种对Template Method的理解。spring中的JdbcTemplate，在用这个类时并不想去继承这个类，因为这个类的方法太多，但是我们还是想用到JdbcTemplate已有的稳定的、公用的数据库连接，那么我们怎么办呢？我们可以把变化的东西抽出来作为一个参数传入JdbcTemplate的方法中。但是变化的东西是一段代码，而且这段代码会用到JdbcTemplate中的变量。怎么办？那我们就用回调对象吧。在这个回调对象中定义一个操纵JdbcTemplate中变量的方法，我们去实现这个方法，就把变化的东西集中到这里了。然后我们再传入这个回调对象到JdbcTemplate，从而完成了调用。这可能是Template Method不需要继承的另一种实现方式吧。
+
+以下是一个具体的例子：
+ JdbcTemplate中的execute方法 
+
+![img](https:////upload-images.jianshu.io/upload_images/13317307-db5895f58ed508b3.png?imageMogr2/auto-orient/strip|imageView2/2/w/742/format/webp)
+
+  JdbcTemplate执行execute方法
+
+![img](https:////upload-images.jianshu.io/upload_images/13317307-a63aaa1e4c128549.png?imageMogr2/auto-orient/strip|imageView2/2/w/741/format/webp)
+
+
 
 ## 设计模式相关原则
 
