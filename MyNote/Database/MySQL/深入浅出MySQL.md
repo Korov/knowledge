@@ -120,7 +120,7 @@ SQL语句主要可以划分为以下3个类别：
 
 ```
 //utf8mb4是utf8的超集，但是占用更多内存，ci不区分大小写，bin区分大小写，general_ci不支持扩展，unicode_ci支持扩展
-CREATE DATABASE dbname default character set utf8mb4 collate utf8mb4_general_ci;
+CREATE DATABASE dbname character set utf8mb4 collate utf8mb4_general_ci;
 SHOW DATABASES；// 查看当前所有的数据库
 USE dbname;//使用该数据库
 ```
