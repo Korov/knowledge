@@ -1,6 +1,9 @@
 package com.distributed.lock.test;
 
 import com.distributed.lock.ApplicationTests;
+import com.distributed.lock.mysql.LockService;
+import com.distributed.lock.mysql.Tests;
+import com.distributed.lock.mysql.model.TableLockMethod;
 import com.distributed.lock.redis.RedisLock;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,82 +11,46 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;
 import redis.clients.jedis.JedisPool;
 
+import java.util.Date;
+
 public class LockTest extends ApplicationTests {
     @Autowired
-    @Qualifier("redisTemplate")
-    private RedisTemplate redisTemplate;
+    private RedisLock redisLock;
 
-    @Autowired
-    @Qualifier("jedisPool")
-    private JedisPool jedisPool;
+    static class MyThread implements Runnable {
+        private final String value;
 
-    //使用RedisLock
-    class Outputer {
-        //创建一个名为redisLock的RedisLock类型的锁
-        RedisLock redisLock = new RedisLock("redisLock", redisTemplate);
+        private RedisLock redisLock;
 
-        public void output(String name) {
-            //上锁
-            redisLock.lock();
+        public MyThread(String value, RedisLock redisLock) {
+            this.value = value;
+            this.redisLock = redisLock;
+        }
+
+        @Override
+        public void run() {
+            char[] values = value.toCharArray();
+            String token= redisLock.lock("demo",10000,10000);
             try {
-                for (int i = 0; i < name.length(); i++) {
-                    System.out.print(name.charAt(i));
+                for (int i = 0; i < values.length; i++) {
+                    System.out.print(values[i]);
                 }
-                System.out.println();
+                System.out.println("|||");
             } finally {
-                //任何情况下都要释放锁
-                redisLock.unlock();
+                redisLock.unlock("demo",token);
             }
+
         }
     }
 
     @Test
-    public void test() {
-        final Outputer output = new Outputer();
-        //线程1打印zhangsan
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    System.out.println("aaa");
-                    output.output("zhangsan");
-                }
-            }
-        }).start();
-
-        //线程2打印lingsi
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    output.output("lingsi");
-                }
-            }
-        }).start();
-
-        //线程3打印wangwu
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (true) {
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    output.output("huangwu");
-                }
-            }
-        }).start();
+    public void main() throws InterruptedException {
+        Thread thread1 = new Thread(new MyThread("zhangsan", redisLock), "thread1");
+        Thread thread2 = new Thread(new MyThread("lisi", redisLock), "thread2");
+        Thread thread3 = new Thread(new MyThread("wangwu", redisLock), "thread3");
+        thread1.start();
+        thread2.start();
+        thread3.start();
+        Thread.sleep(200000);
     }
 }

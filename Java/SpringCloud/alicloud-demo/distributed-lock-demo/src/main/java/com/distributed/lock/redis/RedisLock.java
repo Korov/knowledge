@@ -1,104 +1,113 @@
 package com.distributed.lock.redis;
 
 
+import org.springframework.data.redis.connection.RedisConnection;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStringCommands;
+import org.springframework.data.redis.connection.ReturnType;
+import org.springframework.data.redis.core.RedisConnectionUtils;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.types.Expiration;
+import org.springframework.stereotype.Component;
 
+import java.nio.charset.Charset;
 import java.util.Random;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 
 
-public class RedisLock implements Lock {
+@Component
+public class RedisLock {
 
-    protected StringRedisTemplate redisStringTemplate;
+    /**
+     * 解锁脚本，原子操作
+     */
+    private static final String unlockScript =
+            "if redis.call(\"get\",KEYS[1]) == ARGV[1]\n"
+                    + "then\n"
+                    + "    return redis.call(\"del\",KEYS[1])\n"
+                    + "else\n"
+                    + "    return 0\n"
+                    + "end";
 
-    // 存储到redis中的锁标志
-    private static final String LOCKED = "LOCKED";
+    private StringRedisTemplate redisTemplate;
 
-    // 请求锁的超时时间(ms)
-    private static final long TIME_OUT = 30000;
-
-    // 锁的有效时间(s)
-    public static final int EXPIRE = 60;
-
-    // 锁标志对应的key;
-    private String key;
-
-    // state flag
-    private volatile boolean isLocked = false;
-
-    private RedisTemplate redisTemplate;
-
-
-    public RedisLock(String key, RedisTemplate redisTemplate) {
-        this.key = key;
+    public RedisLock(StringRedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
-    @Override
-    public void lock() {
-        //系统当前时间，毫秒
-        long nowTime = System.nanoTime();
-        //请求锁超时时间，毫秒
-        long timeout = TIME_OUT * 1000000;
-        final Random r = new Random();
-        try {
-            //不断循环向Master节点请求锁，当请求时间(System.nanoTime() - nano)超过设定的超时时间则放弃请求锁
-            //这个可以防止一个客户端在某个宕掉的master节点上阻塞过长时间
-            //如果一个master节点不可用了，应该尽快尝试下一个master节点
-            while ((System.nanoTime() - nowTime) < timeout) {
-                //将锁作为key存储到redis缓存中，存储成功则获得锁
-                if (redisStringTemplate.getConnectionFactory().getConnection().setNX(key.getBytes(),
-                        LOCKED.getBytes())) {
-                    //设置锁的有效期，也是锁的自动释放时间，也是一个客户端在其他客户端能抢占锁之前可以执行任务的时间
-                    //可以防止因异常情况无法释放锁而造成死锁情况的发生
-                    redisStringTemplate.expire(key, EXPIRE, TimeUnit.SECONDS);
-                    isLocked = true;
-                    //上锁成功结束请求
+    /**
+     * 加锁，有阻塞
+     * @param name
+     * @param expire
+     * @param timeout
+     * @return
+     */
+    public String lock(String name, long expire, long timeout){
+        long startTime = System.currentTimeMillis();
+        String token;
+        do{
+            token = tryLock(name, expire);
+            if(token == null) {
+                if((System.currentTimeMillis()-startTime) > (timeout-50))
                     break;
+                try {
+                    Thread.sleep(50); //try 50 per sec
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    return null;
                 }
-                //获取锁失败时，应该在随机延时后进行重试，避免不同客户端同时重试导致谁都无法拿到锁的情况出现
-                //睡眠3毫秒后继续请求锁
-                Thread.sleep(3, r.nextInt(500));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+        }while(token==null);
+
+        return token;
+    }
+
+    /**
+     * 加锁，无阻塞
+     * @param name
+     * @param expire
+     * @return
+     */
+    public String tryLock(String name, long expire) {
+        String token = UUID.randomUUID().toString();
+        RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
+        RedisConnection conn = factory.getConnection();
+        try{
+            Boolean result = conn.set(name.getBytes(Charset.forName("UTF-8")), token.getBytes(Charset.forName("UTF-8")),
+                    Expiration.from(expire, TimeUnit.MILLISECONDS), RedisStringCommands.SetOption.SET_IF_ABSENT);
+            if(result!=null && result)
+                return token;
+        }finally {
+            RedisConnectionUtils.releaseConnection(conn, factory);
         }
-    }
-
-    @Override
-    public void unlock() {
-        //释放锁
-        //不管请求锁是否成功，只要已经上锁，客户端都会进行释放锁的操作
-        if (isLocked) {
-            redisStringTemplate.delete(key);
-        }
-    }
-
-    @Override
-    public void lockInterruptibly() throws InterruptedException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public boolean tryLock() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-
-    @Override
-    public boolean tryLock(long time, TimeUnit unit) throws InterruptedException {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public Condition newCondition() {
-        // TODO Auto-generated method stub
         return null;
     }
+
+    /**
+     * 解锁
+     * @param name
+     * @param token
+     * @return
+     */
+    public boolean unlock(String name, String token) {
+        byte[][] keysAndArgs = new byte[2][];
+        keysAndArgs[0] = name.getBytes(Charset.forName("UTF-8"));
+        keysAndArgs[1] = token.getBytes(Charset.forName("UTF-8"));
+        RedisConnectionFactory factory = redisTemplate.getConnectionFactory();
+        RedisConnection conn = factory.getConnection();
+        try {
+            Long result = (Long)conn.scriptingCommands().eval(unlockScript.getBytes(Charset.forName("UTF-8")), ReturnType.INTEGER, 1, keysAndArgs);
+            if(result!=null && result>0)
+                return true;
+        }finally {
+            RedisConnectionUtils.releaseConnection(conn, factory);
+        }
+
+        return false;
+    }
 }
+
