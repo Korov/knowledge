@@ -28,6 +28,7 @@ public class QuickSort {
         log.info(Arrays.toString(array));
     }
 
+    //自己写的垃圾排序
     public <T extends Comparable<? super T>> List<T> quickSort(List<T> list) {
         if (list == null || list.size() <= 1) {
             List<T> newList = new ArrayList<>(Constants.COLLECTIONSIZE);
@@ -62,40 +63,44 @@ public class QuickSort {
     }
 
     private <T extends Comparable<? super T>> void quickSort(T[] array, int left, int right) {
+        //对于数组长度大于CUTOFF才进行快速排序，否则进行插入排序
         if (left + CUTOFF <= right) {
             T pivot = median3(array, left, right);
-            int i = left;
-            int j = right - 1;
+            int leftPointer = left;
+            int rightPointer = right - 1;
+            // 经历一遍循环将数组中的数据分为小于pivot和大于pivot两个部分
             for (; ; ) {
-                while (array[++i].compareTo(pivot) < 0) {
+                while (array[++leftPointer].compareTo(pivot) < 0) {
                 }
-                while (array[--j].compareTo(pivot) > 0) {
+                while (array[--rightPointer].compareTo(pivot) > 0) {
                 }
-                if (i < j) {
-                    swapReferences(array, i, j);
+                if (leftPointer < rightPointer) {
+                    swapReferences(array, leftPointer, rightPointer);
                 } else {
                     break;
                 }
             }
-            swapReferences(array, i, right - 1);
-            quickSort(array, left, i - 1);
-            quickSort(array, i + 1, right);
+            // 将pivot由right - 1放置到合适位置
+            swapReferences(array, leftPointer, right - 1);
+
+            // 将左边和右边再分别进行快速排序
+            quickSort(array, left, leftPointer - 1);
+            quickSort(array, leftPointer + 1, right);
         } else {
-            insertionSort(array, left, right);
+            InsertionSort.insertionSort(array, left, right);
         }
     }
 
-    private <T extends Comparable<? super T>> void insertionSort(T[] array, int left, int right) {
-        for (int p = left + 1; p <= right; p++) {
-            T tmp = array[p];
-            int j;
-            for (j = p; j > left && tmp.compareTo(array[j - 1]) < 0; j--) {
-                array[j] = array[j - 1];
-            }
-            array[j] = tmp;
-        }
-    }
-
+    /**
+     * 1.对left，right和(left + right) / 2位置的数按照大小进行位置对调
+     * 2.将对调完毕后将(left + right) / 2位置的数放到right - 1的位置
+     * 3.返回right - 1位置的数作为中间的数
+     * @param array
+     * @param left
+     * @param right
+     * @param <T>
+     * @return
+     */
     private <T extends Comparable<? super T>> T median3(T[] array, int left, int right) {
         int center = (left + right) / 2;
         if (array[center].compareTo(array[left]) < 0) {

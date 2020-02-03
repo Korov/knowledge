@@ -18,6 +18,9 @@ public class InsertionSort {
         log.info(Arrays.toString(array));
     }
 
+    public static <T extends Comparable<? super T>> void insertionSort(T[] array) {
+        insertionSort(array, 0, array.length-1);
+    }
 
     /**
      * 插入排序方法
@@ -26,12 +29,11 @@ public class InsertionSort {
      * @param array
      * @param <T>
      */
-    public <T extends Comparable<? super T>> void insertionSort(T[] array) {
-        int i = 0;
-        int j = 0;
-        for (i = 1; i < array.length; i++) {
-            T tmp = array[i];
-            for (j = i; j > 0 && tmp.compareTo(array[j - 1]) < 0; j--) {
+    public static <T extends Comparable<? super T>> void insertionSort(T[] array, int left, int right) {
+        for (int pointer = left + 1; pointer <= right; pointer++) {
+            T tmp = array[pointer];
+            int j;
+            for (j = pointer; j > left && tmp.compareTo(array[j - 1]) < 0; j--) {
                 array[j] = array[j - 1];
             }
             array[j] = tmp;
