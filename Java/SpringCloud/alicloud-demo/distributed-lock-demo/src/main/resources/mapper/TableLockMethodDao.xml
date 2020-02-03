@@ -26,6 +26,11 @@
     from table_lock_method
     where resources = #{resources,jdbcType=VARCHAR}
   </select>
+  <select id="selectAllLocked" resultType="com.distributed.lock.mysql.model.TableLockMethod">
+    select
+    <include refid="Base_Column_List" />
+    from table_lock_method where state=1
+  </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
     delete from table_lock_method
     where id = #{id,jdbcType=INTEGER}
