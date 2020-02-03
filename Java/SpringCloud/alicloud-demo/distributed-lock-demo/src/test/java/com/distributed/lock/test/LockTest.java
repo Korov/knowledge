@@ -1,7 +1,7 @@
-package com.redis.lock.test;
+package com.distributed.lock.test;
 
-import com.redis.lock.ApplicationTests;
-import com.redis.lock.demo.RedisLock;
+import com.distributed.lock.ApplicationTests;
+import com.distributed.lock.redis.RedisLock;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

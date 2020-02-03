@@ -1,4 +1,4 @@
-package com.redis.lock.demo;
+package com.distributed.lock.redis;
 
 
 import org.springframework.data.redis.core.RedisTemplate;

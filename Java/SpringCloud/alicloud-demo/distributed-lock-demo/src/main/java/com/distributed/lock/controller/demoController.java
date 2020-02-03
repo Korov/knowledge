@@ -1,4 +1,4 @@
-package com.redis.lock.controller;
+package com.distributed.lock.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
