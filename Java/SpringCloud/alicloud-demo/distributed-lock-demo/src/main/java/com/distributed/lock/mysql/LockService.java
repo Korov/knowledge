@@ -8,6 +8,9 @@ import org.springframework.stereotype.Service;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * 未实现乐观锁
+ */
 @Service
 public class LockService {
     @Autowired
