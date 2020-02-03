@@ -9,8 +9,9 @@ CREATE TABLE `table_lock_method` (
 `resources` varchar(64) NOT NULL DEFAULT '' COMMENT '锁定的资源名称',
 `state` int NOT NULL COMMENT '1:未分配；2：已分配',
 `version` int NOT NULL COMMENT '版本号',
+`time_begin` long not null comment '线程开始时间',
+`time_valid` long not null comment '线程有效时间',
 `desc` varchar(1024) NOT NULL DEFAULT '备注信息',
 `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '保存数据时间，自动生成',
-`valid_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '线程的有效时间，超过此时间之后锁失效',
 PRIMARY KEY (`id`),
 UNIQUE KEY `key_method_name` (`resources`) USING BTREE ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='锁定中的方法';

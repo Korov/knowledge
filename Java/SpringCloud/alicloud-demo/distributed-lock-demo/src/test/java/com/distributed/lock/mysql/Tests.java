@@ -18,6 +18,9 @@ public class Tests extends ApplicationTests {
         model.setResources("demo");
         model.setState(2);
         model.setVersion(0);
+        model.setTimeBegin(String.valueOf(System.currentTimeMillis()));
+        model.setTimeValid("2000");
+        model.setDesc("demo");
         model.setUpdateTime(new Date());
         dao.insert(model);
         System.out.println("aaa");

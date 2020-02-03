@@ -13,9 +13,9 @@ public interface TableLockMethodDao {
 
     TableLockMethod selectByPrimaryKey(Integer id);
 
+    TableLockMethod selectByResources(String resources);
+
     int updateByPrimaryKeySelective(TableLockMethod record);
 
     int updateByPrimaryKey(TableLockMethod record);
-
-    TableLockMethod selectByResources(String resources);
 }

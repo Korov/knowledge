@@ -1,13 +1,13 @@
 package com.distributed.lock.mysql.model;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
  * table_lock_method
- *
- * @author
+ * @author 
  */
-public class TableLockMethod {
+public class TableLockMethod implements Serializable {
     /**
      * 主键
      */
@@ -28,12 +28,24 @@ public class TableLockMethod {
      */
     private Integer version;
 
+    /**
+     * 线程开始时间
+     */
+    private String timeBegin;
+
+    /**
+     * 线程有效时间
+     */
+    private String timeValid;
+
     private String desc;
 
     /**
      * 保存数据时间，自动生成
      */
     private Date updateTime;
+
+    private static final long serialVersionUID = 1L;
 
     public Integer getId() {
         return id;
@@ -65,6 +77,22 @@ public class TableLockMethod {
 
     public void setVersion(Integer version) {
         this.version = version;
+    }
+
+    public String getTimeBegin() {
+        return timeBegin;
+    }
+
+    public void setTimeBegin(String timeBegin) {
+        this.timeBegin = timeBegin;
+    }
+
+    public String getTimeValid() {
+        return timeValid;
+    }
+
+    public void setTimeValid(String timeValid) {
+        this.timeValid = timeValid;
     }
 
     public String getDesc() {
