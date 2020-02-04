@@ -1,0 +1,45 @@
+server:
+  port: 8003
+
+mybatis:
+  type-aliases-package: com.distributed.transaction.model    # 所有Entity别名类所在包
+  mapper-locations:
+    - classpath:mapper/*.xml                       # mapper映射文件
+
+spring:
+  application:
+    name: distributed-transaction-demo
+
+  datasource:
+    type: com.alibaba.druid.pool.DruidDataSource           # 当前数据源操作类型
+    driver-class-name: com.mysql.cj.jdbc.Driver            # mysql驱动包
+    url: jdbc:mysql://localhost:3306/transaction_demo?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true            # 数据库名称
+    username: root
+    password: root123
+    dbcp2:
+      min-idle: 5                                           # 数据库连接池的最小维持连接数
+      initial-size: 5                                       # 初始化连接数
+      max-total: 50                                          # 最大连接数
+      max-wait-millis: 200
+
+  kafka:
+    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+
+    producer:
+      retries: 3
+      batch-size: 323804
+      buffer-memory: 33554432
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: -1
+      linger: 10
+    consumer:
+      group-id: test
+      auto-offset-reset: earliest
+      enable-auto-commit: true
+      auto-commit-interval: 100
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      max-poll-records: 2000
+    listener:
+      concurrency: 4
