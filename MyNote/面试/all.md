@@ -487,8 +487,6 @@ SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");
 System.out.println(simpleDateFormat.format(date));
 ```
 
-
-
 ## Java实现多线程有哪几种方式
 
 - 继承Threads类

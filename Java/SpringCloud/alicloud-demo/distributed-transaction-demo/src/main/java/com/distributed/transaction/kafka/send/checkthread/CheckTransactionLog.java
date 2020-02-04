@@ -12,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Service
 @Slf4j
@@ -27,8 +29,26 @@ public class CheckTransactionLog {
     @Transactional(rollbackFor = Exception.class)
     public void sendMessage() {
         List<TransactionLog> logs = transactionLogMapper.selectNewLog();
+        ExecutorService fixedPool = Executors.newFixedThreadPool(5);
         for (TransactionLog transactionLog : logs) {
-            log.info("My data: {}", JSON.toJSONString(transactionLog));
+            fixedPool.execute(new PublishRunner(transactionLogMapper, kafkaTemplate, transactionLog));
+        }
+    }
+
+    class PublishRunner implements Runnable {
+        private TransactionLogMapper transactionLogMapper;
+        private KafkaTemplate<String, String> kafkaTemplate;
+        private TransactionLog transactionLog;
+
+        public PublishRunner(TransactionLogMapper transactionLogMapper, KafkaTemplate<String, String> kafkaTemplate, TransactionLog transactionLog) {
+            this.transactionLogMapper = transactionLogMapper;
+            this.kafkaTemplate = kafkaTemplate;
+            this.transactionLog = transactionLog;
+        }
+
+
+        @Override
+        public void run() {
             kafkaTemplate.send("transaction-demo", JSON.toJSONString(transactionLog));
             transactionLog.setState("PUBLISHED");
             transactionLog.setUpdateTime(new Date());
