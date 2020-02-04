@@ -1615,3 +1615,93 @@ Desired Survivor Size：Survivor空间大小验证阙值(默认是survivor空间
 Current Survivor Size：当前survivor空间大小
 
 histogram柱状图：表示年龄段对象的存储柱状图
+
+## jvm常用命令积累
+
+```bash
+// 查看相关参数信息
+jinfo -flag MetaspaceSize 3140
+```
+
+## jvm干货
+
+### MetaspaceSize
+
+MetaspaceSize为出发FullGC的阈值，默认约为21M，如做了配置，最小阈值为自定义配置大小。空间使用达到阈值，触发FullGC，同时对该值扩大。当然如果元空间实际使用小于阈值，在GC的时候也会对该值缩小。
+ MaxMetaspaceSize为元空间的最大值，如果设置太小，可能会导致频繁FullGC，甚至OOM。
+
+### GC
+
+清理Eden区和Survivor区叫**Minor GC**；清理Old区叫**Major GC**；清理整个堆空间—包括年轻代和老年代叫**Full GC**。
+
+### 新JVM参数配置指南
+
+```conf
+// 设置元数据空间和堆空间
+-XX:MetaspaceSize=128M -XX:MaxMetaspaceSize=256M -Xms256m -Xmx256m
+```
+
+官方指导的内存大小：Java堆大小设置，Xms 和 Xmx设置为老年代存活对象的3-4倍，即FullGC之后的老年代内存占用的3-4倍，年轻代Xmn的设置为老年代存活对象的1-1.5倍。老年代的内存大小设置为老年代存活对象的2-3倍。
+
+以上数据可以通过系统运行一段事件后查看系统的各个指标再进行配置。
+
+## G1调优
+
+### G1 GC相关参数
+
+G1 GC是垃圾收集优先的垃圾收集器，同时有着”可预期的暂停时间“，垃圾收集过程是分代的，但堆空间是基于分区进行分配。所以整体的空间利用率，时间效率都有更大的提升。G1的YoungGC和MixedGC以及并发标记阶段都有很多机制可以控制触发时机，一般情况是不建议过度更改官方建议参数。但默认参数不一定适用于所有应用，调优前需要有明确的目标，或者问题处理思路。
+
+以下先整理下G1垃圾收集器可以调整的重要参数：
+
+-XX:+UseG1GC：启用 G1 (Garbage First) 垃圾收集器
+-XX:MaxGCPauseMillis：设置允许的最大GC停顿时间(GC pause time)，这只是一个期望值，实际可能会超出，可以和年轻代大小调整一起并用来实现。默认是200ms。
+-XX:G1HeapRegionSize：每个分区的大小，默认值是会根据整个堆区的大小计算出来，范围是1M~32M，取值是2的幂，计算的倾向是尽量有2048个分区数。比如如果是2G的heap，那region=1M。16Gheap,region=8M。
+-XX:MaxTenuringThreshold=n：晋升到老年代的“年龄”阀值，默认值为 15。
+-XX:InitiatingHeapOccupancyPercent：一般会简写IHOP,默认是45%,这个占比跟并发周期的启动相关，当空间占比达到这个值时，会启动并发周期。如果经常出现FullGC，可以调低该值，尽早的回收可以减少FullGC的触发，但如果过低，则并发阶段会更加频繁，降低应用的吞吐。
+-XX:G1NewSizePercent：年轻代最小的堆空间占比，默认是5%。
+-XX:G1MaxNewSizePercent：年轻代最大的堆空间占比，默认是60%。
+-XX:ConcGCThreads：并发执行的线程数，默认值接近整个应用线程数的1/4。
+-XX:G1HeapWastePercent:允许的浪费堆空间的占比，默认是5%。如果并发标记可回收的空间小于5%,则不会触发MixedGC。
+-XX:G1MixedGCCountTarget:一次全局并发标记之后，后续最多执行的MixedGC次数。 默认值是8.
+
+### 年轻代调优
+
+因为G1 GC是启发式算法，会动态调整年轻代的空间大小。目标也就是为了达到接近预期的暂停时间。年轻代调优中比较重要的就是对暂停时间的处理。一般都是根据MaxGCPauseMillis以及年轻代占比G1NewSizePercent、G1MaxNewSizePercent，结合应用的特点和GC数据进行接近期望pause time的调整。
+
+### 并发标记和MixGC 调优
+
+**InitiatingHeapOccupancyPercent**就是触发并发标记的一个决定阀值。当Java堆空间占用到45%便开启并发周期。并发标记的初始标记阶段伴随着一次YoungGC的暂停。
+
+IHOP如果阀值设置过高，可能会遇到转移失败的风险，比如对象进行转移时空间不足。如果阀值设置过低，就会使标记周期运行过于频繁，并且有可能混合收集期回收不到空间。
+IHOP值如果设置合理，但是在并发周期时间过长时，可以尝试增加并发线程数，调高**ConcGCThreads**。
+
+### 引用处理
+
+G1 GC对于虚引用、弱引用、软引用的处理会比一般对象多一些收集任务。如果在引用处理占用了很长时间，需要更进一步排查。在并发标记的Remark阶段会记录引用的处理，日志信息如下：
+
+```
+[GC remark 2018-05-26T19:50:57.386-0800: 78.610: [Finalize Marking, 0.0002675 secs] 2018-05-26T19:50:57.386-0800: 78.611: [GC ref-proc, 0.0001091 secs] 2018-05-26T19:50:57.386-0800: 78.611: [Unloading, 0.0204521 secs], 0.0212793 secs]
+```
+
+可以通过**-XX:+PrintReferenceGC**打印更详细的引用计数信息:
+
+```
+[SoftReference, 0 refs, 0.0000482 secs]2018-06-03T20:52:03.887-0800: 18.033: [WeakReference, 116 refs, 0.0000321 secs]2018-06-03T20:52:03.887-0800: 18.033: [FinalReference, 1073 refs, 0.0009571 secs]2018-06-03T20:52:03.888-0800: 18.034: [PhantomReference, 0 refs, 1 refs, 0.0000211 secs]2018-06-03T20:52:03.888-0800: 18.034: [JNI Weak Reference, 0.0000192 secs], 0.0084976 secs]
+```
+
+一般在**Ref Proc**时间超过GC暂停时间的10%时就要关注。Ref Proc的信息打印在每次垃圾收集的**Other**信息模块
+
+```
+ [Other: 0.6 ms]
+      [Choose CSet: 0.0 ms]
+      [Ref Proc: 0.4 ms]
+      [Ref Enq: 0.0 ms]
+      [Redirty Cards: 0.1 ms]
+      [Humongous Register: 0.0 ms]
+      [Humongous Reclaim: 0.0 ms]
+      [Free CSet: 0.0 ms]
+```
+
+如果SoftReference过多，会有频繁的老年代收集。-XX:SoftRefLRUPolicyMSPerMB参数，可以指定每兆堆空闲空间的软引用的存活时间，默认值是1000，也就是1秒。可以调低这个参数来触发更早的回收软引用。如果调高的话会有更多的存活数据，可能在GC后堆占用空间比会增加。
+对于软引用，还是建议尽量少用，会增加存活数据量，增加GC的处理时间。
+
