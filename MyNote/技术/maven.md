@@ -6,8 +6,6 @@ mvn clean清理已经打好的包，通常使用方式：mvn clean package
 
 跳过测试类：mvn clean install -Dmaven.test.skip=true
 
-
-
 # maven中RELEASE和SNAPSHOT的区别
 
 maven中的仓库分为两种SNAPSHOT快照仓库和RELEASE发布仓库。快照仓库用于保存开发过程中不稳定版本号，发布仓库用来保存稳定的发行版本号。
