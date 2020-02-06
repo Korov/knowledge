@@ -1600,7 +1600,7 @@ jstatd -J-Djava.security.policy=/home/korov/Desktop/temp/jstatd.all.policy -J-Dj
 
 ### tomcat启动JMX监控
 
-在tomcat的bin目录下，创建setenv.sh
+JMX可以监控CPU信息，但是不能监控GC信息，在tomcat的bin目录下，创建setenv.sh
 
 ```sh
 #!/bin/sh
