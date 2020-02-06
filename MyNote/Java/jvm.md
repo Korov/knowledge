@@ -1576,6 +1576,49 @@ Java语言定义了5中线程状态，在任意一个时间点，一个线程只
 
 # 自我总结
 
+## visual VM远程连接
+
+### jstatd方式
+
+不可以检测CPU情况，但是不需要修改其他应用的jvm参数就可以监控机器上所有的jvm情况
+
+#### 创建安全策略文件jstatd.all.policy
+
+```
+grant codebase "file:/usr/lib/jvm/java-8-openjdk-amd64/lib/tools.jar" {
+    permission java.security.AllPermission;
+};
+```
+
+#### 执行文件
+
+```bash
+jstatd -J-Djava.security.policy=/home/korov/Desktop/temp/jstatd.all.policy -J-Djava.rmi.server.hostname=192.168.1.102 -J-Djava.rmi.server.logCalls=true -p 1099
+```
+
+可以使用visual VM远程连接了
+
+### tomcat启动JMX监控
+
+在tomcat的bin目录下，创建setenv.sh
+
+```sh
+#!/bin/sh
+JAVA_OPTS="$JAVA_OPTS -Xmx1024m -Djava.rmi.server.hostname=192.168.1.102 -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=9998 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+```
+
+```
+-Djava.rmi.server.hostname=192.168.19.114 ---------------- 192.168.19.114为tomcat所在机器的ip地址。
+-Dcom.sun.management.jmxremote ----------------- 开启jmx，jdk1.5之前还要手动开启，现在已经默认开启了，所以可以省略
+
+-Dcom.sun.management.jmxremote.port=9998 -------------------jmx的端口
+-Dcom.sun.management.jmxremote.authenticate=false ---------------- 不开启验证
+
+-Dcom.sun.management.jmxremote.ssl=false ----------------------不开启ssl通信
+```
+
+其他应用只需要在启动的时候加上上面的那些启动参数就可以了
+
 ## visualGC使用
 
 ![image-20200117234653523](picture/image-20200117234653523.png)
