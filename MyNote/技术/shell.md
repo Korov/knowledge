@@ -18,7 +18,7 @@ bash test.sh  #使用解释器执行脚本
 ## 1.1 Shell变量
 
 ```Shell
-your_name="runoob.com"
+my_name="korov"
 ```
 
 -  变量名和等号之间不能有空格 
@@ -31,17 +31,21 @@ your_name="runoob.com"
 
 ```Shell
 #将 /etc 下目录的文件名循环出来
-for file in `ls /etc`
+for file in `ls /etc`; do
+    echo ${file}
+done
 或
-for file in $(ls /etc)
+for file in $(ls /etc); do
+    echo ${file}
+done
 ```
 
 使用变量，在变量名之前加美元符号
 
 ```Shell
-your_name="qinjx"
-echo $your_name
-echo ${your_name} #推荐
+my_name="korov"
+echo $my_name
+echo ${my_name} #推荐
 ```
 
  变量名外面的花括号是可选的，加不加都行，加花括号是为了帮助解释器识别变量的边界，比如下面这种情况：  
@@ -191,6 +195,37 @@ Shell 传递参数实例！
 | ==     | 相等。用于比较两个数字，相同则返回 true。     | [ $a == $b ] 返回 false。     |
 | !=     | 不相等。用于比较两个数字，不相同则返回 true。 | [ $a != $b ] 返回 true。      |
 
+```sh
+#!/bin/bash
+
+a=10
+b=20
+
+val=`expr $a + $b`
+echo "a + b : $val"
+
+val=`expr $a - $b`
+echo "a - b : $val"
+
+val=`expr $a \* $b`
+echo "a * b : $val"
+
+val=`expr $b / $a`
+echo "b / a : $val"
+
+val=`expr $b % $a`
+echo "b % a : $val"
+
+if [ $a == $b ]
+then
+   echo "a 等于 b"
+fi
+if [ $a != $b ]
+then
+   echo "a 不等于 b"
+fi
+```
+
 ## 3.2 关系运算符
 
 | 运算符 | 说明                                                  | 举例                       |
@@ -202,6 +237,50 @@ Shell 传递参数实例！
 | -ge    | 检测左边的数是否大于等于右边的，如果是，则返回 true。 | [ $a -ge $b ] 返回 false。 |
 | -le    | 检测左边的数是否小于等于右边的，如果是，则返回 true。 | [ $a -le $b ] 返回 true。  |
 
+```sh
+#!/bin/bash
+
+a=10
+b=20
+
+if [ $a -eq $b ]
+then
+   echo "$a -eq $b : a 等于 b"
+else
+   echo "$a -eq $b: a 不等于 b"
+fi
+if [ $a -ne $b ]
+then
+   echo "$a -ne $b: a 不等于 b"
+else
+   echo "$a -ne $b : a 等于 b"
+fi
+if [ $a -gt $b ]
+then
+   echo "$a -gt $b: a 大于 b"
+else
+   echo "$a -gt $b: a 不大于 b"
+fi
+if [ $a -lt $b ]
+then
+   echo "$a -lt $b: a 小于 b"
+else
+   echo "$a -lt $b: a 不小于 b"
+fi
+if [ $a -ge $b ]
+then
+   echo "$a -ge $b: a 大于或等于 b"
+else
+   echo "$a -ge $b: a 小于 b"
+fi
+if [ $a -le $b ]
+then
+   echo "$a -le $b: a 小于或等于 b"
+else
+   echo "$a -le $b: a 大于 b"
+fi
+```
+
 ## 3.3 布尔运算符
 
 | 运算符 | 说明                                                | 举例                                     |
@@ -209,6 +288,38 @@ Shell 传递参数实例！
 | !      | 非运算，表达式为 true 则返回 false，否则返回 true。 | [ ! false ] 返回 true。                  |
 | -o     | 或运算，有一个表达式为 true 则返回 true。           | [ $a -lt 20 -o $b -gt 100 ] 返回 true。  |
 | -a     | 与运算，两个表达式都为 true 才返回 true。           | [ $a -lt 20 -a $b -gt 100 ] 返回 false。 |
+
+```sh
+#!/bin/bash
+
+a=10
+b=20
+
+if [ $a != $b ]
+then
+   echo "$a != $b : a 不等于 b"
+else
+   echo "$a == $b: a 等于 b"
+fi
+if [ $a -lt 100 -a $b -gt 15 ]
+then
+   echo "$a 小于 100 且 $b 大于 15 : 返回 true"
+else
+   echo "$a 小于 100 且 $b 大于 15 : 返回 false"
+fi
+if [ $a -lt 100 -o $b -gt 100 ]
+then
+   echo "$a 小于 100 或 $b 大于 100 : 返回 true"
+else
+   echo "$a 小于 100 或 $b 大于 100 : 返回 false"
+fi
+if [ $a -lt 5 -o $b -gt 100 ]
+then
+   echo "$a 小于 5 或 $b 大于 100 : 返回 true"
+else
+   echo "$a 小于 5 或 $b 大于 100 : 返回 false"
+fi
+```
 
 ## 3.4 逻辑运算符
 
@@ -355,6 +466,9 @@ do
 done
 
 for (( ; ; ))
+do
+    command
+done
 ```
 
 ## 5.5 until循环
@@ -390,13 +504,21 @@ echo '输入 1 到 4 之间的数字:'
 echo '你输入的数字为:'
 read aNum
 case $aNum in
-    1)  echo '你选择了 1'
+    1)
+    echo "Hello"
+    echo '你选择了 1'
     ;;
-    2)  echo '你选择了 2'
+    2)
+    echo "Hello"
+    echo '你选择了 2'
     ;;
-    3)  echo '你选择了 3'
+    3)
+    echo "Hello"
+    echo '你选择了 3'
     ;;
-    4)  echo '你选择了 4'
+    4)
+    echo "Hello"
+    echo '你选择了 4'
     ;;
     *)  echo '你没有输入 1 到 4 之间的数字'
     ;;
@@ -447,3 +569,109 @@ sleep 1m   睡眠1分
 sleep 1h   睡眠1小时
 ```
 
+## 8.2 sed批量替换字符串
+
+```sh
+sed -i "s/原字符串/新字符串/g" `grep 原字符串 -rl 所在目录`
+#例如：我要把 charset=gb2312 替换为 charset=UTF-8，执行命令：
+sed -i "s/charset=gb2312/charset=UTF-8/g" `grep charset=gb2312 -rl /www`
+
+-i 表示inplace edit，就地修改文件
+-r 表示搜索子目录
+-l 表示输出匹配的文件名
+```
+
+### 删除：d命令
+
+```sh
+#删除example文件的第二行。
+sed '2d' example
+#删除example文件的第二行到末尾所有行
+sed '2,$d' example
+#删除example文件的最后一行。
+sed '$d' example
+#删除example文件所有包含test的行
+sed '/test/'d example
+```
+
+### 替换：s命令
+
+```sh
+# 在整行范围内把test替换为mytest。如果没有g标记，则只有每行第一个匹配的test被替换成mytest。
+sed 's/test/mytest/g' example
+# (-n)选项和p标志一起使用表示只打印那些发生替换的行。也就是说，如果某一行开头的test被替换成mytest，就打印它。
+sed -n 's/^test/mytest/p' example
+# &符号表示替换换字符串中被找到的部份。所有以192.168.0.1开头的行都会被替换成它自已加localhost，变成192.168.0.1localhost
+sed 's/^192.168.0.1/&localhost/'example
+#love被标记为1，所有loveable会被替换成lovers，而且替换的行会被打印出来 和正则替换很类似
+sed -n 's/\(love\)able/\1rs/p' example
+# 不论什么字符，紧跟着s命令的都被认为是新的分隔符，所以，“#”在这里是分隔符，代替了默认的“/”分隔符。表示把所有10替换成100
+ sed 's#10#100#g' example
+```
+
+### 选定行的范围：逗号
+
+`$ sed -n '/test/,/check/p' exampl`
+所有在模板test和check所确定的范围内的行都被打印。
+
+`$ sed -n '5,/^test/p' example`
+打印从第五行开始到第一个包含以test开始的行之间的所有行。
+
+`$ sed '/test/,/check/s/$/sed test/' example`
+对于模板test和west之间的行，每行的末尾用字符串sed test替换。
+
+### 多点编辑：e命令
+
+`$ sed -e '1,5d' -e 's/test/check/'example`
+(-e)选项允许在同一行里执行多条命令。如例子所示，第一条命令删除1至5行，第二条命令用check替换test。命令的执行顺序对结果有影响。如果两个命令都是替换命令，那么第一个替换命令将影响第二个替换命令的结果。
+
+`$ sed --expression='s/test/check/' --expression='/love/d' example`
+一个比-e更好的命令是–expression。它能给sed表达式赋值。 
+
+### 从文件读入：r命令
+
+`$ sed '/test/r file' example`
+file里的内容被读进来，显示在与test匹配的行后面，如果匹配多行，则file的内容将显示在所有匹配行的下面。
+
+### 写入文件：w命令
+
+`$ sed -n '/test/w file' example`
+在example中所有包含test的行都被写入file里。 
+
+### 追加命令：a命令
+
+`$ sed '/^test/a\\--->this is a example' example<`
+‘this is a example’被追加到以test开头的行后面，sed要求命令a后面有一个反斜杠。
+
+### 插入：i命令
+
+```
+$ sed '/test/i\\new line-------------------------' example
+```
+
+如果test被匹配，则把反斜杠后面的文本插入到匹配行的前面。
+
+### 下一个：n命令
+
+`$ sed '/test/{ n; s/aa/bb/; }' example`
+如果test被匹配，则移动到匹配行的下一行，替换这一行的aa，变为bb，并打印该行，然后继续。
+
+### 变形：y命令
+
+`$ sed '1,10y/abcde/ABCDE/' example`
+把1–10行内所有abcde转变为大写，注意，正则表达式元字符不能使用这个命令。
+
+### 退出：q命令
+
+`$ sed '10q' example`
+打印完第10行后，退出sed。
+
+### 保持和获取：h命令和G命令
+
+`$ sed -e '/test/h' -e '$Gexample`
+在sed处理文件的时候，每一行都被保存在一个叫模式空间的临时缓冲区中，除非行被删除或者输出被取消，否则所有被处理的行都将打印在屏幕上。接着模式空间被清空，并存入新的一行等待处理。在这个例子里，匹配test的行被找到后，将存入模式空间，h命令将其复制并存入一个称为保持缓存区的特殊缓冲区内。第二条语句的意思是，当到达最后一行后，G命令取出保持缓冲区的行，然后把它放回模式空间中，且追加到现在已经存在于模式空间中的行的末尾。在这个例子中就是追加到最后一行。简单来说，任何包含test的行都被复制并追加到该文件的末尾。
+
+### 保持和互换：h命令和x命令
+
+`$ sed -e '/test/h' -e '/check/x' example`
+互换模式空间和保持缓冲区的内容。也就是把包含test与check的行互换。
