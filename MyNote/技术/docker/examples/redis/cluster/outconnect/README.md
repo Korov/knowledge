@@ -27,37 +27,9 @@ Redis集群中每个redis实例（可能一台机部署多个实例）会使用�
 修改redis.conf文件权限,否则后面写入访问密码到文件的时候会提示Permission denied
 
 ```bash
-chown -R root redis1/config
-chgrp -R root redis1/config
-chown -R root redis2/config
-chgrp -R root redis2/config
-chown -R root redis3/config
-chgrp -R root redis3/config
-chown -R root redis4/config
-chgrp -R root redis4/config
-chown -R root redis5/config
-chgrp -R root redis5/config
-chown -R root redis6/config
-chgrp -R root redis6/config
-
-chmod 644 redis1/config/redis.conf
-chmod 644 redis2/config/redis.conf
-chmod 644 redis3/config/redis.conf
-chmod 644 redis4/config/redis.conf
-chmod 644 redis5/config/redis.conf
-chmod 644 redis6/config/redis.conf
-
-rm -rf redis1/data
-rm -rf redis2/data
-rm -rf redis3/data
-rm -rf redis4/data
-rm -rf redis5/data
-rm -rf redis6/data
-
-#后台启动
-docker-compose -f docker-compose.yaml up -d
-#创建集群，Redis容器和启动集群命令都需要使用host网络，此处的ip地址需要使用宿主机的ip
-docker run --net host --rm -it zvelo/redis-trib create --replicas 1 192.168.31.88:6061 192.168.31.88:6062 192.168.31.88:6063 192.168.31.88:6064 192.168.31.88:6065 192.168.31.88:6066
+# 启动项目，192.168.1.108为宿主机的IP，端口会从6061开始一直到6066
+chmod +x setup.sh
+./setup.sh 192.168.1.108 6061
 
 进入某个Redis容器，通过`redis-cli -p 6061 -c`以集群方式进入容器set一个值之后去别的容器查看值是否存在
 ```
