@@ -3818,8 +3818,6 @@ public class StaticFactoryBean {
 
 建一个config.xm配置文件，将其纳入Spring容器来管理,需要通过factory-method指定静态方法名称
 
-
-
 ```csharp
 <bean id="random"
 class="example.chapter3.StaticFactoryBean"
@@ -3829,8 +3827,6 @@ scope="prototype"
 ```
 
 测试：
-
-
 
 ```csharp
 public static void main(String[] args) {
@@ -3852,8 +3848,6 @@ public static void main(String[] args) {
 
 **Adapter类接口**：Target
 
-
-
 ```java
 public interface AdvisorAdapter {
 
@@ -3865,8 +3859,6 @@ boolean supportsAdvice(Advice advice);
 ```
 
 **MethodBeforeAdviceAdapter类**，Adapter
-
-
 
 ```java
 class MethodBeforeAdviceAdapter implements AdvisorAdapter, Serializable {
@@ -3881,8 +3873,6 @@ class MethodBeforeAdviceAdapter implements AdvisorAdapter, Serializable {
       }
 }
 ```
-
-说到这里，也给大家推荐一个架构交流学习群：614478470，里面会分享一些资深架构师录制的视频录像：有Spring，MyBatis，Netty源码分析，高并发、高性能、分布式、微服务架构的原理，JVM性能优化这些成为架构师必备的知识体系。还能领取免费的学习资源，相信对于已经工作和遇到技术瓶颈的码友，在这个群里会有你需要的内容。**[点击加入](https://links.jianshu.com/go?to=https%3A%2F%2Fjq.qq.com%2F%3F_wv%3D1027%26k%3D5gMDouY)**
 
 ### 第五种：包装器（Decorator）
 

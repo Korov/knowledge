@@ -1,7 +1,7 @@
 package com.korov.gradle.knowledge.accumulation.designpatterns.creationalpatterns.singletonpattern;
 
 
-class SingleObject {
+public class SingleObject {
 
     //创建 SingleObject 的一个对象
     private static SingleObject instance = new SingleObject();
@@ -11,8 +11,8 @@ class SingleObject {
     private SingleObject() {
     }
 
-    //获取唯一可用的对象
-    static SingleObject getInstance() {
+    //获取唯一可用的对象（懒加载模式）
+    public static synchronized SingleObject getInstance() {
         if (instance == null) {
             instance = new SingleObject();
         }

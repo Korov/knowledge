@@ -17,6 +17,7 @@
         <module>fastdfs-demo</module>
         <module>distributed-lock-demo</module>
         <module>distributed-transaction-demo</module>
+        <module>designpattern-demo</module>
     </modules>
 
     <properties>

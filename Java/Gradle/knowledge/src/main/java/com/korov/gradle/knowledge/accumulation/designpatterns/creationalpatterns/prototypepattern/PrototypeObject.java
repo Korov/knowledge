@@ -1,6 +1,6 @@
 package com.korov.gradle.knowledge.accumulation.designpatterns.creationalpatterns.prototypepattern;
 
-import java.io.Serializable;
+import java.io.*;
 
 /**
  * Cloneable生命是可以克隆的
@@ -14,7 +14,7 @@ public class PrototypeObject implements Cloneable, Serializable {
     }
 
     TestItem getItem() {
-        return this.item;
+        return item;
     }
 
     public void setItem(TestItem item) {
@@ -30,5 +30,22 @@ public class PrototypeObject implements Cloneable, Serializable {
             e.printStackTrace();
         }
         return object;
+    }
+
+    public PrototypeObject deepClone() {
+        PrototypeObject prototypeObject = null;
+        try {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+
+            objectOutputStream.writeObject(this);
+
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+            ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
+            prototypeObject = (PrototypeObject) objectInputStream.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return prototypeObject;
     }
 }
