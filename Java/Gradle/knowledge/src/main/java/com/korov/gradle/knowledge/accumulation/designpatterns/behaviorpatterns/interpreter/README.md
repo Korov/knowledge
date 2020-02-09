@@ -1,0 +1,7 @@
+解释器模式：给定一门语言，定义他的文法的一种表示，并定义一个解释器，该解释器使用该表示来解释语言中的句子。
+
+角色：
+1. AbstractExpression抽象解释器：具体的解释任务由哥哥实现类完成，具体的解释器分别由TermianlExpression和NonterminalExpression完成
+2. TerminalExpression终结符表达式：实现与文法中的元素相关联的解释操作，通常一个解释器模式中只有一个终结符表达式，但有多个实例，对应不同的终结符。
+3. NontermianlExpression非终结符表达式：文法中的每条规则对应于一个非中介表达式，具体到我们的例子就是加减法规则分别对应到AddExpression和SubExpression两个类。
+4. Context环境角色：
