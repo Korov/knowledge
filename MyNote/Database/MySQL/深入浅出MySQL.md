@@ -1308,11 +1308,11 @@ MySQL 可以自动地监测行锁导致的死锁并进行相应的处理，但�
 **备份**
 
 备份指定的数据库，或者此数据库中某些表。
-shell> mysqldump [options] db_name [tables] > /var/backup/demo.sql
+shell> mysqldump -uroot -p [options] db_name [tables] > /var/backup/demo.sql
 备份指定的一个或多个数据库。
-shell> mysqldump [options] ---database DB1 [DB2 DB3...]
+shell> mysqldump [options] --databases DB1 [DB2 DB3...]
 备份所有数据库。
-shell> mysqldump [options] --all--database
+shell> mysqldump [options] --all-databases
 
 **恢复**
 

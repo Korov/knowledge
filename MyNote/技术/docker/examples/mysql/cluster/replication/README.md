@@ -192,20 +192,8 @@ chgrp -R root slave/config
 
 #创建一个MySQL使用的网络
 docker network create --driver bridge --subnet 172.20.0.0/16 net_mysql
-docker run --name mysql-master --net net_mysql --restart=always -p 3306:3306 -e MYSQL_ROOT_PASSWORD=root123 \
--v `pwd`/master/data:/var/lib/mysql:rw \
--v `pwd`/master/mysql-files:/var/lib/mysql-files:rw \
--v `pwd`/master/log:/var/log/mysql:rw \
--v /etc/localtime:/etc/localtime:ro \
--v `pwd`/master/config/my.cnf:/etc/mysql/my.cnf:rw \
--d mysql;
-docker run --name mysql-slave  --net net_mysql --link mysql-master:mysql-master --restart=always -p 3307:3306 -e MYSQL_ROOT_PASSWORD=root123 \
--v `pwd`/slave/data:/var/lib/mysql:rw \
--v `pwd`/slave/mysql-files:/var/lib/mysql-files:rw \
--v `pwd`/slave/log:/var/log/mysql:rw \
--v /etc/localtime:/etc/localtime:ro \
--v `pwd`/slave/config/my.cnf:/etc/mysql/my.cnf:rw \
--d mysql;
+
+docker-compose -f docker-compose.yaml up -d
 ```
 
 使用数据库连接工具进行连接，先连接主服务器的数据库依次执行
@@ -222,6 +210,9 @@ show master status;#可以看到主数据库的状态
 切换到从数据库，依次执行
 
 ```mysql
+#若是重新配置主从需要执行以下命令
+reset slave;
+
 CHANGE MASTER TO
  MASTER_HOST='mysql-master',
  MASTER_PORT=3306,
