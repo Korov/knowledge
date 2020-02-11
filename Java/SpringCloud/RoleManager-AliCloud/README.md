@@ -10,7 +10,7 @@
 #### 安装教程
 
 1.  安装数据库，使用resources目录下的MySQL-Cluster文件夹下按照README.md启动主从数据库
-2.  启动resources/Nacos-Cluster/example/cluster-hostname.yaml镜像
+2.  启动resources/Nacos-Cluster中的README.md部署nacos集群
 3.  xxxx
 
 #### 使用说明
