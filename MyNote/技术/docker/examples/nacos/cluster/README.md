@@ -2,7 +2,9 @@
 
 1. 启动主从数据库
 2. 在主从数据库中创建数据库`nacos_devtest`，执行init.sql文件创建数据库
-3. 启动nacos集群`sudo docker-compose -f cluster-hostname.yaml up -d`。
+3. 进入build文件夹创建镜像`sudo docker build -t nacos:latest . `。
+4. 启动nacos集群`sudo docker-compose -f cluster-hostname.yaml up -d`。
+5. http://127.0.0.1:8848/nacos，用户名nacos，密码nacos
 
 
 
