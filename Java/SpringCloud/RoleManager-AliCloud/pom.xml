@@ -6,7 +6,11 @@
 
     <groupId>org.example</groupId>
     <artifactId>RoleManager-AliCloud</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>user_service</module>
+    </modules>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,7 +23,7 @@
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
-                <version>Greenwich.RELEASE</version>
+                <version>Greenwich.SR4</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -33,20 +37,22 @@
 
             <!--使用nacos作为注册中心和配置中心-->
             <dependency>
-                <groupId>org.springframework.cloud</groupId>
+                <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
-                <version>0.2.2.RELEASE</version>
+                <version>2.1.1.RELEASE</version>
             </dependency>
+
             <dependency>
-                <groupId>org.springframework.cloud</groupId>
+                <groupId>com.alibaba.cloud</groupId>
                 <artifactId>spring-cloud-starter-alibaba-nacos-config</artifactId>
-                <version>0.2.2.RELEASE</version>
+                <version>2.1.1.RELEASE</version>
             </dependency>
+
 
             <dependency>
                 <groupId>com.alibaba.nacos</groupId>
                 <artifactId>nacos-client</artifactId>
-                <version>1.1.0</version>
+                <version>1.1.4</version>
             </dependency>
 
             <dependency>
@@ -94,6 +100,13 @@
                 <artifactId>spring-kafka</artifactId>
                 <version>2.2.7.RELEASE</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.aspectj</groupId>
+                <artifactId>aspectjweaver</artifactId>
+                <version>1.9.5</version>
+            </dependency>
+
         </dependencies>
     </dependencyManagement>
 
