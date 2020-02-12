@@ -14,14 +14,14 @@ public class UserTest extends ApplicationTests {
 
     @Test
     public void test() {
-        UserModel userModel = userMapper.selectByPrimaryKey(1L);
-        if (userModel == null) {
-            userModel = new UserModel();
-            userModel.setId(1L);
-            userModel.setName("demo");
-            userMapper.insert(userModel);
+        UserModel user = userMapper.selectByPrimaryKey(1L);
+        if (user == null) {
+            user = new UserModel();
+            user.setId(1L);
+            user.setName("demo");
+            long id = userMapper.insert(user);
+            user = userMapper.selectByPrimaryKey(id);
         }
-        userModel = userMapper.selectByPrimaryKey(1L);
-        log.info(userModel.toString());
+        log.info(user.toString());
     }
 }
