@@ -875,6 +875,8 @@ git fetch命令从服务器上抓取本地没有的数据时，它并不会修�
 $ git push origin --delete serverfix
 To https://github.com/schacon/simplegit
 - [deleted] serverfix
+#本地删除分支
+$ git branch -d serverfix
 ```
 
 基本上这个命令做的只是从服务器上移除这个指针。 Git 服务器通常会保留数据一段时间直到垃圾回收运行，所以如果不小心删除掉了，通常是很容易恢复的。
