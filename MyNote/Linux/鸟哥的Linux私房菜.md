@@ -661,3 +661,24 @@ iptables -t nat -F OUTPUT
 ## 5 df查看内存使用情况
 
 df -h 以G为单位查看内存使用情况
+
+## 6 ubuntu中创建桌面图标
+
+在/usr/share/applications中创建后缀为.desktop的文件,内容为下
+
+```
+[Desktop Entry]                                 #标签开始，说明这是一个Desktop Entry文件,每个.desktop文件都以这个.
+Version = 1.0                                    #标明Desktop Entry的版本（可选）
+Name=firefox                                   #程序名称
+Name[en]=Firefox                            #不同语言的应用名称（可选）
+Name[en_US]=Firefox                     #不同语言的应用名称（可选）
+Encoding=UTF-8                             #编码方式（可选）
+Comment=Firefox                            #程序描述
+Exec=/opt/firefox/firefox                  #程序的启动命令，可以带参数运行
+Icon=/opt/firefox/browser/icons/mozicon128.png                          #快捷方式图标绝对路径（可选）
+Terminal=false                                  #是否在终端中运行，数值是布尔值（true 或是 false）（可选）
+Categories=Application;Network;                                         #注明在菜单栏中显示的位置（可选）
+Type=Application
+#desktop的类型（必选），常见值有“Application”和“Link”，Application： 对于启动应用程序的菜单项，应输入此选项。Link: 对于链接到文件、文件夹或 FTP 站点的菜单项，应输入此选项。
+```
+
