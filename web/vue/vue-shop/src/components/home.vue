@@ -8,10 +8,11 @@
       <el-button type="info" @click="logout">退出</el-button>
     </el-header>
     <el-container>
-      <el-aside width="200px">
+      <el-aside :width="isCollapse ? '64px' : '200px'">
         <div class="toggle-button" @click="toggleCollapse">|||</div>
         <!-- 侧边栏菜单区 -->
-        <el-menu background-color="#333744" text-color="#fff" active-text-color="#ffd04b" unique-opened :collapse="false">
+        <el-menu background-color="#333744" text-color="#fff" active-text-color="#ffd04b"
+                 :collapse-transition="false" unique-opened :collapse="isCollapse">
           <!-- 一级菜单 -->
           <el-submenu :index="item.id + ''" v-for="item in menuList" :key="item.id">
             <template slot="title">
@@ -44,7 +45,8 @@ export default {
         101: 'el-icon-goods',
         102: 'el-icon-tickets',
         145: 'el-icon-coin'
-      }
+      },
+      isCollapse: false
     }
   },
   created() {
@@ -62,7 +64,7 @@ export default {
     },
     // 侧边栏隐藏展开事件
     toggleCollapse() {
-
+      this.isCollapse = !this.isCollapse
     }
   }
 }

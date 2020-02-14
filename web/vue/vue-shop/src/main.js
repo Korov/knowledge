@@ -11,7 +11,6 @@ import './assets/css/global.css'
 import axios from 'axios'
 axios.defaults.baseURL = 'http://localhost:8001/'
 axios.interceptors.request.use(config => {
-  console.log(config)
   config.headers.Authorization = window.sessionStorage.getItem('token')
   return config
 })
