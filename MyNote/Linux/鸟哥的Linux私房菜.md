@@ -636,7 +636,14 @@ groupadd新增群组，groupmod修改群组属性，groupdel删除群组，gpass
 ## 2 切换java版本
 
 ```bash
+#ubuntu中使用
 sudo update-alternatives --config java
+#arch系中使用
+korov@korov-pc  ~  archlinux-java status
+Available Java environments:
+  java-11-openjdk
+  java-8-openjdk/jre (default)
+korov@korov-pc  ~  sudo archlinux-java set java-11-openjdk
 ```
 
 ## 3 查看端口占用
