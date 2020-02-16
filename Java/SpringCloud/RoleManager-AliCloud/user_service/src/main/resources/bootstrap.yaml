@@ -1,5 +1,8 @@
 server:
   port: 8001
+  servlet:
+    # 为所有的controller添加一个统一前缀
+    context-path: /service/user
 
 #Development Environment
 logging:
