@@ -35,7 +35,7 @@
         <el-table-column label="操作" width="180px">
           <template slot-scope="scope">
             <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row)"></el-button>
-            <el-button type="danger" icon="el-icon-delete" size="mini"></el-button>
+            <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeUser(scope.row.id)"></el-button>
             <el-tooltip effect="dark" content="修改用户信息" placement="top" :enterable="false">
               <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
             </el-tooltip>
@@ -280,6 +280,19 @@ export default {
         console.log(this.editForm)
         this.editDialogVisible = false
       })
+    },
+    // 删除用户信息
+    async removeUser(userId) {
+      const confirmResult = await this.$confirm('此操作将永久删除此用户, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('取消了删除')
+      }
+      // 实际用该调用接口删除
+      console.log('确认了删除胡')
     }
   }
 }

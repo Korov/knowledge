@@ -9,7 +9,7 @@ import './assets/font/iconfont.css'
 import './assets/css/global.css'
 
 import axios from 'axios'
-axios.defaults.baseURL = 'http://localhost:8001/'
+axios.defaults.baseURL = 'http://localhost:8001/service/user'
 axios.interceptors.request.use(config => {
   config.headers.Authorization = window.sessionStorage.getItem('token')
   return config
