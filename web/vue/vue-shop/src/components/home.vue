@@ -12,7 +12,7 @@
         <div class="toggle-button" @click="toggleCollapse">|||</div>
         <!-- 侧边栏菜单区 -->
         <el-menu background-color="#333744" text-color="#fff" active-text-color="#ffd04b"
-                 :collapse-transition="false" unique-opened :collapse="isCollapse">
+                 :collapse-transition="false" unique-opened :collapse="isCollapse" :router="true" :default-active="activePath">
           <!-- 一级菜单 -->
           <el-submenu :index="item.id + ''" v-for="item in menuList" :key="item.id">
             <template slot="title">
@@ -20,14 +20,16 @@
               <span>{{item.authName}}</span>
             </template>
             <!-- 二级菜单 -->
-            <el-menu-item :index="subItem.id + ''" v-for="subItem in item.subMenus" :key="subItem.id">
+            <el-menu-item :index="'/' + subItem.path" v-for="subItem in item.subMenus" :key="subItem.id" @click="saveNavState('/' + subItem.path)">
               <i class="el-icon-menu"></i>
               <span>{{subItem.authName}}</span>
             </el-menu-item>
           </el-submenu>
         </el-menu>
       </el-aside>
-      <el-main>Main</el-main>
+      <el-main>
+        <router-view></router-view>
+      </el-main>
     </el-container>
   </el-container>
 </template>
@@ -46,11 +48,15 @@ export default {
         102: 'el-icon-tickets',
         145: 'el-icon-coin'
       },
-      isCollapse: false
+      // 是否折叠
+      isCollapse: false,
+      // 被激活的链接地址
+      activePath: ''
     }
   },
   created() {
     this.getMenuList()
+    this.activePath = window.sessionStorage.getItem('activePath')
   },
   methods: {
     logout() {
@@ -59,12 +65,16 @@ export default {
     },
     async getMenuList() {
       const { data: resultVo } = await this.$http.get('/menus')
-      if (resultVo.code !== 1) return this.$message.error(resultVo.message)
+      if (resultVo.code !== 1) return this.$message.error(resultVo.description)
       this.menuList = resultVo.data
     },
     // 侧边栏隐藏展开事件
     toggleCollapse() {
       this.isCollapse = !this.isCollapse
+    },
+    saveNavState(activePath) {
+      window.sessionStorage.setItem('activePath', activePath)
+      this.activePath = window.sessionStorage.getItem('activePath')
     }
   }
 }

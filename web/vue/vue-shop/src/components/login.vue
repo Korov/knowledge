@@ -9,11 +9,11 @@
       <el-form ref="loginFormRef" label-width="0px" class="login_form" :model="loginForm" :rules="loginFormRules">
         <!-- 用户名 -->
         <el-form-item prop="userName">
-          <el-input v-model="loginForm.userName" prefix-icon="el-icon-user"></el-input>
+          <el-input v-model="loginForm.userName" prefix-icon="el-icon-user" placeholder="请输入用户名"></el-input>
         </el-form-item>
         <!-- 密码 -->
         <el-form-item  prop="password">
-          <el-input v-model="loginForm.password" prefix-icon="el-icon-lock" type="password"></el-input>
+          <el-input v-model="loginForm.password" prefix-icon="el-icon-lock" show-password placeholder="请输入密码"></el-input>
         </el-form-item>
         <!-- 按钮 -->
         <el-form-item class="btns">
@@ -57,7 +57,7 @@ export default {
       this.$refs.loginFormRef.validate(async valid => {
         if (!valid) return
         const { data: resultVo } = await this.$http.post('login', this.loginForm)
-        if (resultVo.code !== 1) return this.$message.error('登录失败')
+        if (resultVo.code !== 1) return this.$message.error(resultVo.description)
         this.$message.success('登录成功')
         window.sessionStorage.setItem('token', resultVo.data[0].token)
         this.$router.push('/home')
