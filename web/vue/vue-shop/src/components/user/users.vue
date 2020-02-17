@@ -293,6 +293,7 @@ export default {
       }
       // 实际用该调用接口删除
       console.log('确认了删除胡')
+      this.getUserList()
     }
   }
 }
