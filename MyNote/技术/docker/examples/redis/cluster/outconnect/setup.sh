@@ -1,9 +1,9 @@
 #!/bin/bash
 
 host_name=$1
-host_port1=$2
+host_port=$2
 
-local_port=`expr $host_port1`
+local_port=`expr $host_port`
 
 
 for value in 1 2 3 4 5 6
@@ -29,9 +29,9 @@ sudo docker-compose -f docker-compose.yaml rm
 sudo docker-compose -f docker-compose.yaml up -d
 
 sudo docker run --net host --rm -it zvelo/redis-trib create --replicas 1 \
-${host_name}:`expr $host_port1` \
-${host_name}:`expr $host_port1 + 1` \
-${host_name}:`expr $host_port1 + 2` \
-${host_name}:`expr $host_port1 + 3` \
-${host_name}:`expr $host_port1 + 4` \
-${host_name}:`expr $host_port1 + 5`
+${host_name}:`expr $host_port` \
+${host_name}:`expr $host_port + 1` \
+${host_name}:`expr $host_port + 2` \
+${host_name}:`expr $host_port + 3` \
+${host_name}:`expr $host_port + 4` \
+${host_name}:`expr $host_port + 5`
