@@ -3,7 +3,7 @@
 <mapper namespace="com.rolemanager.user.mapper.UserMapper">
   <resultMap id="BaseResultMap" type="com.rolemanager.user.model.UserModel">
     <!--@mbg.generated-->
-    <!--@Table tbale_user-->
+    <!--@Table table_user-->
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="avtatar" jdbcType="VARCHAR" property="avtatar" />
     <result column="name" jdbcType="VARCHAR" property="name" />
@@ -23,39 +23,39 @@
   </resultMap>
   <sql id="Base_Column_List">
     <!--@mbg.generated-->
-    id, avtatar, `name`, age, nickname, cardno, email, phone, createtime, updatetime, 
+    id, avtatar, `name`, age, nickname, cardno, email, phone, createtime, updatetime,
     pwd, salt, pwderrortime, `status`, statusremark, remark
   </sql>
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     <!--@mbg.generated-->
-    select 
+    select
     <include refid="Base_Column_List" />
-    from tbale_user
+    from table_user
     where id = #{id,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
     <!--@mbg.generated-->
-    delete from tbale_user
+    delete from table_user
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.rolemanager.user.model.UserModel" useGeneratedKeys="true">
     <!--@mbg.generated-->
-    insert into tbale_user (avtatar, `name`, age, 
-      nickname, cardno, email, 
-      phone, createtime, updatetime, 
-      pwd, salt, pwderrortime, 
+    insert into table_user (avtatar, `name`, age,
+      nickname, cardno, email,
+      phone, createtime, updatetime,
+      pwd, salt, pwderrortime,
       `status`, statusremark, remark
       )
-    values (#{avtatar,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER}, 
-      #{nickname,jdbcType=VARCHAR}, #{cardno,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR}, 
-      #{phone,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP}, #{updatetime,jdbcType=TIMESTAMP}, 
-      #{pwd,jdbcType=VARCHAR}, #{salt,jdbcType=VARCHAR}, #{pwderrortime,jdbcType=VARCHAR}, 
+    values (#{avtatar,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, #{age,jdbcType=INTEGER},
+      #{nickname,jdbcType=VARCHAR}, #{cardno,jdbcType=VARCHAR}, #{email,jdbcType=VARCHAR},
+      #{phone,jdbcType=VARCHAR}, #{createtime,jdbcType=TIMESTAMP}, #{updatetime,jdbcType=TIMESTAMP},
+      #{pwd,jdbcType=VARCHAR}, #{salt,jdbcType=VARCHAR}, #{pwderrortime,jdbcType=VARCHAR},
       #{status,jdbcType=INTEGER}, #{statusremark,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}
       )
   </insert>
   <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.rolemanager.user.model.UserModel" useGeneratedKeys="true">
     <!--@mbg.generated-->
-    insert into tbale_user
+    insert into table_user
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="avtatar != null">
         avtatar,
@@ -153,7 +153,7 @@
   </insert>
   <update id="updateByPrimaryKeySelective" parameterType="com.rolemanager.user.model.UserModel">
     <!--@mbg.generated-->
-    update tbale_user
+    update table_user
     <set>
       <if test="avtatar != null">
         avtatar = #{avtatar,jdbcType=VARCHAR},
@@ -205,7 +205,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.rolemanager.user.model.UserModel">
     <!--@mbg.generated-->
-    update tbale_user
+    update table_user
     set avtatar = #{avtatar,jdbcType=VARCHAR},
       `name` = #{name,jdbcType=VARCHAR},
       age = #{age,jdbcType=INTEGER},
@@ -225,7 +225,7 @@
   </update>
   <update id="updateBatch" parameterType="java.util.List">
     <!--@mbg.generated-->
-    update tbale_user
+    update table_user
     <trim prefix="set" suffixOverrides=",">
       <trim prefix="avtatar = case" suffix="end,">
         <foreach collection="list" index="index" item="item">
@@ -310,7 +310,7 @@
   </update>
   <update id="updateBatchSelective" parameterType="java.util.List">
     <!--@mbg.generated-->
-    update tbale_user
+    update table_user
     <trim prefix="set" suffixOverrides=",">
       <trim prefix="avtatar = case" suffix="end,">
         <foreach collection="list" index="index" item="item">
@@ -425,17 +425,26 @@
   </update>
   <insert id="batchInsert" keyColumn="id" keyProperty="id" parameterType="map" useGeneratedKeys="true">
     <!--@mbg.generated-->
-    insert into tbale_user
-    (avtatar, `name`, age, nickname, cardno, email, phone, createtime, updatetime, pwd, 
+    insert into table_user
+    (avtatar, `name`, age, nickname, cardno, email, phone, createtime, updatetime, pwd,
       salt, pwderrortime, `status`, statusremark, remark)
     values
     <foreach collection="list" item="item" separator=",">
-      (#{item.avtatar,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, #{item.age,jdbcType=INTEGER}, 
-        #{item.nickname,jdbcType=VARCHAR}, #{item.cardno,jdbcType=VARCHAR}, #{item.email,jdbcType=VARCHAR}, 
-        #{item.phone,jdbcType=VARCHAR}, #{item.createtime,jdbcType=TIMESTAMP}, #{item.updatetime,jdbcType=TIMESTAMP}, 
-        #{item.pwd,jdbcType=VARCHAR}, #{item.salt,jdbcType=VARCHAR}, #{item.pwderrortime,jdbcType=VARCHAR}, 
+      (#{item.avtatar,jdbcType=VARCHAR}, #{item.name,jdbcType=VARCHAR}, #{item.age,jdbcType=INTEGER},
+        #{item.nickname,jdbcType=VARCHAR}, #{item.cardno,jdbcType=VARCHAR}, #{item.email,jdbcType=VARCHAR},
+        #{item.phone,jdbcType=VARCHAR}, #{item.createtime,jdbcType=TIMESTAMP}, #{item.updatetime,jdbcType=TIMESTAMP},
+        #{item.pwd,jdbcType=VARCHAR}, #{item.salt,jdbcType=VARCHAR}, #{item.pwderrortime,jdbcType=VARCHAR},
         #{item.status,jdbcType=INTEGER}, #{item.statusremark,jdbcType=VARCHAR}, #{item.remark,jdbcType=VARCHAR}
         )
     </foreach>
   </insert>
+    <select id="getUsers" resultMap="BaseResultMap">
+      select
+      <include refid="Base_Column_List" />
+      from table_user
+      limit #{index,jdbcType=BIGINT}, #{length,jdbcType=BIGINT}
+    </select>
+  <select id="getUserNum" resultType="long">
+    select count(*) from table_user;
+  </select>
 </mapper>

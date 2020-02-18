@@ -17,6 +17,10 @@ mybatis:
     - classpath:mapper/*Mapper.xml                       # mapper映射文件
 
 spring:
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
   application:
     name: rolemanager-user
   cloud:

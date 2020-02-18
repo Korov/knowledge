@@ -17,17 +17,21 @@
           </el-input>
         </el-col>
         <el-col :span="4">
-          <el-button type="primary" @click="addDialogVisible = true">添加用户</el-button>
+          <el-button type="primary" @click="userDialogVisible = true">添加用户</el-button>
         </el-col>
       </el-row>
       <!-- 用户列表区域 -->
-      <el-table :data="userList" stripe border>
+      <el-table :data="userList" stripe border :height="tableHeight">
         <el-table-column type="index" label="#"></el-table-column>
-        <el-table-column prop="name" label="用户名"></el-table-column>
-        <el-table-column prop="email" label="邮件"></el-table-column>
-        <el-table-column prop="phone" label="电话"></el-table-column>
-        <el-table-column prop="nickname" label="角色"></el-table-column>
-        <el-table-column prop="status" label="状态">
+        <el-table-column prop="name" label="用户名" width="80px"></el-table-column>
+        <el-table-column prop="age" label="年龄" width="60px"></el-table-column>
+        <el-table-column prop="nickname" label="用户昵称" width="80px"></el-table-column>
+        <el-table-column prop="cardno" label="身份证号码" width="150px"></el-table-column>
+        <el-table-column prop="email" label="邮件" width="150px"></el-table-column>
+        <el-table-column prop="phone" label="电话" width="100px"></el-table-column>
+        <el-table-column prop="createtime" label="创建时间" width="220px"></el-table-column>
+        <el-table-column prop="updatetime" label="更新时间" width="220px"></el-table-column>
+        <el-table-column prop="status" label="状态" width="70px">
           <template slot-scope="scope">
             <el-switch v-model="scope.row.status" @change="userStatusChanged(scope.row)"></el-switch>
           </template>
@@ -52,56 +56,38 @@
       </el-pagination>
     </el-card>
     <!-- add user dialog -->
-    <el-dialog title="添加用户" :visible.sync="addDialogVisible" width="50%" @close="addDialogClosed">
+    <el-dialog title="用户信息" :visible.sync="userDialogVisible" width="50%" @close="addDialogClosed">
       <!-- 主体内容 -->
-      <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="70px">
-        <el-form-item label="用户名" prop="userName">
-          <el-input v-model="addForm.userName"></el-input>
+      <el-form :model="userForm" :rules="userFormRules" ref="userFormRef" label-width="95px">
+        <el-form-item label="用户名" prop="name">
+          <el-input v-model="userForm.name"></el-input>
         </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="addForm.password" show-password></el-input>
+        <el-form-item label="年龄" prop="age">
+          <el-input v-model.number="userForm.age"></el-input>
+        </el-form-item>
+        <el-form-item label="昵称" prop="nickname">
+          <el-input v-model="userForm.nickname"></el-input>
+        </el-form-item>
+        <el-form-item label="身份证号码" prop="cardno">
+          <el-input v-model="userForm.cardno"></el-input>
         </el-form-item>
         <el-form-item label="邮件" prop="email">
-          <el-input v-model="addForm.email"></el-input>
+          <el-input v-model="userForm.email"></el-input>
         </el-form-item>
         <el-form-item label="电话" prop="phone">
-          <el-input v-model="addForm.phone"></el-input>
+          <el-input v-model="userForm.phone"></el-input>
         </el-form-item>
-        <el-form-item label="角色" prop="role">
-          <el-input v-model="addForm.role"></el-input>
+        <el-form-item label="密码" prop="pwd">
+          <el-input v-model="userForm.pwd" show-password></el-input>
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-input v-model.number="userForm.status"></el-input>
         </el-form-item>
       </el-form>
       <!-- 底部两个按钮 -->
       <span slot="footer" class="dialog-footer">
-        <el-button @click="addDialogVisible = false">取 消</el-button>
+        <el-button @click="userDialogVisible = false">取 消</el-button>
         <el-button type="primary" @click="addUser">确 定</el-button>
-      </span>
-    </el-dialog>
-
-    <!-- edit user dialog -->
-    <el-dialog title="修改用户" :visible.sync="editDialogVisible" width="50%" @close="editDialogClosed">
-      <!-- 主体内容 -->
-      <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="70px">
-        <el-form-item label="用户名" prop="userName">
-          <el-input v-model="editForm.userName"></el-input>
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="editForm.password" show-password></el-input>
-        </el-form-item>
-        <el-form-item label="邮件" prop="email">
-          <el-input v-model="editForm.email"></el-input>
-        </el-form-item>
-        <el-form-item label="电话" prop="phone">
-          <el-input v-model="editForm.phone"></el-input>
-        </el-form-item>
-        <el-form-item label="角色" prop="role">
-          <el-input v-model="editForm.role"></el-input>
-        </el-form-item>
-      </el-form>
-      <!-- 底部两个按钮 -->
-      <span slot="footer" class="dialog-footer">
-        <el-button @click="editDialogVisible = false">取 消</el-button>
-        <el-button type="primary" @click="editUser">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -114,23 +100,19 @@ export default {
     // 自定义的验证邮箱正则
     var checkEmail = (rule, value, callback) => {
       const regEmail = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
-
       if (regEmail.test(value)) {
         // 校验成功
         return callback()
       }
-
       callback(new Error('请输入合法的邮箱'))
     }
     // 自定义的验证电话正则
     var checkPhone = (rule, value, callback) => {
       const regPhone = /^1(3|4|5|7|8)\d{9}$/
-
       if (regPhone.test(value)) {
         // 校验成功
         return callback()
       }
-
       callback(new Error('请输入合法的电话'))
     }
     return {
@@ -138,37 +120,44 @@ export default {
       queryInfo: {
         query: '',
         pagenum: 1,
-        pagesize: 20
+        pagesize: 10
       },
       userList: [],
       total: 0,
-      addDialogVisible: false,
-      editDialogVisible: false,
+      tableHeight: 580,
+      userDialogVisible: false,
       // 添加的用户
-      addForm: {
-        userName: '',
-        password: '',
-        email: '',
-        phone: '',
-        role: ''
-      },
-      // 修改的用户
-      editForm: {
-        userName: '',
-        password: '',
-        email: '',
-        phone: '',
-        role: ''
+      userForm: {
+        id: '',
+        name: 'user1',
+        age: 20,
+        nickname: 'user1',
+        cardno: '123453246532456434',
+        email: 'demo@demo.com',
+        phone: '13131313131',
+        pwd: 'password',
+        status: 0
       },
       // 用户验证规则
-      addFormRules: {
+      userFormRules: {
         // 验证用户名
-        userName: [
+        name: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
           { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
         ],
+        age: [
+          { type: 'number', required: true, min: 0, max: 100, message: '请输入年龄(1-100)' }
+        ],
+        nickname: [
+          { required: true, message: '请输入昵称', trigger: 'blur' },
+          { min: 5, max: 15, message: '长度在 5 到 15 个字符', trigger: 'blur' }
+        ],
+        cardno: [
+          { required: true, message: '请输入身份证号码', trigger: 'blur' },
+          { min: 18, max: 18, message: '长度为 18 个字符', trigger: 'blur' }
+        ],
         // 验证密码
-        password: [
+        pwd: [
           { required: true, message: '请输入密码', trigger: 'blur' },
           { min: 5, max: 15, message: '长度在 5 到 15 个字符', trigger: 'blur' }
         ],
@@ -182,38 +171,10 @@ export default {
           { required: true, message: '请输入电话', trigger: 'blur' },
           { validator: checkPhone, trigger: 'blur' }
         ],
-        // 验证角色
-        role: [
-          { required: true, message: '请输入角色', trigger: 'blur' },
-          { min: 5, max: 15, message: '长度在 5 到 15 个字符', trigger: 'blur' }
-        ]
-      },
-      // 用户验证规则
-      editFormRules: {
-        // 验证用户名
-        userName: [
-          { required: true, message: '请输入用户名', trigger: 'blur' },
-          { min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur' }
-        ],
-        // 验证密码
-        password: [
-          { required: true, message: '请输入密码', trigger: 'blur' },
-          { min: 5, max: 15, message: '长度在 5 到 15 个字符', trigger: 'blur' }
-        ],
-        // 验证邮箱
-        email: [
-          { required: true, message: '请输入邮箱', trigger: 'blur' },
-          { validator: checkEmail, trigger: 'blur' }
-        ],
         // 验证电话
-        phone: [
-          { required: true, message: '请输入电话', trigger: 'blur' },
-          { validator: checkPhone, trigger: 'blur' }
-        ],
-        // 验证角色
-        role: [
-          { required: true, message: '请输入角色', trigger: 'blur' },
-          { min: 5, max: 15, message: '长度在 5 到 15 个字符', trigger: 'blur' }
+        status: [
+          { required: true, message: '请输入用户状态', trigger: 'blur' },
+          { type: 'number', min: 0, max: 1, message: '0：可用，1：不可用', trigger: ['blur', 'change'] }
         ]
       }
     }
@@ -229,7 +190,7 @@ export default {
       this.userList.forEach(element => {
         element.status = (element.status === 0)
       })
-      this.total = resultVo.data[0].contets.length
+      this.total = resultVo.data[0].total
     },
     // 监听pagesize改变的事件
     handleSizeChange(newSize) {
@@ -248,7 +209,7 @@ export default {
     },
     // 监听对话框关闭事件
     addDialogClosed() {
-      this.$refs.addFormRef.resetFields()
+      this.$refs.userFormRef.resetFields()
     },
     // 监听对话框关闭事件
     editDialogClosed() {
@@ -256,20 +217,22 @@ export default {
     },
     // 添加用户
     addUser() {
-      this.$refs.addFormRef.validate(async valid => {
+      this.$refs.userFormRef.validate(async valid => {
         if (!valid) return
-        console.log('add success')
-        console.log(this.addForm)
-        this.addDialogVisible = false
+        const { data: resultVo } = await this.$http.post('adduser', this.userForm)
+        if (resultVo.code !== 1) return this.$message.error(resultVo.description)
+        this.$message.success('添加用户成功')
+        this.userDialogVisible = false
+        this.getUserList()
       })
     },
     // 显示修改对话框
     showEditDialog(userInfo) {
-      this.editForm.userName = userInfo.name
-      this.editForm.email = userInfo.email
-      this.editForm.phone = userInfo.phone
-      this.editForm.role = userInfo.nickname
-      this.editDialogVisible = true
+      this.userForm.name = userInfo.name
+      this.userForm.email = userInfo.email
+      this.userForm.phone = userInfo.phone
+      this.userForm.nickname = userInfo.nickname
+      this.userDialogVisible = true
       console.log(userInfo)
     },
     // 修改用户信息
@@ -278,7 +241,7 @@ export default {
         if (!valid) return
         console.log('edit success')
         console.log(this.editForm)
-        this.editDialogVisible = false
+        this.userDialogVisible = false
       })
     },
     // 删除用户信息
@@ -292,7 +255,13 @@ export default {
         return this.$message.info('取消了删除')
       }
       // 实际用该调用接口删除
-      console.log('确认了删除胡')
+      const { data: resultVo } = await this.$http.delete('deleteuser', {
+        params: {
+          id: userId
+        }
+      })
+      if (resultVo.code !== 1) return this.$message.error(resultVo.description)
+      this.$message.success('删除用户成功')
       this.getUserList()
     }
   }

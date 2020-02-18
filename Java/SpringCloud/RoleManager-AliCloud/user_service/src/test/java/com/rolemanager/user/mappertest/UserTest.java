@@ -7,6 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 @Slf4j
 public class UserTest extends ApplicationTests {
     @Autowired
@@ -23,5 +25,8 @@ public class UserTest extends ApplicationTests {
             user = userMapper.selectByPrimaryKey(id);
         }
         log.info(user.toString());
+
+        List<UserModel> userModels = userMapper.getUsers(0,30);
+        System.out.println("debug");
     }
 }
