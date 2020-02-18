@@ -1,6 +1,7 @@
 package com.rolemanager.user.controller;
 
 import com.rolemanager.user.constant.Constant;
+import com.rolemanager.user.model.RoleModel;
 import com.rolemanager.user.model.UserModel;
 import com.rolemanager.user.service.UserService;
 import com.rolemanager.user.vo.PageVo;
@@ -36,6 +37,42 @@ public class Users {
         pageVo.setContets(userModels);
         users.add(pageVo);
         resultVo.setData(users);
+
+        List<RoleModel> roles = new ArrayList<>();
+        RoleModel role = new RoleModel();
+        role.setId(1L);
+        role.setRoleCode("001");
+        role.setRoleName("角色1");
+        roles.add(role);
+        role = new RoleModel();
+        role.setId(2L);
+        role.setRoleCode("002");
+        role.setRoleName("角色2");
+        roles.add(role);
+        role = new RoleModel();
+        role.setId(3L);
+        role.setRoleCode("003");
+        role.setRoleName("角色3");
+        roles.add(role);
+
+        List<RoleModel> subRoles = new ArrayList<>();
+        RoleModel subRole = new RoleModel();
+        subRole.setId(11L);
+        subRole.setRoleCode("011");
+        subRole.setRoleName("角色11");
+        subRoles.add(subRole);
+        role.setRoles(subRoles);
+
+        List<RoleModel> subRoles11 = new ArrayList<>();
+        RoleModel subRole11 = new RoleModel();
+        subRole11.setId(111L);
+        subRole11.setRoleCode("0111");
+        subRole11.setRoleName("角色111");
+        subRoles11.add(subRole11);
+        subRole.setRoles(subRoles11);
+
+        userModels.forEach(user -> user.setRoles(roles));
+
         return resultVo;
     }
 

@@ -22,6 +22,29 @@
       </el-row>
       <!-- 用户列表区域 -->
       <el-table :data="userList" stripe border :height="tableHeight">
+        <el-table-column type="expand" label="展开">
+          <template slot-scope="scope">
+            <!-- 一级权限-->
+            <el-row :class="['bdbottom', i1 === 0 ? 'bdtop' : '']" v-for="(role, i1) in scope.row.roles" :key="role.id">
+              <el-col :span="5">
+                <el-tag type="success">{{role.roleName}}</el-tag>
+                <i class="el-icon-caret-right"></i>
+              </el-col>
+              <el-col :span="19">
+                <!-- 二级权限-->
+                <el-row :class="[i2 === 0 ? '' : 'bdtop']" v-for="(subRole, i2) in role.roles" :key="subRole.id">
+                 <el-col :span="6">
+                   <el-tag type="danger">{{subRole.roleName}}</el-tag>
+                   <i class="el-icon-caret-right"></i>
+                 </el-col>
+                  <el-col :span="18">
+                    <el-tag v-for="(subRole1) in subRole.roles" :key="subRole1.id" closable @close="removeRoleById(scope.row, subRole1.id)">{{subRole1.roleName}}</el-tag>
+                  </el-col>
+                </el-row>
+              </el-col>
+            </el-row>
+          </template>
+        </el-table-column>
         <el-table-column type="index" label="#"></el-table-column>
         <el-table-column prop="name" label="用户名" width="80px"></el-table-column>
         <el-table-column prop="age" label="年龄" width="60px"></el-table-column>
@@ -271,11 +294,37 @@ export default {
       if (resultVo.code !== 1) return this.$message.error(resultVo.description)
       this.$message.success('删除用户成功')
       this.getUserList()
+    },
+    // 删除用户权限
+    async removeRoleById(userInfo, roleId) {
+      const confirmResult = await this.$confirm('删除用户权限, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+      if (confirmResult !== 'confirm') {
+        return this.$message.info('取消了删除')
+      }
+      // 实际应该调用借口
+      console.log('删除了用户的权限')
+
+      // 直接赋值防止界面刷新
+      // userInfo.roles = userInfo.roles
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
+.el-tag {
+  margin: 10px;
+}
 
+.bdtop {
+  border-top: 1px solid #eeeeee;
+}
+
+.bdbottom {
+  border-bottom: 1px solid #eeeeee;
+}
 </style>
