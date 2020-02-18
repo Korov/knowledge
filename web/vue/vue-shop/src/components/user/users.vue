@@ -203,9 +203,16 @@ export default {
       this.getUserList()
     },
     // 监听用户状态的改变
-    userStatusChanged(userInfo) {
-      // 待处理
-      console.log(userInfo)
+    async userStatusChanged(userInfo) {
+      var statusValue = userInfo.status === true ? '0' : '1'
+      const { data: resultVo } = await this.$http.post('adduser', {
+        id: userInfo.id,
+        status: statusValue
+      })
+      if (resultVo.code !== 1) return this.$message.error(resultVo.description)
+      this.$message.success('用户状态修改成功')
+      this.userDialogVisible = false
+      this.getUserList()
     },
     // 监听对话框关闭事件
     addDialogClosed() {
@@ -228,12 +235,13 @@ export default {
     },
     // 显示修改对话框
     showEditDialog(userInfo) {
+      this.userForm.id = userInfo.id
+      this.userForm.age = userInfo.age
       this.userForm.name = userInfo.name
       this.userForm.email = userInfo.email
       this.userForm.phone = userInfo.phone
       this.userForm.nickname = userInfo.nickname
       this.userDialogVisible = true
-      console.log(userInfo)
     },
     // 修改用户信息
     editUser() {
