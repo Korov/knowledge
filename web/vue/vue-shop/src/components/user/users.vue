@@ -64,7 +64,7 @@
             <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row)"></el-button>
             <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeUser(scope.row.id)"></el-button>
             <el-tooltip effect="dark" content="修改用户信息" placement="top" :enterable="false">
-              <el-button type="warning" icon="el-icon-setting" size="mini"></el-button>
+              <el-button type="warning" icon="el-icon-setting" size="mini" @click="showRoleDialog(scope.row)"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
@@ -113,6 +113,17 @@
         <el-button type="primary" @click="addUser">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- roles dialog -->
+    <el-dialog title="角色分配" :visible.sync="roleDialogVisible" width="50%" @close="roleDialogClosed">
+      <!-- 主体内容 -->
+      <el-tree :data="rolesTree" :props="roleProps" show-checkbox node-key="id" default-expand-all :default-checked-keys="defKeys"></el-tree>
+      <!-- 底部两个按钮 -->
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="userDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="updateRoles">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -149,6 +160,7 @@ export default {
       total: 0,
       tableHeight: 580,
       userDialogVisible: false,
+      roleDialogVisible: false,
       // 添加的用户
       userForm: {
         id: '',
@@ -161,6 +173,7 @@ export default {
         pwd: 'password',
         status: 0
       },
+      defKeys: [1, 11],
       // 用户验证规则
       userFormRules: {
         // 验证用户名
@@ -199,6 +212,12 @@ export default {
           { required: true, message: '请输入用户状态', trigger: 'blur' },
           { type: 'number', min: 0, max: 1, message: '0：可用，1：不可用', trigger: ['blur', 'change'] }
         ]
+      },
+      // 用户角色信息
+      rolesTree: {},
+      roleProps: {
+        children: 'roles',
+        label: 'roleName'
       }
     }
   },
@@ -265,6 +284,20 @@ export default {
       this.userForm.phone = userInfo.phone
       this.userForm.nickname = userInfo.nickname
       this.userDialogVisible = true
+    },
+    // 显示角色修改对话框
+    showRoleDialog(userInfo) {
+      console.log(userInfo)
+      this.rolesTree = userInfo.roles
+      this.roleDialogVisible = true
+    },
+    // 关闭角色修改对话框
+    roleDialogClosed() {
+      this.roleDialogVisible = false
+    },
+    // 角色修改的确定
+    updateRoles() {
+      this.roleDialogVisible = false
     },
     // 修改用户信息
     editUser() {
