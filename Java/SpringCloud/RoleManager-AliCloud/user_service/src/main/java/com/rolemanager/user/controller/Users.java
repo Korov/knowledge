@@ -6,6 +6,7 @@ import com.rolemanager.user.model.UserModel;
 import com.rolemanager.user.service.UserService;
 import com.rolemanager.user.vo.PageVo;
 import com.rolemanager.user.vo.ResultVo;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +21,7 @@ public class Users {
     @Autowired
     private UserService userService;
 
+    @ApiOperation(value = "获取用户信息", notes = "分页获取用户信息，并且可以传递查询信息")
     @GetMapping(value = "/users")
     public ResultVo getUsers(@PathParam(value = "query") String query,
                              @PathParam(value = "pagenum") String pagenum, @PathParam(value = "pagesize") String pagesize) {
