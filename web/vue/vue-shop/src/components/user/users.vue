@@ -33,12 +33,14 @@
               <el-col :span="19">
                 <!-- 二级权限-->
                 <el-row :class="[i2 === 0 ? '' : 'bdtop']" v-for="(subRole, i2) in role.roles" :key="subRole.id">
-                 <el-col :span="6">
-                   <el-tag type="danger">{{subRole.roleName}}</el-tag>
-                   <i class="el-icon-caret-right"></i>
-                 </el-col>
+                  <el-col :span="6">
+                    <el-tag type="danger">{{subRole.roleName}}</el-tag>
+                    <i class="el-icon-caret-right"></i>
+                  </el-col>
                   <el-col :span="18">
-                    <el-tag v-for="(subRole1) in subRole.roles" :key="subRole1.id" closable @close="removeRoleById(scope.row, subRole1.id)">{{subRole1.roleName}}</el-tag>
+                    <el-tag v-for="(subRole1) in subRole.roles" :key="subRole1.id" closable
+                            @close="removeRoleById(scope.row, subRole1.id)">{{subRole1.roleName}}
+                    </el-tag>
                   </el-col>
                 </el-row>
               </el-col>
@@ -64,18 +66,19 @@
             <el-button type="primary" icon="el-icon-edit" size="mini" @click="showEditDialog(scope.row)"></el-button>
             <el-button type="danger" icon="el-icon-delete" size="mini" @click="removeUser(scope.row.id)"></el-button>
             <el-tooltip effect="dark" content="修改用户信息" placement="top" :enterable="false">
-              <el-button type="warning" icon="el-icon-setting" size="mini" @click="showRoleDialog(scope.row)"></el-button>
+              <el-button type="warning" icon="el-icon-setting" size="mini"
+                         @click="showRoleDialog(scope.row)"></el-button>
             </el-tooltip>
           </template>
         </el-table-column>
       </el-table>
       <!-- 分页区域 -->
       <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange"
-        :current-page="queryInfo.pagenum"
-        :page-sizes="[10, 20, 50, 100]"
-        :page-size="queryInfo.pagesize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total">
+                     :current-page="queryInfo.pagenum"
+                     :page-sizes="[10, 20, 50, 100]"
+                     :page-size="queryInfo.pagesize"
+                     layout="total, sizes, prev, pager, next, jumper"
+                     :total="total">
       </el-pagination>
     </el-card>
     <!-- add user dialog -->
@@ -117,7 +120,8 @@
     <!-- roles dialog -->
     <el-dialog title="角色分配" :visible.sync="roleDialogVisible" width="50%" @close="roleDialogClosed">
       <!-- 主体内容 -->
-      <el-tree :data="rolesTree" :props="roleProps" show-checkbox node-key="id" default-expand-all :default-checked-keys="defKeys"></el-tree>
+      <el-tree :data="rolesTree" :props="roleProps" show-checkbox node-key="id" default-expand-all
+               :default-checked-keys="defKeys"></el-tree>
       <!-- 底部两个按钮 -->
       <span slot="footer" class="dialog-footer">
         <el-button @click="userDialogVisible = false">取 消</el-button>
@@ -186,7 +190,7 @@ export default {
         ],
         nickname: [
           { required: true, message: '请输入昵称', trigger: 'blur' },
-          { min: 5, max: 15, message: '长度在 5 到 15 个字符', trigger: 'blur' }
+          { min: 5, max: 15, message: '长度在 5 到 15 个字x符', trigger: 'blur' }
         ],
         cardno: [
           { required: true, message: '请输入身份证号码', trigger: 'blur' },
@@ -349,15 +353,15 @@ export default {
 </script>
 
 <style lang="less" scoped>
-.el-tag {
-  margin: 10px;
-}
+  .el-tag {
+    margin: 10px;
+  }
 
-.bdtop {
-  border-top: 1px solid #eeeeee;
-}
+  .bdtop {
+    border-top: 1px solid #eeeeee;
+  }
 
-.bdbottom {
-  border-bottom: 1px solid #eeeeee;
-}
+  .bdbottom {
+    border-bottom: 1px solid #eeeeee;
+  }
 </style>
