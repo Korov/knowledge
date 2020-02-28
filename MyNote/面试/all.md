@@ -365,7 +365,7 @@ lambda可以访问外部变量，该变量可以不是final的但是必须是实
 
 把类的静态方法或者实例的静态方法和实例方法整合成lambda表达式传递出去
 
-- `object::instanceMethod`
+- `object::staticMethod`
 - `Class::staticMethod`
 - `Class::instanceMethod`
 
