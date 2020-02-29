@@ -970,3 +970,6 @@ git bash中设置全局变量 `git config --global core.quotepath false`
 git config --global credential.helper store
 ```
 
+## 4.3 .gitkeep
+
+git不会跟踪空文件，如果想要追踪空文件，可以在空文件中添加一个空白的文件`.gitkeep`，此时git就会跟踪此空白文件夹
