@@ -401,3 +401,102 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
 }
 ```
 
+```java
+public class AuthorizationServerConfigurerAdapter implements AuthorizationServerConfigurer {
+    public AuthorizationServerConfigurerAdapter() {}
+    public void configure(AuthorizationServerSecurityConfigurer security) throws Exception {}
+    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {}
+    public void configure(AuthorizationServerEndpointsConfigurer endpoints) throws Exception {}
+}
+```
+
+- ClientDetailsServiceConfigurer：用来配置客户端详情服务（ClientDetailsService），客户端详情信息在这里进行初始化，你能够把客户端详情信息写死在这里或者是通过数据库来存储调取详情信息
+- AuthorizationServerEndpointsConfigurer：用来配置令牌（token）的访问端点和令牌服务（token services）
+- AuthorizationServerSecurityConfigurer：用来配置令牌端点的安全约束
+
+#### 配置客户端详细信息
+
+ClientDetailsServiceConfigurer能够使用内存或者JDBC来实现客户端详情服务（ClientDetailsService），ClientDetailsService负责查找ClientDetails，而ClientDetails有几个重要的属性如下列表：
+
+- clientId：必须的，用来标志客户的id
+- secret：（需要值得信任的客户端）客户端安全码，如果有的话
+- scope：用来限制客户端的访问范围，如果为空（默认）的话，那么客户端拥有全部的访问范围
+- authorizedGrantTypes：此客户端可以使用的授权类型，默认为空
+- authorities：此客户端可以使用的权限（基于Spring Security authorities）
+
+客户端详情能够在应用程序运行的时候进行更新，可以通过访问底层的存储服务或者通过自己实现ClientRegistrationService接口（同时你也可以实现ClientDetailsService接口）来进行管理
+
+暂时使用内存方式存储客户端详情信息，配置如下：
+
+```java
+@Override
+    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
+        clients.inMemory()//使用 in memory存储客户详情
+                .withClient("Client1") // clientId
+                .secret(new BCryptPasswordEncoder().encode("secrett"))//客户端根据id和密钥获取令牌
+                .resourceIds("res1")//可以访问的资源
+                .authorizedGrantTypes("authorization_code","password","client_credentials","implicit","refresh_token")//该client允许的授权类型
+                .scopes("all")//允许的授权范围
+                .autoApprove(false)
+                //加上验证回调地址
+                .redirectUris("http://www.baidu.com");
+    }
+```
+
+#### 管理令牌
+
+AuthorizationServerTokenServices接口定义了一些操作使得你可以对令牌进行一些必要的管理，令牌可以用来加载身份信息，里面包含了这个令牌的相关权限
+
+自己可以创建AuthorizationServerTokenServices这个接口的实现，同时需要继承DefaultTokenServices这个类，里面包含了一些有用的实现，你可以使用他来修改令牌的格式和令牌的存储。默认的，当他尝试创建一个令牌的时候，是使用随机值来进行填充的，除了持久化令牌是委托一个TokenStore接口实现以外，这个类几乎帮你做了所有的事情，并且TokenStore这个接口有一个默认的实现，他就是InMemoryTokenStore，所有的令牌都被保存在内存中，除了使用这个类以外，你还可以使用一些其他的预定义实现，如下：
+
+- InMemoryTokenStore：默认采用此实现，它可以完美的工作在单服务器上（访问并发压力不大的情况下，并且它在失败的时候不会进行备份），大多数的项目都可以使用这个版本的实现来进行尝试
+- JdbcTokenStore：令牌会被保存进关系型数据库
+- JwtTokenStore：它可以把令牌相关的数据进行编码，后端不需要存储它，但是撤销一个已经授权令牌将会非常困难，所以它通常用来处理一个声明周期较短的令牌以及撤销刷新令牌（refresh_token）。
+
+##### 配置TokenConfig
+
+```java
+@Configuration
+public class TokenConfig {
+    // 设置令牌的存储策略
+    @Bean
+    public TokenStore tokenStore() {
+        // 使用内存存储
+        return new InMemoryTokenStore();
+    }
+}
+```
+
+##### 定义AuthorizationServerTokenServices
+
+在AuthorizationServer中定义AuthorizationServerTokenServices
+
+```java
+    @Autowired
+    private TokenStore tokenStore;
+
+    @Autowired
+    private ClientDetailsService clientDetailsService;
+
+    @Bean
+    public AuthorizationServerTokenServices tokenService() {
+        DefaultTokenServices service = new DefaultTokenServices();
+        service.setClientDetailsService(clientDetailsService);
+        service.setSupportRefreshToken(true);
+        service.setTokenStore(tokenStore);
+        service.setAccessTokenValiditySeconds(7200); // 令牌默认有效期2小时
+        service.setRefreshTokenValiditySeconds(259200); // 刷新令牌默认有效期3天
+        return service;
+    }
+```
+
+##### 令牌访问端点配置（AuthorizationServerEndpointsConfigurer）
+
+配置授权类型，AuthorizationServerEndpointsConfigurer通过设定一下属性决定支持的**授权类型（Grant Types）**:
+
+- authenticationManager：认证管理，当你选择了资源所有者密码授权类型的时候，请设置这个属性注入一个AuthenticationManager对象
+- userDetailsService：如果你设置了这个属性的话，你需要自己实现UserDetailsService接口。当你设置了这个之后，那么`refresh_token`即刷新令牌授权类型模式的流程中就会包含一个检查，用来确保这个账号是否仍然有效
+- authorizationCodeServices：设置授权码服务，主要用于`authorization_code`授权码类型模式
+- implicitGrantService：设置隐士授权模式，用来管理隐士授权模式的状态
+- tokengranter：授权将由你完全掌控，并且忽略掉上面设置的几个属性，这个属性一般用作拓展用途，即标准的四种授权模式都满足不了你的需求时，才考虑使用这个。
+
