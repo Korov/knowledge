@@ -440,6 +440,8 @@ From gitee.com:korov/gitee
    c46a7a8..de01109  master     -> origin/master
 # git fetch [remote-name] [branch-name]
 $ git fetch origin master
+# 会想fetch下来的数据与当前分之的数据进行合并，例如当前分之为dev，执行完这两个命令之后会将master分之代码合并到dev中
+$ git merge origin master
 ```
 
 这个命令会访问远程仓库，从中拉取所有你还没有的数据。 执行完成后，你将会拥有那个远程仓库中所有分支的引用，可以随时合并或查看。如果你使用 clone 命令克隆了一个仓库，命令会自动将其添加为远程仓库并默认以 “origin” 为简写。 所
@@ -462,7 +464,6 @@ $ git merge
 ```bash
 #git push [remote-name] [branch-name]
 $ git push origin master
-
 ```
 
 只有当你有所克隆服务器的写入权限，并且之前没有人推送过时，这条命令才能生效。 当你和其他人在同一时间克隆，他们先推送到上游然后你再推送到上游，你的推送就会毫无疑问地被拒绝。 你必须先将他们的工作拉取下来并将其合并进你的工作后才能推送。
@@ -483,7 +484,6 @@ Local branch configured for 'git pull':
 master merges with remote master
 Local ref configured for 'git push':
 master pushes to master (up to date)
-
 ```
 
 #### 2.2.6远程仓库的移除与重命名
@@ -498,7 +498,6 @@ paul
 $ git remote rm paul
 $ git remote
 origin
-
 ```
 
 ### 2.3打标签
