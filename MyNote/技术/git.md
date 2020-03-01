@@ -1,6 +1,4 @@
-# ProGit
-
-## 1.起步
+# 1.起步
 
 git直接记录快照，而非差异比较，git像是把数据看作是对小型文件系统的一组快照。每次你提交更新，或在git中保存项目状态时，它主要对当时的全部文件制作一个快照并保存这个快照的索引。为了高效，如果文件没有修改，git不再重新存储该文件，而是只保留一个链接指向之前存储的文件。git对待数据更像是一个快照流。
 
@@ -8,11 +6,11 @@ git直接记录快照，而非差异比较，git像是把数据看作是对小�
 
 git中所有数据在存储前都计算校验和，然后以检验和来引用。git使用SHA-1来计算校验和。
 
-### 1.1git一般只添加数据
+## 1.1git一般只添加数据
 
 你的操作几乎只往git数据库中增加数据，这保证你很难执行任何不可逆操作。
 
-### 1.2三种状态
+## 1.2三种状态
 
 git有三种状态，你的文件可能处于其中之一：已提交（committed），已修改（modified），已暂存（staged）。已提交表示数据已经安全的保存在本地数据库中。已修改表示修改了文件，但还没有保存到数据库中。已暂存表示对一个已修改文件的当前版本做了标记，使之包含在下次提交的快照中。
 
@@ -31,9 +29,9 @@ Git 仓库目录是 Git 用来保存项目的元数据和对象数据库的地�
 
 如果 Git 目录中保存着特定版本的文件，就属于已提交状态。 如果作了修改并已放入暂存区域，就属于已暂存状态。 如果自上次取出后，作了修改但还没有放到暂存区域，就是已修改状态。 在Git 基础一章，你会进一步了解这些状态的细节，并学会如何根据文件状态实施后续操作，以及怎样跳过暂存直接提交。
 
-### 1.3安装git
+## 1.3安装git
 
-#### 初次运行前的配置
+### 初次运行前的配置
 
 Git 自带一个 git config 的工具来帮助设置控制 Git 外观和行为的配置变量。 这些变量存储在三个不同的位置：
 
@@ -43,7 +41,7 @@ Git 自带一个 git config 的工具来帮助设置控制 Git 外观和行为�
 
 每一个级别覆盖上一级别的配置，所以 .git/config 的配置变量会覆盖 /etc/gitconfig 中的配置变量
 
-#### 用户信息
+### 用户信息
 
 当安装完 Git 应该做的第一件事就是设置你的用户名称与邮件地址。 这样做很重要，因为每一个 Git 的提交都会使用这些信息，并且它会写入到你的每一次提交中，不可更改：
 
@@ -52,7 +50,7 @@ $ git config --global user.name "John Doe"
 $ git config --global user.email johndoe@example.com
 ```
 
-#### 文本编辑器
+### 文本编辑器
 
 Git 会使用操作系统默认的文本编辑器，通常是 Vim。 如果你想使用不同的文本编辑器，例如 Emacs，可以这样做：
 
@@ -60,7 +58,7 @@ Git 会使用操作系统默认的文本编辑器，通常是 Vim。 如果你�
 $ git config --global core.editor emacs
 ```
 
-#### 检查配置信息
+### 检查配置信息
 
 如果想要检查你的配置，可以使用 git config --list 命令来列出所有 Git 当时能找到的配置
 
@@ -82,7 +80,7 @@ $ git config user.name
 John Doe
 ```
 
-#### 获取帮助
+### 获取帮助
 
 ```bash
 $ git help <verb>
@@ -92,13 +90,13 @@ $ man git-<verb>
 $ git help config
 ```
 
-## 2.git基础
+# 2.git基础
 
-### 2.1获取Git仓库
+## 2.1获取Git仓库
 
 两种取得Git项目仓库的方法。在现有项目或目录下导入所有文件到Git中；从一个服务器服务器克隆一个现有的Git仓库。
 
-#### 2.1.1在现有目录中初始化仓库
+### 2.1.1在现有目录中初始化仓库
 
 ```bash
 $ git init
@@ -115,7 +113,7 @@ $ git add LICENSE
 $ git commit -m 'initial project version'
 ```
 
-#### 2.1.2克隆现有的仓库
+### 2.1.2克隆现有的仓库
 
 ```bash
 #git clone [url]
@@ -125,7 +123,7 @@ $ git clone https://github.com/libgit2/libgit2 mylibgit
 
 工作目录下的每一个文件都不外乎两种状态：已跟踪或未跟踪。已跟踪的文件是指那些被纳入了版本控制的文件，在上一次快照中有他们的记录，在工作一段时间后，他们的状态可能处于未修改、已修改或已放入暂存区。工作目录中除已跟踪文件以外的所有其他文件都属于未跟踪文件，他们既不存在于上次快照的记录中，也没有放入暂存区。初次克隆某个仓库的时候，工作目录中的所有文件都属于已跟踪文件，并处于未修改状态。
 
-#### 2.1.3检查当前文件状态
+### 2.1.3检查当前文件状态
 
 ```bash
 #查看哪些文件处于什么状态
@@ -137,7 +135,7 @@ nothing to commit, working directory clean
 
 On branch master显示当前所在的分支为master。nothing to commit, working directory clean说明当前工作目录很干净，没有做过修改。
 
-#### 2.1.4跟踪文件
+### 2.1.4跟踪文件
 
 ```bash
 #把未跟踪的和已修改的文件添加到暂存区域
@@ -176,7 +174,7 @@ M lib/simplegit.rb
 
 新添加的未跟踪文件前面有 ?? 标记，新添加到暂存区中的文件前面有 A 标记，修改过的文件前面有 M 标记。 你可能注意到了 M 有两个可以出现的位置，出现在右边的 M 表示该文件被修改了但是还没放入暂存区，出现在靠左边的 M 表示该文件被修改了并放入了暂存区。 例如，上面的状态报告显示： README 文件在工作区被修改了但是还没有将修改后的文件放入暂存区,lib/simplegit.rb 文件被修改了并将修改后的文件放入了暂存区。 而Rakefile 在工作区被修改并提交到暂存区后又在工作区中被修改了，所以在暂存区和工作区都有该文件被修改了的记录。
 
-#### 2.1.5忽略文件
+### 2.1.5忽略文件
 
 我们可以创建一个名为 .gitignore的文件，列出要忽略的文件模式
 
@@ -204,7 +202,7 @@ $ cat .gitignore
 
 了解更多https://github.com/github/gitignore
 
-#### 2.1.6查看已暂存和未暂存的修改
+### 2.1.6查看已暂存和未暂存的修改
 
 你想知道具体修改了什么地方，可以用 git diff 命令，此命令比较的是工作目录中当前文件和暂存区域快照之间的差异， 也就是修改之后还没有暂存起来的变化内容。
 
@@ -221,7 +219,7 @@ git config --global mergetool.bc4.path "E:\\Install\\Beyond Compare 4\\BComp.exe
 
 ```
 
-#### 2.1.7提交更新
+### 2.1.7提交更新
 
 为确保提交前所有的文件都已经存放到暂存区，需要使用git status查看当前工作目录的所有文件的状态，再使用git commit提交文件
 
@@ -242,7 +240,7 @@ $ git commit -a
 
 这种方式会启动文本编辑器以便输入本次提交的说明。 (默认会启用 shell 的环境变量 $EDITOR 所指定的软件，一般都是 vim 或 emacs。当然也可以按照 起步 介绍的方式，使用 git config --global core.editor 命令设定你喜欢的编辑软件。）
 
-#### 2.1.8移除文件
+### 2.1.8移除文件
 
 git rm之后git commit就可以了
 
@@ -254,7 +252,7 @@ $ git rm --cached README
 
 ```
 
-#### 2.1.9移动文件
+### 2.1.9移动文件
 
 ```bash
 $ git mv file_from file_to
@@ -270,7 +268,7 @@ $ git add README
 
 ```
 
-#### 2.1.10查看提交记录
+### 2.1.10查看提交记录
 
 ```bash
 $ git log
@@ -386,7 +384,7 @@ unborn branch
 
 ```
 
-#### 2.1.11撤销操作
+### 2.1.11撤销操作
 
 有时候我们提交完了才发现漏掉了几个文件没有添加，或者提交信息写错了。 此时，可以运行带有 --amend 选项的提交命令尝试重新提交。这个命令会将暂存区中的文件提交。 如果自上次提交以来你还未做任何修改（例如，在上次提交后马上执行了此命令），那么快照会保持不变，而你所修改的只是提交信息。
 
@@ -398,9 +396,9 @@ git reset HEAD <file>...将暂存区中的文件移除到未暂存的区域
 
 git checkout -- [file]，这是一个危险的命令，你对这个文件做的任何修改都消失，你只是拷贝了另一个来覆盖它。除非你确实清楚不想要那个文件了，否则不要使用这个命令。
 
-### 2.2远程仓库的使用
+## 2.2远程仓库的使用
 
-#### 2.2.1查看远程仓库
+### 2.2.1查看远程仓库
 
 ```bash
 #列出你指定的每一个远程服务器的简写
@@ -415,7 +413,7 @@ origin https://github.com/schacon/ticgit (fetch)
 origin https://github.com/schacon/ticgit (push)
 ```
 
-#### 2.2.2添加远程仓库
+### 2.2.2添加远程仓库
 
 ```bash
 $ git remote add pb https://github.com/paulboone/ticgit
@@ -426,7 +424,7 @@ pb https://github.com/paulboone/ticgit (fetch)
 pb https://github.com/paulboone/ticgit (push)
 ```
 
-#### 2.2.3从远程仓库中抓取与拉取
+### 2.2.3从远程仓库中抓取与拉取
 
 ```bash
 # git fetch [remote-name]
@@ -457,9 +455,7 @@ $ git log -p origin/master
 $ git merge
 ```
 
-
-
-#### 2.2.4推送到远程仓库
+### 2.2.4推送到远程仓库
 
 ```bash
 #git push [remote-name] [branch-name]
@@ -468,7 +464,7 @@ $ git push origin master
 
 只有当你有所克隆服务器的写入权限，并且之前没有人推送过时，这条命令才能生效。 当你和其他人在同一时间克隆，他们先推送到上游然后你再推送到上游，你的推送就会毫无疑问地被拒绝。 你必须先将他们的工作拉取下来并将其合并进你的工作后才能推送。
 
-#### 2.2.5查看远程仓库
+### 2.2.5查看远程仓库
 
 ```bash
 #git remote show [remote-name]
@@ -486,7 +482,7 @@ Local ref configured for 'git push':
 master pushes to master (up to date)
 ```
 
-#### 2.2.6远程仓库的移除与重命名
+### 2.2.6远程仓库的移除与重命名
 
 ```bash
 #重命名
@@ -500,11 +496,11 @@ $ git remote
 origin
 ```
 
-### 2.3打标签
+## 2.3打标签
 
 git可以给历史中的某一个提交打上标签，以示重要。比较有代表性的是人们会使用这个功能来标记发布节点（v1.0等）。
 
-#### 2.3.1列出标签
+### 2.3.1列出标签
 
 ```bash
 $ git tag
@@ -526,7 +522,7 @@ v1.8.5.5
 
 ```
 
-#### 2.3.2创建标签
+### 2.3.2创建标签
 
 Git 使用两种主要类型的标签：轻量标签（lightweight）与附注标签（annotated）。
 
@@ -578,7 +574,7 @@ $ git tag -a v1.2 9fceb02
 
 ```
 
-#### 2.3.3共享标签
+### 2.3.3共享标签
 
 git push 命令并不会传送标签到远程仓库服务器上。 在创建完标签后你必须显式地推送标签到共享服务器上。 这个过程就像共享远程分支一样 - 你可以运行 git push origin [tagname]。
 
@@ -591,7 +587,7 @@ $ git push origin --tags
 
 现在，当其他人从仓库中克隆或拉取，他们也能得到你的那些标签
 
-#### 2.3.4删除标签
+### 2.3.4删除标签
 
 ```bash
 #git tag -d <tagname>
@@ -601,7 +597,7 @@ $ git push origin :refs/tags/v1.4-lw
 
 ```
 
-#### 2.3.5检出标签
+### 2.3.5检出标签
 
 如果你想查看某个标签所指向的文件版本，可以使用 git checkout 命令，虽然说这会使你的仓库处于“分离头指针（detacthed HEAD）”状态——这个状态有些不好的副作用：
 
@@ -632,7 +628,7 @@ Switched to a new branch 'version2'
 
 当然，如果在这之后又进行了一次提交，version2 分支会因为这个改动向前移动，version2 分支就会和v2.0.0 标签稍微有些不同，这时就应该当心了。
 
-### 2.4Git别名
+## 2.4Git别名
 
 可以通过 git config 文件来轻松地为每一个命令设置一个别名。 这里有一些例子你可以试试：
 
@@ -646,9 +642,9 @@ $ git config --global alias.st status
 
 这意味着，当要输入 git commit 时，只需要输入 git ci。
 
-## 3.Git分支
+# 3.Git分支
 
-### 3.1分支简介
+## 3.1分支简介
 
 在进行提交操作时，Git 会保存一个提交对象（commit object）。知道了 Git 保存数据的方式，我们可以很自然的想到——该提交对象会包含一个指向暂存内容快照的指针。 但不仅仅是这样，该提交对象还包含了作者的姓名和邮箱、提交时输入的信息以及指向它的父对象的指针。首次提交产生的提交对象没有父对象，普通提交操作产生的提交对象有一个父对象，而由多个分支合并产生的提交对象有多个父对象，
 
@@ -674,9 +670,7 @@ korov@korov-PC:~/git/github/seata$ git branch --all
   remotes/origin/multi-primar
 ```
 
-
-
-### 3.2分支创建
+## 3.2分支创建
 
 ```bash
 $ git branch testing
@@ -694,7 +688,7 @@ $ git log --oneline --decorate
 
 ```
 
-### 3.3分支切换
+## 3.3分支切换
 
 ```bash
 $ git checkout testing
@@ -702,9 +696,9 @@ $ git checkout testing
 $ git push --set-upstream origin testing
 ```
 
-### 3.4分支的新建与合并
+## 3.4分支的新建与合并
 
-#### 3.4.1新建分支
+### 3.4.1新建分支
 
 ```bash
 #创建iss53分支并切换到该分支上
@@ -747,7 +741,7 @@ $ git branch -d hotfix
 
 ![1569954330384](picture\1569954330384.png)
 
-#### 3.4.2遇到冲突时的分支合并
+### 3.4.2遇到冲突时的分支合并
 
 ```bash
 #使用git status查看哪些文件冲突了
@@ -781,7 +775,7 @@ please contact us at email.support@github.com
 
 --merged 与 --no-merged 这两个有用的选项可以过滤这个列表中已经合并或尚未合并到当前分支的分支。如果要查看哪些分支已经合并到当前分支
 
-### 3.5远程分支
+## 3.5远程分支
 
 远程引用是对远程仓库的引用（指针），包括分支、标签等等。 你可以通过 git ls-remote (remote) 来显式地获得远程引用的完整列表，或者通过 git remote show (remote) 获得远程分支的更多信息。 然而，一个更常见的做法是利用远程跟踪分支。
 
@@ -798,7 +792,7 @@ please contact us at email.support@github.com
 
 现在，可以运行 git fetch teamone 来抓取远程仓库 teamone 有而本地没有的数据。 因为那台服务器上现有的数据是 origin 服务器上的一个子集，所以 Git 并不会抓取数据而是会设置远程跟踪分支teamone/master 指向 teamone 的 master 分支。
 
-#### 3.5.1推送
+### 3.5.1推送
 
 如果希望和别人一起在名为 serverfix 的分支上工作，你可以像推送第一个分支那样推送它。 运行 git push (remote) (branch):
 
@@ -824,7 +818,7 @@ Branch serverfix set up to track remote branch serverfix from origin.
 Switched to a new branch 'serverfix'
 ```
 
-#### 3.5.2跟踪分支
+### 3.5.2跟踪分支
 
 从一个远程跟踪分支检出一个本地分支会自动创建所谓的 “跟踪分支””。 跟踪分支是与远程分支有直接关系的本地分支。 如果在一个跟踪分支上输入 git pull，Git 自动地识别去哪个服务器上抓取、合并到那个分支
 
@@ -861,13 +855,13 @@ testing 5ea463a trying something new
 #这里可以看到 iss53 分支正在跟踪 origin/iss53 并且 “ahead” 是 2，意味着本地有两个提交还没有推送到服务器上。 也能看到 master 分支正在跟踪 origin/master 分支并且是最新的。 接下来可以看到serverfix 分支正在跟踪 teamone 服务器上的 server-fix-good 分支并且领先 3 落后1，意味着服务器上有一次提交还没有合并入同时本地有三次提交还没有推送。 最后看到 testing 分支并没有跟踪任何远程分支。
 ```
 
-#### 3.5.3拉取
+### 3.5.3拉取
 
 git fetch命令从服务器上抓取本地没有的数据时，它并不会修改工作目录中的内容。它只会获取数据然后让你自己合并。git pull在大多数情况下的含义是一个git fetch紧接着一个git merge命令。git pull会查找当前分支所跟踪的服务器与分支，从服务器上抓取数据然后尝试合并入那个远程分支。
 
 由于git pull的魔法经常令人困惑所以通常单独显示的使用fetch与merge命令更好一些。
 
-#### 3.5.4删除远程分支
+### 3.5.4删除远程分支
 
 ```bash
 #从服务器上删除serverfix分支
@@ -880,11 +874,11 @@ $ git branch -d serverfix
 
 基本上这个命令做的只是从服务器上移除这个指针。 Git 服务器通常会保留数据一段时间直到垃圾回收运行，所以如果不小心删除掉了，通常是很容易恢复的。
 
-### 3.6变基
+## 3.6变基
 
 git中整合来自不同分支的修改主要有两种方法：merge和rebase。
 
-#### 3.6.1变基的基本操作
+### 3.6.1变基的基本操作
 
 之前介绍过，整合分支最容易的方法是 merge 命令。 它会把两个分支的最新快照（C3 和 C4）以及二者最近的共同祖先（C2）进行三方合并，合并的结果是生成一个新的快照（并提交）。
 
@@ -911,7 +905,7 @@ $ git merge experiment
 
 merge与rebase两种整合方法的最终结果没有任何区别，但是变基使得提交历史更加整洁。无论是通过变基，还是通过三方合并，整合的最终结果所指向的快照始终是一样的，只不过提交历史不同罢了。变基是将一系列提交按照原有次序依次应用到另一分支上，而合并时把最终结果合在一起。
 
-#### 3.6.2更有趣的变基例子
+### 3.6.2更有趣的变基例子
 
 ![1570000224155](picture\1570000224155.png)
 
@@ -932,13 +926,13 @@ $ git merge client
 $ git rebase master server
 ```
 
-#### 3.6.3变基的风险
+### 3.6.3变基的风险
 
 使用变基必须遵守一条准则：**不要对在你的仓库外有副本的分支执行变基**
 
 变基操作实质是丢弃一些现有的提交，然后相应的新建一些内容一样但实际上不同的提交。如果你已经将提交推送至某个仓库，而其他人已经从该仓库拉取提交并进行了后续工作，此时，如果你用git rebase命令重新整理了提交并再次推送，你的同伴因此将不得不再次将他们手头的工作与你的提交进行整合，如果接下来还要拉取并整合他们修改过的提交，事情就会变得一团糟。
 
-#### 3.6.4用变基解决变基
+### 3.6.4用变基解决变基
 
 如果遇到前面提到的 有人推送了经过变基的提交，并丢弃了你的本地开发所基于的一些提交 那种情境，如果我们不是执行合并，而是执行 git rebase teamone/master, Git 将会：
 
@@ -949,21 +943,21 @@ $ git rebase master server
 
 在本例中另一种简单的方法是使用 git pull --rebase 命令而不是直接 git pull。 又或者你可以自己手动完成这个过程，先 git fetch，再 git rebase teamone/master。
 
-#### 3.6.5变基vs合并
+### 3.6.5变基vs合并
 
 总的原则是，只对尚未推送或分享给别人的本地修改执行变基操作清理历史，从不对已推送至别处的提交执行变基操作，这样，你才能享受到两种方式带来的便利。
 
 
 
-## 4.问题处理
+# 4.问题处理
 
-### 4.1 git bash中文被转义
+## 4.1 git bash中文被转义
 
 在git bash界面右击Options...->Text 将Locale设置为zh_CN，将Character set设置为UTF-8。
 
 git bash中设置全局变量 `git config --global core.quotepath false` 
 
-### 4.2 git记住用户名和密码
+## 4.2 git记住用户名和密码
 
 ```bash
 git config --global credential.helper store
@@ -972,3 +966,55 @@ git config --global credential.helper store
 ## 4.3 .gitkeep
 
 git不会跟踪空文件，如果想要追踪空文件，可以在空文件中添加一个空白的文件`.gitkeep`，此时git就会跟踪此空白文件夹
+
+## 4.4 git stash
+
+作用将目前还不想提交但是已经修改的内容保存至堆栈中，之后可以在某个分支上恢复堆栈中的内容。git stash作用的范围包括工作区和暂存区中的内容，也就是说没有commit的内容都会保存到堆栈中。
+
+> 本应该在dev分之开发的内容，你却在master分之开发了，此时可以使用git stash将修改内容保存到堆栈中，然后到dev分支上恢复开发。
+
+```bash
+#使用git stash之后所有的修改将会保存到堆栈中，所有文件会恢复到修改之前的状态，save时可以添加备注
+git stash save 'dev stash test'
+#save已经不推荐使用，推荐使用push，可以指定stash哪些文件，--keep-index(-k)只会存储被git追踪的文件,--include-untracked(-u)未被git追踪的也会被存储起来，--all所有文件包括忽略的文件也会被存储起来
+git stash push [<filename>] -u -m 'dev stash test'
+#查看暂存的文件
+git stash list
+#恢复暂存的文件并删除堆栈中的暂存文件，使用的是堆的方式，即后进先出。
+git stash pop
+#恢复暂存文件单不删除堆栈中的暂存文件，恢复方式后进先出
+git stash apply
+#不想要后进先出的方式
+git stash ( pop | apply ) --index 1
+#删除堆栈中制定stash
+git stash drop 1
+#清空堆栈
+git stash clear
+#创建一个新的分支dev0，并将stash0 apply用于devo，相当于两个命令，git switch -c dev0, git stash apply 0,使用的时候需要注意解决冲突
+git stash branch dev0 0
+#查看stash与当前分之差异，此处的选项与git diff中的选项相同，可以用 -p 显示所有修改
+git stash show [<选项>] [<stash>]
+```
+
+
+
+## 4.5 git switch和git restore
+
+这两个命令是新版本增加的，用于解耦git checkout的功能。
+
+### 4.5.1 git switch
+
+`git checkout <branch>`,`git switch <branch>`都是用来切换分支，推荐使用switch来创建和切换分支。
+
+```bash
+#创建并切换到新的分支
+git switch -c dev
+#切换到已有分之
+git switch master
+```
+
+### 4.5.1 git restore
+
+`git checkout <filename>`,`git restore <filename>`功能相同，用来恢复文件，推荐使用restore。
+
+`git reset <filename>`,`git restore --staged <filename>`功能相同，将暂存区文件移除到工作区，推荐使用restore。
