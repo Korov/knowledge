@@ -11,6 +11,7 @@
     <modules>
         <module>user_service</module>
         <module>gateway</module>
+        <module>oauth</module>
     </modules>
 
     <properties>
@@ -95,9 +96,13 @@
                 <version>1.2.62</version>
             </dependency>
             <dependency>
-                <groupId>io.jsonwebtoken</groupId>
-                <artifactId>jjwt</artifactId>
-                <version>0.9.1</version>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-jwt</artifactId>
+                <version>1.1.0.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.security.oauth.boot</groupId>
+                <artifactId>spring-security-oauth2-autoconfigure</artifactId>
             </dependency>
             <dependency>
                 <groupId>com.alibaba.csp</groupId>
@@ -126,13 +131,11 @@
                 <artifactId>dom4j</artifactId>
                 <version>2.1.1</version>
             </dependency>
-
             <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
                 <version>1.25</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 

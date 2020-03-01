@@ -8,6 +8,8 @@ import com.rolemanager.user.vo.PageVo;
 import com.rolemanager.user.vo.ResultVo;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
@@ -20,6 +22,10 @@ public class Users {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    @Qualifier(value = "bCryptPasswordEncoder")
+    private PasswordEncoder passwordEncoder;
 
     @ApiOperation(value = "获取用户信息", notes = "分页获取用户信息，并且可以传递查询信息")
     @GetMapping(value = "/users")
@@ -80,6 +86,8 @@ public class Users {
 
     @PostMapping(value = "/adduser")
     public ResultVo addUser(@RequestBody UserModel userModel) {
+        String password = userModel.getPwd();
+        userModel.setPwd(passwordEncoder.encode(password));
         if (userModel.getId() == null) {
             userModel.setCreatetime(new Date());
             userModel.setUpdatetime(new Date());

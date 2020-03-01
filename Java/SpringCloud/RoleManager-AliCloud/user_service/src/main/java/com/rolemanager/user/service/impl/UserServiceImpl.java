@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<UserModel> getUsers(long pagenum, long pagesize) {
-        long index = (pagenum -1) * pagesize;
+        long index = (pagenum - 1) * pagesize;
         long length = pagesize;
         return userMapper.getUsers(index, length);
     }
@@ -65,5 +65,15 @@ public class UserServiceImpl implements UserService {
     @Override
     public long getUserNum() {
         return userMapper.getUserNum();
+    }
+
+    @Override
+    public UserModel getUserById(long userId) {
+        return userMapper.getUserById(userId);
+    }
+
+    @Override
+    public UserModel getUserByName(String userName) {
+        return userMapper.getUserByName(userName);
     }
 }

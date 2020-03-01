@@ -23,4 +23,8 @@ public interface UserService {
     List<UserModel> getUsers(@Param("index") long index, @Param("length") long length);
 
     long getUserNum();
+
+    UserModel getUserById(long userId);
+
+    UserModel getUserByName(String userName);
 }

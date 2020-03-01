@@ -1,0 +1,28 @@
+server:
+  port: 8101
+
+logging:
+  config: classpath:logback.xml
+  level:
+    root: INFO
+    org.springframework.web.servlet.DispatcherServlet: DEBUG
+
+mybatis:
+  type-aliases-package: com.rolemanager.oauth.model    # 所有Entity别名类所在包
+  mapper-locations:
+    - classpath:mapper/*Mapper.xml                       # mapper映射文件
+
+spring:
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+  application:
+    name: rolemanager-oauth
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+      config:
+        server-addr: localhost:8848
+        file-extension: yaml
