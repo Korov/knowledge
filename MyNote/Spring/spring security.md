@@ -500,3 +500,56 @@ public class TokenConfig {
 - implicitGrantService：设置隐士授权模式，用来管理隐士授权模式的状态
 - tokengranter：授权将由你完全掌控，并且忽略掉上面设置的几个属性，这个属性一般用作拓展用途，即标准的四种授权模式都满足不了你的需求时，才考虑使用这个。
 
+##### 配置授权端点的URL
+
+AuthorizationServerEndpointsConfigurer中有一个pathMapping()的方法用来配置端点URL，有两个参数：
+
+- 第一个参数：String类型，这个端点的默认链接
+- 第二个参数：String类型，你要进行替代的URL链接
+
+以下为常见的默认URL，可以作为pathMapping()的第一个参数：
+
+- /oauth/authorize:授权端点
+- /oauth/token:令牌端点
+- /oauth/confirm_access:用户确认授权提交端点
+- /oauth/error:授权服务错误信息端点
+- /oauth/check_token:用于资源服务访问的令牌解析端点
+- /oauth/token_key:提供公有秘钥的端点，如果你使用JWT令牌的话
+
+在AuthorizationServer中配置令牌访问端点
+
+```java
+    @Autowired
+    private AuthorizationCodeServices authorizationCodeServices;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
+
+    @Override
+    public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
+        endpoints
+                .authenticationManager(authenticationManager)
+                .authorizationCodeServices(authorizationCodeServices)
+                .tokenServices(tokenService())
+                .allowedTokenEndpointRequestMethods(HttpMethod.POST);
+    }
+```
+
+配置令牌访问端点安全策略
+
+```java
+public void configure (AuthorizationServerSecurityConfigurer security) {
+    security
+        .tokenKeyAccess("permitAll()")
+        .checkTokenAccess("permitAll()")
+        .allowFormAuthenticationForClients();//允许通过表单来申请令牌
+}
+```
+
+#### oauth配置总结
+
+既然要完成认证，它首先得知道客户端信息从哪儿读取，因此要进行客户端详情配置。
+
+既然要颁发token，那必须得定义token的相关endpoint，以及token如何存取，以及客户端支持那些类型的token。
+
+既然暴露除了一些Endpoint，那对这些写Endpoint可以定义一些安全上的约束等。
