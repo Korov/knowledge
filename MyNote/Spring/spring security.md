@@ -392,6 +392,8 @@ oauth Model和user Model的依赖（版本已经在父工程中声明，此处�
 
 ## oauth配置
 
+### 授权服务器配置@EnableAuthorizationServer
+
 添加Server类
 
 ```java
@@ -414,7 +416,7 @@ public class AuthorizationServerConfigurerAdapter implements AuthorizationServer
 - AuthorizationServerEndpointsConfigurer：用来配置令牌（token）的访问端点和令牌服务（token services）
 - AuthorizationServerSecurityConfigurer：用来配置令牌端点的安全约束
 
-#### 配置客户端详细信息
+### 配置客户端详细信息
 
 ClientDetailsServiceConfigurer能够使用内存或者JDBC来实现客户端详情服务（ClientDetailsService），ClientDetailsService负责查找ClientDetails，而ClientDetails有几个重要的属性如下列表：
 
@@ -433,7 +435,7 @@ ClientDetailsServiceConfigurer能够使用内存或者JDBC来实现客户端详�
     public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
         clients.inMemory()//使用 in memory存储客户详情
                 .withClient("Client1") // clientId
-                .secret(new BCryptPasswordEncoder().encode("secrett"))//客户端根据id和密钥获取令牌
+                .secret(new BCryptPasswordEncoder().encode("secret"))//客户端根据id和密钥获取令牌
                 .resourceIds("res1")//可以访问的资源
                 .authorizedGrantTypes("authorization_code","password","client_credentials","implicit","refresh_token")//该client允许的授权类型
                 .scopes("all")//允许的授权范围
@@ -443,7 +445,7 @@ ClientDetailsServiceConfigurer能够使用内存或者JDBC来实现客户端详�
     }
 ```
 
-#### 管理令牌
+### 管理令牌
 
 AuthorizationServerTokenServices接口定义了一些操作使得你可以对令牌进行一些必要的管理，令牌可以用来加载身份信息，里面包含了这个令牌的相关权限
 
@@ -453,7 +455,7 @@ AuthorizationServerTokenServices接口定义了一些操作使得你可以对令
 - JdbcTokenStore：令牌会被保存进关系型数据库
 - JwtTokenStore：它可以把令牌相关的数据进行编码，后端不需要存储它，但是撤销一个已经授权令牌将会非常困难，所以它通常用来处理一个声明周期较短的令牌以及撤销刷新令牌（refresh_token）。
 
-##### 配置TokenConfig
+### 配置TokenConfig
 
 ```java
 @Configuration
@@ -467,7 +469,7 @@ public class TokenConfig {
 }
 ```
 
-##### 定义AuthorizationServerTokenServices
+#### 定义AuthorizationServerTokenServices
 
 在AuthorizationServer中定义AuthorizationServerTokenServices
 
@@ -490,7 +492,7 @@ public class TokenConfig {
     }
 ```
 
-##### 令牌访问端点配置（AuthorizationServerEndpointsConfigurer）
+#### 令牌访问端点配置（AuthorizationServerEndpointsConfigurer）
 
 配置授权类型，AuthorizationServerEndpointsConfigurer通过设定一下属性决定支持的**授权类型（Grant Types）**:
 
@@ -500,7 +502,7 @@ public class TokenConfig {
 - implicitGrantService：设置隐士授权模式，用来管理隐士授权模式的状态
 - tokengranter：授权将由你完全掌控，并且忽略掉上面设置的几个属性，这个属性一般用作拓展用途，即标准的四种授权模式都满足不了你的需求时，才考虑使用这个。
 
-##### 配置授权端点的URL
+#### 配置授权端点的URL
 
 AuthorizationServerEndpointsConfigurer中有一个pathMapping()的方法用来配置端点URL，有两个参数：
 
@@ -546,9 +548,9 @@ public void configure (AuthorizationServerSecurityConfigurer security) {
 }
 ```
 
-#### oauth配置总结
+### oauth配置总结
 
-既然要完成认证，它首先得知道客户端信息从哪儿读取，因此要进行客户端详情配置。
+首先要对申请令牌的客户端进行认证，查看客户端是否有效，既然要完成认证，它首先得知道客户端信息从哪儿读取，因此要进行客户端详情配置。
 
 既然要颁发token，那必须得定义token的相关endpoint，以及token如何存取，以及客户端支持那些类型的token。
 
