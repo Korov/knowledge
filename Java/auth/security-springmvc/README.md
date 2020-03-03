@@ -1,6 +1,6 @@
 # 项目介绍
 
-使用SpringMVC和Servlet3.0实现session认证
+使用SpringMVC和Servlet3.0实现session认证，没有使用spring security，但是spring security的大致原理是基于此种模式
 
 # 搭建项目
 
