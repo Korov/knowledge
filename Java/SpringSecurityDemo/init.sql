@@ -1,60 +1,94 @@
-drop database if exists `user_db`;
-create database `user_db`;
+DROP DATABASE IF EXISTS `user_db`;
+CREATE DATABASE `user_db` CHARACTER SET 'utf8' COLLATE 'utf8_general_ci';
+
 use `user_db`;
 
-drop table if exists `t_user`;
-create table `t_user`
+DROP TABLE IF EXISTS `t_user`;
+CREATE TABLE `t_user`
 (
-    id       varchar(128),
-    username varchar(128),
-    password varchar(128),
-    fullname varchar(128),
-    mobile   varchar(128)
-)ENGINE = InnoDB AUTO_INCREMENT = 0 DEFAULT CHARSET = utf8;
+    `id`       bigint(20)   NOT NULL COMMENT '用户id',
+    `username` varchar(64)  NOT NULL,
+    `password` varchar(64)  NOT NULL,
+    `fullname` varchar(255) NOT NULL COMMENT '用户姓名',
+    `mobile`   varchar(11) DEFAULT NULL COMMENT '手机号',
+    PRIMARY KEY (`id`) USING BTREE
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8
+  ROW_FORMAT = DYNAMIC;
 
-drop table if exists `t_permission`;
-create table `t_permission`
-(
-    id       varchar(128),
-    code varchar(128),
-    description varchar(128),
-    url varchar(128)
-)ENGINE = InnoDB AUTO_INCREMENT = 0 DEFAULT CHARSET = utf8;
+INSERT INTO t_user (id, username, password, fullname, mobile)
+VALUES ('1', 'zhangsan', '$2a$10$1oJq1Omjpzxe7F5T0G0EvucGGegckK24kGfi1hP87piQMeypEybkK', 'zhangsan', '12345534');
 
-drop table if exists `t_role_permission`;
-create table `t_role_permission`
-(
-    role_id       varchar(128),
-    permission_id varchar(128)
-)ENGINE = InnoDB AUTO_INCREMENT = 0 DEFAULT CHARSET = utf8;
 
-drop table if exists `t_user_role`;
-create table `t_user_role`
+DROP TABLE IF EXISTS `t_role`;
+CREATE TABLE `t_role`
 (
-    role_id       varchar(128),
-    user_id varchar(128)
-)ENGINE = InnoDB AUTO_INCREMENT = 0 DEFAULT CHARSET = utf8;
+    `id`          varchar(32) NOT NULL,
+    `role_name`   varchar(255) DEFAULT NULL,
+    `description` varchar(255) DEFAULT NULL,
+    `create_time` datetime     DEFAULT NULL,
+    `update_time` datetime     DEFAULT NULL,
+    `status`      char(1)     NOT NULL,
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `unique_role_name` (`role_name`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8;
+insert into `t_role`(`id`, `role_name`, `description`, `create_time`, `update_time`, `status`)
+values ('1', '管理员', NULL, NULL, NULL, '');
+
+DROP TABLE IF EXISTS `t_user_role`;
+CREATE TABLE `t_user_role`
+(
+    `user_id`     varchar(32) NOT NULL,
+    `role_id`     varchar(32) NOT NULL,
+    `create_time` datetime     DEFAULT NULL,
+    `creator`     varchar(255) DEFAULT NULL,
+    PRIMARY KEY (`user_id`, `role_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8;
+insert into `t_user_role`(`user_id`, `role_id`, `create_time`, `creator`)
+values ('1', '1', NULL, NULL);
+
+DROP TABLE IF EXISTS `t_permission`;
+CREATE TABLE `t_permission`
+(
+    `id`          varchar(32) NOT NULL,
+    `code`        varchar(32) NOT NULL COMMENT '权限标识符',
+    `description` varchar(64)  DEFAULT NULL COMMENT '描述',
+    `url`         varchar(128) DEFAULT NULL COMMENT '请求地址',
+    PRIMARY KEY (`id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8;
+insert into `t_permission`(`id`, `code`, `description`, `url`)
+values ('1', 'p1', '测试资源1', '/r/r1'),
+       ('2', 'p3', '测试资源2', '/r/r2');
+
+DROP TABLE IF EXISTS `t_role_permission`;
+CREATE TABLE `t_role_permission`
+(
+    `role_id`       varchar(32) NOT NULL,
+    `permission_id` varchar(32) NOT NULL,
+    PRIMARY KEY (`role_id`, `permission_id`)
+) ENGINE = InnoDB
+  DEFAULT CHARSET = utf8;
+insert into `t_role_permission`(`role_id`, `permission_id`)
+values ('1', '1'),
+       ('1', '2');
 
 DROP TABLE IF EXISTS `oauth_client_details`;
 CREATE TABLE `oauth_client_details`
 (
-    `client_id`               varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '客户端标
-识',
-    `resource_ids`            varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL     DEFAULT NULL
-        COMMENT '接入资源列表',
-    `client_secret`           varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL     DEFAULT NULL
-        COMMENT '客户端秘钥',
+    `client_id`               varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL COMMENT '客户端标识',
+    `resource_ids`            varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL     DEFAULT NULL COMMENT '接入资源列表',
+    `client_secret`           varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL     DEFAULT NULL COMMENT '客户端秘钥',
     `scope`                   varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL     DEFAULT NULL,
-    `authorized_grant_types`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL     DEFAULT
-                                                                                                   NULL,
-    `web_server_redirect_uri` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL     DEFAULT
-                                                                                                   NULL,
+    `authorized_grant_types`  varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL     DEFAULT NULL,
+    `web_server_redirect_uri` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL     DEFAULT NULL,
     `authorities`             varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL     DEFAULT NULL,
     `access_token_validity`   int(11)                                                 NULL     DEFAULT NULL,
     `refresh_token_validity`  int(11)                                                 NULL     DEFAULT NULL,
     `additional_information`  longtext CHARACTER SET utf8 COLLATE utf8_general_ci     NULL,
-    `create_time`             timestamp(0)                                            NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE
-        CURRENT_TIMESTAMP(0),
+    `create_time`             timestamp(0)                                            NOT NULL DEFAULT CURRENT_TIMESTAMP(0) ON UPDATE CURRENT_TIMESTAMP(0),
     `archived`                tinyint(4)                                              NULL     DEFAULT NULL,
     `trusted`                 tinyint(4)                                              NULL     DEFAULT NULL,
     `autoapprove`             varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL     DEFAULT NULL,
@@ -65,19 +99,23 @@ CREATE TABLE `oauth_client_details`
   ROW_FORMAT = Dynamic;
 INSERT INTO `oauth_client_details`
 VALUES ('c1', 'res1',
-        '$2a$10$NlBC84MVb7F95EXYTXwLneXgCca6/GipyWR5NHm8K0203bSQMLpvm', 'ROLE_ADMIN,ROLE_USER,ROLE_API',
+        '$2a$10$Csc2DEvx7IiCbHoM1vAvLusYoHofpSaV20zw71T6sqYPIhVwOLuca', 'ROLE_ADMIN,ROLE_USER,ROLE_API',
         'client_credentials,password,authorization_code,implicit,refresh_token', 'http://www.baidu.com',
         NULL, 7200, 259200, NULL, '2020-03-03 21:43:30', 0, 0, 'false');
 INSERT INTO `oauth_client_details`
 VALUES ('c2', 'res2',
-        '$2a$10$NlBC84MVb7F95EXYTXwLneXgCca6/GipyWR5NHm8K0203bSQMLpvm', 'ROLE_API',
+        '$2a$10$Csc2DEvx7IiCbHoM1vAvLusYoHofpSaV20zw71T6sqYPIhVwOLuca', 'ROLE_API',
         'client_credentials,password,authorization_code,implicit,refresh_token', 'http://www.baidu.com',
         NULL, 31536000, 2592000, NULL, '2020-03-03 21:43:30', 0, 0, 'false');
 
-INSERT INTO t_permission (id, code, description, url) VALUES ('1', 'p1', 'p1', 'p1');
-
-INSERT INTO t_role_permission (role_id, permission_id) VALUES ('1', '1');
-
-INSERT INTO t_user (id, username, password, fullname, mobile) VALUES ('1', 'zhangsan', '$2a$10$1oJq1Omjpzxe7F5T0G0EvucGGegckK24kGfi1hP87piQMeypEybkK', 'zhangsan', '12345534');
-
-INSERT INTO t_user_role (role_id, user_id) VALUES ('1', '1');
+DROP TABLE IF EXISTS `oauth_code`;
+CREATE TABLE `oauth_code`
+(
+    `create_time`    timestamp(0)                                            NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `code`           varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NULL     DEFAULT NULL,
+    `authentication` blob                                                    NULL,
+    INDEX `code_index` (`code`) USING BTREE
+) ENGINE = InnoDB
+  CHARACTER SET = utf8
+  COLLATE = utf8_general_ci
+  ROW_FORMAT = Compact;
