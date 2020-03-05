@@ -90,3 +90,4 @@ public class SpringDataUserDetailsService implements UserDetailsService {
 
 # 添加Controller
 
+用户登录成功之后用户的信息存储在`SecurityContextHolder`中，可以获取用户的用户名，密码，权限等信息。
