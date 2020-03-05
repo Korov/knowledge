@@ -725,6 +725,8 @@ $ git checkout master
 $ git merge hotfix
 #问题修复完成后将hotfix删除之后切回iss53分支继续工作
 $ git branch -d hotfix
+#删除远端分支
+$ git push origin --delete hotfix
 ```
 
 ![1569954125196](picture\1569954125196.png)
