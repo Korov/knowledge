@@ -1,3 +1,11 @@
+buildscript {
+    repositories {
+        maven {
+            url 'http://maven.aliyun.com/nexus/content/groups/public/'
+        }
+    }
+}
+
 plugins {
     id 'org.springframework.boot' version '2.2.1.RELEASE'
     id 'io.spring.dependency-management' version '1.0.8.RELEASE'
@@ -42,5 +50,8 @@ allprojects {
     //设置项目字符集为UTF-8
     tasks.withType(JavaCompile) {
         options.encoding = 'UTF-8'
+    }
+    repositories {
+        maven{ url 'http://maven.aliyun.com/nexus/content/groups/public/'}
     }
 }
