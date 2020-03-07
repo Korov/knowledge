@@ -1292,3 +1292,38 @@ EnumMap<Weekday, Employee> personInCharge = new EnumMap<>(Weekday.class);
 ```
 
 1.9
+
+# java11新特性
+
+## 1. FlightRecorder
+
+记录Java程序的运行时数据，类似飞机中的黑匣子，对于性能损耗很小，如果使用VisualVM将会占用主机大量性能，推荐使用JFR作为性能记录。然后分析运行时数据。
+
+可以使用`-XX:StartFlightRecording`jvm参数启动，启动之后会输出如下内容。
+
+```log
+/usr/lib/jvm/java-11-openjdk/bin/java -XX:StartFlightRecording -javaagent:/home/korov/Desktop/install/idea-IU-193.5662.53/lib/idea_rt.jar=33641:/home/korov/Desktop/install/idea-IU-193.5662.53/bin -Dfile.encoding=UTF-8 -classpath /home/korov/Desktop/temp/javaDemo/target/classes com.demo.JFRTest
+Started recording 1. No limit specified, using maxsize=250MB as default.
+
+Use jcmd 25165 JFR.dump name=1 filename=FILEPATH to copy recording data to file.
+```
+
+`Started recording 1`代表此记录的编号为1，`using maxsize=250MB`表示记录的内容存在内存中，最多保存250MB。
+
+接下来使用命令将记录导出到文件
+
+```bash
+jcmd 25165 JFR.dump name=1 filename=JFRTest.jfr
+```
+
+使用命令方式启动JFR
+
+```bash
+$ jcmd <pid> JFR.start  #PID为要监控的java进程的id
+
+$ jcmd <pid> JFR.dump filename=recording.jfr
+
+$ jcmd <pid> JFR.stop
+```
+
+获取到文件之后可以使用`jfr`命令来解析生成的文件。
