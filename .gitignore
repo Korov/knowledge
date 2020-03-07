@@ -2,7 +2,6 @@
 /**/lib
 /**/out
 /**/build
-/**/gradle/wrapper
 /**/logs
 *.iml
 *.iws
