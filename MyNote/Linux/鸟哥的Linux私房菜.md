@@ -658,11 +658,11 @@ groupadd新增群组，groupmod修改群组属性，groupdel删除群组，gpass
 #ubuntu中使用
 sudo update-alternatives --config java
 #arch系中使用
-archlinux-java status
+$ archlinux-java status
 Available Java environments:
   java-11-openjdk
   java-8-openjdk/jre (default)
-sudo archlinux-java set java-11-openjdk
+$ sudo archlinux-java set java-11-openjdk
 ```
 
 ## 3 查看端口占用
@@ -719,5 +719,13 @@ unzip -o -d /home/sunny myfile.zip
 zip -d myfile.zip smart.tx
 #添加文件，向压缩文件中myfile.zip中添加rpm_info.txt文件
 zip -m myfile.zip ./rpm_info.txt
+```
+
+## 8 创建link
+
+例如在当前目录下创建一个链接`/opt/gradle/bin/gradle`的文件
+
+```bash
+ln -s /opt/gradle/bin/gradle ./gradle
 ```
 
