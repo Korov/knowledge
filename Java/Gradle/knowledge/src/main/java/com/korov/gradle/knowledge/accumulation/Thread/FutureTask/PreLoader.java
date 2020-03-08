@@ -14,7 +14,7 @@ public class PreLoader {
         return productInfo;
     }
 
-    private final FutureTask<ProductInfo> futureTask = new FutureTask<>(new Callable<>() {
+    private final FutureTask<ProductInfo> futureTask = new FutureTask<>(new Callable<ProductInfo>() {
         @Override
         public ProductInfo call() throws Exception {
             return PreLoader.loadProductInfo();

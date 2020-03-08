@@ -14,7 +14,7 @@ public abstract class Renderer {
         List<ImageInfo> infos = scanForImageInfo(source);
         CompletionService<ImageData> completionService = new ExecutorCompletionService<>(executorService);
         for (ImageInfo imageInfo : infos) {
-            completionService.submit(new Callable<>() {
+            completionService.submit(new Callable<ImageData>() {
                 @Override
                 public ImageData call() throws Exception {
                     return imageInfo.downloadImage();

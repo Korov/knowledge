@@ -15,7 +15,7 @@ public class Memoizer<A, V> implements Computable<A, V> {
         while (true) {
             Future<V> future = cache.get(arg);
             if (future == null) {
-                Callable<V> eval = new Callable<>() {
+                Callable<V> eval = new Callable<V>() {
                     @Override
                     public V call() throws Exception {
                         return computable.compute(arg);

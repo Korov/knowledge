@@ -49,7 +49,7 @@ public class ManagerDaoTest extends KnowledgeApplicationTests {
     private static void sortDuties(Managers manager, List<String> names) {
         List<String> duties = Stream.of(manager.getSpecificDuties().split(",")).collect(Collectors.toList());
         duties.retainAll(names);
-        duties.sort(new Comparator<>() {
+        duties.sort(new Comparator<String>() {
             @Override
             public int compare(String o1, String o2) {
                 return o1.compareTo(o2);

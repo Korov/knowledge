@@ -31,7 +31,7 @@ public abstract class SocketUsingTask<T> implements CancellableTask<T> {
 
     @Override
     public RunnableFuture<T> newTask() {
-        return new FutureTask<>(this) {
+        return new FutureTask<T>(this) {
             @Override
             public boolean cancel(boolean mayInterruptIfRunning) {
                 try {

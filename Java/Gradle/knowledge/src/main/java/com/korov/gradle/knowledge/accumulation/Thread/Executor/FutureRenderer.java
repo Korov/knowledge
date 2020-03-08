@@ -9,7 +9,7 @@ abstract class FutureRenderer {
 
     void renderPage(CharSequence source) {
         List<ImageInfo> imageInfos = scanForImageInfo(source);
-        Callable<List<ImageData>> task = new Callable<>() {
+        Callable<List<ImageData>> task = new Callable<List<ImageData>>() {
             @Override
             public List<ImageData> call() throws Exception {
                 List<ImageData> result = new ArrayList<>();
