@@ -172,6 +172,103 @@ Running tests for root project 'gradle lifecycle'
 
 将一段代码逻辑抽取出来放到某个地方，所有项目都可以用
 
+在build.gradle中写下这段代码：创建了10个task
+
+```groovy
+class HelloPlugin implements Plugin<Project> {
+    @Override
+    void apply(Project project) {
+        (0..<10).each { i ->
+            project.task('task' + i) {
+                def myI = i
+                doLast {
+                    println("this is task ${myI}")
+                }
+            }
+        }
+    }
+}
+
+apply plugin: HelloPlugin
+```
+
+执行：task7
+
+```bash
+$ ./gradlew task7                            
+
+> Task :task7
+this is task 7
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 7.0.
+Use '--warning-mode all' to show the individual deprecation warnings.
+See https://docs.gradle.org/6.2.2/userguide/command_line_interface.html#sec:command_line_warnings
+
+BUILD SUCCESSFUL in 1s
+1 actionable task: 1 executed
+```
+
+如果在build.gradle中想要使用maven或者自己写的插件需要为添加相关依赖，gradle.build的依赖和源代码的依赖是分开的
+
+```groovy
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'org.codehaus.groovy:groovy-all:2.3.11'
+    }
+}
+```
+
+### 使用buildSrc
+
+在项目根目录创建`buildSrc`文件加，里面有`src/main/java`，刷新gradle之后gradle会自动识别该文件夹，在里面写一个插件类
+
+```java
+import org.gradle.api.Plugin;
+import org.gradle.api.Project;
+
+public class MyPlugin implements Plugin<Project> {
+    @Override
+    public void apply(Project target) {
+        for (int i = 0; i < 10; i++) {
+            target.task("task" + i);
+        }
+    }
+}
+```
+
+在build.gradle中使用该插件
+
+```groovy
+apply plugin: MyPlugin
+```
+
+运行：
+
+```bash
+$ ./gradlew task7
+> Task :buildSrc:compileJava UP-TO-DATE
+> Task :buildSrc:compileGroovy NO-SOURCE
+> Task :buildSrc:processResources NO-SOURCE
+> Task :buildSrc:classes UP-TO-DATE
+> Task :buildSrc:jar UP-TO-DATE
+> Task :buildSrc:assemble UP-TO-DATE
+> Task :buildSrc:compileTestJava NO-SOURCE
+> Task :buildSrc:compileTestGroovy NO-SOURCE
+> Task :buildSrc:processTestResources NO-SOURCE
+> Task :buildSrc:testClasses UP-TO-DATE
+> Task :buildSrc:test NO-SOURCE
+> Task :buildSrc:check UP-TO-DATE
+> Task :buildSrc:build UP-TO-DATE
+> Task :task7 UP-TO-DATE
+
+BUILD SUCCESSFUL in 1s
+
+```
+
 
 
 # 自我总结
