@@ -1,7 +1,5 @@
 package com.korov.springboot.ThreadTest.cancell;
 
-import net.jcip.annotations.GuardedBy;
-import net.jcip.annotations.ThreadSafe;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -16,7 +14,6 @@ import java.util.concurrent.*;
  */
 
 public abstract class SocketUsingTask<T> implements CancellableTask<T> {
-    @GuardedBy("this")
     private Socket socket;
 
     protected synchronized void setSocket(Socket s) {
@@ -56,7 +53,6 @@ interface CancellableTask<T> extends Callable<T> {
 }
 
 
-@ThreadSafe
 class CancellingExecutor extends ThreadPoolExecutor {
     public CancellingExecutor(int corePoolSize, int maximumPoolSize, long keepAliveTime, TimeUnit unit, BlockingQueue<Runnable> workQueue) {
         super(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue);
