@@ -2,7 +2,7 @@ server:
   port: 8101
   servlet:
     # 为所有的controller添加一个统一前缀
-    context-path: /service
+    context-path: /uaa
 
 logging:
   config: classpath:logback.xml
@@ -11,7 +11,7 @@ logging:
     org.springframework.web.servlet.DispatcherServlet: DEBUG
 
 mybatis:
-  type-aliases-package: com.rolemanager.commons.model.oauth    # 所有Entity别名类所在包
+  type-aliases-package: com.rolemanager.commons.model.users    # 所有Entity别名类所在包
   mapper-locations:
     - classpath:mapper/*Mapper.xml                       # mapper映射文件
 
@@ -35,3 +35,10 @@ spring:
       config:
         server-addr: localhost:8848
         file-extension: yaml
+
+  freemarker:
+    enabled: true
+    suffix: .html
+    request-context-attribute: rc
+    content-type: text/html
+    charset: UTF-8

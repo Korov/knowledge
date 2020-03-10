@@ -39,6 +39,16 @@
         select * from table_user where nickname = #{nickname,jdbcType=VARCHAR};
     </select>
     <select id="getPermissionsByUserId" resultType="com.rolemanager.commons.model.users.PermissionModel">
-        
+        select *
+        from table_role where id in (
+        select distinct role_id
+        from table_user_role
+        where user_id = #{userId,jdbcType=BIGINT}
+        union
+        select distinct B.role_id
+        from (
+        select group_id
+        from table_user_group
+        where user_id = #{userId,jdbcType=BIGINT}) A left join table_group_role B on A.group_id=B.group_id)
     </select>
 </mapper>

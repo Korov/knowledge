@@ -3,10 +3,6 @@ CREATE DATABASE `RoleManager`;
 USE `RoleManager`;
 
 drop table if exists table_user;
-
-/*==============================================================*/
-/* Table: tbale_user                                            */
-/*==============================================================*/
 create table table_user
 (
     id           bigint not null auto_increment,

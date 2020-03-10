@@ -29,11 +29,11 @@ import java.util.Arrays;
 @EnableAuthorizationServer
 public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
     @Autowired
-    private TokenStore tokenStore;
+    @Qualifier("clientDetailsServiceImpl")
+    private ClientDetailsService clientDetailsService;
 
     @Autowired
-    @Qualifier(value = "clientDetailsServiceImpl")
-    private ClientDetailsService clientDetailsService;
+    private TokenStore tokenStore;
 
     @Autowired
     private AuthorizationCodeServices authorizationCodeServices;
@@ -47,18 +47,19 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
     @Autowired
     PasswordEncoder passwordEncoder;
 
+    //客户端详情服务
+    @Override
+    public void configure(ClientDetailsServiceConfigurer clients)
+            throws Exception {
+        clients.withClientDetails(clientDetailsService);
+    }
+
     //将客户端信息存储到数据库
     @Bean(name = "clientDetailsServiceImpl")
     public ClientDetailsService clientDetailsService(DataSource dataSource) {
         ClientDetailsService clientDetailsService = new JdbcClientDetailsService(dataSource);
         ((JdbcClientDetailsService) clientDetailsService).setPasswordEncoder(passwordEncoder);
         return clientDetailsService;
-    }
-
-    //设置授权码模式的授权码如何存取，存储在数据库中
-    @Bean
-    public AuthorizationCodeServices authorizationCodeServices(DataSource dataSource) {
-        return new JdbcAuthorizationCodeServices(dataSource);//设置授权码模式的授权码如何存取
     }
 
     //令牌管理服务
@@ -78,11 +79,10 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
         return service;
     }
 
-    //客户端详情服务
-    @Override
-    public void configure(ClientDetailsServiceConfigurer clients)
-            throws Exception {
-        clients.withClientDetails(clientDetailsService);
+    //设置授权码模式的授权码如何存取，存储在数据库中
+    @Bean
+    public AuthorizationCodeServices authorizationCodeServices(DataSource dataSource) {
+        return new JdbcAuthorizationCodeServices(dataSource);//设置授权码模式的授权码如何存取
     }
 
     @Override
