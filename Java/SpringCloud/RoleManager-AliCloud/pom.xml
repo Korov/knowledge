@@ -15,12 +15,6 @@
         <module>commons</module>
     </modules>
 
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-    </properties>
-
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -63,7 +57,6 @@
                 <artifactId>springfox-swagger-ui</artifactId>
                 <version>2.9.2</version>
             </dependency>
-
 
             <dependency>
                 <groupId>com.alibaba.nacos</groupId>
@@ -137,20 +130,6 @@
                 <artifactId>snakeyaml</artifactId>
                 <version>1.25</version>
             </dependency>
-
-            <dependency>
-                <groupId>org.hibernate</groupId>
-                <artifactId>hibernate-validator</artifactId>
-                <version>5.1.0.Final</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-        </dependency>
-    </dependencies>
-
 </project>

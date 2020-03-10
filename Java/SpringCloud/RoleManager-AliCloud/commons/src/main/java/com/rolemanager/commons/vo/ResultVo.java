@@ -1,8 +1,8 @@
 package com.rolemanager.commons.vo;
 
 import com.alibaba.fastjson.JSON;
-import com.google.common.base.Strings;
 import com.rolemanager.commons.constant.Constant;
+import com.rolemanager.commons.util.StringUtil;
 import lombok.Data;
 import lombok.ToString;
 
@@ -37,7 +37,7 @@ public class ResultVo<T> {
     }
 
     public static <T> ResultVo<T> getResultVo(String vo) {
-        if (Strings.isNullOrEmpty(vo)) {
+        if (StringUtil.isEmpty(vo)) {
             return getFail();
         }
         ResultVo<T> tableData = JSON.parseObject(vo, ResultVo.class);
