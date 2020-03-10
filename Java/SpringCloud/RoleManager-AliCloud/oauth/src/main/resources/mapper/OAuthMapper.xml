@@ -38,8 +38,21 @@
     <select id="getUserByName" resultMap="BaseResultMap">
         select * from table_user where nickname = #{nickname,jdbcType=VARCHAR};
     </select>
-    <select id="getPermissionsByUserId" resultType="com.rolemanager.commons.model.users.PermissionModel">
+
+    <resultMap id="PermissionMap" type="com.rolemanager.commons.model.users.PermissionModel">
+        <!--@mbg.generated-->
+        <!--@Table table_user-->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
+        <result column="permission_name" jdbcType="VARCHAR" property="permissionName"/>
+        <result column="permission_code" jdbcType="VARCHAR" property="permissionCode"/>
+    </resultMap>
+    <select id="getPermissionsByUserId" resultMap="PermissionMap">
         select *
+        from table_permission where id in (
+        select permission_id
+        from table_role_permission where role_id in
+        (select id
         from table_role where id in (
         select distinct role_id
         from table_user_role
@@ -49,6 +62,6 @@
         from (
         select group_id
         from table_user_group
-        where user_id = #{userId,jdbcType=BIGINT}) A left join table_group_role B on A.group_id=B.group_id)
+        where user_id = #{userId,jdbcType=BIGINT}) A left join table_group_role B on A.group_id=B.group_id)))
     </select>
 </mapper>

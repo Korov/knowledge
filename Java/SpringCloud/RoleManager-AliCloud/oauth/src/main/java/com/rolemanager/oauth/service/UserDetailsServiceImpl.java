@@ -1,7 +1,6 @@
-package com.security.springcloud.uaa.service;
+package com.rolemanager.oauth.service;
 
 import com.rolemanager.commons.model.users.UserModel;
-import com.rolemanager.oauth.service.OAuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

@@ -2,7 +2,7 @@ server:
   port: 8101
   servlet:
     # 为所有的controller添加一个统一前缀
-    context-path: /uaa
+    context-path: /oauthservice
 
 logging:
   config: classpath:logback.xml
@@ -35,10 +35,3 @@ spring:
       config:
         server-addr: localhost:8848
         file-extension: yaml
-
-  freemarker:
-    enabled: true
-    suffix: .html
-    request-context-attribute: rc
-    content-type: text/html
-    charset: UTF-8

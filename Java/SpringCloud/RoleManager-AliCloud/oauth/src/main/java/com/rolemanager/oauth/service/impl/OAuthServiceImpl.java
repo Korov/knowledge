@@ -23,9 +23,9 @@ public class OAuthServiceImpl implements OAuthService {
 
     @Override
     public List<String> findPermissionsByUserId(long userId) {
-        List<PermissionModel> permissions = oAuthMapper.getPermissionsByUserId(userId);
+        List<PermissionModel> permissionModels = oAuthMapper.getPermissionsByUserId(userId);
         List<String> permissionCodes = new ArrayList<>();
-        permissions.stream().forEach(permissionModel -> {
+        permissionModels.forEach(permissionModel -> {
             permissionCodes.add(permissionModel.getPermissionCode());
         });
         return permissionCodes;
