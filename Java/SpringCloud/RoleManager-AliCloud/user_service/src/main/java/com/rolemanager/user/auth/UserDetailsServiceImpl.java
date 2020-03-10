@@ -1,6 +1,6 @@
 package com.rolemanager.user.auth;
 
-import com.rolemanager.commons.model.UserModel;
+import com.rolemanager.commons.model.users.UserModel;
 import com.rolemanager.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

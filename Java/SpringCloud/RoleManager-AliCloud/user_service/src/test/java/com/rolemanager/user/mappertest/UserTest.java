@@ -1,6 +1,6 @@
 package com.rolemanager.user.mappertest;
 
-import com.rolemanager.commons.model.UserModel;
+import com.rolemanager.commons.model.users.UserModel;
 import com.rolemanager.user.ApplicationTests;
 import com.rolemanager.user.mapper.UserMapper;
 import lombok.extern.slf4j.Slf4j;

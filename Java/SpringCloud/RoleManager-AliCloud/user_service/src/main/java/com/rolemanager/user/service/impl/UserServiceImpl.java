@@ -1,6 +1,6 @@
 package com.rolemanager.user.service.impl;
 
-import com.rolemanager.commons.model.UserModel;
+import com.rolemanager.commons.model.users.UserModel;
 import com.rolemanager.user.mapper.UserMapper;
 import com.rolemanager.user.service.UserService;
 import lombok.extern.slf4j.Slf4j;

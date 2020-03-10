@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rolemanager.user.mapper.GroupMapper">
-    <resultMap id="BaseResultMap" type="com.rolemanager.commons.model.GroupModel">
+    <resultMap id="BaseResultMap" type="com.rolemanager.commons.model.users.GroupModel">
         <!--@mbg.generated-->
         <!--@Table table_group-->
         <id column="id" jdbcType="BIGINT" property="id"/>
@@ -25,7 +25,7 @@
         delete from table_group
         where id = #{id,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.rolemanager.commons.model.GroupModel"
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.rolemanager.commons.model.users.GroupModel"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into table_group (parent_id, group_name, group_code
@@ -34,7 +34,7 @@
         )
     </insert>
     <insert id="insertSelective" keyColumn="id" keyProperty="id"
-            parameterType="com.rolemanager.commons.model.GroupModel"
+            parameterType="com.rolemanager.commons.model.users.GroupModel"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into table_group
@@ -61,7 +61,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.rolemanager.commons.model.GroupModel">
+    <update id="updateByPrimaryKeySelective" parameterType="com.rolemanager.commons.model.users.GroupModel">
         <!--@mbg.generated-->
         update table_group
         <set>
@@ -77,7 +77,7 @@
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.rolemanager.commons.model.GroupModel">
+    <update id="updateByPrimaryKey" parameterType="com.rolemanager.commons.model.users.GroupModel">
         <!--@mbg.generated-->
         update table_group
         set parent_id = #{parentId,jdbcType=BIGINT},

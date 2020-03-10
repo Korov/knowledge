@@ -1,6 +1,6 @@
 package com.rolemanager.user.service;
 
-import com.rolemanager.commons.model.UserModel;
+import com.rolemanager.commons.model.users.UserModel;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

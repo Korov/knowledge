@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rolemanager.user.mapper.UserRoleMapper">
-    <resultMap id="BaseResultMap" type="com.rolemanager.commons.model.UserRoleModel">
+    <resultMap id="BaseResultMap" type="com.rolemanager.commons.model.users.UserRoleModel">
         <!--@mbg.generated-->
         <!--@Table table_user_role-->
         <id column="role_id" jdbcType="BIGINT" property="roleId"/>
@@ -13,12 +13,12 @@
         where role_id = #{roleId,jdbcType=BIGINT}
         and user_id = #{userId,jdbcType=INTEGER}
     </delete>
-    <insert id="insert" parameterType="com.rolemanager.commons.model.UserRoleModel">
+    <insert id="insert" parameterType="com.rolemanager.commons.model.users.UserRoleModel">
         <!--@mbg.generated-->
         insert into table_user_role (role_id, user_id)
         values (#{roleId,jdbcType=BIGINT}, #{userId,jdbcType=INTEGER})
     </insert>
-    <insert id="insertSelective" parameterType="com.rolemanager.commons.model.UserRoleModel">
+    <insert id="insertSelective" parameterType="com.rolemanager.commons.model.users.UserRoleModel">
         <!--@mbg.generated-->
         insert into table_user_role
         <trim prefix="(" suffix=")" suffixOverrides=",">

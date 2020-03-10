@@ -1,35 +1,42 @@
-package com.rolemanager.oauth.service;
+package com.security.springcloud.uaa.service;
 
-import com.rolemanager.oauth.model.UserModel;
-import lombok.extern.slf4j.Slf4j;
+import com.rolemanager.commons.model.oauth.UserDto;
+import com.rolemanager.oauth.mapper.UserDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
+/**
+ * @author Administrator
+ * @version 1.0
+ **/
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
-    private UserService userService;
+    UserDao userDao;
 
+    //根据 账号查询用户信息
     @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        UserModel userModel = userService.getUserByName(userName);
-        if (null == userModel) {
-            log.error("用户不存在");
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+
+        //将来连接数据库根据账号查询用户信息
+        UserDto userDto = userDao.getUserByUsername(username);
+        if (userDto == null) {
+            //如果用户查不到，返回null，由provider来抛出异常
+            return null;
         }
-        // 用户角色列表，实际需要去数据库中获取所有的用户角色信息之后讲角色的code添加到此list中
-        List<GrantedAuthority> authorities = new ArrayList<GrantedAuthority>();
-        authorities.add(new SimpleGrantedAuthority("Role1"));
-        return User.withUsername(userModel.getNickname()).password(userModel.getPwd()).authorities("Role1").build();
+        //根据用户的id查询用户的权限
+        List<String> permissions = userDao.findPermissionsByUserId(userDto.getId());
+        //将permissions转成数组
+        String[] permissionArray = new String[permissions.size()];
+        permissions.toArray(permissionArray);
+        UserDetails userDetails = User.withUsername(userDto.getUsername()).password(userDto.getPassword()).authorities(permissionArray).build();
+        return userDetails;
     }
 }

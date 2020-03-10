@@ -1,6 +1,7 @@
 package com.rolemanager.oauth.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -31,6 +32,7 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
     private TokenStore tokenStore;
 
     @Autowired
+    @Qualifier(value = "clientDetailsServiceImpl")
     private ClientDetailsService clientDetailsService;
 
     @Autowired
@@ -43,17 +45,23 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
     private JwtAccessTokenConverter accessTokenConverter;
 
     @Autowired
-    public PasswordEncoder passwordEncoder;
+    PasswordEncoder passwordEncoder;
 
     //将客户端信息存储到数据库
-    @Bean
+    @Bean(name = "clientDetailsServiceImpl")
     public ClientDetailsService clientDetailsService(DataSource dataSource) {
         ClientDetailsService clientDetailsService = new JdbcClientDetailsService(dataSource);
         ((JdbcClientDetailsService) clientDetailsService).setPasswordEncoder(passwordEncoder);
         return clientDetailsService;
     }
 
-    // 令牌管理服务
+    //设置授权码模式的授权码如何存取，存储在数据库中
+    @Bean
+    public AuthorizationCodeServices authorizationCodeServices(DataSource dataSource) {
+        return new JdbcAuthorizationCodeServices(dataSource);//设置授权码模式的授权码如何存取
+    }
+
+    //令牌管理服务
     @Bean
     public AuthorizationServerTokenServices tokenService() {
         DefaultTokenServices service = new DefaultTokenServices();
@@ -70,33 +78,20 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
         return service;
     }
 
-    @Bean
-    public AuthorizationCodeServices authorizationCodeServices(DataSource dataSource) {
-        return new JdbcAuthorizationCodeServices(dataSource);//设置授权码模式的授权码如何存取
+    //客户端详情服务
+    @Override
+    public void configure(ClientDetailsServiceConfigurer clients)
+            throws Exception {
+        clients.withClientDetails(clientDetailsService);
     }
 
     @Override
     public void configure(AuthorizationServerEndpointsConfigurer endpoints) {
         endpoints
-                .authenticationManager(authenticationManager)
-                .authorizationCodeServices(authorizationCodeServices)
-                .tokenServices(tokenService())
+                .authenticationManager(authenticationManager)//认证管理器
+                .authorizationCodeServices(authorizationCodeServices)//授权码服务
+                .tokenServices(tokenService())//令牌管理服务
                 .allowedTokenEndpointRequestMethods(HttpMethod.POST);
-    }
-
-    //客户端详情服务
-    @Override
-    public void configure(ClientDetailsServiceConfigurer clients) throws Exception {
-        // clients.inMemory() //使用 in memory存储客户详情
-        //         .withClient("Client1") // clientId
-        //         .secret(new BCryptPasswordEncoder().encode("secret"))
-        //         .resourceIds("res1")
-        //         .authorizedGrantTypes("authorization_code", "password", "client_credentials", "implicit", "refresh_token") //该client允许的授权类型
-        //         .scopes("all") //允许的授权范围
-        //         .autoApprove(false)
-        //         //加上验证回调地址
-        //         .redirectUris("http://www.baidu.com");
-        clients.withClientDetails(clientDetailsService);
     }
 
     @Override
@@ -104,6 +99,7 @@ public class AuthorizationServer extends AuthorizationServerConfigurerAdapter {
         security
                 .tokenKeyAccess("permitAll()")                    //oauth/token_key是公开
                 .checkTokenAccess("permitAll()")                  //oauth/check_token公开
-                .allowFormAuthenticationForClients();                //表单认证（申请令牌）
+                .allowFormAuthenticationForClients()                //表单认证（申请令牌）
+        ;
     }
 }

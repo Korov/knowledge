@@ -1,6 +1,6 @@
 package com.rolemanager.user.mapper;
 
-import com.rolemanager.commons.model.UserRoleModel;
+import com.rolemanager.commons.model.users.UserRoleModel;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;

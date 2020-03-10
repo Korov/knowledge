@@ -1,4 +1,4 @@
-package com.rolemanager.commons.model;
+package com.rolemanager.commons.model.users;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

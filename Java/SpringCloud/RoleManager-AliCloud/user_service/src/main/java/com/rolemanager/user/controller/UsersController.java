@@ -1,8 +1,8 @@
 package com.rolemanager.user.controller;
 
 import com.rolemanager.commons.constant.Constant;
-import com.rolemanager.commons.model.RoleModel;
-import com.rolemanager.commons.model.UserModel;
+import com.rolemanager.commons.model.users.RoleModel;
+import com.rolemanager.commons.model.users.UserModel;
 import com.rolemanager.commons.vo.PageVo;
 import com.rolemanager.commons.vo.ResultVo;
 import com.rolemanager.user.service.UserService;

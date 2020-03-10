@@ -11,7 +11,7 @@ logging:
     org.springframework.web.servlet.DispatcherServlet: DEBUG
 
 mybatis:
-  type-aliases-package: com.rolemanager.oauth.model    # 所有Entity别名类所在包
+  type-aliases-package: com.rolemanager.commons.model.oauth    # 所有Entity别名类所在包
   mapper-locations:
     - classpath:mapper/*Mapper.xml                       # mapper映射文件
 

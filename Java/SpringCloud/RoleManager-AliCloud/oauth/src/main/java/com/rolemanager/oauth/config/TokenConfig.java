@@ -11,7 +11,6 @@ public class TokenConfig {
 
     private String SIGNING_KEY = "uaa123";
 
-    // 设置令牌的存储策略
     @Bean
     public TokenStore tokenStore() {
         //JWT令牌存储方案

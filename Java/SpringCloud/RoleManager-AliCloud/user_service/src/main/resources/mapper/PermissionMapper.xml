@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rolemanager.user.mapper.PermissionMapper">
-    <resultMap id="BaseResultMap" type="com.rolemanager.commons.model.PermissionModel">
+    <resultMap id="BaseResultMap" type="com.rolemanager.commons.model.users.PermissionModel">
         <!--@mbg.generated-->
         <!--@Table table_permission-->
         <id column="id" jdbcType="BIGINT" property="id"/>
@@ -25,7 +25,8 @@
         delete from table_permission
         where id = #{id,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.rolemanager.commons.model.PermissionModel"
+    <insert id="insert" keyColumn="id" keyProperty="id"
+            parameterType="com.rolemanager.commons.model.users.PermissionModel"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into table_permission (parent_id, permission_name, permission_code
@@ -34,7 +35,7 @@
         )
     </insert>
     <insert id="insertSelective" keyColumn="id" keyProperty="id"
-            parameterType="com.rolemanager.commons.model.PermissionModel" useGeneratedKeys="true">
+            parameterType="com.rolemanager.commons.model.users.PermissionModel" useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into table_permission
         <trim prefix="(" suffix=")" suffixOverrides=",">
@@ -60,7 +61,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.rolemanager.commons.model.PermissionModel">
+    <update id="updateByPrimaryKeySelective" parameterType="com.rolemanager.commons.model.users.PermissionModel">
         <!--@mbg.generated-->
         update table_permission
         <set>
@@ -76,7 +77,7 @@
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.rolemanager.commons.model.PermissionModel">
+    <update id="updateByPrimaryKey" parameterType="com.rolemanager.commons.model.users.PermissionModel">
         <!--@mbg.generated-->
         update table_permission
         set parent_id = #{parentId,jdbcType=BIGINT},
