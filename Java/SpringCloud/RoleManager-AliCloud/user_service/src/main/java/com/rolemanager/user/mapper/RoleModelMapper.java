@@ -1,8 +1,9 @@
 package com.rolemanager.user.mapper;
 
-import com.rolemanager.user.model.RoleModel;
-import java.util.List;
+import com.rolemanager.commons.model.RoleModel;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 public interface RoleModelMapper {
     int deleteByPrimaryKey(Long id);

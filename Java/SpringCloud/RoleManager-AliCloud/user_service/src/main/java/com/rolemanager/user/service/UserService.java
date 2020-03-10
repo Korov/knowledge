@@ -1,6 +1,6 @@
 package com.rolemanager.user.service;
 
-import com.rolemanager.user.model.UserModel;
+import com.rolemanager.commons.model.UserModel;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
@@ -23,8 +23,6 @@ public interface UserService {
     List<UserModel> getUsers(@Param("index") long index, @Param("length") long length);
 
     long getUserNum();
-
-    UserModel getUserById(long userId);
 
     UserModel getUserByName(String userName);
 }

@@ -1,6 +1,6 @@
 // package com.rolemanager.user.auth;
 //
-// import com.rolemanager.user.model.UserModel;
+// import com.rolemanager.commons.model.UserModel;
 // import org.springframework.security.core.GrantedAuthority;
 // import org.springframework.security.core.userdetails.UserDetails;
 //

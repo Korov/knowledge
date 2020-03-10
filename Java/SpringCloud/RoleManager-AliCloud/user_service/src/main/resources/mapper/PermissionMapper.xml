@@ -1,106 +1,106 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.rolemanager.user.mapper.RoleModelMapper">
-    <resultMap id="BaseResultMap" type="com.rolemanager.commons.model.RoleModel">
+<mapper namespace="com.rolemanager.user.mapper.PermissionMapper">
+    <resultMap id="BaseResultMap" type="com.rolemanager.commons.model.PermissionModel">
         <!--@mbg.generated-->
-        <!--@Table table_role-->
+        <!--@Table table_permission-->
         <id column="id" jdbcType="BIGINT" property="id"/>
         <result column="parent_id" jdbcType="BIGINT" property="parentId"/>
-        <result column="role_name" jdbcType="VARCHAR" property="roleName"/>
-        <result column="role_code" jdbcType="VARCHAR" property="roleCode"/>
+        <result column="permission_name" jdbcType="VARCHAR" property="permissionName"/>
+        <result column="permission_code" jdbcType="VARCHAR" property="permissionCode"/>
     </resultMap>
     <sql id="Base_Column_List">
         <!--@mbg.generated-->
-        id, parent_id, role_name, role_code
+        id, parent_id, permission_name, permission_code
     </sql>
     <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
         <!--@mbg.generated-->
         select
         <include refid="Base_Column_List"/>
-        from table_role
+        from table_permission
         where id = #{id,jdbcType=BIGINT}
     </select>
     <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
         <!--@mbg.generated-->
-        delete from table_role
+        delete from table_permission
         where id = #{id,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.rolemanager.commons.model.RoleModel"
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.rolemanager.commons.model.PermissionModel"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
-        insert into table_role (parent_id, role_name, role_code
+        insert into table_permission (parent_id, permission_name, permission_code
         )
-        values (#{parentId,jdbcType=BIGINT}, #{roleName,jdbcType=VARCHAR}, #{roleCode,jdbcType=VARCHAR}
+        values (#{parentId,jdbcType=BIGINT}, #{permissionName,jdbcType=VARCHAR}, #{permissionCode,jdbcType=VARCHAR}
         )
     </insert>
-    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.rolemanager.commons.model.RoleModel"
-            useGeneratedKeys="true">
+    <insert id="insertSelective" keyColumn="id" keyProperty="id"
+            parameterType="com.rolemanager.commons.model.PermissionModel" useGeneratedKeys="true">
         <!--@mbg.generated-->
-        insert into table_role
+        insert into table_permission
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="parentId != null">
                 parent_id,
             </if>
-            <if test="roleName != null">
-                role_name,
+            <if test="permissionName != null">
+                permission_name,
             </if>
-            <if test="roleCode != null">
-                role_code,
+            <if test="permissionCode != null">
+                permission_code,
             </if>
         </trim>
         <trim prefix="values (" suffix=")" suffixOverrides=",">
             <if test="parentId != null">
                 #{parentId,jdbcType=BIGINT},
             </if>
-            <if test="roleName != null">
-                #{roleName,jdbcType=VARCHAR},
+            <if test="permissionName != null">
+                #{permissionName,jdbcType=VARCHAR},
             </if>
-            <if test="roleCode != null">
-                #{roleCode,jdbcType=VARCHAR},
+            <if test="permissionCode != null">
+                #{permissionCode,jdbcType=VARCHAR},
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.rolemanager.commons.model.RoleModel">
+    <update id="updateByPrimaryKeySelective" parameterType="com.rolemanager.commons.model.PermissionModel">
         <!--@mbg.generated-->
-        update table_role
+        update table_permission
         <set>
             <if test="parentId != null">
                 parent_id = #{parentId,jdbcType=BIGINT},
             </if>
-            <if test="roleName != null">
-                role_name = #{roleName,jdbcType=VARCHAR},
+            <if test="permissionName != null">
+                permission_name = #{permissionName,jdbcType=VARCHAR},
             </if>
-            <if test="roleCode != null">
-                role_code = #{roleCode,jdbcType=VARCHAR},
+            <if test="permissionCode != null">
+                permission_code = #{permissionCode,jdbcType=VARCHAR},
             </if>
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.rolemanager.commons.model.RoleModel">
+    <update id="updateByPrimaryKey" parameterType="com.rolemanager.commons.model.PermissionModel">
         <!--@mbg.generated-->
-        update table_role
+        update table_permission
         set parent_id = #{parentId,jdbcType=BIGINT},
-        role_name = #{roleName,jdbcType=VARCHAR},
-        role_code = #{roleCode,jdbcType=VARCHAR}
+        permission_name = #{permissionName,jdbcType=VARCHAR},
+        permission_code = #{permissionCode,jdbcType=VARCHAR}
         where id = #{id,jdbcType=BIGINT}
     </update>
     <update id="updateBatch" parameterType="java.util.List">
         <!--@mbg.generated-->
-        update table_role
+        update table_permission
         <trim prefix="set" suffixOverrides=",">
             <trim prefix="parent_id = case" suffix="end,">
                 <foreach collection="list" index="index" item="item">
                     when id = #{item.id,jdbcType=BIGINT} then #{item.parentId,jdbcType=BIGINT}
                 </foreach>
             </trim>
-            <trim prefix="role_name = case" suffix="end,">
+            <trim prefix="permission_name = case" suffix="end,">
                 <foreach collection="list" index="index" item="item">
-                    when id = #{item.id,jdbcType=BIGINT} then #{item.roleName,jdbcType=VARCHAR}
+                    when id = #{item.id,jdbcType=BIGINT} then #{item.permissionName,jdbcType=VARCHAR}
                 </foreach>
             </trim>
-            <trim prefix="role_code = case" suffix="end,">
+            <trim prefix="permission_code = case" suffix="end,">
                 <foreach collection="list" index="index" item="item">
-                    when id = #{item.id,jdbcType=BIGINT} then #{item.roleCode,jdbcType=VARCHAR}
+                    when id = #{item.id,jdbcType=BIGINT} then #{item.permissionCode,jdbcType=VARCHAR}
                 </foreach>
             </trim>
         </trim>
@@ -111,7 +111,7 @@
     </update>
     <update id="updateBatchSelective" parameterType="java.util.List">
         <!--@mbg.generated-->
-        update table_role
+        update table_permission
         <trim prefix="set" suffixOverrides=",">
             <trim prefix="parent_id = case" suffix="end,">
                 <foreach collection="list" index="index" item="item">
@@ -120,17 +120,17 @@
                     </if>
                 </foreach>
             </trim>
-            <trim prefix="role_name = case" suffix="end,">
+            <trim prefix="permission_name = case" suffix="end,">
                 <foreach collection="list" index="index" item="item">
-                    <if test="item.roleName != null">
-                        when id = #{item.id,jdbcType=BIGINT} then #{item.roleName,jdbcType=VARCHAR}
+                    <if test="item.permissionName != null">
+                        when id = #{item.id,jdbcType=BIGINT} then #{item.permissionName,jdbcType=VARCHAR}
                     </if>
                 </foreach>
             </trim>
-            <trim prefix="role_code = case" suffix="end,">
+            <trim prefix="permission_code = case" suffix="end,">
                 <foreach collection="list" index="index" item="item">
-                    <if test="item.roleCode != null">
-                        when id = #{item.id,jdbcType=BIGINT} then #{item.roleCode,jdbcType=VARCHAR}
+                    <if test="item.permissionCode != null">
+                        when id = #{item.id,jdbcType=BIGINT} then #{item.permissionCode,jdbcType=VARCHAR}
                     </if>
                 </foreach>
             </trim>
@@ -142,11 +142,12 @@
     </update>
     <insert id="batchInsert" keyColumn="id" keyProperty="id" parameterType="map" useGeneratedKeys="true">
         <!--@mbg.generated-->
-        insert into table_role
-        (parent_id, role_name, role_code)
+        insert into table_permission
+        (parent_id, permission_name, permission_code)
         values
         <foreach collection="list" item="item" separator=",">
-            (#{item.parentId,jdbcType=BIGINT}, #{item.roleName,jdbcType=VARCHAR}, #{item.roleCode,jdbcType=VARCHAR}
+            (#{item.parentId,jdbcType=BIGINT}, #{item.permissionName,jdbcType=VARCHAR},
+            #{item.permissionCode,jdbcType=VARCHAR}
             )
         </foreach>
     </insert>

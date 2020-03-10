@@ -1,8 +1,8 @@
 package com.rolemanager.user.mappertest;
 
+import com.rolemanager.commons.model.UserModel;
 import com.rolemanager.user.ApplicationTests;
 import com.rolemanager.user.mapper.UserMapper;
-import com.rolemanager.user.model.UserModel;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,17 +16,16 @@ public class UserTest extends ApplicationTests {
 
     @Test
     public void test() {
-        UserModel user = userMapper.selectByPrimaryKey(1L);
+        UserModel user = userMapper.getUserByName("demo");
         if (user == null) {
             user = new UserModel();
-            user.setId(1L);
-            user.setName("demo");
-            long id = userMapper.insert(user);
-            user = userMapper.selectByPrimaryKey(id);
+            user.setNickname("demo");
+            userMapper.insert(user);
+            user = userMapper.getUserByName("demo");
         }
         log.info(user.toString());
 
-        List<UserModel> userModels = userMapper.getUsers(0,30);
+        List<UserModel> userModels = userMapper.getUsers(0, 30);
         System.out.println("debug");
     }
 }

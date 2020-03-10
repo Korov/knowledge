@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.rolemanager.user.mapper.UserMapper">
-    <resultMap id="BaseResultMap" type="com.rolemanager.user.model.UserModel">
+    <resultMap id="BaseResultMap" type="com.rolemanager.commons.model.UserModel">
         <!--@mbg.generated-->
         <!--@Table table_user-->
         <id column="id" jdbcType="BIGINT" property="id"/>
@@ -38,7 +38,7 @@
         delete from table_user
         where id = #{id,jdbcType=BIGINT}
     </delete>
-    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.rolemanager.user.model.UserModel"
+    <insert id="insert" keyColumn="id" keyProperty="id" parameterType="com.rolemanager.commons.model.UserModel"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into table_user (avtatar, `name`, age,
@@ -54,7 +54,7 @@
         #{status,jdbcType=INTEGER}, #{statusremark,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR}
         )
     </insert>
-    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.rolemanager.user.model.UserModel"
+    <insert id="insertSelective" keyColumn="id" keyProperty="id" parameterType="com.rolemanager.commons.model.UserModel"
             useGeneratedKeys="true">
         <!--@mbg.generated-->
         insert into table_user
@@ -153,7 +153,7 @@
             </if>
         </trim>
     </insert>
-    <update id="updateByPrimaryKeySelective" parameterType="com.rolemanager.user.model.UserModel">
+    <update id="updateByPrimaryKeySelective" parameterType="com.rolemanager.commons.model.UserModel">
         <!--@mbg.generated-->
         update table_user
         <set>
@@ -205,7 +205,7 @@
         </set>
         where id = #{id,jdbcType=BIGINT}
     </update>
-    <update id="updateByPrimaryKey" parameterType="com.rolemanager.user.model.UserModel">
+    <update id="updateByPrimaryKey" parameterType="com.rolemanager.commons.model.UserModel">
         <!--@mbg.generated-->
         update table_user
         set avtatar = #{avtatar,jdbcType=VARCHAR},
