@@ -1020,3 +1020,52 @@ git switch master
 `git checkout <filename>`,`git restore <filename>`功能相同，用来恢复文件，推荐使用restore。
 
 `git reset <filename>`,`git restore --staged <filename>`功能相同，将暂存区文件移除到工作区，推荐使用restore。
+
+## 4.6 拉取远端分支，并再本地创建相应分支
+
+```bash
+#创建新分支之前都需要fetch以下，否则会不成功
+git fetch
+#本地创建一个分支 dev1并切换到次分支，并将本地分支dev1与远端分支dev1建立联系
+git checkout -b dev1 origin/dev1
+#本地创建一个分支 dev3并切换到此分支，并将本地分支dev3与远端分支dev3建立联系
+git switch -c dev3 origin/dev3
+#本地创建一个分支 dev1，并将本地分支与远端分支建立联系
+git fetch origin dev2 dev2
+```
+
+## 4.7 设置upstream
+
+有一个远端仓库A：https://gitee.com/geek_qi/cloud-platform.git，你fork为自己的仓库B，clone到本地的C，此时你想本地的C与A保持一致，可以做以下操作。
+
+```bash
+#添加upstream
+git remote add upstream https://gitee.com/geek_qi/cloud-platform.git
+#查看remote
+$ git remote -v
+origin	https://gitee.com/korov/cloud-platform.git (fetch)
+origin	https://gitee.com/korov/cloud-platform.git (push)
+upstream	https://gitee.com/geek_qi/cloud-platform.git (fetch)
+upstream	https://gitee.com/geek_qi/cloud-platform.git (push)
+#获取upstream的数据
+$ git fetch upstream 
+#将C中的master与A中的master关联
+$ git branch --set-upstream-to=upstream/master
+分支 'master' 设置为跟踪来自 'upstream' 的远程分支 'master'。
+#将A代码同步到C，再将C中代码push到B
+git fetch upstream master
+git merge
+git push origin master
+```
+
+不切换分支直接设置其他分支的upstream：`git br -u upstream/br01 br01`（设置本地分支br01的upstream为upstream/br01）。
+
+取消upstream：
+
+```bash
+#取消当前分支的upstream
+git branch --unset-upstream
+#取消其他分支的upstream
+git branch --unset-upstream [分支名]
+```
+

@@ -152,3 +152,6 @@ maven-release-plugin的用途是帮助自动化项目版本发布，它依赖于
 
 然而在当你想要跳过测试、排除某些 测试类、或者使用一些TestNG特性的时候，了解maven-surefire-plugin的一些配置选项就很有用了。例如 mvn test -Dtest=FooTest 这样一条命令的效果是仅运行FooTest测试类，这是通过控制maven-surefire-plugin的test参数实现的。
 
+## mvn package 和 mvn install
+
+mvn package只会将包大好放到代码路径下面，mvn install会将包大好放到代码路径下并且复制一份到maven的本地仓库中，放到本地仓库中之后其他项目就可以引用你发布的jar包。
