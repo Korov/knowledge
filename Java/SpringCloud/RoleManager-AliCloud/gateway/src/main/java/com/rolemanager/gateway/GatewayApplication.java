@@ -26,11 +26,20 @@ public class GatewayApplication {
         SpringApplication.run(GatewayApplication.class, args);
     }
 
+    /**
+     * id：路由的ID
+     * uri：匹配路由的转发地址
+     * predicates：配置该路由的断言，通过PredicateDefinition类进行接收配置。
+     *
+     * @param builder
+     * @return
+     */
     @Bean
     public RouteLocator customRouteLocatoe(RouteLocatorBuilder builder) {
+        // 遇到oauthservice直接转到oauth服务器上
         return builder.routes()
-                .route(r -> r.path("/rewrite/**")
-                        .uri("lb://rolemanager-consumer").id("route-consumer")).build();
+                .route(r -> r.path("/oauthservice/**")
+                        .uri("lb://rolemanager-oauth").id("route-oauth")).build();
     }
 
     private static final String MAX_AGE = "18000L";
