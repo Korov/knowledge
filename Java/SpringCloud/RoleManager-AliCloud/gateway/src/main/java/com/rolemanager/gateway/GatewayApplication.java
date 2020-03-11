@@ -61,12 +61,4 @@ public class GatewayApplication {
             return chain.filter(ctx);
         };
     }
-//
-//    /**
-//     * *如果使用了注册中心（如：Eureka），进行控制则需要增加如下配置
-//     */
-//    @Bean
-//    public RouteDefinitionLocator discoveryClientRouteDefinitionLocator(DiscoveryClient discoveryClient) {
-//        return new DiscoveryClientRouteDefinitionLocator(discoveryClient);
-//    }
 }
