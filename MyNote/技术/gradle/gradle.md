@@ -266,10 +266,41 @@ $ ./gradlew task7
 > Task :task7 UP-TO-DATE
 
 BUILD SUCCESSFUL in 1s
-
 ```
 
+# 依赖管理
 
+
+
+# 多项目构建
+
+对于多项目的工程来说可以使用`gradle projects`来查看项目中的所有模块。
+
+## settings文件
+
+settings文件声明了所需的配置来实例化项目的层次结构。
+
+实例：
+
+```groovy
+rootProject.name = 'rolemanager'
+include 'gateway'
+```
+
+## 配置子项目
+
+以下几点是真实多项目构建的共同需求：
+
+- 根项目和所有子项目应该使用相同的group和version属性值
+- 所有子项目都是java项目，并且都需要java插件来保证正常运行，所以只需要对子项目应用插件，而不是根项目
+- web子项目是唯一需要声明外部依赖的项目，这个项目类型来自于其他子项目，它产生一个war包，并且使用jetty插件运行应用程序
+- 在子项目之间建模依赖关系
+
+### 多项目中的构建
+
+`gradle build`将会构建所有的项目，`gralde :module:build`将会构建制定module模块。`gralde build -a`所有文件重新编译，`gralde build --no-rebuild`只会重新获取文件，不会编译代码。
+
+通常`build`只编译依赖项目的代码，组装成jar文件，并且使其作为其他项目的依赖。为了运行测试，可以执行`buildNeeded`。项目的任何改变都可能对依赖于它的其他项目产生副作用，可以使用`buildDependents`，通过构建和测试依赖的项目来验证代码变化所产生的影响。
 
 # 自我总结
 

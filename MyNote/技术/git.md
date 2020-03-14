@@ -571,7 +571,6 @@ a6b4c97498bd301d84096da251c98a07c7723e65 beginning write support
 8a5cbc430f1a9c3d00faaeffd07798508422908a updated readme
 #要在那个提交上打标签，你需要在命令的末尾指定提交的校验和（或部分校验和）
 $ git tag -a v1.2 9fceb02
-
 ```
 
 ### 2.3.3共享标签
@@ -582,7 +581,6 @@ git push 命令并不会传送标签到远程仓库服务器上。 在创建完�
 $ git push origin v1.5
 #一次性推送很多标签
 $ git push origin --tags
-
 ```
 
 现在，当其他人从仓库中克隆或拉取，他们也能得到你的那些标签
@@ -594,7 +592,6 @@ $ git push origin --tags
 $ git tag -d v1.4-lw
 #git push <remote> :refs/tags/<tagname> 同步删除远程仓库标签
 $ git push origin :refs/tags/v1.4-lw
-
 ```
 
 ### 2.3.5检出标签
@@ -615,7 +612,6 @@ $ git checkout 2.0-beta-0.1
 Previous HEAD position was 99ada87... Merge pull request #89 from
 schacon/appendix-final
 HEAD is now at df3f601... add atlas.json and cover image
-
 ```
 
 在“分离头指针”状态下，如果你做了某些更改然后提交它们，标签不会发生变化，但你的新提交将不属于任何分支，并且将无法访问，除非确切的提交哈希。因此，如果你需要进行更改——比如说你正在修复旧版本的错误——这通常需要创建一个新分支：
@@ -623,7 +619,6 @@ HEAD is now at df3f601... add atlas.json and cover image
 ```bash
 $ git checkout -b version2 v2.0.0
 Switched to a new branch 'version2'
-
 ```
 
 当然，如果在这之后又进行了一次提交，version2 分支会因为这个改动向前移动，version2 分支就会和v2.0.0 标签稍微有些不同，这时就应该当心了。
@@ -637,7 +632,6 @@ $ git config --global alias.co checkout
 $ git config --global alias.br branch
 $ git config --global alias.ci commit
 $ git config --global alias.st status
-
 ```
 
 这意味着，当要输入 git commit 时，只需要输入 git ci。
