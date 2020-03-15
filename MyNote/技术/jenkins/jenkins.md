@@ -26,3 +26,10 @@ docker rm jenkins-blueocean
 ```
 
 启动完成之后需要到`jenkins-data`中修改`hudson.model.UpdateCenter.xml`，将`https://updates.jenkins-ci.org/update-center.json`修改成`https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json`。重启容器，等待一会就可以了。
+
+# 集成gitee
+
+首页，打开系统管理，点击系统配置，找到Gitee配置（需要安装gitee插件）
+
+配置好之后新建一个任务，里面会有相关设置，进行设置之后就可以将文件部署完成。
+
