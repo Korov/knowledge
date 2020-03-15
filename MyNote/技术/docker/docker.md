@@ -12,21 +12,15 @@
 ## 1.2 镜像创建和启动
 
 ```bash
-docker build -t eureka:1.0 .
 # 创建了一个eureka镜像，版本1.0，后面的.表示dockerfile的相对位置
-docker run -d -p 7001:7001 eureka:1.0
+docker build -t eureka:1.0 .
 # 启动镜像
-```
-
-```bash
-#将镜像rabbitmq:3.8-rc-alpine保存为rabbitmq3.8.tar到当前文件夹
-docker save rabbitmq:3.8-rc-alpine -o rabbitmq3.8.tar
-#从当前文件夹加载rabbitmq3.8.tar为docker中的镜像
-docker load -i rabbitmq3.8.tar
-
-docker rmi `docker images -q`;
+docker run -d -p 7001:7001 eureka:1.0
 # 删除所有镜像
+docker rmi `docker images -q`;
 ```
+
+
 
 ## 1.3 容器相关操作
 
@@ -72,7 +66,20 @@ docker exec -it kafka /bin/sh
 docker inspect 容器名
 ```
 
+## 1.7 镜像、容器、文件转换
 
+```bash
+#将镜像rabbitmq:3.8-rc-alpine保存为rabbitmq3.8.tar到当前文件夹
+docker save rabbitmq:3.8-rc-alpine -o rabbitmq3.8.tar
+#从当前文件夹加载rabbitmq3.8.tar为docker中的镜像
+docker load -i rabbitmq3.8.tar
+#将jenkins容器转为myjenkins镜像
+docker commit jenkins myjenkins
+#将jenkins容器保存为jenkins.tar文件
+docker export jenkins -o jenkins.tar
+#jenkins.tar文件转为镜像，是容器转出的文件
+cat ./jenkins.tar | sudo docker import - imagename:latest
+```
 
 # 2 dockerfile
 
