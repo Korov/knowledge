@@ -270,7 +270,35 @@ BUILD SUCCESSFUL in 1s
 
 # 依赖管理
 
+`gradle [module]:dependencies`查看项目的依赖管理。
 
+Java Library plugin - configurations used to declare dependencies*
+
+| Configuration name   | Role                                     | Consumable? | Resolvable? | Description                                                  |
+| :------------------- | :--------------------------------------- | :---------- | :---------- | :----------------------------------------------------------- |
+| `api`                | Declaring API dependencies               | no          | no          | This is where you should declare dependencies which are transitively exported to consumers, for compile. |
+| `implementation`     | Declaring implementation dependencies    | no          | no          | This is where you should declare dependencies which are purely internal and not meant to be exposed to consumers. |
+| `compileOnly`        | Declaring compile only dependencies      | no          | no          | This is where you should declare dependencies which are only required at compile time, but should not leak into the runtime. This typically includes dependencies which are shaded when found at runtime. |
+| `runtimeOnly`        | Declaring runtime dependencies           | no          | no          | This is where you should declare dependencies which are only required at runtime, and not at compile time. |
+| `testImplementation` | Test dependencies                        | no          | no          | This is where you should declare dependencies which are used to compile tests. |
+| `testCompileOnly`    | Declaring test compile only dependencies | no          | no          | This is where you should declare dependencies which are only required at test compile time, but should not leak into the runtime. This typically includes dependencies which are shaded when found at runtime. |
+| `testRuntimeOnly`    | Declaring test runtime dependencies      | no          | no          | This is where you should declare dependencies which are only required at test runtime, and not at test compile time. |
+
+*Java Library plugin — configurations used by consumers*
+
+| Configuration name | Role                               | Consumable? | Resolvable? | Description                                                  |
+| :----------------- | :--------------------------------- | :---------- | :---------- | :----------------------------------------------------------- |
+| `apiElements`      | For compiling against this library | yes         | no          | This configuration is meant to be used by consumers, to retrieve all the elements necessary to compile against this library. Unlike the `default` configuration, this doesn’t leak implementation or runtime dependencies. |
+| `runtimeElements`  | For executing this library         | yes         | no          | This configuration is meant to be used by consumers, to retrieve all the elements necessary to run against this library. |
+
+*Java Library plugin - configurations used by the library itself*
+
+| Configuration name   | Role                                    | Consumable? | Resolvable? | Description                                                  |
+| :------------------- | :-------------------------------------- | :---------- | :---------- | :----------------------------------------------------------- |
+| compileClasspath     | For compiling this library              | no          | yes         | This configuration contains the compile classpath of this library, and is therefore used when invoking the java compiler to compile it. |
+| runtimeClasspath     | For executing this library              | no          | yes         | This configuration contains the runtime classpath of this library |
+| testCompileClasspath | For compiling the tests of this library | no          | yes         | This configuration contains the test compile classpath of this library. |
+| testRuntimeClasspath | For executing tests of this library     | no          | yes         | This configuration contains the test runtime classpath of this library |
 
 # 多项目构建
 
