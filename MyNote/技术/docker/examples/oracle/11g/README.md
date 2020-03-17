@@ -12,9 +12,22 @@ export ORACLE_HOME=/home/oracle/app/oracle/product/11.2.0/dbhome_2
 export ORACLE_SID=helowin
 export PATH=$ORACLE_HOME/bin:$PATH
 
+#重启配置文件
+source /etc/profile
+
 #建立软链接
 ln -s $ORACLE_HOME/bin/sqlplus /usr/bin
 #切换到oracle用户下
-su oracle
+su - oracle
+
+sqlplus /nolog
+conn /as sysdba
+
+alter user system identified by oracle;
+alter user sys identified by oracle;
+ALTER PROFILE DEFAULT LIMIT PASSWORD_LIFE_TIME UNLIMITED;
 ```
 
+完成之后打开DataGrip，选择oracle，user为`sys as sysdba`，password为`oracle`。
+
+jdbc:oracle:thin:@localhost:1521:helowin
