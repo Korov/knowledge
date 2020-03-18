@@ -3,7 +3,7 @@
 ## 安装
 
 ```bash
-cnpm install -g @angular/cli 或 npm install -g @angular/cli
+yarn add @angular/cli
 ```
 
 ## 创建新项目
@@ -12,7 +12,7 @@ cnpm install -g @angular/cli 或 npm install -g @angular/cli
 // 创建项目并跳过安装依赖的环节
 ng new project_name --skip-install
 // 如果安装时间过程可以停止，之后使用cnpm安装依赖
-cnpm install
+yarn install
 ```
 
 ## 编译以及运行项目
