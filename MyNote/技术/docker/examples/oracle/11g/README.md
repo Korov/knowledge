@@ -1,5 +1,7 @@
 ```bash
 docker pull registry.cn-hangzhou.aliyuncs.com/helowin/oracle_11g
+docker run -d -p 1521:1521 -v `pwd`/oradata:/home/oracle/app/oracle/oradata --name oracle11g registry.cn-hangzhou.aliyuncs.com/helowin/oracle_11g
+
 docker run -d -p 1521:1521 --name oracle11g registry.cn-hangzhou.aliyuncs.com/helowin/oracle_11g
 
 #进入容器内部进行配置

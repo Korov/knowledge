@@ -16,7 +16,7 @@ public class HelloWorld {
 }
 ```
 
-![1566312846478](picture\1566312846478.png)
+![1566312846478](picture/1566312846478.png)
 
 ### 1.1数据类型
 
@@ -1293,6 +1293,78 @@ EnumMap<Weekday, Employee> personInCharge = new EnumMap<>(Weekday.class);
 
 1.9
 
+## 2.5数据库编程
+
+JDBC的思想：根据API编写的程序都可以与驱动管理器进行通信，而驱动管理器则通过驱动程序与实际的数据库进行通信。
+
+### JDBC驱动程序常见类型
+
+1. 驱动程序是纯java客户端类库，它使用一种与具体数据库无关的协议将数据库请求发送给服务器构件，然后该构件再将数据库请求翻译成数据库相关的协议。这简化了部署，因为平台相关的代码只位于服务器端。
+2. 纯java类库，它将JDBC请求直接翻译成数据库相关的协议
+
+JDBC最终是为了实现以下目标：
+
+- 通过使用标准的SQL语句，甚至是专门的SQL扩展，程序员可以利用java语言开发访问数据库的应用，同时还依旧遵循java语言的相关约定
+- 数据库供应商和数据库工具开发商可以提供底层的驱动程序。因此，他们可以优化各自数据库产品的驱动程序。
+
+### JDBC配置
+
+#### 数据库url
+
+链接数据库时我们必须使用与数据库类型相关的参数，例如主机名、端口号和数据库名。
+
+例如链接mysql8:`jdbc:mysql://localhost:3306/rolemanager?characterEncoding=utf8&useSSL=false&serverTimezone=UTC&rewriteBatchedStatements=true`
+
+此url指向了本机的rolemanager数据库。
+
+JDBC URL的一般语法为：`jdbc:subprotocol:other stuff`。
+
+其中subprotocol用于选择链接到数据库的具体驱动程序。other stuff参数的格式随所使用的subprotocol不同而不同。
+
+#### 驱动程序JAR文件
+
+你需要获得包含了你所使用的数据库的驱动程序的JAR文件。这里我们使用的是MySQL驱动mysql:mysql-connector-java.jar
+
+#### 链接到数据库
+
+在java程序中，我们可以再代码中打开一个数据库链接：
+
+```java
+String url = "";
+String username = "";
+String password = "";
+Connection conn = DriverManager.getConnection(url,username,password);
+```
+
+```java
+public class Jdbc {
+
+    public static void main(String[] args) throws ClassNotFoundException {
+
+        String driver = "oracle.jdbc.driver.OracleDriver";
+        String url = "jdbc:oracle:thin:@localhost:1521:helowin";
+        String username = "sys as sysdba";
+        String password = "oracle";
+        Class.forName(driver);
+        String sql = "select tablespace_name, file_id,file_name from dba_data_files order by tablespace_name, file_id";
+        try (Connection connection = DriverManager.getConnection(url, username, password);
+             Statement stm = connection.createStatement();
+             ResultSet rs = stm.executeQuery(sql)) {
+            while (rs.next()) {
+                String value1 = rs.getString(1);
+                String value2 = rs.getString(2);
+                String value3 = rs.getString(3);
+                System.out.println(value1 + value2 + value3);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+一个链接实例
+
 # java11新特性
 
 ## 1. FlightRecorder
@@ -1327,3 +1399,4 @@ $ jcmd <pid> JFR.stop
 ```
 
 获取到文件之后可以使用`jfr`命令来解析生成的文件。
+
