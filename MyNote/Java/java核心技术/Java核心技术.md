@@ -1363,7 +1363,166 @@ public class Jdbc {
 }
 ```
 
-一个链接实例
+一个链接实例。
+
+Statement中方法的解析：`int executeUpdate(String sql) throws SQLException;`：返回受SQL语句影响的行数，或者对不返回行数的语句返回0。其既可以执行insert、update、delete之类的操作，也可以执行create table、drop table之类的数据定义语句。但是select查询必须使用executeQuery方法。另外还有execute（执行指定的SQL语句，可能会产生多个结果集和更新计数。如果第一个执行结果是结果集，则返回true，反之，返回false。调用getResultSet或getUpdateCount方法可以得到第一个执行结果。）语句可以执行任意的SQL语句，此方法通常只用于由用户提供的交互式查询。
+
+执行查询的时候，executeQuery方法会返回一个ResultSet类型的对象，可以通过它来每次一行的迭代遍历所有查询结果。
+
+查看每一行数据时，当我们希望获取没一列的内容时，有许多访问器方法可以使用：
+
+```java
+String value = rs.getString(1);//通过列的索引返回数据，索引从1开始。返回String
+double price = rs.getDouble("Price");//通过列名获取该列的值，返回double
+```
+
+#### 管理连接、语句和结果集
+
+每个Connection对象都可以创建一个或多个Statement对象。同一个Statement对象可以用于多个不相关的命令和查询。但是，一个Statement对象最多只能有一个打开的结果集。如果需要执行多个查询操作，且需要同时分析查询结果，那么必须创建多个Statement对象。
+
+SQLServer的JDBC驱动程序只允许同时存在一个活动的Statement对象。使用DatabaseMetaData接口中的getMaxStatements方法可以获取JDBC驱动程序支持的同时活动的语句对象的总数。
+
+使用完ResultSet、Statement或Connection对象后，应立即调用close方法。这些对象都使用了规模较大的数据结构，他们会占用数据库服务器商的有限资源。
+
+如果Statement对象上有一个打开的结果集，那么调用close方法将自动关闭该结果集。同样的调用Connection类的close方法将关闭该链接上的所有语句，调用closeOnCompletion方法，在其所有结果集都被关闭后，该语句会立即执行关闭连接。
+
+如果连接时短时的则应使用try-with-resources方法，使用完之后立即关闭连接。
+
+#### 分析SQL异常
+
+每个SQLException都有一个由多个SQLException对象构成的链，这些对象可以通过getNextException方法获取。这个异常链是每个异常都具有的Throwable对象构成的“成因”，SQLException实现了迭代器接口：
+
+```java
+// 获取异常的异常码和状态，这由相应的数据库决定
+sqlException.getErrorCode();
+sqlException.getSQLState();
+// 遍历SQLException
+for (Throwable throwable : sqlException) {
+    // TODO
+}
+```
+
+#### 预备语句
+
+prepared staement。我们可以在预备语句中使用？来设置变量，每次通过修改变量来实现查询不同条件的数据。我们需要使用set方法来设置变量的值，如果一个预备语句中有多个？，则需要通过？的索引来设置不同位置？的值
+
+```java
+        Connection connection = DriverManager.getConnection(url, username, password);
+        String querySql = "select * from table where id=? and name = ?";
+        PreparedStatement preparedStatement = connection.prepareStatement(querySql);
+        preparedStatement.setInt(1, 10);
+        preparedStatement.setString(2, "korov");
+        ResultSet resultSet = preparedStatement.executeQuery();
+```
+
+如果想要重用已经执行过得预备查询语句，那么除非使用set方法或调用clearParameters方法，否则所有宿主变量的绑定都不会改变。
+
+#### 读写LOB
+
+许多数据库还可以存储大对象，二进制大对象称为BLOB，字符型大对象称为CLOB。读取LOB需要执行SELECT语句，然后在ResultSet上调用getBlob或getClob方法。
+
+要将LOB置于数据库中，需要在Connection对象上调用createBlob或CreateClob然后获取一个用于该LOB的输出流或写出器，写出数据，并将该对象存储到数据库中。
+
+#### 多结果集
+
+当一个select返回多个结果集，重复调用getMoreResults方法移动到下一个结果集，当不存在更多的结果集或更新计数时，完成操作。
+
+#### 获取自动生成的键
+
+```java
+preparedStatement.executeUpdate();
+        ResultSet resultSet =preparedStatement.getGeneratedKeys();
+        while (resultSet.next()){
+            int key = resultSet.getInt(1);
+        }
+```
+
+#### 行集
+
+RowSet接口用于将结果缓存起来，可以操作行集中的数据。
+
+#### 元数据
+
+可以使用DatabaseMetaData获取数据库的元数据。
+
+#### 事务
+
+我们可以将一组语句构建成一个事务。当所有语句都顺利执行之后，事务可以被提交。否则，如果其中某个语句遇到错误，那么事务将被回滚。
+
+```java
+Connection connection = null;
+        try {
+            connection = DriverManager.getConnection(url, username, password);
+            connection.setAutoCommit(false);
+
+            PreparedStatement preparedStatement = connection.prepareStatement(querySql);
+            preparedStatement.executeUpdate();
+
+            preparedStatement = connection.prepareStatement(querySql1);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            try {
+                connection.commit();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+        // 有保存点
+        Savepoint savepoint = null;
+        try {
+            connection = DriverManager.getConnection(url, username, password);
+            connection.setAutoCommit(false);
+
+            PreparedStatement preparedStatement = connection.prepareStatement(querySql);
+            preparedStatement.executeUpdate();
+
+            // 事务失败后将回滚到此处
+            savepoint = connection.setSavepoint();
+
+            preparedStatement = connection.prepareStatement(querySql1);
+            preparedStatement.executeUpdate();
+        } catch (SQLException e) {
+            try {
+                connection.rollback(savepoint);
+                // 用完之后释放保存点
+                connection.releaseSavepoint(savepoint);
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        } finally {
+            try {
+                connection.commit();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+```
+
+#### 批量更新
+
+```java
+try {
+            Statement statement = connection.createStatement();
+            statement.addBatch(sql);
+
+            statement.addBatch(sql1);
+
+            int[] counts = statement.executeBatch();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+```
+
+
 
 # java11新特性
 
