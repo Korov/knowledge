@@ -1378,7 +1378,7 @@ double price = rs.getDouble("Price");//通过列名获取该列的值，返回do
 
 #### 管理连接、语句和结果集
 
-每个Connection对象都可以创建一个或多个Statement对象。同一个Statement对象可以用于多个不相关的命令和查询。但是，一个Statement对象最多只能有一个打开的结果集。如果需要执行多个查询操作，且需要同时分析查询结果，那么必须创建多个Statement对象。
+每个Connection对象都可以创建一个或多个Statement对象。同一个Statement对象可以用于多个不相关的命令和查询。但是，一个Statement对象最多只能有一个打开的结果集。如果需要执行多个查询操作，且需要同时分析查询结果，那么必须创建多个Statement对象，**Statement获取的是游标，并不保存数据**。
 
 SQLServer的JDBC驱动程序只允许同时存在一个活动的Statement对象。使用DatabaseMetaData接口中的getMaxStatements方法可以获取JDBC驱动程序支持的同时活动的语句对象的总数。
 
