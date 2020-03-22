@@ -40,7 +40,6 @@ public class ResouceServerConfig {
 
 
     //order资源
-    //uaa资源服务配置
     @Configuration
     @EnableResourceServer
     public class OrderServerConfig extends ResourceServerConfigurerAdapter {
@@ -49,12 +48,14 @@ public class ResouceServerConfig {
 
         @Override
         public void configure(ResourceServerSecurityConfigurer resources) {
+            System.out.println("debug");
             resources.tokenStore(tokenStore).resourceId(RESOURCE_ID)
                     .stateless(true);
         }
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
+            System.out.println("debug");
             http
                     .authorizeRequests()
                     .antMatchers("/order/**").access("#oauth2.hasScope('ROLE_API')");
