@@ -4,7 +4,7 @@ docker run -d --name kafka --publish 9092:9092 --link zookeeper \
 --env KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 \
 --env KAFKA_ADVERTISED_HOST_NAME=localhost \
 --env KAFKA_ADVERTISED_PORT=9092 \
---volume /etc/localtime:/etc/localtime wurstmeister/kafka;
+--volume /etc/localtime:/etc/localtime wurstmeister/kafka:2.12-2.4.1;
 ```
 
 以上启动Kafka，接下来需要进入Kafka的docker修改文件

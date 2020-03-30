@@ -1032,3 +1032,20 @@ net.bridge.bridge-nf-call-iptables = 1
 sysctl -p
 ```
 
+## idea集成docker
+
+开启2375端口：
+
+```bash
+sudo vim /usr/lib/systemd/system/docker.service
+#在文件末尾添加如下内容
+[Service]
+ExecStart=
+ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375 -H unix://var/run/docker.sock
+
+#重启
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
+
+idea中打开file->settings->build,execution...->docker，选择TCP socket，Engine API URL：`tcp://localhost:2375`。

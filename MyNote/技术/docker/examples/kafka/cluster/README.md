@@ -17,9 +17,9 @@ docker exec -it kafka1 /bin/sh
 #查看topic
 ./opt/kafka_*/bin/kafka-topics.sh --describe --zookeeper zoo1:2181,zoo2:2181,zoo3:2181 --topic test1
 #创建一个生产者
-./opt/kafka_*/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test1
+./opt/kafka_*/bin/kafka-console-producer.sh --broker-list 172.21.0.24:9092 --topic test-topic2
 #创建一个消费者
-./opt/kafka_*/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test1 --from-beginning
+./opt/kafka_*/bin/kafka-console-consumer.sh --bootstrap-server 172.21.0.24:9092 --topic test-topic2 --from-beginning
 ```
 
 参数详解：
