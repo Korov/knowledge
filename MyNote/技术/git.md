@@ -1063,3 +1063,19 @@ git branch --unset-upstream
 git branch --unset-upstream [分支名]
 ```
 
+## 4.8 git reflog
+
+查看最近所有的提交记录。
+
+```bash
+▶ git reflog show develop | head -5
+e7f1c10 develop@{0}: commit: web实现cors，webflux未实现
+6fc8c7e develop@{1}: commit: 集成spring cloud bus kafka
+bd34153 develop@{2}: commit: 集成redis
+469117e develop@{3}: commit: 完善dockerfile
+290773d develop@{4}: commit: 增加dockerfile
+
+#切换至此commit
+git reset --hard develop@{1}
+```
+

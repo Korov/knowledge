@@ -1750,14 +1750,32 @@ G1 GC对于虚引用、弱引用、软引用的处理会比一般对象多一些
 
 ## 打印GC的参数
 
-### -XX:-PrintGC
+### -XX:+PrintGC
 
 打印GC信息
 
-### -XX:-PrintGCDetails
+### -XX:+PrintGCDetails
 
 打印GC的详细信息
 
-### -XX:-PrintGCTimeStamps
+### -XX:+PrintGCDateStamps
 
 GC时，打印进程启动到现在经历的时间
+
+-XX:+PrintGCApplicationStoppedTime
+
+-XX:+PrintHeapAtGC
+
+-XX:+UseGCLogFileRotation
+
+-XX:+NumberOfGCLogFiles=10000
+
+-XX:+GCLogFileSize=10M
+
+-Xloggc:/home/korov/Desktop/install/jetbrains/gclog/gc_%t.log
+
+
+
+-XX:+HeapDumpOnOutOfMemoryError
+
+-XX:HeapDumpPath:/home/korov/Desktop/install/jetbrains/dump
