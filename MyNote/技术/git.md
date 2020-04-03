@@ -1085,3 +1085,17 @@ git push origin --delete dev
 git push origin dev
 ```
 
+### git clean
+
+删除untracked文件
+
+```bash
+#查看将会被删除的文件
+git clean -fdn
+#真正删除文件
+git clean -fd
+
+#删除untracked以及gitignore标记的文件
+git clean -fdxn
+git clean -fdx
+```
