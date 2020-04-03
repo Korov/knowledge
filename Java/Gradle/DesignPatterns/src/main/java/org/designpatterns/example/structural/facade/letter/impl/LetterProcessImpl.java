@@ -1,4 +1,6 @@
-package org.designpatterns.example.structural.facade;
+package org.designpatterns.example.structural.facade.letter.impl;
+
+import org.designpatterns.example.structural.facade.letter.LetterProcess;
 
 public class LetterProcessImpl implements LetterProcess {
     @Override

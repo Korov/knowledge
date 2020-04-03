@@ -1,5 +1,7 @@
 package org.designpatterns.example.creational.builder;
 
+import org.designpatterns.example.creational.builder.builder.Builder;
+
 public class Director {
     private Builder builder;
 

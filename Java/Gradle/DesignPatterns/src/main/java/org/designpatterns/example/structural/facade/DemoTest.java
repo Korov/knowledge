@@ -1,5 +1,9 @@
 package org.designpatterns.example.structural.facade;
 
+import org.designpatterns.example.structural.facade.facade.FacadeDemo;
+import org.designpatterns.example.structural.facade.letter.LetterProcess;
+import org.designpatterns.example.structural.facade.letter.impl.LetterProcessImpl;
+
 public class DemoTest {
     public static void main(String[] args) {
         // 以前寄信
@@ -14,7 +18,6 @@ public class DemoTest {
          *
          * 外观模式为子系统中的一组接口提供一个一致的界面
          */
-        FacadeDemo facadeDemo = new FacadeDemo();
-        facadeDemo.sendLetter("写信", "地址");
+        FacadeDemo.sendLetter("写信", "地址");
     }
 }

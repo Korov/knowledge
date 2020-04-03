@@ -8,31 +8,21 @@ import java.io.*;
  */
 public class PrototypeObject implements Cloneable, Serializable {
     private static final long serialVersionUID = -332030374249484766L;
-    private TestItem item;
+    private String value;
 
     PrototypeObject() {
     }
 
-    TestItem getItem() {
-        return item;
+    public void setValue(String value) {
+        this.value = value;
     }
 
-    public void setItem(TestItem item) {
-        this.item = item;
+    public String getValue() {
+        return value;
     }
 
     @Override
     public PrototypeObject clone() {
-        PrototypeObject object = null;
-        try {
-            object = (PrototypeObject) super.clone();
-        } catch (final CloneNotSupportedException e) {
-            e.printStackTrace();
-        }
-        return object;
-    }
-
-    public PrototypeObject deepClone() {
         PrototypeObject prototypeObject = null;
         try {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();

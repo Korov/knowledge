@@ -6,7 +6,7 @@ import org.designpatterns.example.creational.abstractfactory.factory.AbstractFac
 import org.designpatterns.example.creational.abstractfactory.factory.FactoryProducer;
 import org.designpatterns.example.creational.abstractfactory.shape.Shape;
 
-public class TestDemo {
+public class Tests {
     public static void main(final String[] args) {
         //获取形状工厂
         final AbstractFactory shapeFactory = FactoryProducer.getFactory("SHAPE");

@@ -1,4 +1,6 @@
-package org.designpatterns.example.creational.builder;
+package org.designpatterns.example.creational.builder.builder;
+
+import org.designpatterns.example.creational.builder.production.Product;
 
 public interface Builder {
     // 创建部件A   比如创建汽车车轮

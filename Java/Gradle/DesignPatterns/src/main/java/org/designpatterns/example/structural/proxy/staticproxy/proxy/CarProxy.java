@@ -1,4 +1,6 @@
-package org.designpatterns.example.structural.proxy;
+package org.designpatterns.example.structural.proxy.staticproxy.proxy;
+
+import org.designpatterns.example.structural.proxy.staticproxy.subject.Car;
 
 /**
  * 代理类，代理模式的核心
@@ -8,34 +10,29 @@ package org.designpatterns.example.structural.proxy;
  * 的代理模式。 在通常情况下， 一个接口只需要一个代理类就可以了， 具体代理哪个实现类由
  * 高层模块来决定， 也就是在代理类的构造函数中传递被代理者
  */
-public class Proxy implements Subject {
+public class CarProxy implements Car {
     //要代理哪个实现类
-    private Subject subject = null;
-
-    // 默认被代理者
-    public Proxy() {
-        subject = new Proxy();
-    }
+    private Car car = null;
 
     // 通过构造函数传递代理者
-    public Proxy(Object... objects) {
-
+    public CarProxy(Car car) {
+        this.car = car;
     }
 
     @Override
-    public void request() {
+    public void run() {
         before();
-        subject.request();
+        car.run();
         after();
     }
 
     // 预处理
     private void before() {
-        System.out.println("代理类的预处理");
+        System.out.println("Start Car");
     }
 
     // 善后处理
     private void after() {
-        System.out.println("代理类的善后处理");
+        System.out.println("Close Car");
     }
 }

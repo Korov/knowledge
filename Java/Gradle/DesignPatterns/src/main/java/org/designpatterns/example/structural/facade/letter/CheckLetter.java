@@ -1,4 +1,4 @@
-package org.designpatterns.example.structural.facade;
+package org.designpatterns.example.structural.facade.letter;
 
 public class CheckLetter {
     public void checkLetter(LetterProcess letterProcess) {
