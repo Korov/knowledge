@@ -1085,7 +1085,7 @@ git push origin --delete dev
 git push origin dev
 ```
 
-### git clean
+## git clean
 
 删除untracked文件
 
