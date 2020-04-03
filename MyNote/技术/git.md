@@ -1077,5 +1077,10 @@ bd34153 develop@{2}: commit: 集成redis
 
 #切换至此commit
 git reset --hard develop@{1}
+#远程同时回退需要先将远程分支删掉，然后再把本地的分支push到远端
+#删除远端分支   dev前面的冒号不能少
+git push origin :dev
+#把本地分支推送到远端
+git push origin dev
 ```
 
