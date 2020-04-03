@@ -570,7 +570,7 @@ a6b4c97498bd301d84096da251c98a07c7723e65 beginning write support
 964f16d36dfccde844893cac5b347e7b3d44abbc commit the todo
 8a5cbc430f1a9c3d00faaeffd07798508422908a updated readme
 #要在那个提交上打标签，你需要在命令的末尾指定提交的校验和（或部分校验和）
-$ git tag -a v1.2 9fceb02
+$ git tag -a v1.2 -m 'test 1' 9fceb02
 ```
 
 ### 2.3.3共享标签
@@ -1080,6 +1080,7 @@ git reset --hard develop@{1}
 #远程同时回退需要先将远程分支删掉，然后再把本地的分支push到远端
 #删除远端分支   dev前面的冒号不能少
 git push origin :dev
+git push origin --delete dev
 #把本地分支推送到远端
 git push origin dev
 ```
