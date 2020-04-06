@@ -1726,7 +1726,7 @@ G1 GC对于虚引用、弱引用、软引用的处理会比一般对象多一些
 [GC remark 2018-05-26T19:50:57.386-0800: 78.610: [Finalize Marking, 0.0002675 secs] 2018-05-26T19:50:57.386-0800: 78.611: [GC ref-proc, 0.0001091 secs] 2018-05-26T19:50:57.386-0800: 78.611: [Unloading, 0.0204521 secs], 0.0212793 secs]
 ```
 
-可以通过**-XX:+PrintReferenceGC**打印更详细的引用计数信息:
+可以通过`-XX:+PrintReferenceGC`打印更详细的引用计数信息:
 
 ```
 [SoftReference, 0 refs, 0.0000482 secs]2018-06-03T20:52:03.887-0800: 18.033: [WeakReference, 116 refs, 0.0000321 secs]2018-06-03T20:52:03.887-0800: 18.033: [FinalReference, 1073 refs, 0.0009571 secs]2018-06-03T20:52:03.888-0800: 18.034: [PhantomReference, 0 refs, 1 refs, 0.0000211 secs]2018-06-03T20:52:03.888-0800: 18.034: [JNI Weak Reference, 0.0000192 secs], 0.0084976 secs]
@@ -1750,15 +1750,17 @@ G1 GC对于虚引用、弱引用、软引用的处理会比一般对象多一些
 
 ## 打印GC的参数
 
-### -XX:+PrintGC
+### jdk8
+
+-XX:+PrintGC
 
 打印GC信息
 
-### -XX:+PrintGCDetails
+-XX:+PrintGCDetails
 
 打印GC的详细信息
 
-### -XX:+PrintGCDateStamps
+-XX:+PrintGCDateStamps
 
 GC时，打印进程启动到现在经历的时间
 
@@ -1779,3 +1781,8 @@ GC时，打印进程启动到现在经历的时间
 -XX:+HeapDumpOnOutOfMemoryError
 
 -XX:HeapDumpPath:/home/korov/Desktop/install/jetbrains/dump
+
+### jdk11
+
+-Xlog:gc*
+-Xloggc:/home/korov/Desktop/install/jetbrains/gclog/gc.log
