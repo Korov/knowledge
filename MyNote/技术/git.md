@@ -221,7 +221,9 @@ git config --global mergetool.bc4.path "E:\\Install\\Beyond Compare 4\\BComp.exe
 
 ### 2.1.7提交更新
 
-为确保提交前所有的文件都已经存放到暂存区，需要使用git status查看当前工作目录的所有文件的状态，再使用git commit提交文件
+为确保提交前所有的文件都已经存放到暂存区，需要使用git status查看当前工作目录的所有文件的状态，再使用git commit提交文件.
+
+每个commit都会产生一个对象,包含id,parent-id,commiter,name.email,author.次commit都会改变仓库中文件的状态,commit式不可变的.
 
 ```bash
 $ git commit
@@ -232,6 +234,8 @@ $ git commit -m "Story 182: Fix benchmarks for speed"
 #将所有已跟踪的文件暂存起来一并提交，从而跳过git add步骤
 $ git commit -a
 
+#会创建一个新的commit,此commit的parent-id与上一次commit的parent-id相同,出现了分叉,意思就是抛弃了上一次commit.需要git pull才能commit
+git commit --amend -m 'test'
 ```
 
 提交后它会告诉你，当前是在哪个分支（**master**）提交的，本次提交的完整 SHA-1 校验和是什么（**463dc4f**），以及在本次提交中，有多少文件修订过，多少行添加和删改过。
@@ -456,6 +460,8 @@ $ git merge
 ```
 
 ### 2.2.4推送到远程仓库
+
+<u>git push可以成功的前提是远端的commit必须是当前commit的父亲,否则不可push</u>
 
 ```bash
 #git push [remote-name] [branch-name]
@@ -872,7 +878,7 @@ $ git branch -d serverfix
 
 ## 3.6变基
 
-git中整合来自不同分支的修改主要有两种方法：merge和rebase。
+git中整合来自不同分支的修改主要有两种方法：merge和rebase。使用rebase之后必须使用git push --force才能将修改推送到远程分支.
 
 ### 3.6.1变基的基本操作
 
@@ -941,9 +947,7 @@ $ git rebase master server
 
 ### 3.6.5变基vs合并
 
-总的原则是，只对尚未推送或分享给别人的本地修改执行变基操作清理历史，从不对已推送至别处的提交执行变基操作，这样，你才能享受到两种方式带来的便利。
-
-
+<u>总的原则是，只对尚未推送或分享给别人的本地修改执行变基操作清理历史，从不对已推送至别处的提交执行变基操作，这样，你才能享受到两种方式带来的便利。</u>
 
 # 4.问题处理
 
@@ -1103,3 +1107,27 @@ git clean -fd
 git clean -fdxn
 git clean -fdx
 ```
+
+## 新指示点
+
+### git checkout 
+
+此命令后面可以是一个commit的id,一个分支,HEAD,标签等.这些可以标志一个仓库的状态.
+
+head指向当前分支的头,如果在dev分支则HEAD就指向dev,如果在prod分支则执行prod分支.
+
+HEAD~1表示当前HEAD的父亲commit,HEAD~2代表爷爷,依次递增,如果有多个父亲则以左一为准,也可以为master~2,commitId~3. 
+
+commitid^表示此commitid的父亲,commitid^2^1表示当前commitid的第二个父亲的第一个父亲.
+
+### git merge --squash
+
+实例在master的A出分出一个feature分支并在之后提交了3个commit B,C,D,并且master分支也有了两个commit E,F.
+
+```bash
+git switch master
+git merge feature --squash
+```
+
+此时会将feature的B,C,D的commit整合成一个,然后合入master,squash压扁的意思.
+
