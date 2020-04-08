@@ -394,7 +394,7 @@ unborn branch
 
 **取消暂存的文件**
 
-git reset HEAD <file>...将暂存区中的文件移除到未暂存的区域
+`git reset HEAD <file>...`将暂存区中的文件移除到未暂存的区域
 
 **撤销对文件的修改**
 
@@ -1108,6 +1108,35 @@ git clean -fdxn
 git clean -fdx
 ```
 
+## git cherry-pick
+
+将某个commitID的修改引用到当前HEAD上
+
+```bash
+#单个commit
+git cherry-pick commitID
+#多个commit,一个commit区间
+git cherry-pick commitID..commitID
+```
+
+## git revert
+
+`git revert commitId`,将此commit做的修改撤销.其过程是如果此commit中增加了一个文件a.java,使用revert之后会创建一个删除a.java的commit提交.
+
+## git bisect
+
+使用二分查找找到有引入bug的commit.使用的时候
+
+```bash
+#开始和重置查找
+git bisect start/reset
+git bisect good/bad/skip
+#使用脚本进行测试,git bisect run ./run.sh
+git bisect run
+```
+
+
+
 ## 新知识点
 
 ### git checkout 
@@ -1133,5 +1162,5 @@ git merge feature --squash
 
 ### git add和git reset的正则匹配失效
 
-使用git add *.java时命令行会讲*转化为当前文件夹中匹配到的文件，例如当前文件夹中如果有a.java，那么git add *.java就相当于git add a.java，需要使用git add '*.java'使用git来解析正则而不是命令行来解析正则
+使用`git add *.java`时命令行会讲`*`转化为当前文件夹中匹配到的文件，例如当前文件夹中如果有a.java，那么`git add *.java`就相当于`git add a.java`，需要使用`git add '*.java'`使用git来解析正则而不是命令行来解析正则
 
