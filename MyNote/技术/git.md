@@ -949,6 +949,28 @@ $ git rebase master server
 
 <u>总的原则是，只对尚未推送或分享给别人的本地修改执行变基操作清理历史，从不对已推送至别处的提交执行变基操作，这样，你才能享受到两种方式带来的便利。</u>
 
+### 3.6.6压扁
+
+压扁前test-my-feature有DEFG四个commit.
+
+```bash
+D---E---F---G
+```
+
+压扁后将EFG三个commit合并成一个commitH
+
+```
+D---H
+```
+
+实现方式
+
+```bash
+#使用默认的mixed方式reset
+git reset commit-D
+git commit -m 'squash commit'
+```
+
 # 4.问题处理
 
 ## 4.1 git bash中文被转义
