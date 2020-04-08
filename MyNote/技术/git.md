@@ -1108,7 +1108,7 @@ git clean -fdxn
 git clean -fdx
 ```
 
-## 新指示点
+## 新知识点
 
 ### git checkout 
 
@@ -1130,4 +1130,8 @@ git merge feature --squash
 ```
 
 此时会将feature的B,C,D的commit整合成一个,然后合入master,squash压扁的意思.
+
+### git add和git reset的正则匹配失效
+
+使用git add *.java时命令行会讲*转化为当前文件夹中匹配到的文件，例如当前文件夹中如果有a.java，那么git add *.java就相当于git add a.java，需要使用git add '*.java'使用git来解析正则而不是命令行来解析正则
 
