@@ -1129,7 +1129,7 @@ git cherry-pick commitID..commitID
 
 之后将执行的命令整合成shell脚本使用`git bisect run ./run.sh`进行自动化测试。
 
-需要配置tag才能实现自动checkout，没有tag的话需要手动checkout慢慢找。
+需要在第一个commitId1处判定此commit是bad，然后去commitId2判定此commit是good之后bisect就可以自动checkout查找bug引入的commit。
 
 ```bash
 #开始和重置查找
