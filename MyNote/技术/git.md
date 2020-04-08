@@ -1125,7 +1125,9 @@ git cherry-pick commitID..commitID
 
 ## git bisect
 
-使用二分查找找到有引入bug的commit.使用的时候
+使用二分查找找到有引入bug的commit，使用过程首先是开始二分查找，然后执行相关命令，查看bug在此commit中是否存在，如果存在就git bisect good，不存在就用git bisect bad，无法执行就git bisect skip。
+
+之后将执行的命令整合成shell脚本使用`git bisect run ./run.sh`进行自动化测试。
 
 ```bash
 #开始和重置查找
@@ -1134,8 +1136,6 @@ git bisect good/bad/skip
 #使用脚本进行测试,git bisect run ./run.sh
 git bisect run
 ```
-
-
 
 ## 新知识点
 
