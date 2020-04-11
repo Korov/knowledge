@@ -565,6 +565,10 @@ Major GC/Full GC（老年代GC）：指发生在老年代的GC，出现了Major 
 | jhat   | JVM Heap Dump Browser，用于分析heapdump文件，它会建立一个HTTP/HTML服务器，让用户可以在浏览器上查看分析结果 |
 | jstack | Stack Trace for Java，显示虚拟机的线程快照                   |
 
+### 常用的搭配
+
+使用`jps`查看当前正在运行的jvm，然后使用`jstack`查看某个jvm的调用栈信息。
+
 ### 4.1.1 jps：虚拟机进程状况工具
 
 可以列出正在运行的虚拟机进程，并显示虚拟机执行主类名称以及这些进程的本地虚拟机唯一ID（Local Virtual Machine Identifier，LVMID）。
@@ -1786,3 +1790,4 @@ GC时，打印进程启动到现在经历的时间
 
 -Xlog:gc*
 -Xloggc:/home/korov/Desktop/install/jetbrains/gclog/gc.log
+
