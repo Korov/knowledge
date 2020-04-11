@@ -186,7 +186,52 @@ mvn package只会将包大好放到代码路径下面，mvn install会将包大�
 
 ## mvn deploy
 
-上传到私服
+上传到私服，首先要用docker搭建一个nexus私服。
+
+首先需要在项目的pom文件中引入deploy插件
+
+```xml
+<plugin>
+    <artifactId>maven-deploy-plugin</artifactId>
+     <version>2.8.2</version>
+ </plugin>
+```
+
+同时增加部署的服务器和仓库
+
+```xml
+<distributionManagement>
+    <snapshotRepository>
+      <id>nexus-snapshots</id>
+      <url>http://localhost:8081/nexus/content/repositories/my/</url>
+    </snapshotRepository>
+  </distributionManagement>
+```
+
+需要在settings.xml中配置仓库的用户名和密码
+
+```xml
+<server>
+      <id>nexus-snapshots</id>
+      <username>admin</username>
+      <password>admin23</password>
+    </server>
+```
+
+之后运行`mvn deploy`就可以将插件部署到私服。
+
+使用的时候需要增加一个插件专用的仓库
+
+```xml
+<pluginRepositories>
+    <pluginRepository>
+      <id>nexus-snapshots</id>
+      <url>http://localhost:8081/nexus/content/repositories/my/</url>
+    </pluginRepository>
+  </pluginRepositories>
+```
+
+
 
 ## mvn site
 
@@ -365,6 +410,116 @@ C:\Users\korov\IdeaProjects\demo>mvn initialize
 ```
 
 如果想传递参数到插件中可以使用-D全局变量的方式，在启动的时候赋予全局变量，然后插件中获取变量进行相应的操作。
+
+# maven多模块之间的依赖传递
+
+使用`<dependencyManagement></dependencyManagement>`进行多模块版本管理。这个只会声明版本，在子模块声明引用的时候不需要声明version。
+
+`pluginManagement`和`dependencyManagement`功能类似，子模块继承父类的插件版本。
+
+对于父模块的所有`dependencies`都会被子模块继承。`properties`也会被继承。
+
+## 超级pom
+
+每个pom中会有`<modelVersion>4.0.0</modelVersion>`表明超级pom的版本，此文件在maven安装目录中`maven-model-builder`的jar包中。里面会有一个`pom-4.0.0.xml`，里面预定义了一些参数，例如中央仓库，插件仓库，main，test这些目录功能的约定。可以自己修改。
+
+# profiles
+
+多环境配置
+
+一个pom文件中的profiles
+
+```xml
+<profiles>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<project.active>dev</project.active>
+			</properties>
+		</profile>
+		<profile>
+			<id>test</id>
+			<properties>
+				<project.active>test</project.active>
+			</properties>
+		</profile>
+	</profiles>
+```
+
+activeByDefault标签的值为true的话表示为默认的profile，使用mvn install命令起作用的就是默认的
+ profiles.activation为我们配置激活的profile
+
+profile中的其他属性
+
+```
+<profile>
+            <id>prod</id>
+            <properties>
+                <profiles.active>prod</profiles.active>
+            </properties>
+            <!--activation用来指定激活方式，可以根据jdk环境，环境变量，文件的存在或缺失-->
+            <activation>
+                <!--配置默认激活-->
+                <activeByDefault>true</activeByDefault>
+                
+                <!--通过jdk版本-->
+                <!--当jdk环境版本为1.5时，此profile被激活-->
+                <jdk>1.5</jdk>
+                <!--当jdk环境版本1.5或以上时，此profile被激活-->
+                <jdk>[1.5,)</jdk>
+
+                <!--根据当前操作系统-->
+                <os>
+                    <name>Windows XP</name>
+                    <family>Windows</family>
+                    <arch>x86</arch>
+                    <version>5.1.2600</version>
+                </os>
+
+                <!--通过系统环境变量，name-value自定义-->
+                <property>
+                    <name>env</name>
+                    <value>test</value>
+                </property>
+
+                <!--通过文件的存在或缺失-->
+                <file>
+                    <missing>target/generated-sources/axistools/wsdl2java/
+                        com/companyname/group</missing>
+                    <exists/>
+                </file>
+            </activation>
+        </profile>
+```
+
+使用指定的profile
+
+```bash
+mvn install -Ptest
+```
+
+表明会将`src\main\resources\test`作为资源路径。
+
+也可以在setting.xml中是定profile
+
+```xml
+<activeProfiles>  
+     <activeProfile>dev</activeProfile>  
+</activeProfiles>  
+```
+
+# maven私服
+
+## nexus
+
+```bash
+docker run -d -p 8081:8081 --name nexus sonatype/nexus:oss
+```
+
+浏览器登录`http://localhost:8081/nexus`，用户名密码是`admin，admin123`，进入之后需要创建一个自己的仓库。
 
 # maven小知识
 
