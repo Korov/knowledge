@@ -1188,3 +1188,21 @@ git merge feature --squash
 
 使用`git add *.java`时命令行会讲`*`转化为当前文件夹中匹配到的文件，例如当前文件夹中如果有a.java，那么`git add *.java`就相当于`git add a.java`，需要使用`git add '*.java'`使用git来解析正则而不是命令行来解析正则
 
+## 从源代码中构建出软件
+
+从github下载源代码之后，源代码中通常会用contributing或者build文件，里面写了如何本地构建软件。
+
+## 任意查找任何感兴趣的代码
+
+找到对应的源代码下载下来，使用ide打开源代码，本地以debug方式启动程序，启动之后程序会开放一个端口，使用ide以debug方式连接该端口，就可以远程debug该程序的源代码。
+
+这种方式对于任何以jvm为基础的程序都适用。远程debug模式。
+
+怎么找到相应的源代码，可以通过debug时候的执行栈信息找到你想debug的类全限定名，在github中检索，找到源代码仓库，将源代码下载下来。有时候你需要确定你找到的是哪个版本的源代码，结合tag实现正确源代码的查找。
+
+### 确定jvm中类的版本
+
+终极找jar的方式，启动远程调试之后，在断点的地方使用idea的Evaluate Expression，在其中执行`class.forName("com.***.***.Launcher")`。结果的classLoader下的ucp下的path显示了这个类是从哪个jar包中加载的。对于任意类都适用。
+
+在断点的地方使用idea的Evaluate Expression，在其中执行`class.forName("com.***.***.Launcher").getResource("/com/***/***/Launcher.class")`。可以查找出绝对路径下的class文件地址，从而确定该类的版本。
+
