@@ -432,6 +432,8 @@ BUILD SUCCESSFUL in 1s
 
 # 依赖管理
 
+依赖冲突的解决原则：新版本优先。
+
 `gradle [module]:dependencies`查看项目的依赖管理。
 
 Java Library plugin - configurations used to declare dependencies*
