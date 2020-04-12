@@ -1,3 +1,7 @@
+# gradle
+
+在命令行输入一个gradle命令之后，gradle会去查找一个Daemon进程（Gradle Daemon），gradle会启动一个小的jvm进程，找到Daemon之后将正真的工作交给Daemon去执行，这样下次执行的时候会加快执行的速度。
+
 # wrapper
 
 是一个包装器，用`gradle wrapper`创建，其目录结构如下：
@@ -17,7 +21,17 @@ $ tree .
 
 将这几个文件复制到相应的gradle项目中，下次运行此项目就会使用此wrapper版本的gradle，配置gradle命令`./gradlew wrapper`
 
-# groovy中的闭包
+# groovy
+
+groovy是java的超集，groovy的MOP（元对象协议）默认一切均反射，动态调用，可以静态编译。
+
+## groovy语法糖
+
+List使用`[]`实现，Map使用`[:]`，String可以想脚本语言一样内嵌`"$val"`。可以使用def定义弱类型。
+
+groovy会默认自动生成geeter/setter方法，没有真正的private，Class创建的语法糖，通过方法名动态调用，方法调用的拦截器，方法调用失败的策略。
+
+## groovy中的闭包
 
 闭包是一段代码，类似于java中的lambda表达式，在gradle中，我们主要把闭包当参数来使用。
 
@@ -46,6 +60,146 @@ def method2(Closure closure) {
 method2(b2)
 ```
 
+# gradle的核心概念
+
+## project
+
+一个build.gradle文件对应一个project，一个build.gradle其本质是一个可执行的脚本，这个脚本会在jvm中的一个project中运行。类似于maven中的pom.xml。
+
+## build.gradle
+
+项目的构建脚本，其实质是一个以project对象为delegate的代码片段。
+
+## task
+
+构建脚本中定义的最小的工作单元，任务之间可以依赖，可以动态创建。
+
+```groovy
+task taskDemo {
+    doLast {
+        println "Hello Task!"
+    }
+}
+```
+
+执行task：`./gradlew :taskDemo`，其中`:`表示执行根目录下脚本中的taskDemo任务，若是在子模块中的taskDemo任务需要执行`./gradlew :subModule:taskDemo`类似与maven中的`-f`参数。
+
+task解析
+
+```groovy
+task("taskDemo", {
+    doLast({
+        println("Hello Task!")
+    })
+})
+```
+
+task传一个string和闭包作为参数，闭包中有一个doLast闭包执行具体任务。
+
+### 示例
+
+执行命令，以及task依赖
+
+```groovy
+task startContainer {
+    doLast {
+        println("docker run -d mysql".execute())
+    }
+}
+
+task taskDemo1 {
+    doLast {
+        println "Hello Task!"
+    }
+}
+
+task taskDemo2 {
+    // taskDemo1首先会在这个task找这个参数，找不到的话就会在整个project中找
+    dependsOn(taskDemo1)
+    doLast {
+        println "Hello Task!"
+    }
+}
+```
+
+task代码复用
+
+```groovy
+task taskDemo(type:MyPrint) {
+    value = "taskDemo"
+}
+
+task taskDemo1(type:MyPrint) {
+    value = "taskDemo1"
+}
+
+class MyPrint extends DefaultTask{
+    String value;
+
+    @TaskAction
+    void run(){
+       println(value)
+    }
+}
+```
+
+
+
+## build.gradle示例
+
+```groovy
+println 1
+task taskDemo {
+    println 2
+    doLast {
+        println 3
+        println "Hello Task!"
+    }
+}
+```
+
+执行结果：
+
+```
+$ ./gradlew :taskDemo
+> Configure project :
+1
+2
+
+> Task :taskDemo
+3
+Hello Task!
+```
+
+执行的时候从上到下执行build.gradle中的脚本，但是doLast不会在配置阶段只是，因为他属于taskDemo任务，只有执行taskDemo这个任务时doLast才会执行。
+
+## afterEvaluate
+
+```groovy
+println 1
+task taskDemo {
+    println 2
+    doLast {
+        println 3
+    }
+}
+
+afterEvaluate {
+    println taskDemo1.name
+}
+
+task taskDemo1 {
+    println 4
+    doLast {
+        println 5
+    }
+}
+```
+
+afterEvaluate表示当执行完build.gradle之后再回来执行其中的内容，执行build.gradle的时候会将afterEvaluate保存起来并创建一个钩子，在执行完build.gradle之后调用这个钩子。
+
+afterEvaluate的主要作用在不同task中传递数据。如果没有afterEvaluate，在taskDemo中直接传递数据个taskDemo1是不会成功的，因为此时taskDemo1还没有创建，会出现null。
+
 # gradle的生命周期
 
 ## 构建阶段
@@ -54,7 +208,7 @@ Gradle构建过程有三个阶段：
 
 1. 初始化（Initialization）
 
-   >Gradle可以构建一个和多个项目。在初始化阶段，Gradle会确定哪些项目参与构建，并且为这些项目创建一个Project实例。
+   >Gradle可以构建一个和多个项目。在初始化阶段，Gradle会确定哪些项目参与构建（扫描settings.gradle文件），并且为这些项目创建一个Project实例。
 
 2. 配置（Configuration）
 
@@ -166,8 +320,6 @@ Adding test task to root project 'gradle lifecycle'
 Running tests for root project 'gradle lifecycle'
 ```
 
-
-
 # 插件编写
 
 将一段代码逻辑抽取出来放到某个地方，所有项目都可以用
@@ -267,6 +419,16 @@ $ ./gradlew task7
 
 BUILD SUCCESSFUL in 1s
 ```
+
+# 增量构建
+
+每次执行任务前都会检查相关的文件是否改变，如果没有改变则这个任务会被忽略掉。
+
+是否增量更新在相应的任务中定义好了怎么判断是否增量，只有自己写的代码需要自己定义增量判断条件。
+
+使用注解声明增量构建，
+
+使用运行时API动态声明增量构建
 
 # 依赖管理
 
