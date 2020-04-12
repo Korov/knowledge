@@ -322,7 +322,13 @@ Running tests for root project 'gradle lifecycle'
 
 # 插件编写
 
-将一段代码逻辑抽取出来放到某个地方，所有项目都可以用
+## 抽取重复代码
+
+### 抽象到文件
+
+将一段代码逻辑抽取出来放到某个地方，所有项目都可以用：将插件放到一个脚本中例如`demo1.gradle`，然后在`build.gradle`中使用`apply from: 'demo1.gradle'`，也可以使用http从网络上获取。
+
+### 抽象到类
 
 在build.gradle中写下这段代码：创建了10个task
 
@@ -376,7 +382,7 @@ buildscript {
 
 ### 使用buildSrc
 
-在项目根目录创建`buildSrc`文件加，里面有`src/main/java`，刷新gradle之后gradle会自动识别该文件夹，在里面写一个插件类
+在项目根目录创建`buildSrc`文件加，里面有`src/main/java`，刷新gradle之后gradle会自动识别该文件夹，在里面写一个插件类，这里的插件可以进行测试，也可以发布到中央仓库，这里的文件与本地的项目已经没有什么关系，只是本地项目需要依赖这个插件做一些事情。
 
 ```java
 import org.gradle.api.Plugin;
@@ -463,6 +469,76 @@ Java Library plugin - configurations used to declare dependencies*
 | runtimeClasspath     | For executing this library              | no          | yes         | This configuration contains the runtime classpath of this library |
 | testCompileClasspath | For compiling the tests of this library | no          | yes         | This configuration contains the test compile classpath of this library. |
 | testRuntimeClasspath | For executing tests of this library     | no          | yes         | This configuration contains the test runtime classpath of this library |
+
+# 自定义Gradle构建
+
+## 参数
+
+可以在项目的根目录中创建gradle.properties存储项目公用的参数，也可以在`.gradle`中创建gradle.properties则为当前用户的所有项目共享的参数
+
+```groovy
+task taskDemo {
+    doLast {
+        // 使用 -P 传递参数
+        println "print $key1"
+        // 使用 -D 传递参数
+        println System.getProperty("key2")
+        // 从 gradle.properties 中获取参数
+        println "print $propertiesKey"
+    }
+}
+```
+
+执行结果
+
+```bash
+gradlew :taskDemo -Pkey1=wwwww -Dkey2=ffffff
+
+> Task :taskDemo
+print wwwww
+ffffff
+print value1
+
+BUILD SUCCESSFUL in 1s
+1 actionable task: 1 executed
+```
+
+对于gradle.properties所有的命令行参数都可以放到此脚本中，下次运行的使用就不需要在命令行中声明此参数
+
+```groovy
+// --consle-plain
+org.gradle.console=plain
+```
+
+
+
+## init脚本
+
+可以在当前项目的根路径下创建一个脚本`init-demo.gradle`，像build.gradle一样写内容，启动方式
+
+```bash
+gradlew --init-script init-demo.gradle
+```
+
+可以在`.gradle`文件夹下创建一个`init.gradle`脚本，这样在当前用户的每个项目执行时都会先使用这个接本在执行任务，可以进行仓库的替换。
+
+## 使用第三方库
+
+ 需要为脚本声明单独的依赖包
+
+```groovy
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        
+    }
+}
+```
+
+
 
 # 多项目构建
 
