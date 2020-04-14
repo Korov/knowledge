@@ -617,3 +617,21 @@ AOP配置元素                              用 途
 
 由容器动态的将某个依赖关系注入到组件之中。构造器注入，xml注入等方式。
 
+## Bean创建过程
+
+1. 创建ApplicationContext
+
+   > SpringApplication的run方法调用public ConfigurableApplicationContext run(String... args) 方法,其中createApplicationContext()创建了一个默认的ApplicationContext,基于注解的AnnotationConfigServletWebServerApplicationContext,在实例化AnnotationConfigServletWebServerApplicationContext的时候会创建一个reader和scanner,在DefaultListableBeanFactory中的registerBeanDefinition将bean添加进beanDefinitionNames,
+
+2. 读取所有的Bean定义并加载
+
+   >public ConfigurableApplicationContext run(String... args) 中的refreshContext(context)方法最终会调用AbstractApplicationContext中的finishBeanFactoryInitialization,此方法中的beanFactory.preInstantiateSingletons();会实例化所有bean,
+   >
+   >这里会创建一个 ConfigurationClassPostProcessor 的bean,这个bean会根据注解扫描更多的bean,还有其他的可以扫描xml的等等.
+
+## spring servlet
+
+spring中有一个DispatcherServlet将请求发送给spring内部进行处理,
+
+可以在HttpServletBean中的init方法中打一个断点,通过调用栈可以看到StandardWrapper中的private synchronized void initServlet(Servlet servlet)方法会调用servlet.init(facade);方法,接下来就会由spring接手来处理请求.
+
