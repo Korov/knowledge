@@ -411,6 +411,67 @@ C:\Users\korov\IdeaProjects\demo>mvn initialize
 
 如果想传递参数到插件中可以使用-D全局变量的方式，在启动的时候赋予全局变量，然后插件中获取变量进行相应的操作。
 
+## surefire插件
+
+用于测试使用的插件.
+
+```xml
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.2</version>
+                <configuration>
+                    <!-- 启动的时候给jvm加参数 -->
+                    <argLine>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005</argLine>
+
+                    <!-- 跳过测试 -->
+                    <skipTests>true</skipTests>
+
+                    <!-- 添加和去除测试类 -->
+                    <includes>
+                        <include>Sample.java</include>
+                    </includes>
+                    <excludes>
+                        <exclude>**/TestCircle.java</exclude>
+                        <exclude>**/TestSquare.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+```
+
+## jacoco
+
+测试覆盖率插件
+
+jacoco是通过拦截方法的调用和执行实现测试覆盖率的检测，使用java agent，使用jacoco是其会在jvm的启动参数中添加某些参数
+
+```xml
+<argLine>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005</argLine>
+```
+
+例如上面使用的argLine时jacoco就会失效，正确启动方式：
+
+```xml
+<argLine>-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005 ${argLine}</argLine>
+```
+
+使用jacoco时需要手动将其report绑定到test阶段，否则不生效，默认是在site阶段执行。
+
+## 对于测试
+
+项目中的test文件下的测试类，每个@Test方法不是在同一个实例中执行的，对于每个@Test方法测试的框架都会使用反射创建一个新的对象，然后执行测试方法，如果有三个测试方法就会创建三个实例，对于@Before每个实例创建之后都是先执行@Before然后再执行@Test方法。@BeforeAll会在所有的测试方法之前被执行。
+
+测试的生命周期：
+
+1. 调用@BeforeAll/@BeforeClass
+2. 创建测试类对象实例
+3. 调用@Before/@BeforeEach
+4. 调用@Test
+5. 调用@After/@AfterEach
+6. 调用@AfterClass/@AfterAll
+
+测试并不保证测试顺序，好的测试不应该相互依赖。
+
 # maven多模块之间的依赖传递
 
 使用`<dependencyManagement></dependencyManagement>`进行多模块版本管理。这个只会声明版本，在子模块声明引用的时候不需要声明version。

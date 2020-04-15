@@ -1791,3 +1791,8 @@ GC时，打印进程启动到现在经历的时间
 -Xlog:gc*
 -Xloggc:/home/korov/Desktop/install/jetbrains/gclog/gc.log
 
+## 远程调试
+
+在启动jvm的时候加上`-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005`参数，然后在本地的ide上连接远程主机以及端口连接jvm进行调试。
+
+上面的是jdk9以上的，jdk5-8使用`-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005`。
