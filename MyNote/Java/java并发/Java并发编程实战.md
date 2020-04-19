@@ -1291,3 +1291,9 @@ ConcurrentHashMap和HashTable，ConcurrentHashMap的加锁粒度更细，HashTab
 CopyOnWriteArrayList和CopyOnWriteArraySet它们是加了写锁的ArrayList和ArraySet，锁住的是整个对象，但读操作可以并发执行
 
 除此之外还有ConcurrentSkipListMap、ConcurrentSkipListSet、ConcurrentLinkedQueue、ConcurrentLinkedDeque等
+
+## JMM
+
+方法中的局部变量是线程私有的，除此之外的其他东西都是共享的。
+
+java中所有共有数据都是存放在堆中的，线程的私有变量会保存在自己的方法栈中，为线程私有的。
