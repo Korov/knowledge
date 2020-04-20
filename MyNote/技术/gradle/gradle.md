@@ -629,3 +629,9 @@ allprojects { Project project ->
 }
 ```
 
+## 跳过测试
+
+```bash
+./gradlew build -x test
+```
+
