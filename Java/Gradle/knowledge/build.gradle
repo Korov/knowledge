@@ -10,11 +10,9 @@ sourceCompatibility = '1.8'
 
 //jar依赖从哪里获取mavenLocal()先从本地找，找不到mavenCentral()从中央仓库下载
 repositories {
+    maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
     mavenLocal()
     mavenCentral()
-    maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-    maven { url 'https://maven.aliyun.com/repository/google/' }
-    maven { url 'https://maven.aliyun.com/repository/jcenter/'}
 }
 
 //依赖关系
@@ -47,9 +45,6 @@ allprojects {
         options.encoding = 'UTF-8'
     }
     repositories {
-        mavenLocal()
-        mavenCentral()
         maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
-        maven { url 'https://maven.aliyun.com/repository/google/' }
-        maven { url 'https://maven.aliyun.com/repository/jcenter/'}    }
+    }
 }
