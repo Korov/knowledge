@@ -1142,17 +1142,13 @@ public static <T> void method(Operate<T> operate) {
 
 ### 1.8.1Collection接口
 
-在Java类库中，集合类的基本接口是Collection接口。这个接口有两个基本方法：
+要对collection接口中的所有方法了如指掌。
 
-```java
-public interface Collection<E>{
-  boolean add(E element);
-  Iterator<E> iterator();
-  ...
-}
+以下这些类为collection的实现类需要了如指掌：
+
 ```
-
-add方法用于向集合中添加元素。如果添加元素确实改变了集合就返回true，如果结合没有发生变化就返回false。iterator方法用于返回一个实现了Iterator接口的对象。可以使用这个迭代器对象依次访问集合中的元素。
+Set,List,Map,SortedSet,SortedMap,HashSet,TreeSet,ArrayList,LinkedList,Vector,Collections,Arrays,AbstractCollection
+```
 
 ### 1.8.2迭代器
 
