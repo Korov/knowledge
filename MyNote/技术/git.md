@@ -1188,6 +1188,19 @@ git merge feature --squash
 
 使用`git add *.java`时命令行会讲`*`转化为当前文件夹中匹配到的文件，例如当前文件夹中如果有a.java，那么`git add *.java`就相当于`git add a.java`，需要使用`git add '*.java'`使用git来解析正则而不是命令行来解析正则
 
+## github设置
+
+需要设置走1080端口
+
+```bash
+git config --global http.proxy http://127.0.0.1:1080
+git config --global https.proxy https://127.0.0.1:1080
+
+#取消
+git config --global --unset http.proxy
+git config --global --unset https.proxy
+```
+
 ## 从源代码中构建出软件
 
 从github下载源代码之后，源代码中通常会用contributing或者build文件，里面写了如何本地构建软件。
