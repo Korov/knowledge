@@ -621,6 +621,8 @@ lambda表达式中，只能引用值不会改变的变量。如果在lambda表�
 
 规定：lambda表达式中捕获的变量必须实际上是最终变量。
 
+> lambda表达式的工作方式与线程类似，捕获外围变量的时候捕获到的是一个变量副本，因此修改的时候只是修改副本中的内容，并不会影响外部变量的内容。
+
 lambda表达式中的this是指创建这个lambda表达式的方法的this参数。例如
 
 ```java
@@ -670,6 +672,32 @@ public class HandleLambda {
 //接口
 public interface IntComsumer {
     void accept(int value);
+}
+```
+
+### 1.4.7 柯里化
+
+一种函数式编程的一个过程，在这个过程中我们能把一个带有多个参数的函数转换成一系列的嵌套函数。它返回一个新函数，这个新函数期望传入下一个参数。
+
+```java
+/**
+ * 柯里化
+ */
+public class CurryingDemo {
+    public static void main(String[] args) {
+        BiFunction<Integer, Integer, Integer> function = Integer::sum;
+
+        Function<Integer, Integer> newFunction = currying(function, 1234);
+        System.out.println(newFunction.apply(3));
+
+        // 上面的内容相当于函数式中调用另外一个函数式
+        Function<Integer, Integer> myFunction = x -> function.apply(x, 1234);
+        System.out.println(myFunction.apply(3));
+    }
+
+    public static Function<Integer, Integer> currying(BiFunction<Integer, Integer, Integer> function, int value) {
+        return x -> function.apply(x, value);
+    }
 }
 ```
 
@@ -1236,6 +1264,24 @@ TreeSet是一个有序集合，可以以任意顺序将元素插入到集合中�
 
 将一个元素添加到树中要比添加到散列表中慢，但是于检查数组或链表中的重复元素相比还是要快很多。
 
+#### TreeMap
+
+是一个基于红黑树实现的Map，其实现了NavigableMap接口，可以根据大小对map中的数据进行排序，TreeSet也是类似的。
+
+#### 红黑树
+
+红黑树是一种平衡二叉查找树的变体，他的左右子树高度差有可能大于1，所以红黑树不是严格意义上的平衡二叉树，但对其进行平衡的代价比较低，其平均性能要强于AVL。
+
+特性：
+
+1. 节点是红色或者黑色
+2. 根节点是黑色
+3. 所有叶子节点都是黑色（叶子是null节点）
+4. 每个红色节点的两个子节点都是黑色（从每个叶子到根的所有路径上不能有两个连续的红色节点
+5. 从任一节点到其他每个叶子的所有路径都包含相同数据的黑色节点
+
+这些约束强制了红黑树的关键性质：从根到叶子的最长可能路径不多于最短的可能路径的两倍长。是性质4导致路径上不能有两个连续的红色节点，最短路径可能都是黑色节点，最长的可能路径有交替的红色和黑色节点，因为根据性质5所有最长路径都有相同数目的黑色节点，这就表明了没有路径能多于任何其他路径的两倍长。
+
 ### 1.8.7优先级队列
 
 优先级队列中的元素可以按照任意的顺序插入，却总是按照排序的顺序进行检索，也就是说无论何时调用remove方法，总会获得当前优先级队列中最小的元素。优先级队列使用堆实现。
@@ -1290,6 +1336,52 @@ EnumMap<Weekday, Employee> personInCharge = new EnumMap<>(Weekday.class);
 ```
 
 1.9
+
+## 2.1 java中的流库
+
+流遵循了“做什么而非怎么做“的原则。
+
+流表面上看起来和集合很类似，都可以让我们转换和获取数据。但是他们之间存在这显著的差异：
+
+1. 流并不存储其元素，这些元素可能存储在底层的集合中，或者是按需生成的
+2. 流的操作不会修改其数据源。例如filter方法不会从新的流中删除元素，而是会生成一个新的流，其中不包含被过滤掉的元素
+3. 流的操作是尽可能惰性执行的。这意味着直至需要其结果时，操作才会执行。例如，我们只想查找前5个长单词而不是所有长单词，那么filter方法就会在匹配到第5个单词后停止过滤。因此我们甚至可以操作无限流
+
+### 2.1.1 filter、map和flatMap方法
+
+```java
+// 产生一个流，包含当前流中所有满足断言条件的元素
+Stream<T> filter(Predicate<? super T> predicate);
+
+// 产生一个流，他包含将mapper应用于当前流中所有元素所产生的结果
+<R> Stream<R> map(Function<? super T, ? extends R> mapper);
+
+// 产生一个流，他是通过将mapper应用于当前流中的所有元素所产生的结果连接到一起而获得的
+<R> Stream<R> flatMap(Function<? super T, ? extends Stream<? extends R>> mapper);
+```
+
+### 2.1.2 Optional类型
+
+推荐使用方式是把Optional作为返回值使用，而不是作为参数使用。
+
+很多流的操作返回值是optinal类型，optional常用的几种函数：
+
+```java
+// 产生这个Optional的值，或者在该Optional为空时，产生other
+public T orElse(T other);
+
+// 产生这个Optinal的值，或者在Optinal为空的时候，产生调用other的结果
+public T orElseGet(Supplier<? extends T> supplier);
+
+// 产生这个Optinal的值，或者在该Optional为空时，抛出exceptionSupplier的结果
+public <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier);
+
+// 如果该Optinal不为空，那么就将他的值传递个consumer
+public void ifPresent(Consumer<? super T> action);
+
+// 产生该Optinal的值传递给mapper后的结果，只要这个Optinal不为空且执行结果不为null。否则产生一个空Optinal
+public <U> Optional<U> map(Function<? super T, ? extends U> mapper);
+```
 
 ## 2.5数据库编程
 
