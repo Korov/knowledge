@@ -1023,6 +1023,15 @@ public static final int value=123;
 3. 启动类加载器检查能不能加载（使用findClass()方法），能就加载（结束）；否则，抛出异常，通知子加载器进行加载、
 4. 重复步骤三
 
+原因：
+
+1. 安全，常用的类必须使用顶层的类加载器加载，防止加载别人的恶意jar造成程序崩溃
+2. 防止冲突，可以保证类是由相同的类加载其加载的。
+
+不遵守双亲委派模型的类加载器：
+
+> 例如jdbc，jdbc是java的核心类，其类加载器是BootstrapClassLoader，但是真正的jdbc的jar包放在classpath中，无法使用BootstrapClassLoader加载，只能使用thread context class loader作为第三方类加载器来加载jdbc的核心类
+
 # 8 虚拟机字节码执行引擎
 
 ## 8.1 概述
