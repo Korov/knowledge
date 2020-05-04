@@ -8,6 +8,7 @@ class LatchTask {
         CountDownLatch endGate = new CountDownLatch(threadNumber);
         for (int i = 0; i < threadNumber; i++) {
             Thread thread = new Thread() {
+                @Override
                 public void run() {
                     try {
                         startGate.await();

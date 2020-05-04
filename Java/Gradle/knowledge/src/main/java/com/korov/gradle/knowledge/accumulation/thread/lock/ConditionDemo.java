@@ -19,7 +19,7 @@ public class ConditionDemo {
     public void setDemoVelue(String value) {
         lock.lock();
         try {
-            while (!demoValue.equals("")) {
+            while (!"".equals(demoValue)) {
                 System.out.println("wait to empty value");
                 cond.await();
             }
@@ -36,7 +36,7 @@ public class ConditionDemo {
     public String getDemoValue() {
         lock.lock();
         try {
-            while (demoValue.equals("")) {
+            while ("".equals(demoValue)) {
                 System.out.println("wait to give value");
                 cond.await();
             }

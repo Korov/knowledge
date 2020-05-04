@@ -788,11 +788,14 @@ option选项：
 - **histo[:live]：** 显示堆中对象的统计信息
 - **clstats：**打印类加载器信息
 - **finalizerinfo：** 显示在F-Queue队列等待Finalizer线程执行finalizer方法的对象
-
 - **dump:：**生成堆转储快照
 - **F：** 当-dump没有响应时，使用-dump或者-histo参数. 在这个模式下,live子参数无效.
 - **help：**打印帮助信息
 - **J：**指定传递给运行jmap的JVM的参数
+
+```bash
+jmap -dump:live,format=b,file=`pwd`/dump.hprof 10566
+```
 
 ### 4.1.5 jhat
 
@@ -1805,3 +1808,7 @@ GC时，打印进程启动到现在经历的时间
 在启动jvm的时候加上`-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=*:5005`参数，然后在本地的ide上连接远程主机以及端口连接jvm进行调试。
 
 上面的是jdk9以上的，jdk5-8使用`-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005`。
+
+## dump文件
+
+dump文件中对象有Shallow Heap和Retained Heap，Shallow Heap表明对象自己所占有的空间，Retained Heap表示释放之后可以释放的所有内存包括自己的内存和引用占用的内存。

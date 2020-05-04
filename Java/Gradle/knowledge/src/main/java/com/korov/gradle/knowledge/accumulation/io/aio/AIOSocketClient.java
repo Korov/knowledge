@@ -10,12 +10,11 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 /**
- *
  * @author macun 2015年11月19日 上午9:56:00
  */
 public class AIOSocketClient {
 
-    public static final int    PORT = 8082;
+    public static final int PORT = 8082;
     public static final String HOST = "localhost";
 
     public static void main(String[] args) throws IOException {
@@ -35,9 +34,9 @@ public class AIOSocketClient {
     public static class ClientWrapper extends Thread {
 
         AsynchronousSocketChannel client;
-        Future<Void>              connectFuture;
+        Future<Void> connectFuture;
 
-        public ClientWrapper(SocketAddress server) throws IOException{
+        public ClientWrapper(SocketAddress server) throws IOException {
             // open a new socket channel and connect to the server
             System.out.println("Open client channel");
             client = AsynchronousSocketChannel.open();
@@ -45,6 +44,7 @@ public class AIOSocketClient {
             connectFuture = client.connect(server);
         }
 
+        @Override
         public void run() {
             System.out.println("client run.");
             // if the connect hasn't happened yet cancel it
@@ -71,7 +71,7 @@ public class AIOSocketClient {
                 Integer countBytes = client.write(message).get();
                 System.out.println(countBytes);
 
-                final ByteBuffer readBuffer = ByteBuffer.allocate(100);
+                ByteBuffer readBuffer = ByteBuffer.allocate(100);
                 // Future<Integer> numberBytes = client.read(readBuffer);
                 client.read(readBuffer, null, new CompletionHandler<Integer, Object>() {
 
