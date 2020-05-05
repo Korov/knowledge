@@ -1188,7 +1188,7 @@ git merge feature --squash
 
 使用`git add *.java`时命令行会讲`*`转化为当前文件夹中匹配到的文件，例如当前文件夹中如果有a.java，那么`git add *.java`就相当于`git add a.java`，需要使用`git add '*.java'`使用git来解析正则而不是命令行来解析正则
 
-## github设置
+## git端口设置
 
 需要设置走1080端口
 
