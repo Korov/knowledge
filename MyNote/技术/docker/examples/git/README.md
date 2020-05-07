@@ -17,5 +17,5 @@ gitlab_rails['gitlab_shell_ssh_port'] = 22
 
 修改完成后`docker exec -it gitlab bash`进入容器重新配置容器`gitlab-ctl reconfigure`.
 
-浏览器访问`http://localhost:80`,重置密码,用户名为root.
+浏览器访问`http://localhost:80`,重置密码,用户名为root，密码重置为root1234
 
