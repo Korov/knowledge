@@ -144,7 +144,7 @@ HashMap的工作原理：
 
 ### 存在有序的HashMap吗？
 
-TreeMap和LinkedHashMap。TreeMap默认是按照key值升序排序的，用红黑树作为实现的，可以使用比较器改变排序。LinkedHashMap是按照put的顺序排序的。
+TreeMap和LinkedHashMap。TreeMap默认是按照key值升序排序的，用红黑树作为实现的，可以使用比较器改变排序。LinkedHashMap是按照put的顺序排序的,LinkedHashMap继承了HashMap，大部分代码都是重用的。
 
 ### 你有更好的实现有序Map的方法吗？
 
@@ -192,6 +192,8 @@ get：
 
 1.多线程put时可能会导致get无限循环，具体表现为CPU使用率100%；原因：在向HashMap  put元素时，会检查HashMap的容量是否足够，如果不足，则会新建一个比原来容量大两倍的Hash表，然后把数组从老的Hash表中迁移到新的Hash表中，迁移的过程就是一个rehash()的过程（该方法中的transfer方法会执行出现循环Entry List），多个线程同时操作就有可能会形成循环链表，所以在使用get()时，就会出现Infinite Loop的情况。
 
+这是JDK7时候迁移的时候会出现这个问题，jdk8做了修改，迁移的时候按原有的顺序迁移
+
 2.多线程put时可能导致元素丢失
 
 ## 如何实现数组和 List 之间的转换
@@ -216,6 +218,8 @@ get：
 ## Java 中 LinkedHashMap 和 PriorityQueue 的区别是什么？
 
 PriorityQueue 保证最高或者最低优先级的的元素总是在队列头部，但是 LinkedHashMap 维持的顺序是元素插入的顺序。当遍历一个 PriorityQueue 时，没有任何顺序保证，但是 LinkedHashMap 课保证遍历顺序是元素插入的顺序。
+
+LinkedHashMap存储数据的结构继承自HashMap，但是多维护了一个双向链表来记录各个节点之间的顺序。
 
 ## Iterator有什么特点
 
@@ -451,7 +455,7 @@ b += a; // ok
 
 ## Java 中，Comparator 与 Comparable 有什么不同？
 
-Comparable 接口用于定义对象的自然顺序，而 comparator 通常用于定义用户定制的顺序。Comparable 总是只有一个，但是可以有多个 comparator 来定义对象的顺序。
+Comparable 接口用于定义对象的自然顺序，而 comparator 通常用于定义用户定制的顺序。通常是某个类实现Comparable接口，重写compareTo方法来实现自然顺序。comparator也是一个接口，通常将某个实现了comparator接口的类作为排序策略传递给某些类。
 
 ## 为什么在重写 equals 方法的时候需要重写 hashCode 方法
 

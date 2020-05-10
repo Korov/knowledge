@@ -1284,11 +1284,9 @@ unpivot
 (score for coursename in (英语,数学,语文))
 ```
 
-# 自我总结
+# oracle优化
 
-## oracle优化
-
-### 设置autotrace
+## 设置autotrace
 
 | 序号 | 命令                        | 解释                             |
 | ---- | --------------------------- | -------------------------------- |
@@ -1298,6 +1296,34 @@ unpivot
 | 4    | SET AUTOTRACE ON            | 包含2,3两项内容                  |
 | 5    | SET AUTOTRACE TRACEONLY     | 与ON相似，但不显示语句的执行结果 |
 
-### EXPLAIN PLAN FOR
+## EXPLAIN PLAN FOR
 
 EXPLAIN PLAN FOR SELECT * FROM DAVE;
+
+## 优化执行顺序
+
+oracle中的执行顺序是从右到左，从上到下，from多个表是先从最右边的查，where多个条件时先从右边开始，确保from时表的数据先查少的，再查多的，where时先用可以过滤多的
+
+## 使用where子句代替having
+
+having对检索出来的数据进行再次过滤，会进行排序、总计等操作
+
+## 通过内部函数提高SQL效率
+
+## 尽量使用exists代替in，使用not exists代替not in
+
+## 避免在索引列使用not、is null、is not null以及使用计算
+
+## 总是使用索引列的第一列
+
+如果索引建立在多个列上，只有在他第一个列被where子句引用时，优化器才会选择使用该索引。当仅使用索引的第二个列时，优化器使用了全表扫描而忽略了索引
+
+## 避免索引列类型转换、
+
+当比较不同数据类型时，oracle会自动对列进行简单的类型转换，当索引列发生类型转换时这个索引将不会被用到
+
+## 当心where子句
+
+昂where子句中有!=,||,+等操作符时索引会失效
+
+# 自我总结
