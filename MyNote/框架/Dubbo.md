@@ -1,4 +1,4 @@
-Dubbo是一个高性能，轻量级，基于Java的RPC框架。Dubbo包含三个主要功能：基于接口的远程调用，容错和负载均衡，自动服务注册和发现。
+Dubbo是一个                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ，轻量级，基于Java的RPC框架。Dubbo包含三个主要功能：基于接口的远程调用，容错和负载均衡，自动服务注册和发现。
 
 ![image-20191127182551527](picture\image-20191127182551527.png)
 
@@ -24,6 +24,8 @@ Dubbo的底层是依赖Spring的，所以配置信息和Spring类似，并且需
 
 ## 1.1 Dubbo框架的架构
 
+![Screenshot_20200512_005313](picture/Screenshot_20200512_005313.png)
+
 Dubbo中包含Registry、Provider、Consumer、Monitor。Provider启动时会向注册中心把自己的元数据注册上去（比如服务IP和端口等），Consumer在启动时从注册中心订阅（第一次订阅会拉取全量数据）服务提供放的元数据，注册中心发生数据变更会推送给订阅的Consumer。在获取服务元数据后，Consumer可以发起RPC调用，在RPC调用前后会向监控中心上报统计信息（比如并发数和调用的接口）。
 
 **Dubbo着眼于解决的几个基本问题：**
@@ -35,5 +37,30 @@ Dubbo中包含Registry、Provider、Consumer、Monitor。Provider启动时会向
   - 动态流量调节。在应用运行时，某些服务节点可能因为硬件原因需要减少负载，或者某些节点需要人工手动下线，又或者需要实现单元化的调用、灰度功能。Dubbo提供了管理控制台，用户可以在界面上动态的调整每个服务的权重、路由规则、禁用/启用，实现运行时的流量调度
   - 依赖分析与调用统计。当应用规模进一步提升，服务间的依赖关系变得错综复杂，甚至分不清哪个应用要在哪个应用之前启动，架构师都不能完整地描述应用的架构关系。Dubbo可以接入第三方APM做分布式链路追踪与性能分析，或者使用已有的独立监控中心来监控接口的调用次数及耗时，用户可以根据这些数据反推出系统容量。
 
+## Dubbo总体大图
 
+### Dubbo总体分层
 
+Dubbo总体分为业务层（Biz）、RPC层、Remote三层。
+
+![/dev-guide/images/dubbo-framework.jpg](picture/dubbo-framework.jpg)
+
+图例说明：
+
+- 图中左边淡蓝背景的为服务消费方使用的接口，右边淡绿色背景的为服务提供方使用的接口，位于中轴线上的为双方都用到的接口。
+- 图中从下至上分为十层，各层均为单向依赖，右边的黑色箭头代表层之间的依赖关系，每一层都可以剥离上层被复用，其中，Service 和 Config 层为 API，其它各层均为 SPI。
+- 图中绿色小块的为扩展接口，蓝色小块为实现类，图中只显示用于关联各层的实现类。
+- 图中蓝色虚线为初始化过程，即启动时组装链，红色实线为方法调用过程，即运行时调时链，紫色三角箭头为继承，可以把子类看作父类的同一个节点，线上的文字为调用的方法。
+
+## 各层说明
+
+- **Service业务层**：包括业务代码的接口与实现，即开发者实现的业务代码。
+- **config 配置层**：对外配置接口，以 `ServiceConfig`, `ReferenceConfig` 为中心，可以直接初始化配置类，也可以通过 spring 解析配置生成配置类
+- **proxy 服务代理层**：服务接口透明代理，生成服务的客户端 Stub 和服务器端 Skeleton, 以 `ServiceProxy` 为中心，扩展接口为 `ProxyFactory`
+- **registry 注册中心层**：封装服务地址的注册与发现，以服务 URL 为中心，扩展接口为 `RegistryFactory`, `Registry`, `RegistryService`
+- **cluster 路由层**：封装多个提供者的路由及负载均衡，并桥接注册中心，以 `Invoker` 为中心，扩展接口为 `Cluster`, `Directory`, `Router`, `LoadBalance`
+- **monitor 监控层**：RPC 调用次数和调用时间监控，以 `Statistics` 为中心，扩展接口为 `MonitorFactory`, `Monitor`, `MonitorService`
+- **protocol 远程调用层**：封装 RPC 调用，以 `Invocation`, `Result` 为中心，扩展接口为 `Protocol`, `Invoker`, `Exporter`
+- **exchange 信息交换层**：封装请求响应模式，同步转异步，以 `Request`, `Response` 为中心，扩展接口为 `Exchanger`, `ExchangeChannel`, `ExchangeClient`, `ExchangeServer`
+- **transport 网络传输层**：抽象 mina 和 netty 为统一接口，以 `Message` 为中心，扩展接口为 `Channel`, `Transporter`, `Client`, `Server`, `Codec`
+- **serialize 数据序列化层**：可复用的一些工具，扩展接口为 `Serialization`, `ObjectInput`, `ObjectOutput`, `ThreadPool`
