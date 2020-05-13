@@ -1137,7 +1137,7 @@ git clean -fdx
 ```bash
 #单个commit
 git cherry-pick commitID
-#多个commit,一个commit区间
+#多个commit,一个commit区间，不包含起始的commit，包好终点commit
 git cherry-pick commitID..commitID
 ```
 
