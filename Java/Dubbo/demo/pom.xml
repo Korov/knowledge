@@ -11,6 +11,8 @@
     <modules>
         <module>provider</module>
         <module>consumer</module>
+        <module>provider-annotation</module>
+        <module>consummer-annotation</module>
     </modules>
     <dependencies>
         <dependency>
