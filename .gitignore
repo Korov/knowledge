@@ -9,6 +9,7 @@
 /**/.idea
 /**/.gradle
 *.log
+*package-lock.json
 ~$*.docx
 
 
