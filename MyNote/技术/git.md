@@ -1161,6 +1161,14 @@ git bisect good/bad/skip
 git bisect run
 ```
 
+## git log
+
+```bash
+git log --pretty=format:"%Cred%h %Creset%s %C(yellow)%an %Cgreen%ad"
+```
+
+让日志变得色彩缤纷
+
 ## 新知识点
 
 ### git checkout 
