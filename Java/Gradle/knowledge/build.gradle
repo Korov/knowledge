@@ -10,9 +10,9 @@ sourceCompatibility = '1.8'
 
 //jar依赖从哪里获取mavenLocal()先从本地找，找不到mavenCentral()从中央仓库下载
 repositories {
-    maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
     mavenLocal()
     mavenCentral()
+    maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
 }
 
 //依赖关系
@@ -23,7 +23,7 @@ dependencies {
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'mysql:mysql-connector-java'
     compile group: 'org.springframework.kafka', name: 'spring-kafka'
-    compile 'com.alibaba:druid-spring-boot-starter:1.1.21'
+//    compile 'com.alibaba:druid-spring-boot-starter:1.1.21'
     annotationProcessor 'org.projectlombok:lombok'
     compile 'org.springframework.boot:spring-boot-devtools'
     testImplementation('org.springframework.boot:spring-boot-starter-test') {

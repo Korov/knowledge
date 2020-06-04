@@ -5,10 +5,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
 public class KnowledgeApplicationTests {
-
     @Test
     public void contextLoads() {
         System.out.println("start success!");
     }
-
 }
