@@ -123,6 +123,10 @@ ConcurrentHashMap是使用了锁分段技术来保证线程安全的。
 ConcurrentHashMap提供了与Hashtable和SynchronizedMap不同的锁机制。Hashtable中采用的锁机制是一次锁住整个hash表，从而在同一时刻只能由一个线程对其进行操作；而ConcurrentHashMap中则是一次锁住一个桶。
 ConcurrentHashMap默认将hash表分为16个桶，诸如get、put、remove等常用操作只锁住当前需要用到的桶。这样，原来只能一个线程进入，现在却能同时有16个写线程执行，并发性能的提升是显而易见的。
 
+## ConcurrentHashMap jdk1.8
+
+采用Node+CAS+Synchronized来保证并发
+
 ## HashMap的实现
 
 HashMap是基于拉链法实现的一个散列表，内部由数组、链表和红黑树实现。
