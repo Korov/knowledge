@@ -1,7 +1,7 @@
 package com.korov.springboot.ExceptionTest;
 
 import com.korov.springboot.SpringbootApplicationTests;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +56,7 @@ public class ExceptionTest extends SpringbootApplicationTests {
     @Test
     public void test3() throws Throwable {
         String value = "test";
-            List<String> list = new ArrayList<>();
+        List<String> list = new ArrayList<>();
         try {
             list.get(4);
         } catch (ArrayIndexOutOfBoundsException e) {

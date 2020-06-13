@@ -1,7 +1,7 @@
 package com.redis.demo.test;
 
 import com.redis.demo.ApplicationTests;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.RedisTemplate;

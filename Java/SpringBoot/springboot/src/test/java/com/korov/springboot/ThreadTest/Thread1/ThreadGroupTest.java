@@ -1,6 +1,6 @@
 package com.korov.springboot.ThreadTest.Thread1;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class ThreadGroupTest {
     public static void main(String[] args) {
@@ -18,13 +18,13 @@ public class ThreadGroupTest {
     }
 
     @Test
-    public void groupTest(){
+    public void groupTest() {
         ThreadGroup threadGroup = new ThreadGroup("t1");
         threadGroup.setMaxPriority(6);
-        Thread thread = new Thread(threadGroup,"thread");
+        Thread thread = new Thread(threadGroup, "thread");
         thread.setPriority(9);
-        System.out.println("我是线程组的优先级"+threadGroup.getMaxPriority());
-        System.out.println("我是线程的优先级"+thread.getPriority());
-        System.out.println("我是线程的名称"+thread.getName());
+        System.out.println("我是线程组的优先级" + threadGroup.getMaxPriority());
+        System.out.println("我是线程的优先级" + thread.getPriority());
+        System.out.println("我是线程的名称" + thread.getName());
     }
 }

@@ -1,9 +1,8 @@
 package com.korov.springboot.enumtest;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.util.Locale;
-import java.util.Scanner;
 
 public class MyTest {
     @Test

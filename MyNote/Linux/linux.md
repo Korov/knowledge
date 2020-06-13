@@ -740,3 +740,14 @@ zip -m myfile.zip ./rpm_info.txt
 ln -s /opt/gradle/bin/gradle ./gradle
 ```
 
+## 9 服务器上传文件以及下载文件
+
+```bash
+# download file from server to local
+scp username@hostname:/path/file /path/file
+# upload file from local to server
+scp /path/file username@hostname:/path/file
+# copy file from one server to another
+scp username@hostname:/path/file username@hostname:/path/file
+```
+

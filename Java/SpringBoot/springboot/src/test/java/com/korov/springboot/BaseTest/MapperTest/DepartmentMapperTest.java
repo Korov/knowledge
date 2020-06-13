@@ -3,7 +3,7 @@ package com.korov.springboot.BaseTest.MapperTest;
 import com.korov.springboot.SpringbootApplicationTests;
 import com.korov.springboot.entity.DepartmentEntity;
 import com.korov.springboot.mapper.master.IDepartmentMapper;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;

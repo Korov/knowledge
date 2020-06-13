@@ -34,8 +34,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.formLogin() // 启用默认登录页面
                 .defaultSuccessUrl("/index") // 登录成功跳转URL，这里跳转到用户首页
                 .and()
-                .authorizeRequests()    // 定义哪些URL需要被保护、哪些不需要被保护
-                .anyRequest(); //permitAll() 登录页面全部权限可访问
+                .authorizeRequests();    // 定义哪些URL需要被保护、哪些不需要被保护
+        // .anyRequest(); //permitAll() 登录页面全部权限可访问
         super.configure(http);
     }
 
@@ -43,7 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      * 配置内存用户
      */
     @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception{
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
 
         /*auth.inMemoryAuthentication().passwordEncoder(new BCryptPasswordEncoder()).withUser("user").password(new BCryptPasswordEncoder().encode("123456")).roles("USER")
         .and()

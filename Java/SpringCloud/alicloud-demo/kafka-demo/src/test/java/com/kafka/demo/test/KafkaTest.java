@@ -1,7 +1,7 @@
 package com.kafka.demo.test;
 
 import com.kafka.demo.ApplicationTests;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
 

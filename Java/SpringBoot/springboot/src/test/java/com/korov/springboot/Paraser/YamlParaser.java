@@ -1,6 +1,6 @@
 package com.korov.springboot.Paraser;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;

@@ -1,7 +1,7 @@
 package com.korov.springboot.Paraser;
 
 import com.korov.springboot.util.PropertiesUtil;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.io.*;
 import java.util.Locale;
@@ -32,12 +32,11 @@ public class PropertiesParaser {
         System.out.println(url);
 
 
-
         String value = PropertiesUtil.getValue(localeZh, "testkey11");
         System.out.println(value);
         value = PropertiesUtil.getValue(localeUs, "testkey");
         System.out.println(value);
-        value = PropertiesUtil.getValue("src/main/resources/i18n", "springboot",localeZh,"testkey");
+        value = PropertiesUtil.getValue("src/main/resources/i18n", "springboot", localeZh, "testkey");
         System.out.println(value);
     }
 }
