@@ -9,14 +9,14 @@ import java.util.stream.Collectors;
 
 public class StringUtil {
     public static boolean isEmpty(String value) {
-        if ( value== null || value.length() == 0) {
+        if (value == null || value.length() == 0) {
             return false;
         }
         return true;
     }
 
-    public static boolean equals(String value,String anotherValue){
-        if(value==null||anotherValue==null){
+    public static boolean equals(String value, String anotherValue) {
+        if (value == null || anotherValue == null) {
             return false;
         }
         return value.equals(anotherValue);

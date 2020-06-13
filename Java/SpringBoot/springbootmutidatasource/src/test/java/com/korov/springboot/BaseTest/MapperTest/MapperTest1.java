@@ -2,7 +2,7 @@ package com.korov.springboot.BaseTest.MapperTest;
 
 import com.korov.springboot.SpringbootApplicationTests;
 import com.korov.springboot.service.IAssistService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class MapperTest1 extends SpringbootApplicationTests {

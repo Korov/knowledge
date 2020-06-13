@@ -3,7 +3,7 @@ package com.korov.springboot.BaseTest;
 import com.korov.springboot.SpringbootApplicationTests;
 import com.korov.springboot.aspect.Dancer;
 import com.korov.springboot.aspect.aspectj.PerformanceImpl;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 

@@ -3,7 +3,7 @@ package com.distributed.lock.mysql;
 import com.distributed.lock.ApplicationTests;
 import com.distributed.lock.mysql.dao.TableLockMethodDao;
 import com.distributed.lock.mysql.model.TableLockMethod;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
@@ -43,11 +43,11 @@ public class Tests extends ApplicationTests {
 
     @Test
     public void main() {
-        TableLockMethod temp =dao.selectByResources("demo");
-        if (temp!=null){
+        TableLockMethod temp = dao.selectByResources("demo");
+        if (temp != null) {
             dao.deleteByPrimaryKey(temp.getId());
         }
-        TableLockMethod lock =new TableLockMethod();
+        TableLockMethod lock = new TableLockMethod();
         lock.setResources("demo");
         lock.setState(2);
         lock.setVersion(0);

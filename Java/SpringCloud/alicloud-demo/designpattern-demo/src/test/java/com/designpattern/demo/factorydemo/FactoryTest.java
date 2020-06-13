@@ -1,7 +1,7 @@
 package com.designpattern.demo.factorydemo;
 
 import com.designpattern.demo.ApplicationTests;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public class FactoryTest extends ApplicationTests {

@@ -6,7 +6,7 @@ import com.korov.springboot.dao.IUserDao;
 import com.korov.springboot.entity.UserEntity;
 import com.korov.springboot.service.ITestService;
 import com.korov.springboot.service.IUserService;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

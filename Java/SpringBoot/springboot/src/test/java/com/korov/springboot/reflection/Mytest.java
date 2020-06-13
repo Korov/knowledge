@@ -1,7 +1,7 @@
 package com.korov.springboot.reflection;
 
 import com.korov.springboot.entity.TestEntity;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;

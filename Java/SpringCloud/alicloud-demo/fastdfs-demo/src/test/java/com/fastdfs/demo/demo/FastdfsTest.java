@@ -3,7 +3,7 @@ package com.fastdfs.demo.demo;
 import com.fastdfs.demo.ApplicationTests;
 import com.github.tobato.fastdfs.domain.fdfs.FileInfo;
 import com.github.tobato.fastdfs.service.FastFileStorageClient;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.IOException;

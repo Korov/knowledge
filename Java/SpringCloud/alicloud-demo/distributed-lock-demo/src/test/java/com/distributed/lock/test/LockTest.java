@@ -1,17 +1,9 @@
 package com.distributed.lock.test;
 
 import com.distributed.lock.ApplicationTests;
-import com.distributed.lock.mysql.LockService;
-import com.distributed.lock.mysql.Tests;
-import com.distributed.lock.mysql.model.TableLockMethod;
 import com.distributed.lock.redis.RedisLock;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.data.redis.core.RedisTemplate;
-import redis.clients.jedis.JedisPool;
-
-import java.util.Date;
 
 public class LockTest extends ApplicationTests {
     @Autowired
@@ -30,14 +22,14 @@ public class LockTest extends ApplicationTests {
         @Override
         public void run() {
             char[] values = value.toCharArray();
-            String token= redisLock.lock("demo",10000,10000);
+            String token = redisLock.lock("demo", 10000, 10000);
             try {
                 for (int i = 0; i < values.length; i++) {
                     System.out.print(values[i]);
                 }
                 System.out.println("|||");
             } finally {
-                redisLock.unlock("demo",token);
+                redisLock.unlock("demo", token);
             }
 
         }

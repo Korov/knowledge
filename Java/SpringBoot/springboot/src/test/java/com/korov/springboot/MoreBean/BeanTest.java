@@ -1,7 +1,7 @@
 package com.korov.springboot.MoreBean;
 
 import com.korov.springboot.SpringbootApplicationTests;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
