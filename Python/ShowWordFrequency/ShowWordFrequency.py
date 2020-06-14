@@ -50,6 +50,12 @@ def statistics(dir, file, all):
 
 
 if __name__ == "__main__":
+    # 判断pictures和results文件夹是否存在，不存在则创建
+    if not os.path.exists('pictures'):
+        os.mkdir('pictures')
+    if not os.path.exists('results'):
+        os.mkdir('results')
+
     # 使用了微软雅黑字体，防止中文乱码，也可以自己下载对应的字体放到fonts文件夹中并修改font_path的值
     wordCloud = WordCloud(background_color='white', width=800, height=660, margin=2, font_path=r'fonts/msyh.ttf')
     for root, dirs, files in os.walk('texts'):
