@@ -383,6 +383,24 @@ sys	0m0.094s
 
 仅备份比某个时刻还要新的文件：--newer,--newer-mtime。
 
+### 并发打包pigz
+
+```bash
+# 压缩文件：-9压缩级别，-p使用线程数，-k压缩后保留源文件，压缩后生成filename.gz
+pigz -9 -p 16 -k filename
+# 解压文件，两种方式
+gzip -d filename.gz
+pigz -d filename.gz
+
+# 压缩目录
+tar cv filename | pigz -9 -p 16 -k > filename.tar.gz
+# 解压目录，两种方式
+tar xvf filename.tar.gz
+pigz -d filename.tar.gz
+```
+
+
+
 ## 8.4 XFS文件系统的备份与还原
 
 ### 8.4.1 XFS文件系统备份xfsdump
