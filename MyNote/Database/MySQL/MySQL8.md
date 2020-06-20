@@ -432,3 +432,28 @@ innodb_buffer_pool_size调试指南：
 ## 使用二进制日志
 
 要启用二进制日志，必须设置log_bin和server_id并重新启动服务器。可以在log_bin内提及path和base名称，long_bin设置为`/data/mysql/binlogs/server1`，二进制日志存储在`/data/mysql/binlogs/server1`文件中名为server1.000001、server1.000002等的日志文件中。每当服务器启动或刷新日志时，或者当前日志的大小达到max_binlog_size时，服务器都会在系列中创建一个新文件。每个二进制日志的位置都在server1.index文件中被维护。
+
+## 二进制日志的格式
+
+二进制日志可以写成下面的三种格式：
+
+- statement:记录实际的SQL语句
+- row：记录每行所做的更改
+- mixed：当需要的时候，MySQL会从statement切换到row。
+
+## 从二进制日志中提取语句
+
+可以使用mysqlbinlog实用程序从二进制日志中提取内容，并将其应用到其他服务器上。
+
+### 显示日志内容
+
+```bash
+mysqlbinlog /var/lib/mysql/binlog.000002
+```
+
+![image-20200621014830927](picture/image-20200621014830927.png)
+
+`# at`后面的数字表示二进制日志文件中事件的起始位置，下一行包含了语句在服务器上被启用的时间戳。
+
+### 根据时间和位置进行抽取
+
