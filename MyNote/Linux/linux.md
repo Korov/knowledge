@@ -314,7 +314,7 @@ locate的使用更简单，直接在后面输入文件的部分名称后就能�
 
 #### find
 
-语法`find   path   -option   [   -print ]   [ -exec   -ok   command ]   {} \;`
+语法`find path -option [-print] [-exec -ok command] {} \;`
 
 
 
