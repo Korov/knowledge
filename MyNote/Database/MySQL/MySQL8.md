@@ -457,3 +457,234 @@ mysqlbinlog /var/lib/mysql/binlog.000002
 
 ### 根据时间和位置进行抽取
 
+You can extract the data by specifying the time window through --start-datetime and --stop-datatime options.
+
+```bash
+shell> sudo mysqlbinlog /data/mysql/binlogs/server1.000001 --startdatetime="2017-08-19 00:00:01" --stopdatetime="2017-08-19 12:17:00" > binlog_extract
+```
+
+Assume that the backup has given an offset of 471 and the DROP DATABASE command was executed at an offset of You can use --start-position and --stop-position options to extract a log between offsets:
+```bash
+shell> sudo mysqlbinlog /data/mysql/binlogs/server1.000001 --startposition= 471 --stop-position=1793 > binlog_extract
+```
+
+### 基于数据库进行提取
+
+```bash
+shell> sudo mysqlbinlog /data/mysql/binlogs/server1.000001 -- database=employees > binlog_extract
+```
+
+# 性能调优
+
+介绍的内容：
+
+- explain计划
+- 基准查询和服务器
+- 添加索引
+- 不可见索引
+- 降序索引
+- 使用pt-query-digest分析慢查询
+- 优化数据类型
+- 删除重复和冗余索引
+- 检查索引使用情况
+- 控制查询优化器
+- 使用索引提示（hint）
+- 使用生成的列为JSON建立索引
+- 使用资源组
+- 使用performance_schema
+- 使用sys schema
+
+## explain计划
+
+只需要将explain添加到执行语句的开头就可以。也可以使用explain format=json，能提供有关查询执行情况的完整信息
+
+## 基准查询和服务器
+
+mysqlslap工具，他模拟MySQL服务器的客户端负载，并报告每个阶段所耗费的时间，就像多个客户端正在访问该服务器一样。
+
+```bash
+shell> mysqlslap -u <user> -p<pass> --createschema=employees --query="SELECT e.emp_no, salary FROM salaries s JOIN employees e ON s.emp_no=e.emp_no WHERE (first_name='Adam');" -c 1000 i 100
+mysqlslap: [Warning] Using a password on the command
+line interface can be insecure.
+Benchmark
+Average number of seconds to run all queries:3.216 seconds
+Minimum number of seconds to run all queries:3.216 seconds
+Maximum number of seconds to run all queries:3.216 seconds
+Number of clients running queries: 1000
+Average number of queries per client: 1
+```
+
+以上查询是用1000个并发和100个迭代执行的，平均花费了3.216秒。
+
+你可以在文件中指定多个SQL并指定分隔符。mysqlslap会运行文件中的所有查询
+
+```bash
+shell> cat queries.sql
+SELECT e.emp_no, salary FROM salaries s JOIN
+employees e ON s.emp_no=e.emp_no WHERE
+(first_name='Adam');
+SELECT * FROM employees WHERE first_name='Adam' OR
+last_name='Adam';
+SELECT * FROM employees WHERE first_name='Adam';
+shell> mysqlslap -u <user> -p<pass> --createschema=
+employees --concurrency=10 --iterations=10 --
+query=query.sql --query=queries.sql --delimiter=";"
+mysqlslap: [Warning] Using a password on the command
+line interface can be insecure.
+Benchmark
+Average number of seconds to run all queries:
+5.173 seconds
+Minimum number of seconds to run all queries:
+5.010 seconds
+Maximum number of seconds to run all queries:
+5.257 seconds
+Number of clients running queries: 10
+Average number of queries per client: 3
+```
+
+## 添加索引
+
+### 主键（聚簇索引）和二级索引
+
+为了提升对涉及主键列的查询和排序的速度，InnoDB基于主键来存储行。其他所有的索引都被称为辅助键，他们存储主键的值（不直接引用行）。
+
+如果使用主键进行检索，则可以直接获取到对应的数据，非主键索引上存储了聚簇索引的值，通过主键索引获取实际值。
+
+主键索引的选择技巧：
+
+- 他应该是唯一（unique）的和非空（not null）的
+- 选择最小的可能键，因为所有的二级索引都会存储主键。如果主键很大，整个索引会占用更多空间
+- 选择一个单调递增的值。物理行是根据主键进行排序的。所以，如果你选择一个随机键，需要做多次行重排，这会导致性能下降。AUTO_INCREMENT非常适合主键
+- 最好选择一个主键。如果找不到任何主键，请添加一个AUTO_INCREMENT列。如果你不选择任何内容，InnoDB会在内部生成一个带有6字节行ID的隐藏聚簇索引
+
+### 前缀索引
+
+对于字符串列，可以创建仅使用列值得前导部分而非整个列的索引。你需要指定前导部分的长度：
+
+```mysql
+alter table employees add index (last_name(10));
+```
+
+last_name的最大长度是16个字符，但索引仅基于其前10个字符创建。
+
+### 生成列的索引
+
+对于封装在函数中列不能使用索引。入股hire_date上有一个索引，但是在函数中使用了hire_date，MySQL就必须扫描整个表
+
+```mysql
+select * from employees where year(hire_date)>=2000
+```
+
+所以，尽量避免将已被索引的列放入函数中。如果无法避免使用函数，请创建一个虚拟列并在虚拟列上添加一个索引：
+
+```mysql
+alter table employees add hire_date_year as (year(hire_date)) virtual, add index (hire_date_year);
+```
+
+### 不可见索引
+
+首先必须创建索引，然后将索引设置为不可见，设置为不可见之后将无法使用该索引
+
+```mysql
+alter table employees alter index laste_name invisible;
+alter table employees alter index laste_name visible;
+```
+
+### 降序索引
+
+MySQL8之前所引导的定义中可以包含顺序（升序或降序），但他只是被解析并没有被实现。索引值始终以升序存储。降序索引实际上按降序存储关键值。请记住，对于降序查询，反向扫描升序索引效率不高。
+
+在多列索引中，可以指定某些列降序。这样做对同时具有升序和降序的order by子句的查询很有用。
+
+#### 添加降序索引
+
+```mysql
+alter table employees add index name_desc(first_name asc, last_name desc);
+```
+
+## 使用pt-query-digest分析慢查询
+
+第三方工具
+
+## 优化数据类型
+
+你应该这样定义表，他既能保存所有可能值，同时在磁盘上占用的空间又最小。
+
+如果表占用的存储空间越小，则：
+
+- 向磁盘写入或读取的数据就越少，查询起来就去越快
+- 在处理查询时，磁盘上的内容会被加载到主内存中。所以，表越小，占用的主内村空间越小
+- 被索引占用的空间就越小
+
+数据类型指引：
+
+- 在声明类型为varchar的列的时候，应该考虑其长度，尽管类型varchar在磁盘上进行了优化，但是这个类型的数据被加载到内存时却会占用全部长度空间。例如，first_name的存储类型为varchar(255)，并且其实际长度为10，则在磁盘上他占用10+1（用于存储长度的一个附加字节）；但在内存中，他会占用全部的255个字节。
+- 如果这些值是固定的，请使用enum而非varchar类型。因为enum类型只需要1或2个字节即可，其他的需要更多的字节。
+- 优先选择使用整数类型而非字符串类型
+- 尝试利用前缀索引
+- 尝试利用InnoDB压缩
+
+## 删除重复和冗余索引
+
+重复索引和冗余索引都会减慢插入速度。
+
+找出重复索引的工具：
+
+- pt-duplicate-key-checker
+- mysqlindexcheck（会忽略降序索引）
+- sys schema
+
+## 检查索引的使用情况
+
+对于没有用的索引要及时删除
+
+使用的工具：
+
+- pt-index-usage
+- sys schema
+
+## 控制查询优化器
+
+一条查询的成本包括：从磁盘访问数据，从内存访问数据，创建临时表，在内存中对结果进行排序，等等。MySQL会为每个操作分配一个相对值，并将每个计划的成本相加后汇总。最终会执行那个成本最低的执行计划。
+
+### 如何操作
+
+#### optimizer_search_depth
+
+#### optimizer_switch
+
+#### 优化器提示（hint）
+
+#### 调整优化器成本模型
+
+## 使用索引提示
+
+忽略索引from_date_2
+
+```mysql
+EXPLAIN SELECT e.emp_no, salary FROM salaries
+s IGNORE INDEX(from_date_2) JOIN employees e ON
+s.emp_no=e.emp_no WHERE from_date='2001-05-23'\G
+```
+
+强制使用索引
+
+```MySQL
+EXPLAIN SELECT emp_no FROM employees USE
+INDEX(first_name,last_name_2) WHERE first_name='Adam'
+OR last_name='Adam'\G
+```
+
+## 使用生成列为json建立索引
+
+在json列上不能直接建立索引。因此，如果要在json列上使用索引，可以使用虚拟列和在虚拟列上创建索引来提取信息
+
+```MySQL
+ALTER TABLE emp_details ADD COLUMN city
+varchar(20) AS (details->>'$.address.city'), ADD
+INDEX (city);
+```
+
+## 使用资源组
+
+你可以使用资源组来限制查询仅使用一定数量的系统资源。
