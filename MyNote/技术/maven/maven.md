@@ -608,6 +608,8 @@ maven-release-plugin的用途是帮助自动化项目版本发布，它依赖于
 
 ```bash
 mvn -N io.takari:maven:wrapper -Dmaven=3.6.3
+
+mvn -N io.takari:maven:0.7.7:wrapper -Dmaven=3.5.4
 ```
 
 表明想要使用3.6.3版本的maven。
