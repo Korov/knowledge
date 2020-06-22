@@ -635,3 +635,31 @@ allprojects { Project project ->
 ./gradlew build -x test
 ```
 
+## 发布到maven本地仓库
+
+```groovy
+plugins {
+    id 'distribution'
+    id 'maven-publish'
+}
+
+// 会将build中的libs中的jar包打包到distribution文件下
+distributions {
+    main {
+        distributionBaseName = archivesBaseName
+        contents {
+            from { libsDir }
+        }
+    }
+}
+
+// 会将build中的distribution压缩包上传到本地maven仓库
+publishing {
+    publications {
+        myDistribution(MavenPublication) {
+            artifact distZip
+        }
+    }
+}
+```
+
