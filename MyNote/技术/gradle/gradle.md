@@ -643,7 +643,27 @@ plugins {
     id 'maven-publish'
 }
 
-// 会将build中的libs中的jar包打包到distribution文件下
+// 将源文件后缀为java的文件打包
+task sourcesJar(type: Jar) {
+    archiveBaseName = archivesBaseName
+    archiveClassifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+// 将注释信息打包
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveBaseName = archivesBaseName
+    archiveClassifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+// 绑定在build的assemble任务上
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+// 会将build中的libs中的jar包（包括源文件包和注释包）打包到distribution文件下
 distributions {
     main {
         distributionBaseName = archivesBaseName
