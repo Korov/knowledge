@@ -1049,3 +1049,13 @@ sudo systemctl restart docker
 ```
 
 idea中打开file->settings->build,execution...->docker，选择TCP socket，Engine API URL：`tcp://localhost:2375`。
+
+## 添加当前用户到docker
+
+```bash
+sudo groupadd docker
+sudo gpasswd -a ${USER} docker
+sudo systemctl restart docker.service
+newgrp docker
+```
+
