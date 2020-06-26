@@ -1,6 +1,19 @@
- k8s需要在阿里云镜像网站设置镜像。
+ k8s需要在阿里云镜像网站设置镜像。并安装kubelet,kubeadm,kubectl
 
-kubelet,kubeadm,kubectl
+```bash
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://mirrors.aliyun.com/kubernetes/yum/repos/kubernetes-el7-x86_64/
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://mirrors.aliyun.com/kubernetes/yum/doc/yum-key.gpg https://mirrors.aliyun.com/kubernetes/yum/doc/rpm-package-key.gpg
+EOF
+setenforce 0
+yum install -y kubelet kubeadm kubectl
+systemctl enable kubelet && systemctl start kubelet
+```
 
 systemctl enable kubelet
 
@@ -33,8 +46,6 @@ kubeadm config print init-defaults ClusterConfiguration > kubeadm.conf
 设置advertiseAddress为master的ip地址。
 
 添加子网络，在networking节点下添加：podSubnet: 10.244.0.0/16
-
-
 
 还需要下载其他工具：kubeadm config images list --config kubeadm.conf
 

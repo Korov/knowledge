@@ -725,9 +725,29 @@ n>>    使n行都向右移动一个宽度，例如3>>就将接下来的三行每
 
 # 13 账户权限
 
-useradd添加用户，passwd设置账户密码，usermod修改账户的某些设置，chage更详细的密码参数显示功能。userdel删除用户，
+useradd添加用户，passwd设置账户密码，usermod修改账户的某些设置，chage更详细的密码参数显示功能。userdel删除用户
 
-groupadd新增群组，groupmod修改群组属性，groupdel删除群组，gpassed群组管理员，
+```bash
+useradd [-u UID] [-g 初始群组] [-G 次要群组] [-mM] [-c 说明栏] [-d 家目录绝对路径] [-s shell] 使用者帐号名
+```
+
+选项与参数：
+
+- -u :后面接的是UID，一组数字。直接指定一个特定的UID给这个帐号
+- -g :此群组的GID会被放到`/etc/passed`的第四个字段内
+- -G :后面接的组名则是这个帐号还可以加入的群组。这个选项会修改`/etc/group`内的相关资料
+- -M :强制不要建立用户家目录（系统帐号默认值）
+- -m :强制要建立用户家目录（一般帐号默认值）
+- -c :`/etc/passwd`第五栏的说明内容，可以随便设定
+- -d :指定这个目录成为家目录。务必使用绝对路径
+- -r :建立一个系统帐号
+- -s :后面接一个shell，若没有指定则预设时`/bin/bash`
+- -e :后面接一个日期，格式为[YYYY-MM-DD]此项可写入shadow第八字段，即帐号失效日期
+- -f :后面接shadow的第七字段项目，制定密码是否会失效。0立刻失效，-1永不失效
+
+groupadd新增群组，groupmod修改群组属性，groupdel删除群组，gpassed群组管理员
+
+
 
 # 自我总结
 
@@ -830,5 +850,13 @@ scp username@hostname:/path/file /path/file
 scp /path/file username@hostname:/path/file
 # copy file from one server to another
 scp username@hostname:/path/file username@hostname:/path/file
+```
+
+## 关闭图形界面
+
+```bash
+#查看当前设置,multi-user.target 开机已命令模式启动，graphical.target 开机以图形界面启动
+systemctl get-default
+systemctl set-default multi-user.target
 ```
 
