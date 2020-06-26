@@ -1,23 +1,54 @@
 package com.korov.springboot.util;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
+import java.io.FileInputStream;
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.Map;
 
-@Slf4j
-public class YamlUtil {
-    public static Map<String, Object> getYaml(String url) {
-        try {
-            Yaml yaml = new Yaml();
-            Reader reader = new InputStreamReader(new FileInputStream(new File(url)), StandardCharsets.UTF_8);
-            return yaml.load(reader);
-        } catch (FileNotFoundException e) {
-            log.error("get yaml failed");
-            return new HashMap<>();
+/**
+ * @author korov
+ */
+public final class YamlUtil {
+
+    private YamlUtil() {
+    }
+
+    /**
+     * 日志文件
+     */
+    private static final Logger LOGGER = LoggerFactory.getLogger(YamlUtil.class);
+
+    /**
+     * 通过文件路径获取文件
+     *
+     * @param filePath
+     * @param <T>
+     * @return 返回解析结果
+     * @throws FileNotFoundException
+     */
+    public static <T> T getYaml(final String filePath) throws FileNotFoundException {
+        Reader reader = getReader(filePath);
+        Yaml yaml = new Yaml();
+        return (T) yaml.load(reader);
+    }
+
+    private static Reader getReader(final String filePath) throws FileNotFoundException {
+        if (filePath == null) {
+            throw new NullPointerException("please enter file path!");
         }
+        File yamlFile = new File(filePath);
+        if (!yamlFile.exists()) {
+            LOGGER.error("please check the file path {}", filePath);
+            throw new FileNotFoundException(String.format("Can not find the yaml file in path:%s", filePath));
+        }
+        Reader reader = new InputStreamReader(new FileInputStream(yamlFile), StandardCharsets.UTF_8);
+        return reader;
     }
 }
+
