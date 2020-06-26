@@ -1164,7 +1164,7 @@ git bisect run
 ## git log
 
 ```bash
-git log --pretty=format:"%Cred%h %Creset%s %C(yellow)%an %Cgreen%ad"
+git log --pretty=format:"%Cred%h %C(yellow)%an%C(magenta)<%ae> %Cgreen%ad %Creset%s" --date=format:"%Y-%m-%d %H:%M"
 ```
 
 让日志变得色彩缤纷
