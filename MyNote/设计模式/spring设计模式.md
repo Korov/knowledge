@@ -6,7 +6,7 @@
 <beans>
   <bean id="singletonBean" class="com.itxxz.HelloItxxz">
      <constructor-arg>
-       <value>Hello! 这是singletonBean!value>
+       <value>Hello! 这是singletonBean!<value>
      </constructor-arg>
  </ bean>
 ```
