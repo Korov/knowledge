@@ -10,7 +10,7 @@ package org.leetcode;
  * 输出：2
  * 解释：子数组 [4,3] 是该条件下的长度最小的连续子数组。
  */
-public class MinArray {
+public class Solutions209 {
     /**
      * 在方法一和方法二中，都是每次确定子数组的开始下标，然后得到长度最小的子数组，因此时间复杂度较高。为了降低时间复杂度，可以使用双指针的方法。
      * <p>
@@ -47,7 +47,6 @@ public class MinArray {
             }
             end++;
         }
-
-        return result;
+        return result == Integer.MAX_VALUE ? 0 : result;
     }
 }
