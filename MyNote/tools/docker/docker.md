@@ -20,6 +20,41 @@ docker run -d -p 7001:7001 eureka:1.0
 docker rmi `docker images -q`;
 ```
 
+### docker images
+
+```bash
+docker images [OPTIONS] [REPOSITORY[:TAG]]
+# 查看所有的镜像
+List images
+
+Options:
+  -a, --all             Show all images (default hides intermediate images)
+      --digests         Show digests
+  -f, --filter filter   Filter output based on conditions provided
+      --format string   Pretty-print images using a Go template
+      --no-trunc        Don't truncate output
+  -q, --quiet           Only show numeric IDs
+  
+# 示例
+docker images redis 
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+redis               latest              36304d3b4540        5 weeks ago         104MB
+
+# filter，是一个 key=value 
+# 找出tag为none的
+docker images -f "dangling=true"
+
+# format,选项使用Go模板打印出制定格式的列表
+.ID – 镜像ID
+.Repository – 镜像存储库名称
+.Tag – 镜像tag
+.Digest – 镜像digest
+.CreatedSince – 从镜像创建到现在过去的时间
+.CreatedAt – 镜像创建的时间
+.Size – 镜像硬盘占用大小
+docker images --format "{{.ID}}: {{.Repository}}"
+```
+
 
 
 ## 1.3 容器相关操作
