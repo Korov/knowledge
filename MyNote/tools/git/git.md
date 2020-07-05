@@ -967,7 +967,7 @@ D---H
 
 ```bash
 #使用默认的mixed方式reset
-git reset commit-D
+git reset commitID
 git commit -m 'squash commit'
 ```
 
