@@ -1042,6 +1042,15 @@ docker pull zookeeper;
 docker pull webcenter/activemq;
 ```
 
+## 文件拷贝
+
+```bash
+docker cp originpath destinationpath
+
+# 将当前文件中的 file.txt 文件拷贝到 ubuntu-test 这个容器的 /root 路径下
+docker cp ./file.txt ubuntu-test:/root
+```
+
 ## --link参数
 
 启动docker ,需要使用--link使两个容器可以通信，--link 容器名:别名  。可以在此容器中使用 ping nacos通信。
