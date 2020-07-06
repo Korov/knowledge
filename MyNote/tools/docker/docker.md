@@ -1056,7 +1056,7 @@ docker cp ./file.txt ubuntu-test:/root
 ## 外部执行docker中的命令
 
 ```bash
-docker exec jenkins 'cat /var/jenkins_home/secrets/initialAdminPassword'
+docker exec -u root jenkins /bin/bash -c 'cat /var/jenkins_home/secrets/initialAdminPassword'
 ```
 
 ## --link参数
