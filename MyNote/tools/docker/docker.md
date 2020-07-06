@@ -91,6 +91,8 @@ container_name : 容器名
 docker run -it mysql:8.0.11 /bin/bash
 #进入容器命令
 docker exec -it kafka /bin/sh
+#以root用户身份进入容器
+docker exec -it -u root kafka /bin/sh
 ```
 
 ## 1.6 查看容器所有信息
@@ -1049,6 +1051,12 @@ docker cp originpath destinationpath
 
 # 将当前文件中的 file.txt 文件拷贝到 ubuntu-test 这个容器的 /root 路径下
 docker cp ./file.txt ubuntu-test:/root
+```
+
+## 外部执行docker中的命令
+
+```bash
+docker exec jenkins 'cat /var/jenkins_home/secrets/initialAdminPassword'
 ```
 
 ## --link参数
