@@ -21,6 +21,8 @@ public class QuartzManager {
         // 根据Job的实现类创建JobDetail
         JobDetail jobDetail = JobBuilder.newJob(HelloJob.class)
                 .withIdentity("job1", "group1")
+                // 可以传递数据到Job中
+                .usingJobData("data1", "jobDetailValue1")
                 .build();
 
         // 创建一个Trigger，确定什么时候触发Job
@@ -30,6 +32,8 @@ public class QuartzManager {
         Trigger trigger = TriggerBuilder.newTrigger()
                 .withIdentity("trigger1", "group1")
                 .startNow()
+                // 传递数据到Job中
+                .usingJobData("data2", "triggerValue1")
                 .withSchedule(scheduleBuilder)
                 .build();
         scheduler.scheduleJob(jobDetail, trigger);
