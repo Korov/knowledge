@@ -226,3 +226,161 @@ env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 通常情况下，由于网络或系统等外部因素影响，事件数据往往不能及时传输至Flink系统中，导致数据乱序到达或者延迟到达等问题，因此，需要有一种机制能够控制数据处理的过程和进度，比如基于事件时间的Window创建后，具体该如何确定属于该Window的数据元素已经全部到达。如果确定全部到达，就可以对Window的所有数据做窗口计算操作（如汇总、分组等），如果数据没有全部到达，则继续等待该窗口中的数据全部到达才开始处理。这种情况下就需要用到水位线（WaterMarks）机制，它能够衡量数据处理进度（表达数据到达的完整性），保证事件数据（全部）到达Flink系统，或者在乱序及延迟到达时，也能够像预期一样计算出正确并且连续的结果。Flink会将用读取进入系统的最新事件时间减去固定的时间间隔作为Watermark，该时间间隔为用户外部配置的支持最大延迟到达的时间长度，也就是说理论上认为不会有事件超过该间隔到达，否则就认为是迟到事件或异常事件。
 
 简单来讲，当事件接入到Flink系统时，会在SourcesOperator中根据当前最新事件时间产生Watermarks时间戳，记为X，进入到Flink系统中的数据事件时间，记为Y，如果Y<X，则代表WatermarkX时间戳之前的所有事件均已到达，同时Window的EndTime大于Watermark，则触发窗口计算结果并输出。从另一个角度讲，如果想触发对Window内的数据元素的计算，就必须保证对所有进入到窗口的数据元素满足其事件时间Y>=X，否则窗口会继续等待Watermark大于窗口结束时间的条件满足。可以看出当有了Watermarks机制后，对基于事件时间的流数据处理会变得特别灵活，可以有效地处理乱序事件的问题，保证数据在流式统计中的结果的正确性。
+
+#### 指定Timestamps与生成Watermarks
+
+如果使用Event Time时间概念处理流式数据，除了在StreamExecationEvironment中指定TimeCharacteristic外，还需要在Flink程序中指定Event Time时间戳在数据中的字段信息，在Flink程序运行过程中会通过指定字段抽取出对应的事件时间，该过程叫做Timestamps Assigning。简单来讲，就是告诉系统需要用那个字段作为事件时间的数据来源。另外Timestamps指定完毕后，下面就需要制定创建相应的Watermarks，需要用户定义根据Timestamps计算出Watermarks的生成策略。
+
+目前Flink支持两种方式指定Timestamps和生成Watermarks，一种方式在DataStream Source算子接口的Source Function中定义，另外一种方式是通过自定义Timestamps Assigner和Watermarks Generator生成。
+
+## Windows窗口计算
+
+通过按照固定时间或长度将数据流切分成不同的窗口，然后对数据进行相应的聚合运算，从而得到一定时间范围内的统计结果。
+
+Flink DataStream API将窗口抽象成独立的Operator，且在Flink DataStream API中已经内建了大多数窗口算子。如下代码展示了如何定义KeyedWindows算子，在每个窗口算子中包含了Windows Assigner、Windows Trigger（窗口触发器）、Evictor（数据剔除器）、Lateness（时延设定）、Output Tag（输出标签）以及Windows Funciton等组成部分，其中Windows Assigner和Windows Funciton是所有窗口算子必须指定的属性，其余的属性都是根据实际情况选择指定。
+
+```scala
+stream. keyBy(...) // 是 Keyed 类型 数据 集
+.window(...) //指定 窗口 分配器 类型 
+[.trigger(...)] //指定 触发器 类型（ 可选） 
+[.evictor(...)] //指定 evictor 或者 不 指定（ 可选） 
+[.allowedLateness(...)] //指定 是否 延迟 处理 数据（ 可选） [.sideOutputLateData(...)] //指定 Output Lag（ 可选）
+.reduce/ aggregate/ fold/ apply() //指定 窗口 计算 函数 
+[.getSideOutput(...)] //根据 Tag 输出 数据（ 可选）
+```
+
+- Windows Assigner：指定窗口的类型，定义如何将数据流分配到一个或多个窗口
+- Windows Trigger：指定窗口触发的时机，定义窗口满足什么样的条件触发计算
+- Evictor：用于数据剔除
+- Lateness：标记是否处理迟到数据
+- Output Tag：标记输出标签，然后在通过getSideOutput将窗口中的数据根据标签输出
+- Windows Funciton：定义窗口上数据处理的罗技，例如对数据进行sum操作
+
+### Windows Assigner
+
+#### Keyed和Non-Keyed窗口
+
+在运用窗口计算时，Flink根据上游数据集是否为KeyedStream类型（将数据集按照Key分区），对应的Windows Assigner也会有所不同。上游数据集如果是KeyedStream类型，则调用DataStream API的window()方法指定Windows Assigner，数据会根据Key在不同的Task实例中并行分别计算，最后得出针对每个Key统计的结果。如果是Non-Keyed类型，则调用WindowsAll()方法来指定Windows Assigner，所有的数据都会在窗口算子中路由到一个Task中计算，并得到全局统计结果。
+
+#### Windows Assigner
+
+Flink支持两种类型的窗口，一种是基于时间的窗口，窗口基于起始时间戳（闭区间）和终止时间戳（开区间）来决定窗口的大小，数据根据时间戳被分配到不同的窗口中完成计算。Flink使用TimeWindow类来获取窗口的起始时间和终止时间，以及该窗口允许进入的最新时间戳信息等元数据。另一种是基于数量的窗口，根据固定的数量定义窗口的大小，例如每5000条数据形成一个窗口，窗口中接入的数据依赖于数据接入到算子中的顺序，如果数据出现乱序情况，将导致窗口的计算结果不确定。
+
+在Flink流式计算中，通过Windows Assigner将接入数据分配到不同的窗口，根据Windows Assigner数据分配方式的不同将Windows分为4大类，分别是**滚动窗口**(Tumbling Windows)、**滑动窗口**（Sliding Windows）、**会话窗口**（Session Windows）和**全局窗口**（Global Windows）。并且这些Windows Assigner已经在Flink中实现，用户调用DataStream API的windows或windowsAll方法来指定Windows Assigner即可。
+
+##### 滚动窗口
+
+滚动窗口是根据固定时间或大小进行切分，且窗口和窗口之间的元素互不重叠。重叠。这种类型的窗口的最大特点是比较简单，但可能会导致某些有前后关系的数据计算结果不正确，而对于按照固定大小和周期统计某一指标的这种类型的窗口计算就比较适合，同时实现起来也比较方便。
+
+DataStream API中提供了基于Event Time和Process Time两种时间类型的Tumbling窗口，对应的Assigner分别为TumblingEventTimeWindows和TumblingProcessTimeWindows。调用DataStream API的Window方法来指定相应的Assigner，并使用每种Assigner的of()方法来定义窗口的大小，其中时间单位可以是Time.milliseconds(x)、Time.seconds(x)或Time.minutes(x)，也可以是不同时间单位的组合。
+
+默认窗口时间的时区是UTC-0，因此UTC-0以外的其他地区均需要通过设定时间偏移量调整时区，在国内需要指定Time.hours（-8）的偏移量。
+
+##### 滑动窗口
+
+滑动窗口也是一种比较常见的窗口类型，其特点是在滚动窗口基础之上增加了窗口滑动时间（Slide Time），且允许窗口数据发生重叠。如图4-12所示，当Windows size固定之后，窗口并不像滚动窗口按照Windows Size向前移动，而是根据设定的Slide Time向前滑动。窗口之间的数据重叠大小根据Windows size和Slide time决定，当Slide time小于Windows size便会发生窗口重叠，Slide size大于Windows size就会出现窗口不连续，数据可能不能在任何一个窗口内计算，Slide size和Windows size相等时，Sliding Windows其实就是Tumbling Windows。滑动窗口能够帮助用户根据设定的统计频率计算指定窗口大小的统计指标，例如每隔30s统计最近10min内活跃用户数等。
+
+DataStream API针对Sliding Windows也提供了不同时间类型的Assigner，其中包括基于Event Time的SlidingEventTimeWindows和基于Process Time的SlidingProcessingTime-Windows。
+
+##### 会话窗口
+
+会话窗口（Session Windows）主要是将某段时间内活跃度较高的数据聚合成一个窗口进行计算，窗口的触发的条件是Session Gap，是指在规定的时间内如果没有数据活跃接入，则认为窗口结束，然后触发窗口计算结果。需要注意的是如果数据一直不间断地进入窗口，也会导致窗口始终不触发的情况。与滑动窗口、滚动窗口不同的是，Session Windows不需要有固定windows size和slide time，只需要定义session gap，来规定不活跃数据的时间上限即可。
+
+DataStream API中可以创建基于Event Time和Process Time的Session Windows，对应的Assigner分别为EventTimeSessionWindows和ProcessTimeSessionWindows，在创建Session Windows的过程中，除了调用withGap方法输入固定的Session Gap，Flink也能支持动态的调整Session Gap。如代码清单4-12所示，只需要实现SessionWindowTimeGapExtractor接口，并复写extract方法，完成动态Session Gap的抽取，然后将创建好的Session Gap抽取器传入ProcessingTimeSessionWindows.withDynamicGap()方法中即可。
+
+##### 全局窗口
+
+全局窗口（Global Windows）将所有相同的key的数据分配到单个窗口中计算结果，窗口没有起始和结束时间，窗口需要借助于Triger来触发计算，如果不对Global Windows指定Triger，窗口是不会触发计算的。因此，使用Global Windows需要非常慎重，用户需要非常明确自己在整个窗口中统计出的结果是什么，并指定对应的触发器，同时还需要有指定相应的数据清理机制，否则数据将一直留在内存中。
+
+#### Windows Function
+
+定义窗口内数据的计算逻辑。Flink中提供了四种类型的Windows Function，分别为ReduceFunction、AggregateFunction、FoldFunction以及ProcessWindowFunction。
+
+四种类型的Window Fucntion按照计算原理的不同可以分为两大类，一类是增量聚合函数，对应有ReduceFunction、AggregateFunction和FoldFunction；另一类是全量窗口函数，对应有ProcessWindowFunction。增量聚合函数计算性能较高，占用存储空间少，主要因为基于中间状态的计算结果，窗口中只维护中间结果状态值，不需要缓存原始数据。而全量窗口函数使用的代价相对较高，性能比较弱，主要因为此时算子需要对所有属于该窗口的接入数据进行缓存，然后等到窗口触发的时候，对所有的原始数据进行汇总计算。如果接入数据量比较大或窗口时间比较长，就比较有可能导致计算性能的下降。
+
+##### ReduceFunction
+
+ReduceFunction定义了对输入的两个相同类型的数据元素按照指定的计算方法进行聚合的逻辑，然后输出类型相同的一个结果元素。创建好Window Assigner之后通过在reduce()方法中指定ReduceFunciton逻辑，可以使用Scala lambada表达式定义计算逻辑。
+
+```scala
+val inputStream: DataStream[( Int, Long)] = ...; 
+val reduceWindowStream = inputStream .keyBy(_._ 0) 
+//指定 窗口 类型 
+.window( SlidingEventTimeWindows. of( Time. hours( 1), Time. minutes( 10))) 
+//指定 聚合 函数 逻辑， 将 根据 ID 将 第二个 字段 求和 
+.reduce { (v1, v2) => (v1._ 1, v1._ 2 + v2._ 2) }
+```
+
+除了可以直接使用表达式的方式对ReduceFunction逻辑进行定义，也可以创建Class实现ReduceFunction接口来定义聚合逻辑，
+
+```scala
+val reduceWindowStream = inputStream .keyBy(_._ 1) 
+//指定 窗口 类型 
+.window( SlidingEventTimeWindows. of( Time. hours( 1), Time. minutes( 10))) 
+//定义 ReduceFunction 实现 类 定义 聚合 函数 逻辑， 将 根据 ID 将 第二个 字段 求和 
+.reduce( new ReduceFunction[( Int, Long)] { override def reduce( t1: (Int, Long), t2: (Int, Long)): (Int, Long) = { (t1._ 1, t1._ 2 + t2._ 2) }})
+```
+
+##### AggregateFunction
+
+和ReduceFunction相似，AggregateFunction也是基于中间状态计算结果的增量计算函数，但AggregateFunction在窗口计算上更加通用。AggregateFunction接口相对ReduceFunction更加灵活，实现复杂度也相对较高。AggregateFunction接口中定义了三个需要复写的方法，其中add()定义数据的添加逻辑，getResult定义了根据accumulator计算结果的逻辑，merge方法定义合并accumulator的逻辑。
+
+```scala
+//定义 求取 平均值 的 AggregateFunction 
+class MyAverageAggregate extends AggregateFunction[( String, Long), (Long, Long), Double] { 
+    //定义 createAccumulator 为 两个 参数 的 元祖 
+    override def createAccumulator() = (0L, 0L) 
+    //定义 输入 数据 累加 到 accumulator 的 逻辑 
+    override def add( input: (String, Long), acc: (Long, Long)) = (acc._ 1 + input._ 2, acc._ 2 + 1L) 
+    //根据 累加器 得出 结果 
+    override def getResult( acc: (Long, Long)) = acc._ 1 / acc._ 2 
+    //定义 累加器 合并 的 逻辑 
+    override def merge( acc1: (Long, Long), acc2: (Long, Long)) = (acc1._ 1 + acc2._ 1, acc1._ 2 + acc2._ 2) } 
+//在 DataStream API 使用 定义 好的 AggregateFunction 
+val inputStream: DataStream[( String, Long)] = ... 
+val aggregateWindowStream = inputStream .keyBy(_._ 1) 
+//指定 窗口 类型 
+.window( SlidingEventTimeWindows. of( Time. hours( 1), Time. minutes( 10))) 
+//指定 聚合 函数 逻辑， 将 根据 ID 将 第二个 字段 求 平均值 
+.aggregate( new MyAverageAggregate)
+```
+
+##### FoldFunction
+
+FoldFunction定义了如何将窗口中的输入元素与外部的元素合并的逻辑，如代码清单4-17所示将“flink”字符串添加到inputStream数据集中所有元素第二个字段上，并将结果输出到下游DataStream中。
+
+```scala
+val inputStream: DataStream[( String, Long)] = ...; 
+val foldWindowStream = inputStream .keyBy(_._ 1) 
+//指定 窗口 类型 
+.window( SlidingEventTimeWindows. of( Time. hours( 1), Time. minutes( 10))) 
+//指定 聚合 函数 逻辑， 将 flink 字符串 和 每个 元祖 中 第二个 字段 相连 并 输出 
+.fold(" flink") { (acc, v) => acc + v._ 2 }
+```
+
+##### ProcessWindowFunction
+
+ProcessWindowsFunction能够更加灵活地支持基于窗口全部数据元素的结果计算，例如统计窗口数据元素中某一字段的中位数和众数。在Flink中ProcessWindowsFunction抽象类定义如代码清单4-18所示，在类中的Context抽象类完整地定义了Window的元数据以及可以操作Window的状态数据，包括GlobalState以及WindowState。
+
+```scala
+public abstract class ProcessWindowFunction< IN, OUT, KEY, W extends Window> extends AbstractRichFunction { 
+    //评估 窗口 并且 定义 窗口 输出 的 元素 
+    void process( KEY key, Context ctx, Iterable< IN> vals, Collector< OUT> out) throws Exception; 
+    //定义 清除 每个 窗口 计算 结束 后 中间 状态 的 逻辑 
+    public void clear( Context ctx) throws Exception {} 
+    //定义 包含 窗口 元 数据 的 上下文 
+    public abstract class Context implements Serializable { 
+        //返回 窗口 的 元 数据 
+        public abstract W window(); 
+        //返回 窗口 当前 的 处理 时间 
+        public abstract long currentProcessingTime(); 
+        //返回 窗口 当前 的 event- time 的 Watermark 
+        public abstract long currentWatermark(); 
+        //返回 每个 窗口 的 中间 状态 
+        public abstract KeyedStateStore windowState(); 
+        //返回 每个 Key 对应 的 中间 状态 
+        public abstract KeyedStateStore globalState(); 
+        //根据 OutputTag 输出 数据 
+        public abstract < X> void output( OutputTag< X> outputTag, X value); } }
+```
+
