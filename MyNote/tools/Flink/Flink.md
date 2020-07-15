@@ -384,3 +384,58 @@ public abstract class ProcessWindowFunction< IN, OUT, KEY, W extends Window> ext
         public abstract < X> void output( OutputTag< X> outputTag, X value); } }
 ```
 
+##### IncrementalAggregation和ProcessWindowsFunction整合
+
+##### ProcessWindowFunction状态操作
+
+除了能够通过RichFunction操作keyedState之外，ProcessWindowFunction也可以操作基于窗口之上的状态数据，这类状态被称为PerwindowState。
+
+### Trigger窗口触发器
+
+数据接入窗口后，窗口是否触发WindowFunciton计算，取决于窗口是否满足触发条件，每种类型的窗口都有对应的窗口触发机制，保障每一次接入窗口的数据都能够按照规定的触发逻辑进行统计计算。Flink在内部定义了窗口触发器来控制窗口的触发机制，分别有EventTimeTrigger、ProcessTimeTrigger以及CountTrigger等。每种触发器都对应于不同的WindowAssigner，例如EventTime类型的Windows对应的触发器是EventTimeTrigger，其基本原理是判断当前的Watermark是否超过窗口的EndTime，如果超过则触发对窗口内数据的计算，反之不触发计算。
+
+- EventTimeTrigger：通过对比Watermark和窗口EndTime确定是否触发窗口，如果Watermark的时间大于WindowsEndTime则触发计算，否则窗口继续等待；
+- ProcessTimeTrigger：通过对比ProcessTime和窗口EndTime确定是否触发窗口，如果窗口ProcessTime大于WindowsEndTime则触发计算，否则窗口继续等待；
+- ContinuousEventTimeTrigger：根据间隔时间周期性触发窗口或者Window的结束时间小于当前EventTime触发窗口计算；
+- ContinuousProcessingTimeTrigger：根据间隔时间周期性触发窗口或者Window的结束时间小于当前ProcessTime触发窗口计算；
+- CountTrigger：根据接入数据量是否超过设定的阈值确定是否触发窗口计算；
+- DeltaTrigger：根据接入数据计算出来的Delta指标是否超过指定的Threshold，判断是否触发窗口计算；
+- PurgingTrigger：可以将任意触发器作为参数转换为Purge类型触发器，计算完成后数据将被清理。
+
+如果已有的Trigger无法满足实际需求，用户也可以继承并实现抽象类Trigger自定义触发器，FlinkTrigger接口中共有如下方法需要复写，然后在DataStream API中调用trigger方法传入自定义Trigger
+
+- OnElement()：针对每一个接入窗口的数据元素进行触发操作；
+- OnEventTime()：根据接入窗口的EventTime进行触发操作；
+- OnProcessTime()：根据接入窗口的ProcessTime进行触发操作；
+- OnMerge()：对多个窗口进行Merge操作，同时进行状态的合并；
+- Clear()：执行窗口及状态数据的清除方法。
+
+在自定义触发器时，判断窗口触发方法返回的结果有如下类型，分别是CONTINUE、FIRE、PURGE、FIRE_AND_PURGE。其中CONTINUE代表当前不触发计算，继续等待；FIRE代表触发计算，但是数据继续保留；PURGE代表窗口内部数据清除，但不触发计算；FIRE_AND_PURGE代表触发计算，并清除对应的数据；用户在指定触发逻辑满足时可以通过将以上状态返回给Flink，由Flink在窗口计算过程中，根据返回的状态选择是否触发对当前窗口的数据进行计算。
+
+### Evictors数据剔除器
+
+Evictors是Flink窗口机制中一个可选的组件，其主要作用是对进入WindowFuction前后的数据进行剔除处理，Flink内部实现CountEvictor、DeltaEvictor、TimeEvitor三种Evictors。在Flink中Evictors通过调用DataStreamAPI中evictor()方法使用，且默认的Evictors都是在WindowsFunction计算之前对数据进行剔除处理。
+
+- CountEvictor：保持在窗口中具有固定数量的记录，将超过指定大小的数据在窗口计算前剔除；
+- DeltaEvictor：通过定义DeltaFunction和指定threshold，并计算Windows中的元素与最新元素之间的Delta大小，如果超过threshold则将当前数据元素剔除；
+- TimeEvictor：通过指定时间间隔，将当前窗口中最新元素的时间减去Interval，然后将小于该结果的数据全部剔除，其本质是将具有最新时间的数据选择出来，删除过时的数据。
+
+和Trigger一样，用户也可以通过实现Evictor接口完成自定义Evictor，如代码清单422所示，Evictor接口需要复写的方法有两个：evictBefore()方法定义数据在进入WindowsFunction计算之前执行剔除操作的逻辑，evictAfter()方法定义数据在WindowsFunction计算之后执行剔除操作的逻辑。其中方法参数中elements是代表在当前窗口中所有的数据元素。
+
+```scala
+publicinterfaceEvictor<T,WextendsWindow>extendsSerializable{
+  //定义WindowFunciton触发之前的数据剔除逻辑
+ voidevictBefore(Iterable<TimestampedValue<T>>elements,intsize,Wwindow,EvictorContextevictorContext);
+  //定义WindowFunciton触发之后的数据剔除逻辑
+ voidevictAfter(Iterable<TimestampedValue<T>>elements,intsize,Wwindow,EvictorContextevictorContext);
+  //定义上下文对象
+ interfaceEvictorContext{longgetCurrentProcessingTime();MetricGroupgetMetricGroup();longgetCurrentWatermark();}}
+```
+
+### 延迟数据处理
+
+延时非常严重时，即使通过Watermark机制也无法等到数据全部进入窗口再进行处理。Flink中默认会将这些迟到的数据做丢弃处理，但是有些时候用户希望即使数据延迟到达的情况下，也能够正常按照流程处理并输出结果，此时就需要使用Allowed Lateness机制来对迟到的数据进行额外的处理。
+
+DataStreamAPI中提供了allowedLateness方法来指定是否对迟到数据进行处理，在该方法中传入Time类型的时间间隔大小(t)，其代表允许延时的最大时间，Flink窗口计算过程中会将Window的Endtime加上该时间，作为窗口最后被释放的结束时间（P），当接入的数据中EventTime未超过该时间（P），但Watermak已经超过Window的EndTime时直接触发窗口计算。相反，如果事件时间超过了最大延时时间（P），则只能对数据进行丢弃处理。
+
+通常情况下用户虽然希望对迟到的数据进行窗口计算，但并不想将结果混入正常的计算流程中，例如用户大屏数据展示系统，即使正常的窗口中没有将迟到的数据进行统计，但为了保证页面数据显示的连续性，后来接入到系统中迟到数据所统计出来的结果不希望显示在屏幕上，而是将延时数据和结果存储到数据库中，便于后期对延时数据进行分析。对于这种情况需要借助SideOutput来处理，通过使用sideOutputLateData（OutputTag）来标记迟到数据计算的结果，然后使用getSideOutput（lateOutputTag）从窗口结果中获取lateOutputTag标签对应的数据，之后转成独立的DataStream数据集进行处理，如下代码所示，创建latedata的OutputTag，再通过该标签从窗口结果中将迟到数据筛选出来。
