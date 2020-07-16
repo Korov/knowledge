@@ -12,3 +12,5 @@ CREATE USER 'liaozesong'@'%' IDENTIFIED WITH mysql_native_password BY 'Lzslov123
 GRANT ALL PRIVILEGES ON *.* TO 'liaozesong'@'%';
 ```
 
+将文件挂载到`/docker-entrypoint-initdb.d`中，文件会按照字母顺序执行，支持的文件有`.sh`, `.sql` 和 `.sql.gz`。
+

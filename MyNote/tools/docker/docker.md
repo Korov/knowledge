@@ -55,8 +55,6 @@ docker images -f "dangling=true"
 docker images --format "{{.ID}}: {{.Repository}}"
 ```
 
-
-
 ## 1.3 容器相关操作
 
 ```bash
