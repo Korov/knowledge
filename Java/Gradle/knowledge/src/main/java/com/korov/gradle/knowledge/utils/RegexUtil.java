@@ -24,7 +24,7 @@ public class RegexUtil {
         return matcher.replaceAll(replace);
     }
 
-    public static List<String> finds(String regex, String content) {
+    public static List<String> findAll(String regex, String content) {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(content);
         List<String> matchers = new ArrayList<>(5);
@@ -32,5 +32,14 @@ public class RegexUtil {
             matchers.add(content.substring(matcher.start(), matcher.end()));
         }
         return matchers;
+    }
+
+    public static String find(String regex, String content) {
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(content);
+        if (matcher.find()) {
+            return content.substring(matcher.start(), matcher.end());
+        }
+        return "";
     }
 }
