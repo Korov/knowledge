@@ -18,8 +18,9 @@ public class BatchWordCount {
     public static void main(String[] args) throws Exception {
         // 创建一个批处理的执行环境
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
+        env.setParallelism(1);
         // 从文件中读取数据
-        String filePath = String.join(File.separator, "src", "main", "resources", "data.txt");
+        String filePath = String.join(File.separator, "file", "data.txt");
         DataSet<String> inputDataSet = env.readTextFile(filePath);
         DataSet<Tuple2<String, Integer>> resultDataSet = inputDataSet
                 .flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {

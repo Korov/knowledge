@@ -1,6 +1,7 @@
 package org.korov.flink.wordcount;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
+import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -41,7 +42,14 @@ public class StreamWordCount {
         DataStream<Tuple2<String, Integer>> dataStream = env
                 .socketTextStream(hostname, port)
                 .flatMap(new Splitter())
-                .keyBy(0)
+                .keyBy(new KeySelector<Tuple2<String, Integer>, Object>() {
+                    private static final long serialVersionUID = 1136154280689082856L;
+
+                    @Override
+                    public Object getKey(Tuple2<String, Integer> stringIntegerTuple2) throws Exception {
+                        return stringIntegerTuple2.getField(0);
+                    }
+                })
                 /**
                  * 窗口机制时streaming到batch的桥梁。Tumbling window（滚动窗口，无重叠）
                  * Sliding window（滑动窗口，时间有重叠），Session window（会话窗口，无重叠）
