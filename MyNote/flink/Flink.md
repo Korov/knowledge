@@ -207,6 +207,73 @@ Value数据类型实现了org.apache.flink.types.Value，其中包括read()和wr
 
 DataStream API主要可以分为三个部分，DataSource模块、Transformation模块以及DataSink模块，DataSource模块主要定义了数据接入功能，主要是将各种外部数据接入至Flink系统中，并将接入数据转换成对应的DataStream数据集。在Transformation模块定义了对DataSource数据集的各种转换操作，例如进行map、filter、windows等操作。最后，将结果数据通过DataSink模块写出到外部存储介质中，例如将数据输出到文件或Kafka消息中间件等。
 
+### DataSource
+
+程序的数据源输入，可以通过StreamExecutionEnvironment.addSource(sourceFunction)为程序添加一个数据源。
+
+Flink针对DataStream提供了大量的已经实现的DataSource接口，比如下面4种：
+
+1. 基于文件：`readTextFile(path)`
+2. 基于Socket：`socketTextStream()`
+3. 基于集合：`fromCollection(Collection)`
+4. 自定义输入：`addSource`可以实现读取第三方数据源的数据
+
+Flink提供了一部分常用第三方数据源的connector，也可以自己定义第三方数据源，有两种方式实现：
+
+- 通过实现`SourceFunction`接口来自定义无并行度的数据源
+- 通过实现`ParallelSourceFunction`接口或这继承`RichParallelSourceFunction`来自定义有并行度的数据源
+
+### Transformation
+
+具体的操作，它对一个或多个输入数据源进行计算处理，比如Map、FlatMap和Filter等
+
+Flink针对DataStream提供了大量的已经实现的算子：
+
+- Map：输入一个元素，然后返回一个元素，中间可以进行清洗转换等操作
+- FlatMap：输入一个元素，可以返回零个、一个或者多个元素
+- Filter：过滤函数，对传入的数据进行判断，符合条件的数据会被留下
+- KeyBy：根据指定的Key进行分组，Key相同的数据会进入同一个分区。
+- Reduce：对数据进行聚合操作，结合当前元素和上一次Reduce返回的值进行聚合操作，然后返回一个新的值
+- Aggregations：sum(),min(),max()等
+- Union：合并多个流，新的流包含所有流中的数据，但是Union有一个限制，就是所有合并的流的类型必须是一致的
+- Connect：和Union类似，但是只能连接两个流，两个流的数据类型可以不同，会对两个流中的数据应用不同的处理方法
+- coMap和coFlatMap：在ConnectedStream中需要使用这种函数，类似于Map和FlatMap
+- Split：根据规则把一个数据流切分为多个流
+- Select：和Split配合使用，选择切分后的流
+
+另外，Flink针对DataStream提供了一些数据分区规则，具体如下：
+
+- Random partitioning：随机分区：`DataStream.shuffle()`
+
+- Rebalancing：对数据集进行再平衡、重分区和消除数据倾斜：`DataStream.rebalance()`
+
+- Rescaling：重新调节：`DataStream.rescale()`
+
+  >如果上游有2个并发，而下游操作有4个并发，那么上游的一个并发结果分配给下游的2个并发操作。另一方面，下游2个并发操作而上游有4个并发操作，那么上游的其中2个操作的结果分配了给下游的一个并发操作。
+  >
+  >Rescaling与Rebalancing的区别为Rebalancing会产生全量分区，而Rescaling不会。
+
+- Custom partitioning：自定义分区
+
+  > 自定义分区实现Partitioner接口的方法如下：`DataStream.partitionCustom(partitioner, "someKey")`或者`DataStream.partitionCustom(partitioner, 0)`
+
+### Sink
+
+程序的输出，它可以把Transformation处理之后的数据输出到指定存储介质中
+
+Flink针对DataStream提供了大量的已经实现的数据目的地，具体如下：
+
+- writeAsText()：将元素以字符串形式逐行写入，这些字符串通过调用每个元素的toString()方法来获取
+
+- print()/printToErr()：打印每个元素的toString()方法的值到标准输出或者标准错误输出流中
+
+- 自定义输出：addSink()可以实现把数据输出到第三方存储介质中
+
+  > 自定义Sink有两种实现方式：
+  >
+  > - 实现SinkFunction接口
+  > - 继承RichSinkFunction类
+
 ## 时间概念与Watermark
 
 Flink根据时间产生的位子不同，将时间区分为三种时间概念，分别为事件生成时间（Event Time）、事件接入时间（Ingestion Time）和事件处理时间（Processing Time）。数据从终端产生，或者从系统中产生的过程中生成的时间为事件生成时间，当数据经过消息中间件传入到Flink系统中，在DataSource中接入的时候会产生事件接入时间，当数据在Flink系统中通过各个算子实例执行转换操作的过程中，算子实例所在系统的时间为数据处理时间。用户能够根据需要选择时间类型作为对流式数据的依据，这种情况极大地增强了对事件数据处理的灵活性和准确性。
@@ -439,3 +506,7 @@ publicinterfaceEvictor<T,WextendsWindow>extendsSerializable{
 DataStreamAPI中提供了allowedLateness方法来指定是否对迟到数据进行处理，在该方法中传入Time类型的时间间隔大小(t)，其代表允许延时的最大时间，Flink窗口计算过程中会将Window的Endtime加上该时间，作为窗口最后被释放的结束时间（P），当接入的数据中EventTime未超过该时间（P），但Watermak已经超过Window的EndTime时直接触发窗口计算。相反，如果事件时间超过了最大延时时间（P），则只能对数据进行丢弃处理。
 
 通常情况下用户虽然希望对迟到的数据进行窗口计算，但并不想将结果混入正常的计算流程中，例如用户大屏数据展示系统，即使正常的窗口中没有将迟到的数据进行统计，但为了保证页面数据显示的连续性，后来接入到系统中迟到数据所统计出来的结果不希望显示在屏幕上，而是将延时数据和结果存储到数据库中，便于后期对延时数据进行分析。对于这种情况需要借助SideOutput来处理，通过使用sideOutputLateData（OutputTag）来标记迟到数据计算的结果，然后使用getSideOutput（lateOutputTag）从窗口结果中获取lateOutputTag标签对应的数据，之后转成独立的DataStream数据集进行处理，如下代码所示，创建latedata的OutputTag，再通过该标签从窗口结果中将迟到数据筛选出来。
+
+# 疑问
+
+## 分区的作用是什么
