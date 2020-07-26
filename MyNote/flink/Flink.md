@@ -507,6 +507,48 @@ DataStreamAPI中提供了allowedLateness方法来指定是否对迟到数据进�
 
 通常情况下用户虽然希望对迟到的数据进行窗口计算，但并不想将结果混入正常的计算流程中，例如用户大屏数据展示系统，即使正常的窗口中没有将迟到的数据进行统计，但为了保证页面数据显示的连续性，后来接入到系统中迟到数据所统计出来的结果不希望显示在屏幕上，而是将延时数据和结果存储到数据库中，便于后期对延时数据进行分析。对于这种情况需要借助SideOutput来处理，通过使用sideOutputLateData（OutputTag）来标记迟到数据计算的结果，然后使用getSideOutput（lateOutputTag）从窗口结果中获取lateOutputTag标签对应的数据，之后转成独立的DataStream数据集进行处理，如下代码所示，创建latedata的OutputTag，再通过该标签从窗口结果中将迟到数据筛选出来。
 
+# DataSet API的使用
+
+## DataSource
+
+对于DataSet批处理而言，较频繁的操作时读取HDFS中的文件数据，因此这里主要介绍两个DataSource组件
+
+- 基于集合：`fromCollection(Collection)`
+- 基于文件：`readTextFile(path)`基于HDFS中的数据进行计算分析
+
+## Transformation
+
+Flink针对DataSet提供了大量的已经实现的算子：
+
+- Map：输入一个元素，然后返回一个元素，中间可以进行清洗转换等操作
+- FlatMap：输入一个元素，可以返回零、一个或者多个元素
+- MapPartition：类似Map，一次处理一个分区的数据（如果在进行Map处理的时候需要获取第三方资源连接，建议使用MapPartition）
+- Filter：过滤函数，对传入的数据进行判断，符合条件的数据会被留下
+- Reduce：对数据进行聚合操作，结合当前元素和上一次Reduce返回的值进行聚合操作，然后返回一个新的值
+- Aggregations：sum、max、min等
+- Distinct：返回一个数据集中去重之后的元素
+- Join：内连接
+- OuterJoin：外连接
+- Cross：获取两个数据集的笛卡尔积
+- Union：返回两个数据集的总和，数据类型需要一致
+- First-n：获取集合中的前N个元素
+- Sort Partition：在本地对数据集的所有分区进行排序，通过sortPartition()的链接调用来完成对多个字段的排序
+
+Flink针对DataSet提供了一些数据分区的规则具体如下：
+
+- Rebalance：对数据集进行再平衡、重分区以及消除数据倾斜操作
+- Hash-Partition：根据指定Key的散列值对数据集进行分区
+- Range-Partition：根据指定的Key对数据集进行范围分区
+- Custom Partitioning：自定义分区规则，自定义分区需要实现Partitioner接口
+
+## Sink
+
+Flink针对DataSet提供了大量的已经实现的Sink
+
+- writeAsText()：将元素以字符串形式逐行写入，这些字符串通过调用每个元素的toString()方法来获取
+- writeAsCsv()：将元组以逗号分隔写入文件中，行及字段之间的分隔时可配置的，每个字段的值来自对象的tiString()方法
+- print()：打印每个元素的toString()方法的值到标准输出或者标准错误输出流中
+
 # 疑问
 
 ## 分区的作用是什么
