@@ -294,6 +294,15 @@ arangosh> db._query(
 ........> }).toArray();
 ```
 
+```bash
+# 查看所有数据库
+db._databases();
+# 切换到指定数据库
+db._useDatabase("siem_db");
+```
+
+
+
 ## ES6
 
 ```typescript
