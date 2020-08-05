@@ -27,5 +27,7 @@ func main()  {
 		v, err := strconv.Atoi(args[1])
 		ret := simplemath.Sqrt(v)
 		fmt.Println("Result: ", ret)
+	default:
+		Usage()
 	}
 }
