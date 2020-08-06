@@ -70,3 +70,5 @@ testem.log
 # System Files
 Thumbs.db
 *.exe
+
+/**/gobuild

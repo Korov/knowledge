@@ -17,17 +17,17 @@ func main() {
 		return
 	}
 
-	switch args[0] {
+	switch args[1] {
 	case "add":
-		v1, err1 := strconv.Atoi(args[1])
-		v2, err2 := strconv.Atoi(args[2])
+		v1, err1 := strconv.Atoi(args[2])
+		v2, err2 := strconv.Atoi(args[3])
 		if err1 != nil || err2 != nil {
 			return
 		}
 		ret := simplemath.Add(v1, v2)
 		fmt.Println("Result: ", ret)
 	case "sqrt":
-		v, err := strconv.Atoi(args[1])
+		v, err := strconv.Atoi(args[2])
 		if err != nil {
 			return
 		}
