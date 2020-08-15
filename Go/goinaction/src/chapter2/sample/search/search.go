@@ -37,13 +37,13 @@ func Run(searchTerm string) {
 		// Launch the goroutine to perform the search.
 		go func(matcher Matcher, feed *Feed) {
 			Match(matcher, feed, searchTerm, results)
-			waitGroup.Done()
+			waitGroup.Done() // 信号量减一
 		}(matcher, feed)
 	}
 
 	// Launch a goroutine to monitor when all the work is done.
 	go func() {
-		// Wait for everything to be processed.
+		// Wait for everything to be processed. waitGroup是一个计数信号两，这里会有len(feeds)个信号量
 		waitGroup.Wait()
 
 		// Close the channel to signal to the Display
