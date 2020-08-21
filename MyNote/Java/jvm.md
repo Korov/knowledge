@@ -1800,8 +1800,13 @@ GC时，打印进程启动到现在经历的时间
 
 ### jdk11
 
+```
 -Xlog:gc*
--Xlog:/home/korov/Desktop/install/jetbrains/gclog/gc.log
+-Xlog:gc+heap=debug
+-Xlog:safepoint
+# 此配置的gc日志会输出到文件，上面的只会输出到标准输出
+-Xlog:gc*=trace:/home/korov/work/install/jetbrains/gclog/gc.log
+```
 
 ## 远程调试
 
