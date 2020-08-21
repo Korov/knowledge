@@ -1801,7 +1801,7 @@ GC时，打印进程启动到现在经历的时间
 ### jdk11
 
 -Xlog:gc*
--Xloggc:/home/korov/Desktop/install/jetbrains/gclog/gc.log
+-Xlog:/home/korov/Desktop/install/jetbrains/gclog/gc.log
 
 ## 远程调试
 
