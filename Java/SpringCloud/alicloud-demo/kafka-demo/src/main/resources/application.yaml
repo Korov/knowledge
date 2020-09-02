@@ -6,7 +6,7 @@ spring:
     name: kafka-demo
 
   kafka:
-    bootstrap-servers: localhost:9092,localhost:9093,localhost:9094
+    bootstrap-servers: localhost:9092
 
     producer:
       retries: 3

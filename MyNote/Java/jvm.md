@@ -1817,3 +1817,13 @@ GC时，打印进程启动到现在经历的时间
 ## dump文件
 
 dump文件中对象有Shallow Heap和Retained Heap，Shallow Heap表明对象自己所占有的空间，Retained Heap表示释放之后可以释放的所有内存包括自己的内存和引用占用的内存。
+
+## 火焰图
+
+使用`async-profiler`
+
+```shell
+# 10是监控时长 3537是java的pid
+./profiler.sh -d 10 -f 111.svg 3537
+```
+
