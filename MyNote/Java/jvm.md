@@ -1823,7 +1823,8 @@ dump文件中对象有Shallow Heap和Retained Heap，Shallow Heap表明对象自
 使用`async-profiler`
 
 ```shell
-# 10是监控时长 3537是java的pid
-./profiler.sh -d 10 -f 111.svg 3537
+# 10是监控时长 3537是java的pid 500采集间隔时间默认10000000 (10ms)，svg中会有samples数量成衣此间隔就是那个方法耗费的时间
+#绿色是java栈帧，黄色和红色是native栈帧
+./profiler.sh -d 10 -i 500us -f 111.svg 3537
 ```
 
