@@ -581,7 +581,7 @@ gradle init
 ## 升级已有项目的gradle wrapper
 
 ```bash
-./gradlew wrapper --gradle-version=6.2.2 --distribution-type=bin
+./gradlew wrapper --gradle-version=6.5.1 --distribution-type=bin
 ```
 
 ## Gradle全局配置`init.gradle`
