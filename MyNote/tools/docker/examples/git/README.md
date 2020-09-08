@@ -1,8 +1,8 @@
 #  使用docker搭建gitlab服务器
 
 ```bash
-docker pull gitlab/gitlab-ce
-docker run -d  -p 443:443 -p 80:80 -p 22:22 --name gitlab -v `pwd`/config:/etc/gitlab -v `pwd`/logs:/var/log/gitlab -v `pwd`/data:/var/opt/gitlab gitlab/gitlab-ce
+docker pull gitlab/gitlab-ce:13.3.5-ce.0
+docker run -d  -p 443:443 -p 80:80 -p 2222:22 --name gitlab -v `pwd`/config:/etc/gitlab -v `pwd`/logs:/var/log/gitlab -v `pwd`/data:/var/opt/gitlab gitlab/gitlab-ce:13.3.5-ce.0
 ```
 
 修改`gitlab.rb`文件
