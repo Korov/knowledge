@@ -343,6 +343,13 @@ arangosh> c = stmt.execute();
 ## 还原
 
 ```bash
-arangodb3-3.6.4/bin/arangorestore --server.endpoint tcp://172.17.0.4:8529 --server.username root --server.password "" --server.authentication true --server.database newdb3 --create-database true --input-directory "dump" --number-of-shards 6 --replication-factor 2 --replication-factor 2
+arangodb3-3.6.4/bin/arangorestore --server.endpoint tcp://172.17.0.4:8529 --server.username root --server.password "" --server.authentication true --server.database newdb3 --create-database true --input-directory "dump" --number-of-shards 6 --replication-factor 2
 ```
 
+# 从单机迁移到集群
+
+需要将单机中的数据备份出来，然后在集群中恢复，使用arangodump和arangorestore命令
+
+分片（shards）：同一个数据库中的数据分散在不同的物理机器上
+
+复制（replication）：将数据复制到另一台计算机上
