@@ -333,3 +333,16 @@ arangosh> c = stmt.execute();
 ```
 
 ## Cursors
+
+## 备份
+
+```bash
+/opt/rizhiyi/parcels/arangodb/bin/arangodump --output-directory "/tmp/arangodump" --overwrite true --server.endpoint tcp://192.168.1.19:8529 --server.username root --server.password "rizhiyi&2014" --server.authentication true --server.database siem_db
+```
+
+## 还原
+
+```bash
+arangodb3-3.6.4/bin/arangorestore --server.endpoint tcp://172.17.0.4:8529 --server.username root --server.password "" --server.authentication true --server.database newdb3 --create-database true --input-directory "dump" --number-of-shards 6 --replication-factor 2 --replication-factor 2
+```
+
