@@ -7,13 +7,13 @@ RUN mkdir $APP_HOME
 
 WORKDIR $APP_HOME
 
-COPY arango/arangodb3-3.6.6.tar.gz /arango
+COPY arangodb3-3.6.6.tar.gz /arango
 
 RUN tar -xzvf /arango/arangodb3-3.6.6.tar.gz -C /arango
 
-ADD arango/bin/docker-startup.sh bin/docker-startup.sh
+RUN tar -xzvf /arango/arangodb3-3.6.6.tar.gz -C /arango
 
-RUN chmod +x bin/docker-startup.sh
+RUN rm -rf /arango/arangodb3-3.6.6.tar.gz
 
 EXPOSE 8529
-ENTRYPOINT ["bin/docker-startup.sh"]
+CMD ["bash"]
