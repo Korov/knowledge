@@ -32,44 +32,15 @@ docker run --rm -it --name=siem-arango1 --network=docker_default --hostname=siem
 
 #启动agent
 /arango/arangodb3-3.6.6/usr/sbin/arangod \
--c /arango/arangodb3-3.6.6/config/agent.conf \
---javascript.startup-directory /arango/arangodb3-3.6.6/usr/share/arangodb3/js \
---javascript.app-path /arango/arangodb3-3.6.6/usr/share/arangodb3/js/apps \
---server.endpoint tcp://0.0.0.0:8531 \
---agency.my-address tcp://siem-arango1:8531 \
---server.authentication false \
---agency.activate true \
---agency.size 3 \
---agency.supervision true \
---database.directory /var/lib/arangodb3/agency &
+-c /arango/arangodb3-3.6.6/config/agent.conf &
 
 #启动DBSERVER
 /arango/arangodb3-3.6.6/usr/sbin/arangod \
--c /arango/arangodb3-3.6.6/config/arangodb.conf \
---javascript.startup-directory /arango/arangodb3-3.6.6/usr/share/arangodb3/js \
---javascript.app-path /arango/arangodb3-3.6.6/usr/share/arangodb3/js/apps \
---server.authentication=false \
---server.endpoint tcp://0.0.0.0:8530 \
---cluster.my-address tcp://siem-arango1:8530 \
---cluster.my-role DBSERVER \
---cluster.agency-endpoint tcp://siem-arango1:8531 \
---cluster.agency-endpoint tcp://siem-arango2:8531 \
---cluster.agency-endpoint tcp://siem-arango3:8531 \
---database.directory /var/lib/arangodb3/dbserver &
+-c /arango/arangodb3-3.6.6/config/arangodb.conf &
 
 #启动Coordinator
 /arango/arangodb3-3.6.6/usr/sbin/arangod \
--c /arango/arangodb3-3.6.6/config/coordinator.conf \
---javascript.startup-directory /arango/arangodb3-3.6.6/usr/share/arangodb3/js \
---javascript.app-path /arango/arangodb3-3.6.6/usr/share/arangodb3/js/apps \
---server.endpoint tcp://0.0.0.0:8529 \
---cluster.my-address tcp://siem-arango1:8529 \
---server.authentication false \
---cluster.my-role COORDINATOR \
---cluster.agency-endpoint tcp://siem-arango1:8531 \
---cluster.agency-endpoint tcp://siem-arango2:8531 \
---cluster.agency-endpoint tcp://siem-arango3:8531 \
---database.directory /var/lib/arangodb3/coordinator &
+-c /arango/arangodb3-3.6.6/config/coordinator.conf &
 ```
 
 ### 启动第二个容器
@@ -79,44 +50,15 @@ docker run --rm -it --name=siem-arango2 --network=docker_default --hostname=siem
 
 #启动agent
 /arango/arangodb3-3.6.6/usr/sbin/arangod \
--c /arango/arangodb3-3.6.6/config/agent.conf \
---javascript.startup-directory /arango/arangodb3-3.6.6/usr/share/arangodb3/js \
---javascript.app-path /arango/arangodb3-3.6.6/usr/share/arangodb3/js/apps \
---server.endpoint tcp://0.0.0.0:8531 \
---agency.my-address tcp://siem-arango2:8531 \
---server.authentication false \
---agency.activate true \
---agency.size 3 \
---agency.supervision true \
---database.directory /var/lib/arangodb3/agency &
+-c /arango/arangodb3-3.6.6/config/agent.conf &
 
 #启动DBSERVER
 /arango/arangodb3-3.6.6/usr/sbin/arangod \
--c /arango/arangodb3-3.6.6/config/arangodb.conf \
---javascript.startup-directory /arango/arangodb3-3.6.6/usr/share/arangodb3/js \
---javascript.app-path /arango/arangodb3-3.6.6/usr/share/arangodb3/js/apps \
---server.authentication=false \
---server.endpoint tcp://0.0.0.0:8530 \
---cluster.my-address tcp://siem-arango2:8530 \
---cluster.my-role DBSERVER \
---cluster.agency-endpoint tcp://siem-arango1:8531 \
---cluster.agency-endpoint tcp://siem-arango2:8531 \
---cluster.agency-endpoint tcp://siem-arango3:8531 \
---database.directory /var/lib/arangodb3/dbserver &
+-c /arango/arangodb3-3.6.6/config/arangodb.conf &
 
 #启动Coordinator
 /arango/arangodb3-3.6.6/usr/sbin/arangod \
--c /arango/arangodb3-3.6.6/config/coordinator.conf \
---javascript.startup-directory /arango/arangodb3-3.6.6/usr/share/arangodb3/js \
---javascript.app-path /arango/arangodb3-3.6.6/usr/share/arangodb3/js/apps \
---server.endpoint tcp://0.0.0.0:8529 \
---cluster.my-address tcp://siem-arango2:8529 \
---server.authentication false \
---cluster.my-role COORDINATOR \
---cluster.agency-endpoint tcp://siem-arango1:8531 \
---cluster.agency-endpoint tcp://siem-arango2:8531 \
---cluster.agency-endpoint tcp://siem-arango3:8531 \
---database.directory /var/lib/arangodb3/coordinator &
+-c /arango/arangodb3-3.6.6/config/coordinator.conf &
 ```
 
 ### 启动第三个容器
@@ -124,49 +66,31 @@ docker run --rm -it --name=siem-arango2 --network=docker_default --hostname=siem
 ```bash
 docker run --rm -it --name=siem-arango3 --network=docker_default --hostname=siem-arango3 -p 8531:8529 -v $PWD/arango3/config:/arango/arangodb3-3.6.6/config -v $PWD/arango3/agency:/var/lib/arangodb3/agency -v $PWD/arango3/dbserver:/var/lib/arangodb3/dbserver -v $PWD/arango3/coordinator:/var/lib/arangodb3/coordinator siem-arango:1.0 bash
 
-#启动agent
 /arango/arangodb3-3.6.6/usr/sbin/arangod \
--c /arango/arangodb3-3.6.6/config/agent.conf \
---javascript.startup-directory /arango/arangodb3-3.6.6/usr/share/arangodb3/js \
---javascript.app-path /arango/arangodb3-3.6.6/usr/share/arangodb3/js/apps \
---server.endpoint tcp://0.0.0.0:8531 \
---agency.my-address tcp://siem-arango3:8531 \
---server.authentication false \
---agency.activate true \
---agency.size 3 \
---agency.endpoint tcp://siem-arango1:8531 \
---agency.endpoint tcp://siem-arango2:8531 \
---agency.endpoint tcp://siem-arango3:8531 \
---agency.supervision true \
---database.directory /var/lib/arangodb3/agency &
+-c /arango/arangodb3-3.6.6/config/agent.conf &
 
-#启动DBSERVER
 /arango/arangodb3-3.6.6/usr/sbin/arangod \
--c /arango/arangodb3-3.6.6/config/arangodb.conf \
---javascript.startup-directory /arango/arangodb3-3.6.6/usr/share/arangodb3/js \
---javascript.app-path /arango/arangodb3-3.6.6/usr/share/arangodb3/js/apps \
---server.authentication=false \
---server.endpoint tcp://0.0.0.0:8530 \
---cluster.my-address tcp://siem-arango3:8530 \
---cluster.my-role DBSERVER \
---cluster.agency-endpoint tcp://siem-arango1:8531 \
---cluster.agency-endpoint tcp://siem-arango2:8531 \
---cluster.agency-endpoint tcp://siem-arango3:8531 \
---database.directory /var/lib/arangodb3/dbserver &
+-c /arango/arangodb3-3.6.6/config/arangodb.conf &
 
-#启动Coordinator
 /arango/arangodb3-3.6.6/usr/sbin/arangod \
--c /arango/arangodb3-3.6.6/config/coordinator.conf \
---javascript.startup-directory /arango/arangodb3-3.6.6/usr/share/arangodb3/js \
---javascript.app-path /arango/arangodb3-3.6.6/usr/share/arangodb3/js/apps \
---server.endpoint tcp://0.0.0.0:8529 \
---cluster.my-address tcp://siem-arango3:8529 \
---server.authentication false \
---cluster.my-role COORDINATOR \
---cluster.agency-endpoint tcp://siem-arango1:8531 \
---cluster.agency-endpoint tcp://siem-arango2:8531 \
---cluster.agency-endpoint tcp://siem-arango3:8531 \
---database.directory /var/lib/arangodb3/coordinator &
+-c /arango/arangodb3-3.6.6/config/coordinator.conf &
+```
+
+## 设置密码
+
+设置`authentication=false`
+
+通过Arangosh设置root用户密码
+
+```bash
+/arango/arangodb3-3.6.6/bin/arangosh
+require("org/arangodb/users").update("root", "rizhiyi&2014");
+```
+
+设置`authentication=true`，重启（先kill进程然后使用相同的命令重启）
+
+```bash
+kill 15 <pid>
 ```
 
 # 使用cent
