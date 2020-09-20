@@ -5,7 +5,7 @@ docker run --name mysql --restart=always -p 3306:3306 -e MYSQL_ROOT_PASSWORD=roo
 -v `pwd`/mysql-files:/var/lib/mysql-files:rw \
 -v `pwd`/log:/var/log/mysql:rw \
 -v `pwd`/config/my.cnf:/etc/mysql/my.cnf:rw \
--d mysql:latest;
+-d mysql:8.0.21;
 
 # 添加远程登录用户
 CREATE USER 'liaozesong'@'%' IDENTIFIED WITH mysql_native_password BY 'Lzslov123!';

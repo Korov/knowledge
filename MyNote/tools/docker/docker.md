@@ -93,6 +93,12 @@ docker exec -it kafka /bin/sh
 docker exec -it -u root kafka /bin/sh
 ```
 
+## 启动容器时指定网络
+
+```bash
+docker run --rm -it --name=spider-minions1 --network=minions --hostname=spider-minions --ip=172.31.0.19 --link=kafka-minions:kafka-minions.com spider-minions:1.0 bash
+```
+
 ## 1.6 查看容器所有信息
 
 此命令可以查看此容器的所有信息
