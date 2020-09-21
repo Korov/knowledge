@@ -1,0 +1,38 @@
+version: "3"
+services:
+  siem-arango1:
+    image: siem-arango:1.0
+    container_name: siem-arango1
+    hostname: siem-arango1
+    ports: 
+      - "8529:8529"
+    volumes:
+      - $PWD/arango1/config:/arango/arangodb3-3.6.6/config
+      - $PWD/arango1/agency:/var/lib/arangodb3/agency
+      - $PWD/arango1/dbserver:/var/lib/arangodb3/dbserver
+      - $PWD/arango1/coordinator:/var/lib/arangodb3/coordinator
+    
+  siem-arango2:
+    image: siem-arango:1.0
+    container_name: siem-arango2
+    hostname: siem-arango2
+    ports: 
+      - "8530:8529"
+    volumes:
+      - $PWD/arango2/config:/arango/arangodb3-3.6.6/config
+      - $PWD/arango2/agency:/var/lib/arangodb3/agency
+      - $PWD/arango2/dbserver:/var/lib/arangodb3/dbserver
+      - $PWD/arango2/coordinator:/var/lib/arangodb3/coordinator
+
+  siem-arango3:
+    image: siem-arango:1.0
+    container_name: siem-arango3
+    hostname: siem-arango3
+    ports: 
+      - "8531:8529"
+    volumes:
+      - $PWD/arango3/config:/arango/arangodb3-3.6.6/config
+      - $PWD/arango3/agency:/var/lib/arangodb3/agency
+      - $PWD/arango3/dbserver:/var/lib/arangodb3/dbserver
+      - $PWD/arango3/coordinator:/var/lib/arangodb3/coordinator
+  

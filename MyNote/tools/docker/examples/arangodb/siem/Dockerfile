@@ -15,5 +15,9 @@ RUN tar -xzvf /arango/arangodb3-3.6.6.tar.gz -C /arango
 
 RUN rm -rf /arango/arangodb3-3.6.6.tar.gz
 
+ADD docker-startup.sh bin/docker-startup.sh
+
+RUN chmod +x bin/docker-startup.sh
+
 EXPOSE 8529
-CMD ["bash"]
+ENTRYPOINT ["bin/docker-startup.sh"]
