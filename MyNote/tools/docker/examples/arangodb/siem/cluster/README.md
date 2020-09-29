@@ -93,6 +93,14 @@ require("org/arangodb/users").update("root", "rizhiyi&2014");
 kill 15 <pid>
 ```
 
+## 总结
+
+若设置了`--agency.size 3`为了保证高可用必须确保有两台及以上的agent是可用的才可以。
+
+备份数量必须小于等于DBServer的数量，shard的数量可以大于DBServer的数量
+
+当可用的DBServer的数量小于Write concern*的时候只能读数据不能写数据
+
 # 使用cent
 
 ## 启动容器
