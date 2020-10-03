@@ -408,7 +408,7 @@ bzip2是为了替代gzip，提供了更佳的压缩比。功能与用法与gzip�
 
 查询：tar -jtv -f filename.tar.bz2
 
-解压缩：tar -jxv -f filename.tar.bz2 -C <欲解压的目录>
+解压缩：tar -jvx -f filename.tar.bz2 -C <欲解压的目录>
 
 ```bash
 [root@localhost Docker]# tar -jvc -f config.tar.bz2 ./config/
@@ -459,11 +459,9 @@ pigz -d filename.gz
 # 压缩目录
 tar cv filename | pigz -9 -p 16 -k > filename.tar.gz
 # 解压目录，两种方式
-tar xvf filename.tar.gz
+tar -zvxf filename.tar.gz
 pigz -d filename.tar.gz
 ```
-
-
 
 ## 8.4 XFS文件系统的备份与还原
 
