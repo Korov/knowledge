@@ -1,4 +1,4 @@
-package src
+package algorithm
 
 import (
 	"reflect"
@@ -9,22 +9,23 @@ func TestInsertionSort(t *testing.T) {
 	type args struct {
 		values []int
 	}
-	tests := []struct {
+	var tests = []struct {
 		name    string
 		args    args
 		wantRet []int
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{name: "test1", args: args{values: []int{1, 2, 3, 6, 5, 4}}, wantRet: []int{1, 2, 3, 4, 5, 6}, wantErr: false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			gotRet, err := InsertionSort(tt.args.values)
+			t.Logf("input:%v, result:%v", tt.args.values, gotRet)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("InsertionSort() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if !reflect.DeepEqual(gotRet, tt.wantRet) {
+			if !reflect.DeepEqual(tt.args.values, tt.wantRet) {
 				t.Errorf("InsertionSort() gotRet = %v, want %v", gotRet, tt.wantRet)
 			}
 		})
