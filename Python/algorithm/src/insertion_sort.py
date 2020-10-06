@@ -1,8 +1,8 @@
-from loguru import logger
+from src.log import log
 
 
 def insertion_sort(values):
-    logger.info(values)
+    log.info(values)
     i = 1
     for i in range(len(values)):
         j = i - 1
@@ -15,4 +15,4 @@ def insertion_sort(values):
             else:
                 break
         i += 1
-    logger.info(values)
+    log.info(values)
