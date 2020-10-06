@@ -1,6 +1,8 @@
 package algorithm
 
-import "time"
+import (
+	time "time"
+)
 
 func InsertionSort(values []int) (ret []int, err error) {
 	start := time.Now()
@@ -15,6 +17,9 @@ func InsertionSort(values []int) (ret []int, err error) {
 			}
 		}
 	}
+	/*mylog.WithFields(logrus.Fields{
+		"cost": time.Since(start),
+	}).Info("insertion sort ")*/
 	Info.Panicf("insertion sort cost:%v", time.Since(start))
 	return values, nil
 }
