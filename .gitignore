@@ -75,7 +75,8 @@ Thumbs.db
 
 /**/venv
 Python/scrapy/**/dbs
-Python/algorithm/report/*
+Python/**/report/*
+**/htmlcov
 /**/__pycache__
 /**/project.egg-info
 Python/**/.coverage
