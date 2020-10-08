@@ -1,29 +1,18 @@
 package algorithm
 
 import (
-	"io"
-	"log"
-	"github.com/sirupsen/logrus"
-	"os"
+	"fmt"
+	"github.com/cihub/seelog"
 )
 
-var (
-	Info    *log.Logger
-	Warning *log.Logger
-	Error   *log.Logger
-	//mylog = logrus.New()
-)
+var Logger seelog.LoggerInterface
 
 func init() {
-	//mylog.Out = os.Stdout
-	//mylog.Formatter = &logrus.JSONFormatter{}
-
-	logFile, err := os.OpenFile("logs.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	var err error
+	Logger = seelog.Disabled
+	Logger, err = seelog.LoggerFromConfigAsFile("seelog.xml")
 	if err != nil {
-		log.Fatalln("打开日志文件失败：", err)
+		fmt.Println(err)
+		return
 	}
-
-	Info = log.New(io.MultiWriter(os.Stderr, logFile), "Info:", log.Ldate|log.Ltime|log.Lshortfile)
-	Warning = log.New(io.MultiWriter(os.Stderr, logFile), "Warning:", log.Ldate|log.Ltime|log.Lshortfile)
-	Error = log.New(io.MultiWriter(os.Stderr, logFile), "Error:", log.Ldate|log.Ltime|log.Lshortfile)
 }
