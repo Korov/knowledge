@@ -3,7 +3,7 @@ package algorithm
 import (
 	"io"
 	"log"
-	//"github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 	"os"
 )
 
