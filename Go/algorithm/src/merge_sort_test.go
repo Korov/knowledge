@@ -1,6 +1,7 @@
-package algorithm
+package src_test
 
 import (
+	. "algorithm/src"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )

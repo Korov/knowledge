@@ -1,6 +1,8 @@
-package algorithm
+package src
 
-import "time"
+import (
+	"time"
+)
 
 func InsertionSort(values []int) (ret []int, err error) {
 	start := time.Now()

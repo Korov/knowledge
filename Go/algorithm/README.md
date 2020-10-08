@@ -25,3 +25,18 @@ testing，使用在代码路径下执行`go test -v`会将执行结果输出到�
 
 测试框架Ginkgo用不了`go get -u github.com/onsi/ginkgo/ginkgo`
 
+```
+# 测试所有测试类
+go test -v
+# 测试指定类
+go test -v merge_sort_test.go
+# 测试单个函数 Ginkgo不知道怎么测单个函数
+go test -v merge_sort_test.go -test.run TestHello
+```
+
+```bash
+# 生成测试覆盖率报告
+go test -coverprofile=../report/covprofile
+go tool cover -html=../report/covprofile -o ../report/coverage.html
+```
+

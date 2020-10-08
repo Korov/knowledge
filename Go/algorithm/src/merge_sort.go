@@ -1,4 +1,4 @@
-package algorithm
+package src
 
 func MergeSort(values []int) (result []int, err error) {
 	if len(values) <= 1 {
