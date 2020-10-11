@@ -45,8 +45,7 @@ var _ = Describe("Array", func() {
 			AfterEach(func() {
 				println("AfterEach in Context")
 			})
-			It("return value", func() {
-				println("Exec Test Case")
+			It("insertion_sort", func() {
 				v, _ := InsertionSort(input)
 				Logger.Info("result:", v)
 				Logger.Flush()

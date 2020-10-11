@@ -40,3 +40,13 @@ go test -v ./src -coverprofile=./report/covprofile
 go tool cover -html=../report/covprofile -o ../report/coverage.html
 ```
 
+```bash
+# ginkgo执行所有测试
+ginkgo ./src
+# 生成测试覆盖率
+ginkgo ./src -cover
+# 执行指定的It，通过It第一个字符串的正则匹配
+ginkgo -focus="merge_sort" ./src
+# 跳过指定的It，通过It的第一个字符串的正则匹配
+ginkgo -skip="merge_sort" ./src
+```
