@@ -167,4 +167,86 @@ tar -xzvf arangodb3-3.6.6.tar.gz -C /arango
 --database.directory /var/lib/arangodb3/coordinator &
 ```
 
+```bash
+docker run --rm -it --name cent -p 8531:8529 centos:centos6.9 bash
+```
+
+# 使用ubuntu
+
+```bash
+
+
+docker run -d -it -p 8529:8529 --name ubuntu-arango ubuntu:20.04 bash
+docker cp .\arangodb3-linux-3.6.6.tar.gz ubuntu-arango:/root
+
+docker exec -it ubuntu-arango bash
+cd /root
+mkdir arango
+tar -zvx -f arangodb3-linux-3.6.6.tar.gz -C ./arango
+/root/arango/arangodb3-3.6.6/bin/arangodb create jwt-secret --secret=arangodb.secret
+chmod 400 arangodb.secret
+#本地测试 3个agent3个coordinator3个dbserver
+/root/arango/arangodb3-3.6.6/bin/arangodb --starter.local --starter.data-dir=./localdata --auth.jwt-secret=./arangodb.secret
+#在多个机器上启动， A,B,C表示机器ip，需要在每个机器上都执行次操作
+arangodb --server.storage-engine=rocksdb --auth.jwt-secret=/etc/arangodb.secret --starter.data-dir=./data --starter.join A,B,C
+
+arangodb --server.storage-engine=rocksdb --auth.jwt-secret=/etc/arangodb.secret --starter.data-dir=./data --cluster.agency-size=3 --starter.join A,B,C
+```
+
+# ArangoDB Starter
+
+启动的时候每个机器上将会启动一个Agent，一个Coordinator，一个DB-Server。如果starter使用了8528端口，那么Coordiantor将使用8529（8528+1）端口，DB-Server将使用8530（8528+2）端口，Agent将使用8531（8528+3）可以使用`--starter.port 8528`修改启动端口。
+
+```bash
+docker run -d -it --name=siem-arango1 --network=arango_default --hostname=siem-arango1 -p 8529:8529 ubuntu:20.04 bash
+docker run -d -it --name=siem-arango2 --network=arango_default --hostname=siem-arango2 -p 8530:8529 ubuntu:20.04 bash
+docker run -d -it --name=siem-arango3 --network=arango_default --hostname=siem-arango3 -p 8531:8529 ubuntu:20.04 bash
+docker run -d -it --name=siem-arango4 --network=arango_default --hostname=siem-arango4 -p 8532:8529 ubuntu:20.04 bash
+
+docker cp .\arangodb3-linux-3.6.6.tar.gz siem-arango1:/root/
+docker cp .\arangodb3-linux-3.6.6.tar.gz siem-arango2:/root/
+docker cp .\arangodb3-linux-3.6.6.tar.gz siem-arango3:/root/
+docker cp .\arangodb3-linux-3.6.6.tar.gz siem-arango4:/root/
+docker cp .\arangodb.secret siem-arango1:/root/arango/
+docker cp .\arangodb.secret siem-arango2:/root/arango/
+docker cp .\arangodb.secret siem-arango3:/root/arango/
+docker cp .\arangodb.secret siem-arango4:/root/arango/
+
+docker exec -it siem-arango1 bash
+docker exec -it siem-arango2 bash
+docker exec -it siem-arango3 bash
+docker exec -it siem-arango4 bash
+
+cd /root
+mkdir arango
+tar -zvx -f arangodb3-linux-3.6.6.tar.gz -C ./arango
+
+cd /root/arango
+
+#server A
+/root/arango/arangodb3-3.6.6/bin/arangodb --auth.jwt-secret=./arangodb.secret --starter.data-dir=./data --all.database.password=root123 --starter.join siem-arango1,siem-arango2,siem-arango3
+#server B
+/root/arango/arangodb3-3.6.6/bin/arangodb --auth.jwt-secret=./arangodb.secret --starter.data-dir=./data --all.database.password=root123 --starter.join siem-arango1,siem-arango2,siem-arango3
+#server C
+/root/arango/arangodb3-3.6.6/bin/arangodb --auth.jwt-secret=./arangodb.secret --starter.data-dir=./data --all.database.password=root123 --starter.join siem-arango1,siem-arango2,siem-arango3
+
+docker stop siem-arango1
+docker stop siem-arango2
+docker stop siem-arango3
+docker stop siem-arango4
+
+docker rm siem-arango1
+docker rm siem-arango2
+docker rm siem-arango3
+docker rm siem-arango4
+```
+
+```bash
+#server A
+/root/arango/arangodb3-3.6.6/bin/arangodb --auth.jwt-secret=./arangodb.secret --starter.data-dir=./data --all.database.password=root123 --cluster.agency-size=1 --starter.address=siem-arango1
+#server B
+/root/arango/arangodb3-3.6.6/bin/arangodb --auth.jwt-secret=./arangodb.secret --starter.data-dir=./data --all.database.password=root123 --starter.join siem-arango1
+#server C
+/root/arango/arangodb3-3.6.6/bin/arangodb --auth.jwt-secret=./arangodb.secret --starter.data-dir=./data --all.database.password=root123 --starter.join siem-arango1
+```
 
