@@ -201,21 +201,17 @@ arangodb --server.storage-engine=rocksdb --auth.jwt-secret=/etc/arangodb.secret 
 docker run -d -it --name=siem-arango1 --network=arango_default --hostname=siem-arango1 -p 8529:8529 ubuntu:20.04 bash
 docker run -d -it --name=siem-arango2 --network=arango_default --hostname=siem-arango2 -p 8530:8529 ubuntu:20.04 bash
 docker run -d -it --name=siem-arango3 --network=arango_default --hostname=siem-arango3 -p 8531:8529 ubuntu:20.04 bash
-docker run -d -it --name=siem-arango4 --network=arango_default --hostname=siem-arango4 -p 8532:8529 ubuntu:20.04 bash
 
 docker cp .\arangodb3-linux-3.6.6.tar.gz siem-arango1:/root/
 docker cp .\arangodb3-linux-3.6.6.tar.gz siem-arango2:/root/
 docker cp .\arangodb3-linux-3.6.6.tar.gz siem-arango3:/root/
-docker cp .\arangodb3-linux-3.6.6.tar.gz siem-arango4:/root/
 docker cp .\arangodb.secret siem-arango1:/root/arango/
 docker cp .\arangodb.secret siem-arango2:/root/arango/
 docker cp .\arangodb.secret siem-arango3:/root/arango/
-docker cp .\arangodb.secret siem-arango4:/root/arango/
 
 docker exec -it siem-arango1 bash
 docker exec -it siem-arango2 bash
 docker exec -it siem-arango3 bash
-docker exec -it siem-arango4 bash
 
 cd /root
 mkdir arango
@@ -248,5 +244,41 @@ docker rm siem-arango4
 /root/arango/arangodb3-3.6.6/bin/arangodb --auth.jwt-secret=./arangodb.secret --starter.data-dir=./data --all.database.password=root123 --starter.join siem-arango1
 #server C
 /root/arango/arangodb3-3.6.6/bin/arangodb --auth.jwt-secret=./arangodb.secret --starter.data-dir=./data --all.database.password=root123 --starter.join siem-arango1
+```
+
+```
+docker cp .\password.txt siem-arango1:/root/arango/
+docker cp .\password.txt siem-arango2:/root/arango/
+docker cp .\password.txt siem-arango3:/root/arango/
+
+/root/arango/arangodb3-3.6.6/bin/arangodb --auth.jwt-secret=./arango/arangodb.secret --starter.data-dir=./arango/data --all.database.password=root123 --starter.join siem-arango1,siem-arango2,siem-arango3
+
+/root/arango/arangodb3-3.6.6/bin/arangodb --auth.jwt-secret=./arango/arangodb.secret --starter.data-dir=./arango/data --starter.join siem-arango1,siem-arango2,siem-arango3
+
+#使用jwt登录arangosh，在arangosh中执行更换密码的命令
+/root/arango/arangodb3-3.6.6/bin/arangosh --server.jwt-secret-keyfile=./arango/arangodb.secret
+
+require("@arangodb/users").replace("root", "root123");
+
+# 或者使用arangosh执行对应的文本中的命令
+/root/arango/arangodb3-3.6.6/bin/arangosh --server.jwt-secret-keyfile=./arango/arangodb.secret < ./arango/password.txt
+```
+
+## 单机
+
+```
+docker run -d -it --name=siem-arango4 --network=arango_default --hostname=siem-arango4 -p 8532:8529 ubuntu:20.04 bash
+
+docker cp .\arangodb3-linux-3.6.6.tar.gz siem-arango4:/root/
+
+docker cp .\arangodb.secret siem-arango4:/root/arango/
+docker cp .\arangodb.secret siem-arango4:/root/arango/
+
+docker exec -it siem-arango4 bash
+
+cd /root
+mkdir arango
+tar -zvx -f arangodb3-linux-3.6.6.tar.gz -C ./arango
+/root/arango/arangodb3-3.6.6/bin/arangodb --starter.mode=single --all.database.password=root123 --auth.jwt-secret=./arango/arangodb.secret
 ```
 
