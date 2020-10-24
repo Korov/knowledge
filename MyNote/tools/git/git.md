@@ -992,108 +992,10 @@ git config --global core.quotepath false
 git config --global credential.helper store
 ```
 
-## 4.3 .gitkeep
-
-git不会跟踪空文件，如果想要追踪空文件，可以在空文件中添加一个空白的文件`.gitkeep`，此时git就会跟踪此空白文件夹
-
-## 4.4 git stash
-
-作用将目前还不想提交但是已经修改的内容保存至堆栈中，之后可以在某个分支上恢复堆栈中的内容。git stash作用的范围包括工作区和暂存区中的内容，也就是说没有commit的内容都会保存到堆栈中。
-
-> 本应该在dev分之开发的内容，你却在master分之开发了，此时可以使用git stash将修改内容保存到堆栈中，然后到dev分支上恢复开发。
+## file name too long
 
 ```bash
-#使用git stash之后所有的修改将会保存到堆栈中，所有文件会恢复到修改之前的状态，save时可以添加备注
-git stash save 'dev stash test'
-#save已经不推荐使用，推荐使用push，可以指定stash哪些文件，--keep-index(-k)只会存储被git追踪的文件,--include-untracked(-u)未被git追踪的也会被存储起来，--all所有文件包括忽略的文件也会被存储起来
-git stash push [<filename>] -u -m 'dev stash test'
-#查看暂存的文件
-git stash list
-#恢复暂存的文件并删除堆栈中的暂存文件，使用的是堆的方式，即后进先出。
-git stash pop
-#恢复暂存文件单不删除堆栈中的暂存文件，恢复方式后进先出
-git stash apply
-#不想要后进先出的方式
-git stash ( pop | apply ) --index 1
-#删除堆栈中制定stash
-git stash drop 1
-#清空堆栈
-git stash clear
-#创建一个新的分支dev0，并将stash0 apply用于devo，相当于两个命令，git switch -c dev0, git stash apply 0,使用的时候需要注意解决冲突
-git stash branch dev0 0
-#查看stash与当前分之差异，此处的选项与git diff中的选项相同，可以用 -p 显示所有修改
-git stash show [<选项>] [<stash>]
-```
-
-
-
-## 4.5 git switch和git restore
-
-这两个命令是新版本增加的，用于解耦git checkout的功能。
-
-### 4.5.1 git switch
-
-`git checkout <branch>`,`git switch <branch>`都是用来切换分支，推荐使用switch来创建和切换分支。
-
-```bash
-#创建并切换到新的分支
-git switch -c dev
-#切换到已有分之
-git switch master
-```
-
-### 4.5.1 git restore
-
-`git checkout <filename>`,`git restore <filename>`功能相同，用来恢复文件，推荐使用restore。
-
-`git reset <filename>`,`git restore --staged <filename>`功能相同，将暂存区文件移除到工作区，推荐使用restore。
-
-## 4.6 拉取远端分支，并再本地创建相应分支
-
-```bash
-#创建新分支之前都需要fetch以下，否则会不成功
-git fetch
-#本地创建一个分支 dev1并切换到次分支，并将本地分支dev1与远端分支dev1建立联系
-git checkout -b dev1 origin/dev1
-#本地创建一个分支 dev3并切换到此分支，并将本地分支dev3与远端分支dev3建立联系
-git switch -c dev3 origin/dev3
-#本地创建一个分支 dev1，并将本地分支与远端分支建立联系
-git fetch origin dev2 dev2
-```
-
-## 4.7 设置upstream
-
-有一个远端仓库A：https://gitee.com/geek_qi/cloud-platform.git，你fork为自己的仓库B，clone到本地的C，此时你想本地的C与A保持一致，可以做以下操作。
-
-```bash
-#添加upstream
-git remote add upstream https://gitee.com/geek_qi/cloud-platform.git
-#查看remote
-$ git remote -v
-origin	https://gitee.com/korov/cloud-platform.git (fetch)
-origin	https://gitee.com/korov/cloud-platform.git (push)
-upstream	https://gitee.com/geek_qi/cloud-platform.git (fetch)
-upstream	https://gitee.com/geek_qi/cloud-platform.git (push)
-#获取upstream的数据
-$ git fetch upstream 
-#将C中的master与A中的master关联
-$ git branch --set-upstream-to=upstream/master
-分支 'master' 设置为跟踪来自 'upstream' 的远程分支 'master'。
-#将A代码同步到C，再将C中代码push到B
-git fetch upstream master
-git merge
-git push origin master
-```
-
-不切换分支直接设置其他分支的upstream：`git br -u upstream/br01 br01`（设置本地分支br01的upstream为upstream/br01）。
-
-取消upstream：
-
-```bash
-#取消当前分支的upstream
-git branch --unset-upstream
-#取消其他分支的upstream
-git branch --unset-upstream [分支名]
+git config --global core.longpaths true
 ```
 
 ## 4.8 git reflog
@@ -1117,36 +1019,6 @@ git push origin --delete dev
 #把本地分支推送到远端
 git push origin dev
 ```
-
-## git clean
-
-删除untracked文件
-
-```bash
-#查看将会被删除的文件
-git clean -fdn
-#真正删除文件
-git clean -fd
-
-#删除untracked以及gitignore标记的文件
-git clean -fdxn
-git clean -fdx
-```
-
-## git cherry-pick
-
-将某个commitID的修改引用到当前HEAD上
-
-```bash
-#单个commit
-git cherry-pick commitID
-#多个commit,一个commit区间，不包含起始的commit，包好终点commit
-git cherry-pick commitID..commitID
-```
-
-## git revert
-
-`git revert commitId`,将此commit做的修改撤销.其过程是如果此commit中增加了一个文件a.java,使用revert之后会创建一个删除a.java的commit提交.
 
 ## git bisect
 
@@ -1173,16 +1045,6 @@ git log --pretty=format:"%Cred%h %C(yellow)%an%C(magenta)<%ae> %Cgreen%ad %Crese
 让日志变得色彩缤纷
 
 ## 新知识点
-
-### git checkout 
-
-此命令后面可以是一个commit的id,一个分支,HEAD,标签等.这些可以标志一个仓库的状态.
-
-head指向当前分支的头,如果在dev分支则HEAD就指向dev,如果在prod分支则执行prod分支.
-
-HEAD~1表示当前HEAD的父亲commit,HEAD~2代表爷爷,依次递增,如果有多个父亲则以左一为准,也可以为master~2,commitId~3. 
-
-commitid^表示此commitid的父亲,commitid^2^1表示当前commitid的第二个父亲的第一个父亲.
 
 ### git merge --squash
 
