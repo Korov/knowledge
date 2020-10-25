@@ -950,3 +950,22 @@ systemctl get-default
 systemctl set-default multi-user.target
 ```
 
+## 配置ssh登录
+
+修改ssh配置文件`vim /etc/ssh/sshd_config`
+
+```properties
+PermitRootLogin yes
+RSAAuthentication yes
+PubkeyAuthentication yes
+AuthorizedKeysFile      .ssh/authorized_keys
+```
+
+上传客户端的ssh公钥到服务器上：
+
+```bash
+scp ~/.ssh/id_rsa.pub root@172.16.193.141:/root/.ssh/id_rsa.pub_root
+#在服务器上执行如下命令
+cat /root/.ssh/id_rsa.pub_root >> /root/.ssh/authorized_keys
+```
+
