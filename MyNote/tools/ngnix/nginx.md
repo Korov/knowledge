@@ -248,7 +248,79 @@ worker_processes 4;
 worker_cpu_affinity 1000 0100 0010 0001;
 ```
 
+#### ssl硬件加速
 
+```
+ssl_engine device;
+```
+
+#### 系统调用gettimeofday的执行频率
+
+```
+timer_resolution t;
+```
+
+#### worker进程优先级
+
+```
+worker_priority nice;
+#default
+worker_priority 0;
+```
+
+### 事件类配置项
+
+#### 是否打开accept锁
+
+```
+accept_mutex [on|off]
+#default
+accept_mutext on;
+```
+
+accept_mutext时nginx的负载均衡锁，accept_mutext这把锁可以让多个worker进程轮流的、序列化的与新客户端建立TCP连接。当某一个worker进程建立的连接数量达到worker_connections配置的最大连接数的7/8时，会大大的减少该worker进程试图简历新TCP连接的机会，以此实现所有worker进程之上处理的客户端请求数量接近。
+
+#### lock文件的路径
+
+```
+lock_file path/file;
+#default
+lock_file logs/nginx.lock;
+```
+
+accept锁可能需要这个lock文件。
+
+#### 使用accept锁后到真正建立连接之间的延迟时间
+
+```
+accept_mutex_delay Nms;
+#default
+accept_mutex_delay 500ms;
+```
+
+使用accept锁后，同一时间只有一个worker进程能够取到accept锁，这个accept锁不是阻塞锁，如果取不到会立刻返回。如果一个worker进程试图取accept锁而没有取到，它至少要等accept_mutex_delay定义的时间间隔后才能再次试图取锁。
+
+#### 批量简历新连接
+
+```
+multi_accept [on|off];
+#defalut
+multi_accept off;
+```
+
+#### 选择事件模型
+
+```
+use [kqueue|rtsig|epoll|/dev/poll|select|poll|eventport];
+```
+
+#### 每个worker的最大连接数
+
+```
+worker_connections number;
+```
+
+定义每个worker进程可以同时处理的最大连接数。
 
 # 三大功能
 
