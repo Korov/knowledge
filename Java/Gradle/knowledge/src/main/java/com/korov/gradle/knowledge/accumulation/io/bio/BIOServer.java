@@ -32,7 +32,7 @@ public class BIOServer {
                 sb.append(new String(chars, 0, len));
                 System.out.println("Get message from " + sb);
                 // 使用Writer将数据写回给客户端
-                String response = "Hello " + RegexUtil.finds("No\\.\\d", sb.toString()).get(0) + "! I have get the message!";
+                String response = "Hello " + RegexUtil.findAll("No\\.\\d", sb.toString()).get(0) + "! I have get the message!";
                 PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
                 writer.write(response);
                 writer.flush();
