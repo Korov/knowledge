@@ -10,13 +10,11 @@ sourceCompatibility = '1.8'
 
 //jar依赖从哪里获取mavenLocal()先从本地找，找不到mavenCentral()从中央仓库下载
 repositories {
+    maven {
+        url 'https://maven.aliyun.com/repository/public/'
+    }
     mavenLocal()
-    maven {
-        url "https://maven.aliyun.com/repository/central"
-    }
-    maven {
-        url "https://maven.aliyun.com/repository/gradle-plugin"
-    }
+    mavenCentral()
 }
 
 //依赖关系
@@ -24,6 +22,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.1.1'
     compileOnly 'org.projectlombok:lombok'
+    compile group: 'com.fasterxml.uuid', name: 'java-uuid-generator', version: '4.0.1'
+    compile group: 'com.github.f4b6a3', name: 'uuid-creator', version: '3.1.0'
     runtimeOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'mysql:mysql-connector-java'
     compile group: 'org.springframework.kafka', name: 'spring-kafka'
