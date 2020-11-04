@@ -459,8 +459,6 @@ g ^g可以统计文档字符数，行数。 将光标放在最后一个字符上
 - :X -- 为当前文件设置密码。
 - :set key= -- 去除文件的密码。
 
-[这里是](http://www.cnblogs.com/jiqingwu/admin/vim-quick-edit.html) 滇狐总结的比较高级的vi技巧。
-
 ## [12.2 文件的编码](http://www.cnblogs.com/jiqingwu/archive/2012/06/14/vim_notes.html#id99)
 
 - :e ++enc=utf8 filename, 让vim用utf-8的编码打开这个文件。
