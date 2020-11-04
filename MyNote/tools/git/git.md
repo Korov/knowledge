@@ -598,6 +598,7 @@ $ git push origin --tags
 $ git tag -d v1.4-lw
 #git push <remote> :refs/tags/<tagname> 同步删除远程仓库标签
 $ git push origin :refs/tags/v1.4-lw
+git push origin --delete tag v1.7.0.15
 ```
 
 ### 2.3.5检出标签
