@@ -85,7 +85,7 @@ Kafka的partition实际上并没有太多的业务含义，他的引入就是单
 
 ### 1.4.4 replica
 
-副本，他们存在的唯一目的就是防止数据丢失。副本分为两类：领到副本（leader replica）和追随者副本（follower replica）。追随者副本是不能提供服务给客户端的，它只是被动的想领导者副本获取数据，而一旦领导者副本所在的broker宕机，Kafka就会从剩余的replica中选举出新的leader继续提供服务。
+副本，他们存在的唯一目的就是防止数据丢失。副本分为两类：领导副本（leader replica）和追随者副本（follower replica）。追随者副本是不能提供服务给客户端的，它只是被动的想领导者副本获取数据，而一旦领导者副本所在的broker宕机，Kafka就会从剩余的replica中选举出新的leader继续提供服务。
 
 ### 1.4.6 ISR
 
