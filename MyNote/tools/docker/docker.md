@@ -236,7 +236,7 @@ $ docker run -it --volumes-from dbdata －口ame db2 ubuntu
 此时， 容器dbl 和db2 都挂载同一个数据卷到相同的／ dbdata 目录，三个容器任何一方在该目录下的写人，其他容器都可以看到。
 可以多次使用--volumes-from 参数来从多个容器挂载多个数据卷，还可以从其他已经挂载了容器卷的容器来挂载数据卷：
 $ docker run -d --name db3 --volumes-from dbl training/postgres
-如果删除了挂载的容器（包括dbdata 、db 工和db2 ），数据卷并不会被自动删除。如果要删除一个数据卷，必须在删除最后一个还挂载着它的容器时显式使用dock er rm -v 命令来指定同时删除关联的容器。
+如果删除了挂载的容器（包括dbdata 、db 工和db2 ），数据卷并不会被自动删除。如果要删除一个数据卷，必须在删除最后一个还挂载着它的容器时显式使用docker rm -v 命令来指定同时删除关联的容器。
 
 可以利用数据卷容器对其中的数据卷进行备份、恢复，以实现数据的迁移。
 1. 备份
