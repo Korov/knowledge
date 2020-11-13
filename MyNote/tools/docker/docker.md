@@ -1115,9 +1115,10 @@ sudo systemctl restart docker.service
 newgrp docker
 ```
 
-## 阿里云镜像推送
+## 镜像推送
 
-```
+```bash
+#推送到阿里云
 #登录
 docker login --username=tb393160548 registry.cn-hangzhou.aliyuncs.com
 #重命名镜像
@@ -1126,5 +1127,15 @@ docker tag [ImageId] registry.cn-hangzhou.aliyuncs.com/korov/myubuntu:[镜像版
 docker push registry.cn-hangzhou.aliyuncs.com/korov/myubuntu:[镜像版本号]
 #拉取远端镜像
 docker pull registry.cn-hangzhou.aliyuncs.com/korov/myubuntu:[镜像版本号]
+
+#推送到docker hub
+#登录
+docker login
+#重命名镜像
+docker tag [ImageId] korov/ubuntu:[镜像版本号]
+#镜像推送到远端
+docker push korov/ubuntu:[镜像版本号]
+#拉取远端镜像
+docker pull korov/ubuntu:[镜像版本号]
 ```
 
