@@ -299,6 +299,40 @@ lsattr显示文件隐藏属性
 
 ### 6.4.3 文件特殊权限：SUID，SGID，SBIT
 
+suid只适用于可执行文件，不能用于目录。设置suid以后，用户就可以使用拥有者的权限执行这个文件。
+
+示例：
+
+```bash
+localhost :: ~ » ls -l /usr/bin/passwd
+-rwsr-xr-x. 1 root root 34928 May 11  2019 /usr/bin/passwd
+
+#设置和取消suid
+chmod u+s filename
+chmod u-s filename
+
+chmod 4754 filename
+chmod 0754 filename
+```
+
+sgid即适用于文件，也适用于目录。对于文件，sgid和suid的功能类似，只不过用户是以组的权限执行文件，而不是以拥有者的权限执行文件。
+
+示例：
+
+```bash
+localhost :: ~ » ll | grep origin
+-rw---S---. 1 root  root  2.1K Jun 12 05:38 original-ks.cfg
+
+#设置和取消sgid
+chmod g+s filename
+chmod g-s filename
+
+chmod 2754 filename
+chmod 2754 filename
+```
+
+
+
 ## 6.5 指令与文件的搜寻
 
 ### 6.5.1 脚本文件名的搜索
@@ -340,8 +374,6 @@ locate [-ir] keyword
 -r :后面可接正则表达式的显示方式
 ```
 
-
-
 #### find
 
 语法`find path -option [-print] [-exec -ok command] {} \;`
@@ -352,8 +384,6 @@ locate [-ir] keyword
 #将目前目录及其子目录下所有延伸档名是 c 的文件列出来
 find . -name "*.c"
 ```
-
-
 
 # 8 文件与文件系统的压缩、打包与备份
 
@@ -395,6 +425,7 @@ bzip2是为了替代gzip，提供了更佳的压缩比。功能与用法与gzip�
 | -x              | 解压文件， -C 解压到对应的文件目录。                         |
 | -f              | 后面接要处理的文件                                           |
 | -j              | 通过bzip2方式压缩或解压，最后以.tar.bz2 为后缀。压缩后大小小于.tar.gz |
+| -J              | 通过xz方式压缩或解压，最后以.tar.xz为后缀                    |
 | -z              | 通过gzip方式压缩或解压，最后以.tar.gz 为后缀                 |
 | -v              | 压缩或解压过程中，显示出来过程                               |
 | -t              | 查看打包文件中内容，重点文件名                               |
