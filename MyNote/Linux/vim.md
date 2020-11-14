@@ -686,3 +686,15 @@ normal模式下按:进入命令行模式
 ## [15.4 一些小功能](http://www.cnblogs.com/jiqingwu/archive/2012/06/14/vim_notes.html#id118)
 
 - 简单计算器: 在插入模式下，输入C-r =，然后输入表达式，就能在 光标处得到计算结果。
+
+## 显示行号
+
+```
+:set numberi
+:set nu
+
+#取消
+:set nonumber
+:set nonu
+```
+
