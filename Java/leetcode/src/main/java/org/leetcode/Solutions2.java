@@ -1,7 +1,5 @@
 package org.leetcode;
 
-import java.util.LinkedList;
-
 /**
  * 给出两个 非空 的链表用来表示两个非负的整数。其中，它们各自的位数是按照 逆序 的方式存储的，并且它们的每个节点只能存储 一位 数字。
  * <p>
@@ -16,8 +14,35 @@ import java.util.LinkedList;
  * @date 2020/10/17
  */
 public class Solutions2 {
-    public LinkedList addTwoNumbers(LinkedList l1, LinkedList l2) {
-        
-        return null;
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+        ListNode result = new ListNode(0);
+        ListNode mark = result;
+        int carry = 0;
+        while (l1 != null || l2 != null || carry != 0) {
+            int val1 = l1 != null ? l1.val : 0;
+            int val2 = l2 != null ? l2.val : 0;
+            int sum = val1 + val2 + carry;
+            carry = sum / 10;
+            mark.next = new ListNode(sum % 10);
+            mark = mark.next;
+        }
+        return result.next;
+    }
+
+    public class ListNode {
+        int val;
+        ListNode next;
+
+        ListNode() {
+        }
+
+        ListNode(int val) {
+            this.val = val;
+        }
+
+        ListNode(int val, ListNode next) {
+            this.val = val;
+            this.next = next;
+        }
     }
 }
