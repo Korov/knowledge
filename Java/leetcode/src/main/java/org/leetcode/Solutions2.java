@@ -25,6 +25,12 @@ public class Solutions2 {
             carry = sum / 10;
             mark.next = new ListNode(sum % 10);
             mark = mark.next;
+            if (l1 != null) {
+                l1 = l1.next;
+            }
+            if (l2 != null) {
+                l2 = l2.next;
+            }
         }
         return result.next;
     }
