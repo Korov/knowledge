@@ -1,7 +1,13 @@
 package org.leetcode;
 
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * TODO
@@ -15,13 +21,30 @@ class Solutions3Test {
     @ValueSource(strings = {
             "abcabcbb",
             "bbbbb",
-            "pwwkew",
             "",
             "au",
+            " ",
+            "pwwkew",
+            "aab",
+            "abba",
     })
     void lengthOfLongestSubstring(String value) {
         Solutions3 solutions3 = new Solutions3();
         int result = solutions3.lengthOfLongestSubstring(value);
         System.out.println(result);
+    }
+
+    @Test
+    public void test() {
+        List<String> values = new ArrayList<>();
+        values.add("a");
+        values.add("a1");
+        values.add("a2");
+        Map<String, Integer> map = new HashMap<>();
+        for (int i = 0; i < values.size(); i++) {
+            map.put(values.get(i), -1);
+            int vlaue = map.put(values.get(i), i);
+            System.out.println("debug");
+        }
     }
 }
