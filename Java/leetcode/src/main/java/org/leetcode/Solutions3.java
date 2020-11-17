@@ -25,10 +25,10 @@ public class Solutions3 {
         int res = 0;
         int start = 0;
         for (int i = 0; i < length; i++) {
-            int index = s.charAt(i);
-            start = Math.max(start, last[index] + 1);
+            int value = s.charAt(i);
+            start = Math.max(start, last[value] + 1);
             res = Math.max(res, i - start + 1);
-            last[index] = i;
+            last[value] = i;
         }
 
         return res;
@@ -38,17 +38,13 @@ public class Solutions3 {
         int length = s.length();
         Map<Character, Integer> map = new HashMap<>(length);
         int result = 0;
-        int start = -1;
+        int start = 0;
         for (int index = 0; index < length; index++) {
             char value = s.charAt(index);
-            map.putIfAbsent(value, start);
+            map.putIfAbsent(value, -1);
             int lastIndex = map.put(value, index);
-            if (lastIndex != start) {
-                start = index - 1;
-            }
-            lastIndex = Math.max(lastIndex, start);
-
-            result = Math.max(result, index - lastIndex);
+            start = Math.max(start, lastIndex + 1);
+            result = Math.max(result, index - start + 1);
         }
         return result;
     }
