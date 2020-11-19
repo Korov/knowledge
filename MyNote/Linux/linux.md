@@ -1245,3 +1245,15 @@ scp ~/.ssh/id_rsa.pub root@172.16.193.141:/root/.ssh/id_rsa.pub_root
 cat /root/.ssh/id_rsa.pub_root >> /root/.ssh/authorized_keys
 ```
 
+## vmware无法加载内核
+
+```bash
+sudo modprobe -a vmw_vmci vmmon
+```
+
+## 蓝牙失效
+
+```bash
+pulseaudio -k
+```
+
