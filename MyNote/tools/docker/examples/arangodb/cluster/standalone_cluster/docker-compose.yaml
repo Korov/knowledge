@@ -9,7 +9,7 @@ services:
     volumes:
       - $PWD/arango-standalone/config:/var/lib/arangodb3/config
       - $PWD/arango-standalone/dbserver:/var/lib/arangodb3/dbserver
-    command: "arangod -c /var/lib/arangodb3/config/arangodb.conf"
+    command: /bin/sh -c "arangod -c /var/lib/arangodb3/config/arangodb.conf"
 
   arango-cluster-single:
     image: arangodb/arangodb:3.7.2
@@ -22,7 +22,7 @@ services:
       - $PWD/arango-cluster-single/agency:/var/lib/arangodb3/agency
       - $PWD/arango-cluster-single/dbserver:/var/lib/arangodb3/dbserver
       - $PWD/arango-cluster-single/coordinator:/var/lib/arangodb3/coordinator
-    command: "arangod -c /var/lib/arangodb3/config/agent.conf & arangod -c /var/lib/arangodb3/config/arangodb.conf & arangod -c /var/lib/arangodb3/config/coordinator.conf"
+    command: /bin/sh -c "/usr/sbin/arangod -c /var/lib/arangodb3/config/agent.conf & /usr/sbin/arangod -c /var/lib/arangodb3/config/arangodb.conf & /usr/sbin/arangod -c /var/lib/arangodb3/config/coordinator.conf"
 
   arango-cluster-server1:
     image: arangodb/arangodb:3.7.2
@@ -35,7 +35,7 @@ services:
       - $PWD/arango-cluster-server1/agency:/var/lib/arangodb3/agency
       - $PWD/arango-cluster-server1/dbserver:/var/lib/arangodb3/dbserver
       - $PWD/arango-cluster-server1/coordinator:/var/lib/arangodb3/coordinator
-    command: "arangod -c /var/lib/arangodb3/config/agent.conf & arangod -c /var/lib/arangodb3/config/arangodb.conf & arangod -c /var/lib/arangodb3/config/coordinator.conf"
+    command: /bin/sh -c "arangod -c /var/lib/arangodb3/config/agent.conf & arangod -c /var/lib/arangodb3/config/arangodb.conf & arangod -c /var/lib/arangodb3/config/coordinator.conf"
     
   arango-cluster-server2:
     image: arangodb/arangodb:3.7.2
@@ -48,7 +48,7 @@ services:
       - $PWD/arango-cluster-server2/agency:/var/lib/arangodb3/agency
       - $PWD/arango-cluster-server2/dbserver:/var/lib/arangodb3/dbserver
       - $PWD/arango-cluster-server2/coordinator:/var/lib/arangodb3/coordinator
-    command: "arangod -c /var/lib/arangodb3/config/agent.conf & arangod -c /var/lib/arangodb3/config/arangodb.conf & arangod -c /var/lib/arangodb3/config/coordinator.conf"
+    command: /bin/sh -c "arangod -c /var/lib/arangodb3/config/agent.conf & arangod -c /var/lib/arangodb3/config/arangodb.conf & arangod -c /var/lib/arangodb3/config/coordinator.conf"
 
   arango-cluster-server3:
     image: arangodb/arangodb:3.7.2
@@ -61,4 +61,4 @@ services:
       - $PWD/arango-cluster-server3/agency:/var/lib/arangodb3/agency
       - $PWD/arango-cluster-server3/dbserver:/var/lib/arangodb3/dbserver
       - $PWD/arango-cluster-server3/coordinator:/var/lib/arangodb3/coordinator
-    command: "arangod -c /var/lib/arangodb3/config/agent.conf & arangod -c /var/lib/arangodb3/config/arangodb.conf & arangod -c /var/lib/arangodb3/config/coordinator.conf"
+    command: /bin/sh -c "arangod -c /var/lib/arangodb3/config/agent.conf & arangod -c /var/lib/arangodb3/config/arangodb.conf & arangod -c /var/lib/arangodb3/config/coordinator.conf"
