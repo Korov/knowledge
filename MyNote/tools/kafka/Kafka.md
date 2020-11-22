@@ -207,6 +207,20 @@ public class ProducerTest {
             producer.send(new ProducerRecord<>("mykafka", Integer.toString(i), Integer.toString(i)));
             // 同步发送
             producer.send(new ProducerRecord<>("mykafka", Integer.toString(i), Integer.toString(i))).get();
+            // 异步发送
+            producer.send(new ProducerRecord<>("mykafka1", Integer.toString(i), Integer.toString(i + 1)), new Callback() {
+                @Override
+                public void onCompletion(RecordMetadata metadata, Exception exception) {
+                    if (exception == null) {
+                        // 消息发送成功
+                    } else if (exception instanceof RetriableException) {
+                        // 处理可重试瞬时异常
+                    } else {
+                        // 处理不可重试异常
+                        producer.close(Duration.ofDays(0));
+                    }
+                }
+            });
         }
         producer.close();
     }
@@ -255,9 +269,21 @@ all或-1：表示当发送消息时，leader broker不仅会将消息写入本�
 
 **linger.ms**：上面提到batch未满就发送，这是一种在吞吐量和延时之间的权衡。此参数就是控制消息发送延时行为的。默认为0，表示消息需要被立即发送，无须关系batch是否已被填满。
 
+**client.id**：该参数可以时任意的字符串，服务器会用它来识别消息的来源，还可以用在日志和配额指标里。
+
+**max.in.flight.requests.per.connection**：指定了生产者在收到服务器响应之前可以发送多少个消息。他的值越高，就会占用越多的内存，不过也会提升吞吐量。把它设为1可以保证消息是按照发送的顺序写入服务器的，即使发生了重试
+
 **max.request.size**：控制producer端能够发送的最大消息的大小。默认1048576字节
 
 **request.timeout.ms**：当producer发送请求给broker后，broker需要在规定的时间范围内将处理结果返回给producer，这段时间便是由该参数控制的，默认30秒。
+
+**metadata.fetch.timeout.ms**：指定了生产者在获取元数据（比如目标分区的leader是谁）时等待服务器返回响应的时间。如果等待响应超时，那么生产者要么重试发送数据，要么返回一个错误。
+
+**timeout.ms**：指定了broker等待同步副本返回消息确认的时间，与acks的配置相匹配，如果在指定时间内没有收到同步副本的确认，那么broker就会返回一个错误。
+
+**max.block.ms**：指定了在调用send()方法或使用partitionsFor()方法获取元数据时生产者的阻塞时间，当生产者的发送缓冲区已满，或者没有可用的元数据时，这些方法就会阻塞。在阻塞时间达到max.block.ms时，生产者会抛出超时异常
+
+**receive.buffer.bytes**和**send.buffer.bytes**：分别指定了TCP socker接收和发送数据包的缓冲区大小。如果他们被设为-1,就使用操作系统的默认值。如果生产者或者消费者与broker处于不同的数据中心，那么可以适当增大这些值，因为跨数据中心的网络一般都有比较高的延迟和比较低的带宽。
 
 ## 4.3 消息分区机制
 
