@@ -7,13 +7,20 @@ import org.apache.kafka.common.serialization.StringSerializer;
 
 import java.time.Duration;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 
 public class ProducerTest {
     public static void main(String[] args) {
-        test1();
+        try {
+            ProducerTest.test1();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
-    private static void test1() {
+    private static void test1() throws ExecutionException, InterruptedException {
         Properties properties = new Properties();
         // 以下三项必须指定
         properties.put("bootstrap.servers", "192.168.106.143:9092");
@@ -30,6 +37,8 @@ public class ProducerTest {
         Producer<String, String> producer = new KafkaProducer<>(properties);
         for (int i = 0; i < 200; i++) {
             producer.send(new ProducerRecord<>("mykafka1", "t4_" + Integer.toString(i), Integer.toString(i)));
+            producer.send(new ProducerRecord<>("mykafka1", "t4_" + Integer.toString(i), Integer.toString(i)))
+                    .get();
         }
         producer.close();
     }

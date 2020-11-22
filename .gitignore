@@ -80,3 +80,6 @@ Python/scrapy/**/dbs
 /**/__pycache__
 /**/project.egg-info
 /**/.coverage
+MyNote/tools/docker/examples/arangodb/cluster/standalone_cluster/*/agency/*
+MyNote/tools/docker/examples/arangodb/cluster/standalone_cluster/*/coordinator/*
+MyNote/tools/docker/examples/arangodb/cluster/standalone_cluster/*/dbserver/*

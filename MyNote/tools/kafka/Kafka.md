@@ -174,7 +174,13 @@ producer的首要功能就是向某个topic分区发送一条消息，首先需�
 
 确认了目标分区后，producer要做的第二件事就是寻找这个分区对应的leader。
 
-工作流程：producer首先使用一个线程（用户主线程，也就是启动producer的线程）将待发送的消息封装进一个ProducerRecord类实例，然后将其序列化之后发送给partitioner，再由后者确定了目标分区后一同发送到位于producer程序中的一块内存缓冲区中。而producer的另一个工作线程（I/O发送线程）则负责实时地从该缓冲区中提取出准备就绪的消息封装进一个批次（batch），统一发送给对应的broker。
+工作流程：
+
+1. producer首先使用一个线程（用户主线程，也就是启动producer的线程）将待发送的消息封装进一个ProducerRecord类实例（*我们可以在此时指定partition和key*）
+2. 然后将其序列化之后发送给partitioner(分区器，*分区器通过获取topic的元数据和ProducerRecord中的key判定这个数据发送到哪一个partition*)
+3. 再由后者确定了目标分区后一同发送到位于producer程序中的一块内存缓冲区中。
+4. 而producer的另一个工作线程（I/O发送线程）则负责实时地从该缓冲区中提取出准备就绪的消息封装进一个批次（batch，每个batch中的数据都是发往同一个topic的同一个partition），统一发送给对应的broker。
+5. broker在收到这些消息时会返回一个响应。如果消息成功写入kafka，就返回一个RecordMetaData对象，它包含了主题和分区信息，以及记录在分区里的偏移量。如果写入失败，则会返回一个错误，生产者在收到错误之后会尝试重新发送消息，几次之后如果还是失败，就返回错误信息。
 
 ![image-20191129164720558](picture\image-20191129164720558.png)
 
@@ -196,7 +202,11 @@ public class ProducerTest {
 
         Producer<String, String> producer = new KafkaProducer<>(properties);
         for (int i = 0; i < 100; i++) {
+            // topic:mykafka,后面的两个参数分别为键和值，键和值对象的类型必须与序列化器和生产者对象相匹配
+            // 发送并忘记
             producer.send(new ProducerRecord<>("mykafka", Integer.toString(i), Integer.toString(i)));
+            // 同步发送
+            producer.send(new ProducerRecord<>("mykafka", Integer.toString(i), Integer.toString(i))).get();
         }
         producer.close();
     }
@@ -212,14 +222,18 @@ public class ProducerTest {
 ```Java
 //此方法不需要指定key.serializer和value.serializer
 Serializer<String> keySerializer = new StringSerializer();
-        Serializer<String> valueSerializer = new StringSerializer();
+Serializer<String> valueSerializer = new StringSerializer();
 
-        Producer<String, String> producer = new KafkaProducer(properties, keySerializer, valueSerializer);
+Producer<String, String> producer = new KafkaProducer(properties, keySerializer, valueSerializer);
 ```
 
 **4.消息发送**
 
-Kafka producer发送消息的主方法是send方法。实际上producer在底层完全实现了异步化发送，并且通过Java提供的Future同时实现了同步发送和异步发送+回调两种发送方式。
+Kafka producer发送消息的主方法是send方法。发送消息主要有以下3种方式：
+
+1. 发送并忘记：把消息发送给服务器，但并不关心它是否正常到达，这种方式有时候会丢失一些消息
+2. 同步发送：我们使用send()方法发送消息，它会返回一个Future对象，调用get()方法进行等待，就可以知道消息是否发送成功
+3. 异步发送：调用send()方法，并指定一个回调函数，服务器在返回响应时调用该函数
 
 ### 4.2.2 producer主要参数
 
