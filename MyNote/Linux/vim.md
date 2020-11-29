@@ -690,7 +690,7 @@ normal模式下按:进入命令行模式
 ## 显示行号
 
 ```
-:set numberi
+:set number
 :set nu
 
 #取消
