@@ -683,3 +683,11 @@ publishing {
 }
 ```
 
+## gradle全局代理
+
+在`$HOME/.gradle/gradle.properties`加上这句话
+
+```properties
+org.gradle.jvmargs=-DsocksProxyHost=127.0.0.1 -DsocksProxyPort=10808
+```
+
