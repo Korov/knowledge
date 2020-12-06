@@ -616,3 +616,22 @@ mvn -N io.takari:maven:0.7.7:wrapper -Dmaven=3.5.4
 
 表明想要使用3.6.3版本的maven。
 
+## maven设置代理
+
+```xml
+    <proxy>
+      <id>optional</id>
+      <active>true</active>
+      <protocol>socks</protocol>
+      <host>127.0.0.1</host>
+      <port>10808</port>
+      <nonProxyHosts>local.net|some.host.com</nonProxyHosts>
+    </proxy>
+```
+
+或者命令行设置
+
+```bash
+mvn package assembly:single -DskipTests -DproxySet=true -DproxyHost=127.0.0.1 -DproxyPort=10808
+```
+
