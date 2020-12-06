@@ -688,6 +688,20 @@ publishing {
 在`$HOME/.gradle/gradle.properties`加上这句话
 
 ```properties
+# http和https代理设置
+# systemProp.http.proxyHost=127.0.0.1
+# systemProp.http.proxyPort=10808
+# systemProp.http.proxyUser=userid
+# systemProp.http.proxyPassword=password
+# systemProp.http.nonProxyHosts=*.nonproxyrepos.com|localhost
+
+# systemProp.https.proxyHost=127.0.0.1
+# systemProp.https.proxyPort=10808
+# systemProp.https.proxyUser=userid
+# systemProp.https.proxyPassword=password
+# systemProp.http.nonProxyHosts=*.nonproxyrepos.com|localhost
+
+# scoks代理设置
 org.gradle.jvmargs=-DsocksProxyHost=127.0.0.1 -DsocksProxyPort=10808
 ```
 
