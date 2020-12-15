@@ -702,6 +702,13 @@ publishing {
 # systemProp.http.nonProxyHosts=*.nonproxyrepos.com|localhost
 
 # scoks代理设置
-org.gradle.jvmargs=-DsocksProxyHost=127.0.0.1 -DsocksProxyPort=10808
+systemProp.socks.proxyHost=127.0.0.1 
+systemProp.socks.proxyPort=10808
+```
+
+命令行
+
+```bash
+./gradlew build -DsocksProxyHost=yourHost -DsocksProxyPort=yourHostPort
 ```
 
