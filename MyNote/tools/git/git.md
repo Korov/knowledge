@@ -633,6 +633,12 @@ Switched to a new branch 'tag-v1.7.0.17'
 
 当然，如果在这之后又进行了一次提交，version2 分支会因为这个改动向前移动，version2 分支就会和v2.0.0 标签稍微有些不同，这时就应该当心了。
 
+### 拉取标签
+
+```bash
+git fetch origin --tags
+```
+
 ## 2.4Git别名
 
 可以通过 git config 文件来轻松地为每一个命令设置一个别名。 这里有一些例子你可以试试：
