@@ -437,7 +437,7 @@ bin/kafka-console-consumer.sh --bootstrap-servers localhost:9092 --topic test --
 
 **max.poll.interval.ma**：consumer处理逻辑最大时间。指consumer完成整个处理所用的时间
 
-**auto.offset.reset**：指定了消费者在读取一个没有偏移量（offset）的分区或者偏移量无效的情况下（因消费者长时间失效，包含偏移量的记录已经过时井被删除）该作何处理，默认值是 `latest`。earliest：当各分区有已提交的offset时，从提交的offset开始消费，无提交的offset时，从头开始消费；latest：当各分区下有已提交的offset时，从提交的offset开始消费，无提交的offset时，消费者；none：topic各分区都存在已提交的offset时，从offset后开始消费，只要有一个分区不存在已提交的offset则抛出异常。
+**auto.offset.reset**：指定了消费者在读取一个没有偏移量（offset）的分区或者偏移量无效的情况下（因消费者长时间失效，包含偏移量的记录已经过时井被删除）该作何处理，默认值是 `latest`。earliest：当各分区有已提交的offset时，从提交的offset开始消费，无提交的offset时，从头开始消费；latest：当各分区下有已提交的offset时，从提交的offset开始消费，无提交的offset时，消费者从最新的数据开始消费；none：topic各分区都存在已提交的offset时，从offset后开始消费，只要有一个分区不存在已提交的offset则抛出异常。
 
 **enable.auto.commit**：指定了消费者是否自动提交偏移量，默认值是 `true`，自动提交。设为 `false` 可以程序自己控制何时提交偏移量。如果设为 `true`，需要通过配置 `auto.commit.interval.ms` 属性来控制提交的频率。
 
