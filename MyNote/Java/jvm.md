@@ -1768,45 +1768,39 @@ G1 GC对于虚引用、弱引用、软引用的处理会比一般对象多一些
 
 ### jdk8
 
+```properties
+#打印GC信息
 -XX:+PrintGC
 
-打印GC信息
-
+#打印GC的详细信息
 -XX:+PrintGCDetails
 
-打印GC的详细信息
-
+#GC时，打印进程启动到现在经历的时间
 -XX:+PrintGCDateStamps
-
-GC时，打印进程启动到现在经历的时间
-
 -XX:+PrintGCApplicationStoppedTime
-
 -XX:+PrintHeapAtGC
-
 -XX:+UseGCLogFileRotation
-
 -XX:+NumberOfGCLogFiles=10000
-
 -XX:+GCLogFileSize=10M
-
 -Xloggc:/home/korov/Desktop/install/jetbrains/gclog/gc_%t.log
-
-
-
 -XX:+HeapDumpOnOutOfMemoryError
-
 -XX:HeapDumpPath:/home/korov/Desktop/install/jetbrains/dump
+```
 
 ### jdk11
 
-```
+```properties
 -Xlog:gc*
 -Xlog:gc+heap=debug
 -Xlog:safepoint
 # 此配置的gc日志会输出到文件，上面的只会输出到标准输出
 -Xlog:safepoint=info:/home/korov/work/install/jetbrains/gclog/safepoint.log::filecount=100,filesize=204800000
 -Xlog:gc*=info:/home/korov/work/install/jetbrains/gclog/gc.log::filecount=100,filesize=204800
+
+Xlog:gc+region=trace
+Xlog:gc+liveness=trace
+Xlog:gc+marking=trace
+Xlog:gc+remset*=trace
 ```
 
 ## 远程调试
