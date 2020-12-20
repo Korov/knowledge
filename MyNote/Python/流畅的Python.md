@@ -1,5 +1,17 @@
 # 自我总结
 
+## 创建虚拟环境
+
+```bash
+# 在指定文件夹下创建虚拟环境，此处为当前文件夹的venv文件下创建虚拟环境
+python -m venv ./venv
+# 激活
+chmod 744 ./venv/bin/activate
+source ./venv/bin/activate
+# 取消激活
+deactivate
+```
+
 ## pip使用
 
 ```bash
