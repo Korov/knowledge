@@ -54,8 +54,8 @@ delimiter ;
 
 
 delimiter $$
-DROP function if exists match_threat_user_name;
-CREATE function match_threat_user_name(port1 text, port2 text) returns boolean
+DROP function if exists match_threat_port;
+CREATE function match_threat_port(port1 text, port2 text) returns boolean
     Deterministic
 begin
     DECLARE port_count1 INT default 0;
@@ -66,21 +66,66 @@ begin
         return false;
     end if;
 
-    set port_count1 = length(port1) - length(replace(port1, ':', '')) + 1;
-    set port_count2 = length(port2) - length(replace(port2, ':', '')) + 1;
+    set port_count1 = length(port1) - length(replace(port1, ':', ''));
+    set port_count2 = length(port2) - length(replace(port2, ':', ''));
 
     if (port_count1 != port_count2) THEN
         return false;
     else
         select count(*)
         into join_count
-        from (SELECT substring_index(a.port, '(?<=:)\\d+(?=,)|(?<=:)\\d+$', 1, b.help_topic_id + 1) AS ports
+        from (SELECT regexp_substr(a.port, '(?<=:)\\d+(?=,)|(?<=:)\\d+$', 1, b.help_topic_id + 1) AS ports
               FROM (select port1 as port) a
                        JOIN mysql.help_topic b ON b.help_topic_id < port_count1) ports1
-                 join (SELECT substring_index(a.port, '(?<=:)\\d+(?=,)|(?<=:)\\d+$', 1, b.help_topic_id + 1) AS ports
+                 join (SELECT regexp_substr(a.port, '(?<=:)\\d+(?=,)|(?<=:)\\d+$', 1, b.help_topic_id + 1) AS ports
                        FROM (select port2 as port) a
                                 JOIN mysql.help_topic b ON b.help_topic_id < port_count2) ports2
                       on ports1.ports = ports2.ports;
+        if join_count = port_count1 then
+            return true;
+        else
+            return false;
+        end if;
+    end if;
+end
+$$
+delimiter ;
+
+
+delimiter $$
+DROP function if exists siem_match_threat_port;
+CREATE function siem_match_threat_port(port1 text, port2 text) returns boolean
+    Deterministic
+begin
+    DECLARE port_count1 INT default 0;
+    DECLARE port_count2 INT default 0;
+    DECLARE join_count INT default 0;
+
+    if (port1 is null or port2 is null) then
+        return false;
+    end if;
+
+    set port_count1 = length(port1) - length(replace(port1, ':', ''));
+    set port_count2 = length(port2) - length(replace(port2, ':', ''));
+
+    if (port_count1 != port_count2) THEN
+        return false;
+    else
+        select count(*)
+        into join_count
+        from (select substring_index(aa.ports, ':', -1) as ports
+              from (SELECT substring_index(substring_index(a.port, ',', b.help_topic_id + 1), ',', - 1) AS ports
+                    FROM (select port1 as port) a
+                             JOIN mysql.help_topic b
+                                  ON b.help_topic_id < (length(a.port) - length(replace(a.port, ',', '')) + 1)) aa
+              where aa.ports like '%:%') ports1
+                 join (select substring_index(aa.ports, ':', -1) as ports
+                       from (SELECT substring_index(substring_index(a.port, ',', b.help_topic_id + 1), ',',
+                                                    - 1) AS ports
+                             FROM (select port2 as port) a
+                                      JOIN mysql.help_topic b ON b.help_topic_id <
+                                                                 (length(a.port) - length(replace(a.port, ',', '')) + 1)) aa
+                       where aa.ports like '%:%') ports2 on ports1.ports = ports2.ports;
         if join_count = port_count1 then
             return true;
         else
