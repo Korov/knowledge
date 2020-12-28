@@ -20,6 +20,7 @@ vim是我最喜欢的编辑器，也是linux下第二强大的编辑器。 虽�
 - vim +num file: 从第num行开始；
 - vim +/string file: 打开file，并将光标停留在第一个找到的string上。
 - vim --remote file: 用已有的vim进程打开指定的文件。 如果你不想启用多个vim会话，这个很有用。但要注意， 如果你用vim，会寻找名叫VIM的服务器；如果你已经有一个gvim在运行了， 你可以用gvim --remote file在已有的gvim中打开文件。
+- vim -:从stdin中接受数据显示，例如`ls -al | vim -`
 
 # [3. 文档操作](http://www.cnblogs.com/jiqingwu/archive/2012/06/14/vim_notes.html#id62)
 

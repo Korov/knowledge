@@ -1,5 +1,7 @@
 delimiter $$
 DROP function if exists match_threat_ip;
+-- delimiter_value分割符，ip1和ip2不分先后顺序
+-- 示例，ip1:192.168.1.2:80,192.168.3.4,192.168.9.2，ip2:192.168.3.4,192.168.1.2:80,192.168.9.2，delimiter_value：,
 CREATE function match_threat_ip(delimiter_value varchar(5), ip1 text, ip2 text) returns boolean
     Deterministic
 begin
@@ -11,25 +13,34 @@ begin
         return false;
     end if;
 
+    -- 根据分隔符计算ip的数量
     set ip_count1 = length(ip1) - length(replace(ip1, delimiter_value, '')) + 1;
     set ip_count2 = length(ip2) - length(replace(ip2, delimiter_value, '')) + 1;
 
     if (ip_count1 != ip_count2) THEN
         return false;
     else
+        -- SELECT substring_index(substring_index(substring_index(a.ip, delimiter_value, b.help_topic_id + 1),
+        --                                              delimiter_value, - 1), ':', 1) AS ips
+        --       FROM (select ip1 as ip) a
+        --                JOIN mysql.help_topic b ON b.help_topic_id < ip_count1
+        -- 此sql是将ip1由一行转为多列
+        -- 此处的操作是将ip1和ip2分别转为多列进行join计算数量，示例中的两个ip最后会解析成下面的两个表进行join匹配
+        -- ip1           | ip2          
+        -- 192.168.1.2   | 192.168.3.4
+        -- 192.168.3.4   | 192.168.1.2
+        -- 192.168.9.2   | 192.168.9.2
         select count(*)
         into join_count
         from (SELECT substring_index(substring_index(substring_index(a.ip, delimiter_value, b.help_topic_id + 1),
                                                      delimiter_value, - 1), ':', 1) AS ips
               FROM (select ip1 as ip) a
-                       JOIN mysql.help_topic b ON b.help_topic_id <
-                                                  (length(a.ip) - length(replace(a.ip, delimiter_value, '')) + 1)) ips1
+                       JOIN mysql.help_topic b ON b.help_topic_id < ip_count1) ips1
                  join (SELECT substring_index(
                                       substring_index(substring_index(a.ip, delimiter_value, b.help_topic_id + 1),
                                                       delimiter_value, - 1), ':', 1) AS ips
                        FROM (select ip2 as ip) a
-                                JOIN mysql.help_topic b ON b.help_topic_id <
-                                                           (length(a.ip) - length(replace(a.ip, delimiter_value, '')) + 1)) ips2
+                                JOIN mysql.help_topic b ON b.help_topic_id < ip_count2) ips2
                       on ips1.ips = ips2.ips;
         if join_count = ip_count1 then
             return true;
@@ -105,15 +116,11 @@ begin
         from (SELECT substring_index(substring_index(a.user_name, delimiter_value, b.help_topic_id + 1),
                                      delimiter_value, - 1) AS user_names
               FROM (select user_name1 as user_name) a
-                       JOIN mysql.help_topic b ON b.help_topic_id < (length(a.user_name) -
-                                                                     length(replace(a.user_name, delimiter_value, '')) +
-                                                                     1)) ips1
+                       JOIN mysql.help_topic b ON b.help_topic_id < user_name_count1) ips1
                  join (SELECT substring_index(substring_index(a.user_name, delimiter_value, b.help_topic_id + 1),
                                               delimiter_value, - 1) AS user_names
                        FROM (select user_name2 as user_name) a
-                                JOIN mysql.help_topic b ON b.help_topic_id < (length(a.user_name) -
-                                                                              length(replace(a.user_name, delimiter_value, '')) +
-                                                                              1)) ips2
+                                JOIN mysql.help_topic b ON b.help_topic_id < user_name_count2) ips2
                       on ips1.user_names = ips2.user_names;
         if join_count = user_name_count1 then
             return true;
