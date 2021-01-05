@@ -712,3 +712,9 @@ systemProp.socks.proxyPort=10808
 ./gradlew build -DsocksProxyHost=yourHost -DsocksProxyPort=yourHostPort
 ```
 
+## 依赖分析
+
+```bash
+./gradlew -q common:dependencies
+```
+
