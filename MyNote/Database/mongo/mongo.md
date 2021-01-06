@@ -1,5 +1,7 @@
  
 
+https://docs.mongoing.com/mongodb-crud-operations/query-documents
+
 # mongo shell操作mongodb
 
 ## mongo shell里使用CRUD
@@ -7,7 +9,7 @@
 启动shell：
 
 ```bash
-mongo
+mongo --username alice --password --authenticationDatabase admin --host mongodb0.examples.com --port 28015
 ```
 
 切换数据库
@@ -19,6 +21,7 @@ use database
 db.user.insert({username: "korov"})
 # 查询user集合中的所有数据
 db.user.find()
+db.user.find().pretty()
 # 统计user集合中数据的数量
 db.user.count()
 
@@ -40,5 +43,40 @@ db.user.updateMany({username:"korov1"}, {$set:{country:"china1"}})
 db.user.findOneAndReplace({username:"korov1"}, {country:"china1"})
 # 删掉某个属性
 db.user.updateOne({_id:ObjectId("5ff495366341e441451e17bd")}, {$unset:{lalla:"lllll"}})
+
+# 复杂更新
+db.user.updateOne({username:"korov1"}, {$set:{favorites:{cities:["Chicago", "Cheyenne"],movies:["Casablanca","For a Few Dollars More","The Sting"]}}})
+# 查询一个键名为favorites的对象，内部键名为movies作为新的匹配条件
+db.user.find({"favorites.movies":"Casablanca"})
+```
+
+高级更新
+
+```
+
+```
+
+```
+# 显示正在使用的数据库
+db
+
+```
+
+### 插入一个文件
+
+```
+db.inventory.insertOne(  
+        { item: "canvas", qty: 100, tags: ["cotton"], size: { h: 28, w: 35.5, uom: "cm" } }
+)
+```
+
+### 插入多个文件
+
+```
+db.inventory.insertMany([
+        { item: "journal", qty: 25, tags: ["blank", "red"], size: { h: 14, w: 21, uom: "cm" } }, 
+        { item: "mat", qty: 85, tags: ["gray"], size: { h: 27.9, w: 35.5, uom: "cm" } },
+        { item: "mousepad", qty: 25, tags: ["gel", "blue"], size: { h: 19, w: 22.85, uom: "cm" } }
+    ])
 ```
 
