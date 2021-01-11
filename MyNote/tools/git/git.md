@@ -1111,3 +1111,10 @@ git stash push <file1> <file1> <file1> -m 'note'
 
 在断点的地方使用idea的Evaluate Expression，在其中执行`class.forName("com.***.***.Launcher").getResource("/com/***/***/Launcher.class")`。可以查找出绝对路径下的class文件地址，从而确定该类的版本。
 
+## 本地git接受push
+
+```bash
+git config receive.denyCurrentBranch ignore
+```
+
+别的地方通过文件地址clone你的仓库之后，设置了这个选项，之后别人就可以直接push代码到你的仓库。慎用

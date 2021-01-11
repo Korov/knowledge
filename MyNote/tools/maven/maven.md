@@ -637,3 +637,9 @@ mvn package assembly:single -DskipTests -DproxySet=true -DproxyHost=127.0.0.1 -D
 mvn package assembly:single -DskipTests -DsocksProxyHost=true -DsocksProxyPort=127.0.0.1 -DproxyPort=10808
 ```
 
+## maven使用制定配置文件
+
+```bash
+mvn -s C:\Users\korov\.m2\settings-siem.xml clean
+```
+
