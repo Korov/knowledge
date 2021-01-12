@@ -1257,3 +1257,12 @@ sudo modprobe -a vmw_vmci vmmon
 pulseaudio -k
 ```
 
+## 查看进程io
+
+```bash
+#安装sysstat，查看磁盘的io
+iostat
+#安装iotop，可以查看进程的io
+iotop
+```
+
