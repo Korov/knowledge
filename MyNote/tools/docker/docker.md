@@ -1029,8 +1029,6 @@ curl -sSL https://get.daocloud.io/daotools/set_mirror.sh | sh -s http://f1361db2
 systemctl restart docker.service
 ```
 
-
-
 ## 常用docker镜像：
 
 ```sh
@@ -1137,5 +1135,30 @@ docker tag [ImageId] korov/ubuntu:[镜像版本号]
 docker push korov/ubuntu:[镜像版本号]
 #拉取远端镜像
 docker pull korov/ubuntu:[镜像版本号]
+```
+
+## 设置镜像语言和时区
+
+### ubuntu
+
+#### 更换国内源
+
+```bash
+sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
+```
+
+#### 语言
+
+```bash
+apt-get install language-pack-zh-hans
+locale-gen zh_CN.UTF-8
+echo "export LC_ALL=zh_CN.UTF-8">> /etc/profile
+source /etc/profile
+```
+
+#### 时区
+
+```bash
+apt-get install tzdata
 ```
 
