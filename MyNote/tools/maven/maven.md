@@ -624,8 +624,8 @@ mvn -N io.takari:maven:0.7.7:wrapper -Dmaven=3.5.4
       <active>true</active>
       <protocol>socks</protocol>
       <host>127.0.0.1</host>
-      <port>10808</port>
-      <nonProxyHosts>local.net|some.host.com</nonProxyHosts>
+      <port>1089</port>
+      <nonProxyHosts>localhost|aliyun.com</nonProxyHosts>
     </proxy>
 ```
 
