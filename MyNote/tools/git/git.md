@@ -1076,12 +1076,12 @@ git merge feature --squash
 需要设置走1080端口
 
 ```bash
-git config --global http.proxy http://127.0.0.1:1080
-git config --global https.proxy https://127.0.0.1:1080
+git config --global http.proxy http://127.0.0.1:8889
+git config --global https.proxy https://127.0.0.1:8889
 
 #使用socks
-git config --global http.proxy 'socks://127.0.0.1:10808'
-git config --global https.proxy 'socks://127.0.0.1:10808'
+git config --global http.proxy 'socks://127.0.0.1:1089'
+git config --global https.proxy 'socks://127.0.0.1:1089'
 
 
 #取消
