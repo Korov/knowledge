@@ -1649,3 +1649,23 @@ $ jcmd <pid> JFR.stop
 
 获取到文件之后可以使用`jfr`命令来解析生成的文件。
 
+## 替换jar中的class文件
+
+新创建一个包名类名一致的.java *[确保jar中有对应的class]
+
+```bash
+jar uvf ~/Documents/baidu-license-10.1.2.jar com/baidu/license/LicenseVerifier.class
+```
+
+jar包是一中压缩文件，`u`添加文件到jar包中，`v`生成详细的报告，并输出到标准设备，`f`制定jar包的文件名
+
+其他常用命令：
+
+1. `c`创建一个jar包
+2. `t`显示jar中的内容列表
+3. `x`解压jar包
+4. `m`指定manifest.mf文件(manifest.mf文件中可以对jar包及其中的内容做一些设置)
+5. `O`:产生jar包时不对其中的内容进行压缩处理
+6. `M`：不产生所有文件的清单文件(manifest.mf)
+7. `i`：为指定的jar文件创建索引文件
+8. `C`：表示转到相应目录下执行jar命令，相当于cd到那个目录
