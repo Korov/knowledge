@@ -718,3 +718,9 @@ systemProp.socks.proxyPort=1089
 ./gradlew -q common:dependencies
 ```
 
+## gradle debug
+
+```bash
+./gradlew build -x test -Dorg.gradle.debug=true -d
+```
+
