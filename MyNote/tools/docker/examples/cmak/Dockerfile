@@ -5,6 +5,8 @@ WORKDIR /
 
 ADD cmak-3.0.0.5/ /opt/cmak-3.0.0.5
 
+RUN ln -s /opt/cmak-3.0.0.5/bin/cmak /usr/local/bin/cmak
+
 COPY docker-entrypoint.sh /usr/local/bin/
 
 EXPOSE 9000

@@ -643,3 +643,12 @@ mvn package assembly:single -DskipTests -DsocksProxyHost=true -DsocksProxyPort=1
 mvn -s C:\Users\korov\.m2\settings-siem.xml clean
 ```
 
+## maven打包指定模块
+
+```bash
+mvn clean -pl 指定模块名 -al 依赖模块
+```
+
+## debug
+
+maven的bin目录下有mvnDebug命令，用这个命令执行编译过程就可以使用ide连接上调试器
