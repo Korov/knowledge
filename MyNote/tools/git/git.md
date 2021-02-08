@@ -900,8 +900,9 @@ git中整合来自不同分支的修改主要有两种方法：merge和rebase。
 其实，还有一种方法：你可以提取在 C4 中引入的补丁和修改，然后在 C3 的基础上应用一次。 在 Git 中，这种操作就叫做 变基。 你可以使用 rebase 命令将提交到某一分支上的所有修改都移至另一分支上，就好像“重新播放”一样。
 
 ```bash
-$ git checkout experiment
-$ git rebase master
+# 将develop分支上的所有commit rebase到master分支上
+git checkout master
+git rebase develop
 First, rewinding head to replay your work on top of it...
 Applying: added staged command
 ```
@@ -970,7 +971,7 @@ $ git rebase master server
 D---E---F---G
 ```
 
-压扁后将EFG三个commit合并成一个commitH
+压扁后将EFG三个commit合并成一个commit H
 
 ```
 D---H
@@ -980,7 +981,7 @@ D---H
 
 ```bash
 #使用默认的mixed方式reset
-git reset commitID
+git reset D
 git commit -m 'squash commit'
 ```
 
