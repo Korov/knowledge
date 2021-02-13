@@ -1795,7 +1795,7 @@ G1 GC对于虚引用、弱引用、软引用的处理会比一般对象多一些
 -Xlog:safepoint
 # 此配置的gc日志会输出到文件，上面的只会输出到标准输出
 -Xlog:safepoint=info:/home/korov/work/install/jetbrains/gclog/safepoint.log::filecount=100,filesize=204800000
--Xlog:gc*=info:/home/korov/work/install/jetbrains/gclog/gc.log::filecount=100,filesize=204800
+-Xlog:gc*=info:/home/korov/work/install/jetbrains/gclog/gc.log::filecount=100,filesize=2048000
 
 Xlog:gc+region=trace
 Xlog:gc+liveness=trace
