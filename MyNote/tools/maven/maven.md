@@ -632,9 +632,9 @@ mvn -N io.takari:maven:0.7.7:wrapper -Dmaven=3.5.4
 或者命令行设置
 
 ```bash
-mvn package assembly:single -DskipTests -DproxySet=true -DproxyHost=127.0.0.1 -DproxyPort=10808
+mvn package assembly:single -DskipTests -DproxySet=true -DproxyHost=127.0.0.1 -DproxyPort=8889
 
-mvn package assembly:single -DskipTests -DsocksProxyHost=true -DsocksProxyPort=127.0.0.1 -DproxyPort=10808
+mvn package assembly:single -DskipTests -DsocksProxyHost=true -DsocksProxyPort=127.0.0.1 -DproxyPort=1089
 ```
 
 ## maven使用制定配置文件
