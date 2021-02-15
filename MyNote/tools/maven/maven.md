@@ -640,6 +640,7 @@ mvn package assembly:single -DskipTests -DsocksProxyHost=true -DsocksProxyPort=1
 ## maven使用制定配置文件
 
 ```bash
+# -s or --settings
 mvn -s C:\Users\korov\.m2\settings-siem.xml clean
 ```
 
