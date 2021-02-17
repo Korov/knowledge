@@ -1,7 +1,8 @@
 = 使用AsciiDoc编写文档 =
 Korov9 <korov9@163.com>
 v1.0 2020-12-20
-:toc:
+// 声明在右侧生成目录
+:toc: right
 :imagesdir: assets/images
 :homepage: http://asciidoctor.org
 
