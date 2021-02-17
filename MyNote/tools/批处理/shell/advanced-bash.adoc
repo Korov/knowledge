@@ -1,0 +1,10 @@
+= 高级Bash脚本编程指南 =
+Korov9 <korov9@163.com>
+v1.0 2021-2-17:
+:doctype: book 
+
+== 初见shell ==
+
+=== 样例-清理日志脚本 ===
+
+
