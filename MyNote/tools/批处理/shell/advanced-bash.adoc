@@ -217,5 +217,143 @@ done
 文件路径分隔符[正斜杠]。起分割路径的作用。（比如 `/home/bozo/projects/Makefile`）
 它也在算术运算中充当除法运算符。
 
+`
+
+命令替换符。` command ` 结构可以使得命令的输出结果赋值给一个变量。通常也被称作后引号（backquotes）或反引号（backticks）。
+
+`:`
+
+空命令[冒号]。它在shell中等价于"NOP"（即no op，空操作）与shell内建命令true有同样的效果。它本身也是Bash的内建命令之一，返回值是true（0）。
+
+[source,BASH]
+----
+:
+echo $?   # 返回0
+
+: ${username=`whoami`}
+# ${username=`whoami`}   如果没有:就会报错
+#                        除非 "username" 是系统命令或内建命令
+
+: ${1?"Usage: $0 ARGUMENT"}     # 摘自样例脚本 "usage-message.sh"
+
+
+: ${HOSTNAME?} ${USER?} ${MAIL?}
+#  如果其中一个或多个必要的环境变量没有被设置
+#  将会打印错误
+
+
+# 与>重定向操作符结合，可以在不改变文件权限的情况下清空文件。如果文件不存在，那么将创建这个文件。
+: > data.xxx   # 文件 "data.xxx" 已被清空
+# 与>>重定向操作符结合，将不会清空任何已存在的文件（: >> target_file）。如果文件不存在，将创建这个文件。
+----
+
+`!`
+
+取反（或否定）操作符[感叹号]。! 操作符反转已执行的命令的返回状态（查看样例 6-2）。它同时可以反转测试操作符的意义，例如可以将相等（=）反转成不等（!=）。它是一个Bash关键词。
+
+`?`
+
+测试操作符[问号]。在一些特定的语句中，? 表示一个条件测试。
+在一个双圆括号结构中，? 可以表示一个类似C语言风格的三元（trinary）运算符的一个组成部分。
+[source,BASH]
+----
+(( var0 = var1<98?9:21 ))
+#不要加空格，紧挨着写
+
+#等价于
+# if [ "$var1" -lt 98 ]
+# then
+#   var0=9
+# else
+#   var0=21
+# fi
+----
+
+`$`
+
+取值符号[钱字符]，用来进行变量替换（即取出变量的内容）。
+[source,BASH]
+----
+var1=5
+var2=23skidoo
+
+echo $var1     # 5
+echo $var2     # 23skidoo
+----
+
+`$$`
+
+进程ID变量。此变量保存该运行脚本的进程ID。
+
+`()`
+
+命令组，`(a=hello; echo $a)` 
+
+[NOTE]
+通过括号执行一系列命令会产生一个子shell（subshell）。 括号中的变量，即在子shell中的变量，在脚本的其他部分是不可见的。父进程脚本不能访问子进程（子shell）所创建的变量。
+[source,BASH]
+----
+a=123
+( a=321; )
+
+echo "a = $a"   # a = 123
+# 在括号中的 "a" 就像个局部变量。
+----
+
+数组初始化。
+[source,BASH]
+----
+Array=(element1 element2 element3)
+----
+
+`{xxx,yyy,zzz,...}`
+
+花括号扩展结构
+[source,BASH]
+----
+echo \"{These,words,are,quoted}\"   # " 将作为单词的前缀和后缀
+# "These" "words" "are" "quoted"
+
+
+cat {file1,file2,file3} > combined_file
+# 将 file1, file2 与 file3 拼接在一起后写入 combined_file 中。
+
+cp file22.{txt,backup}
+# 将 "file22.txt" 拷贝为 "file22.backup"
+
+echo {file1,file2}\ :{\ A," B",' C'}
+file1 : A file1 : B file1 : C file2 : A file2 : B file2 : C
+----
+
+`{a..z}`
+
+扩展的花括号扩展结构。
+[source,BASH]
+----
+echo {a..z} #  a b c d e f g h i j k l m n o p q r s t u v w x y z
+# 输出 a 到 z 之间所有的字母。
+
+echo {0..3} # 0 1 2 3
+# 输出 0 到 3 之间所有的数字。
+
+
+base64_charset=( {A..Z} {a..z} {0..9} + / = )
+# 使用扩展花括号初始化一个数组。
+# 摘自 vladz 编写的样例脚本 "base64.sh"。
+----
+
+
+
+
+
+
+
+
+
+`/`
+
+文件路径分隔符[正斜杠]。起分割路径的作用。（比如 `/home/bozo/projects/Makefile`）
+它也在算术运算中充当除法运算符。
+
 `\``
 
