@@ -1,6 +1,6 @@
 {
-    "author": "korov <korov9@163.com>",
-    "description": "router config for chian user",
+    "author": "Anonymous <mystery@example.com>",
+    "description": "The author is too lazy to leave a comment",
     "domainStrategy": "AsIs",
     "domains": {
         "block": [
@@ -151,7 +151,9 @@
             "domain:tuna.tsinghua.edu.cn",
             "domain:qq.com",
             "domain:taobao.org",
-            "domain:cnblogs.com"
+            "domain:cnblogs.com",
+            "domain:soyunpan.com",
+            "domain:xiedaimala.com"
         ],
         "proxy": [
             "geosite:google",
