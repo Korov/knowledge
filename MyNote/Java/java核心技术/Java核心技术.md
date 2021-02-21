@@ -1612,9 +1612,7 @@ try {
         }
 ```
 
-
-
-# java11新特性
+# java新特性
 
 ## 1. FlightRecorder
 
@@ -1647,7 +1645,19 @@ $ jcmd <pid> JFR.dump filename=recording.jfr
 $ jcmd <pid> JFR.stop
 ```
 
-获取到文件之后可以使用`jfr`命令来解析生成的文件。
+获取到文件之后可以使用`jfr`命令或者`JMC`来解析生成的文件。
+
+## 模块化
+
+模块化最好和maven结合，在maven中一个A模块引用了B模块，那么B模块中的所有类对A模块都是可用的，但是用了java模块化之后只有到处的类才可以被A模块使用，目前来看没有什么太大的用处
+
+## jlink
+
+之前启动java项目：`java --class-path a.jar;b.jar`，当某个jar包缺失的时候不会立即报错，而是当找不到这个jar的时候才报错。
+
+jlink相关使用看single_module的示例
+
+# 自我总结
 
 ## 替换jar中的class文件
 
