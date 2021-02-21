@@ -1,0 +1,23 @@
+== 编译 ==
+
+[source, BASH]
+----
+# -d ./target 表示包将会被编译到当前文件夹的target目录下 src/main/java/module-info.java src/main/java/demo/Main.java 表示需要编译的java文件
+javac -d ./target src/main/java/module-info.java src/main/java/demo/Demo.java
+----
+
+== 执行 ==
+
+[source, BASH]
+----
+# --module-path target 模块的路径为当前文件夹的target, -m single_module/demo.Demo 执行single_module模块中的demo pacakge下的Demo类
+java --module-path target -m single_module/demo.Demo
+----
+
+== jlink ==
+
+[source,BASH]
+----
+# --output target/Demo-image 在target文件夹下生成可执行文件，脚本名称是hello，启动类是single_module模块中的demo.Demo
+jlink --module-path target --add-modules single_module --launcher hello=single_module/demo.Demo --output target/Demo-image
+----
