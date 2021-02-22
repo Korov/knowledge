@@ -1640,6 +1640,8 @@ jcmd 25165 JFR.dump name=1 filename=JFRTest.jfr
 ```bash
 $ jcmd <pid> JFR.start  #PID为要监控的java进程的id
 
+jcmd <pid> JFR.start name=demo maxage=2d maxsize=2g filename=demo.jfr
+
 $ jcmd <pid> JFR.dump filename=recording.jfr
 
 $ jcmd <pid> JFR.stop
