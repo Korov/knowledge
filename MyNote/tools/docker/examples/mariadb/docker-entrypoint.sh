@@ -42,6 +42,27 @@ file_env() {
 	unset "$fileVar"
 }
 
+# usage: docker_process_init_files [file [file [...]]]
+#    ie: docker_process_init_files /always-initdb.d/*
+# process initializer files, based on file extensions
+docker_process_init_files() {
+
+	echo
+	local f
+	for f; do
+	    if [ -d "$f" ]; then
+            docker_process_init_files $f/*
+		fi
+		case "$f" in
+			*.sh)     echo "$0: running $f"; . "$f" ;;
+			*.sql)    echo "$0: running $f"; "${mysql[@]}" < "$f"; echo ;;
+			*.sql.gz) echo "$0: running $f"; gunzip -c "$f" | "${mysql[@]}"; echo ;;
+			*)        echo "$0: ignoring $f" ;;
+		esac
+		echo
+	done
+}
+
 _check_config() {
 	toRun=( "$@" --verbose --help --log-bin-index="$(mktemp -u)" )
 	if ! errors="$("${toRun[@]}" 2>&1 >/dev/null)"; then
@@ -169,38 +190,7 @@ if [ "$1" = 'mysqld' -a -z "$wantHelp" ]; then
 			fi
 		fi
 
-		echo
-		for f in /docker-entrypoint-initdb.d/*; do
-			case "$f" in
-				*.sh)     echo "$0: running $f"; . "$f" ;;
-				*.sql)    echo "$0: running $f"; "${mysql[@]}" < "$f"; echo ;;
-				*.sql.gz) echo "$0: running $f"; gunzip -c "$f" | "${mysql[@]}"; echo ;;
-				*)        echo "$0: ignoring $f" ;;
-			esac
-			echo
-		done
-
-		echo
-		for f in /docker-entrypoint-initdb.d/sql/*; do
-			case "$f" in
-				*.sh)     echo "$0: running $f"; . "$f" ;;
-				*.sql)    echo "$0: running $f"; "${mysql[@]}" < "$f"; echo ;;
-				*.sql.gz) echo "$0: running $f"; gunzip -c "$f" | "${mysql[@]}"; echo ;;
-				*)        echo "$0: ignoring $f" ;;
-			esac
-			echo
-		done
-
-		echo
-		for f in /docker-entrypoint-initdb.d/testsql/*; do
-			case "$f" in
-				*.sh)     echo "$0: running $f"; . "$f" ;;
-				*.sql)    echo "$0: running $f"; "${mysql[@]}" < "$f"; echo ;;
-				*.sql.gz) echo "$0: running $f"; gunzip -c "$f" | "${mysql[@]}"; echo ;;
-				*)        echo "$0: ignoring $f" ;;
-			esac
-			echo
-		done
+		docker_process_init_files /docker-entrypoint-initdb.d/*
 
 		if ! kill -s TERM "$pid" || ! wait "$pid"; then
 			echo >&2 'MySQL init process failed.'
