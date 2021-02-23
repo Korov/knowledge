@@ -1641,7 +1641,10 @@ jcmd 25165 JFR.dump name=1 filename=JFRTest.jfr
 $ jcmd <pid> JFR.start  #PID为要监控的java进程的id
 
 # duration=0 表示不限制一直记录
-jcmd <pid> JFR.start name=demo maxage=2d maxsize=2g duration=60s filename=demo.jfr
+jcmd <pid> JFR.start name=demo maxage=2d maxsize=2g duration=60s filename=demo.jfr dumponexit=true
+jcmd <pid> JFR.check
+jcmd <pid> JFR.dump filename=idea-1.jfr
+jcmd <pid> JFR.stop name=idea
 
 $ jcmd <pid> JFR.dump filename=recording.jfr
 
