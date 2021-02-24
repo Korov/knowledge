@@ -1666,6 +1666,8 @@ $ jcmd <pid> JFR.stop
 | path-to-gc-roots | false                                                        | 是否记录GC根节点到活动对象的路径，一般不打开这个，首先这个在我个人定位问题的时候，很难用到，只要你的编程习惯好。还有就是打开这个，性能损耗比较大，会导致FullGC一般是在怀疑有内存泄漏的时候热启动这种采集，并且通过产生对象堆栈无法定位的时候，动态打开即可。一般通过产生这个对象的堆栈就能定位，如果定位不到，怀疑有其他引用，例如 ThreadLocal 没有释放这样的，可以在 dump 的时候采集 gc roots |
 | settings         | 默认是 default.jfc，这个位于 `$JAVA_HOME/lib/jfr/default.jfc` | 采集 Event 的详细配置，采集的每个 Event 都有自己的详细配置。另一个 JDK 自带的配置是 profile.jfc，位于 `$JAVA_HOME/lib/jfr/profile.jfc`。这个配置文件里面的配置是怎么回事，我们后面会涉及。 |
 
+
+
 ## 模块化
 
 模块化最好和maven结合，在maven中一个A模块引用了B模块，那么B模块中的所有类对A模块都是可用的，但是用了java模块化之后只有到处的类才可以被A模块使用，目前来看没有什么太大的用处
