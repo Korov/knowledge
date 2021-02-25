@@ -11,6 +11,7 @@ vim是我最喜欢的编辑器，也是linux下第二强大的编辑器。 虽�
 
 # [2. 启动Vim](http://www.cnblogs.com/jiqingwu/archive/2012/06/14/vim_notes.html#id61)
 
+- vim -b file:以二进制方式打开文件，可以看到文件中隐藏的字符
 - vim -c cmd file: 在打开文件前，先执行指定的命令；
 - vim -r file: 恢复上次异常退出的文件；
 - vim -R file: 以只读的方式打开文件，但可以强制保存；
