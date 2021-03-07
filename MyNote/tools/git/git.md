@@ -985,6 +985,28 @@ git reset D
 git commit -m 'squash commit'
 ```
 
+# git工具
+
+## 搜索
+
+### git grep
+
+你可以很方便的从提交历史、工作目录、甚至索引中查找一个字符串或者正则表达式。（git grep默认所有当前工作目录下的文件）
+
+```bash
+# 显示文档中有gmtime_r，显示前100行（-n --line-number）。-c或者--count输出统计信息，-p或者--show-function显示每个匹配的字符串所有的方法或者函数
+git grep -n 100 gmtime_r
+
+# LINUX BUF_MAX出现在同一行
+git grep --and \( -e LINK -e BUF_MAX )
+```
+
+### 日志搜索
+
+搜索`ZLIB_BUF_MAX`常量时什么时候引入的：`git log -S ZLIB_BUF_MAX --oneline`
+
+展示代码中的一行或者一个函数的历史：`git log -L :git_deflate_bound:zlib.c`。git会尝试找出这个函数的范围，然后查找历史记录，并且从之后一系列变更对应的补丁。也可以使用正则：`git log -L '/unsigned long git_deflate_bound/',/^}/:zlib.c`
+
 # 4.问题处理
 
 ## 4.1 git bash中文被转义
