@@ -1119,3 +1119,21 @@ git config receive.denyCurrentBranch ignore
 ```
 
 别的地方通过文件地址clone你的仓库之后，设置了这个选项，之后别人就可以直接push代码到你的仓库。慎用
+
+## 在服务器上搭建git
+
+先将现有仓库导出为裸仓库（即一个不包含当前工作目录的仓库）
+
+```bash
+git clone --bare my_project my_project.git
+# 相当于
+cp -Rf my_project/.git my_project.git
+
+#把裸仓库放到服务器上
+scp -r my_project.git user@git.example.com:/srv/git
+
+#clone
+git clone user@git.example.com:/srv/git/my_project.git
+```
+
+如果一个用户，通过使用ssh连接到一个服务器并且对`/srv/git/my_project.git`目录拥有可写权限，那么他将自动拥有推送权限
