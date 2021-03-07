@@ -1137,3 +1137,14 @@ git clone user@git.example.com:/srv/git/my_project.git
 ```
 
 如果一个用户，通过使用ssh连接到一个服务器并且对`/srv/git/my_project.git`目录拥有可写权限，那么他将自动拥有推送权限
+
+#### 另外一种方式
+
+将包含当前工作目录的仓库直接上传到服务器，这样就可以在服务器上直接进入目录进行编译
+
+```bash
+scp -r my_project user@git.example.com:/srv/git
+
+git remote add server user@git.example.com:/srv/git/my_project
+```
+
