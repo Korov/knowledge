@@ -141,7 +141,7 @@ log4j.appender.appenderName.option1 = value1
 
 == logback ==
 
-和log4j2相似的配置
+和log4j2相似的配置，定义好Appender，然后定义Logger指向指定的Appender
 
 [source, xml]
 .logback.xml
