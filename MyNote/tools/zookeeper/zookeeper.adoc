@@ -1,0 +1,160 @@
+= Zookeeper =
+Korov9 <korov9@163.com>
+v1.0 2021-3-10
+:toc: right
+
+== 使用Zookeeper ==
+
+=== 客户端脚本 ===
+
+进入Zookeeper的bin目录之后执行如下命令
+[source,bash]
+----
+# 连接本地2181端口
+./zkCli.sh
+# 连接远程服务
+./zkCli.sh -server ip:port
+----
+
+==== 创建 ====
+
+使用create创建一个Zookeeper节点用法如下：
+[source,bash]
+----
+create [-s] [-e] path data acl
+# 创建一个/zk-book的节点，节点的数据内容是123，没有任何权限控制
+create /zk-book 123
+----
+`-s` `-e` 分别指定节点特性：顺序节点或临时节点。默认情况下不加 `-s -e` 参数的是持久节点。 `acl` 进行权限控制，缺省情况下不做任何权限控制。
+
+==== 读取 ====
+
+`ls` ：列出指定节点下的所有子节点，用法： `ls [-s] [-w] [-R] path` 。
+[source,bash]
+----
+[zk: localhost:2181(CONNECTED) 2] ls /
+[zk-book, zookeeper]
+[zk: localhost:2181(CONNECTED) 3] ls /zk-book
+[]
+# ls -s 展示更详细的信息
+[zk: localhost:2181(CONNECTED) 8] ls -s /zk-book
+[]cZxid = 0x2
+ctime = Wed Mar 10 14:42:17 UTC 2021
+mZxid = 0x2
+mtime = Wed Mar 10 14:42:17 UTC 2021
+pZxid = 0x2
+cversion = 0
+dataVersion = 0
+aclVersion = 0
+ephemeralOwner = 0x0
+dataLength = 3
+numChildren = 0
+[zk: localhost:2181(CONNECTED) 20] ls -R /
+/
+/zk-book
+/zookeeper
+/zookeeper/config
+/zookeeper/quota
+----
+
+`get` ：获取指定节点的数据内容和属性信息，用法： `get [-s] [-w] path`
+[source,bash]
+----
+[zk: localhost:2181(CONNECTED) 4] get /zk-book
+123
+[zk: localhost:2181(CONNECTED) 21] get -s /zk-book
+123
+cZxid = 0x2
+ctime = Wed Mar 10 14:42:17 UTC 2021
+mZxid = 0x2
+mtime = Wed Mar 10 14:42:17 UTC 2021
+pZxid = 0x2
+cversion = 0
+dataVersion = 0
+aclVersion = 0
+ephemeralOwner = 0x0
+dataLength = 3
+numChildren = 0
+----
+
+`stat` ：获取节点统计信息，用法：`stat [-w] path`
+[source,bash]
+----
+[zk: localhost:2181(CONNECTED) 12] stat /zk-book
+cZxid = 0x2
+ctime = Wed Mar 10 14:42:17 UTC 2021
+mZxid = 0x2
+mtime = Wed Mar 10 14:42:17 UTC 2021
+pZxid = 0x2
+cversion = 0
+dataVersion = 0
+aclVersion = 0
+ephemeralOwner = 0x0
+dataLength = 3
+numChildren = 0
+----
+
+==== 更新 ====
+
+`set` ：更新指定节点数据，用法： `set [-s] [-v version] path data`
+[source,bash]
+----
+[zk: localhost:2181(CONNECTED) 1] set -s /zk-book 789
+cZxid = 0x2
+ctime = Wed Mar 10 14:42:17 UTC 2021
+mZxid = 0x5
+mtime = Wed Mar 10 15:28:59 UTC 2021
+pZxid = 0x2
+cversion = 0
+dataVersion = 2
+aclVersion = 0
+ephemeralOwner = 0x0
+dataLength = 3
+numChildren = 0
+[zk: localhost:2181(CONNECTED) 2] get /zk-book
+789
+----
+节点数据已经改变，并且节点中的 `dataVersion` 也改变了
+
+==== 删除 ====
+
+`delete` : 删除指定节点，用法： `delete [-v version] path`
+[source,bash]
+----
+[zk: localhost:2181(CONNECTED) 4] delete /zk-book
+[zk: localhost:2181(CONNECTED) 5] ls /
+[zookeeper]
+----
+
+`deleteall` : 用法： `deleteall path`
+
+=== Java客户端API使用 ===
+
+构造方法
+[source,java]
+----
+ZooKeeper(String connectString, int sessionTimeout, Watcher watcher)
+ZooKeeper(String connectString, int sessionTimeout, Watcher watcher, boolean canBeReadOnly)
+ZooKeeper(String connectString, int sessionTimeout, Watcher watcher, long sessionId, byte[] sessionPasswd)
+----
+
+. `connectString`：192.168.1.1:2181,192.168.1.2:2181
+. `sessionTimeout` :会话的超时时间，毫秒为单位。Zookeeper客户端和服务器之间会通过心跳检测机制来维持会话的有效性，一旦在 `sessionTimeout` 时间内没有进行有效的心跳检测，会话就会失效
+. `watcher` :事件通知处理器
+. `canBeReadOnly` :在zookeeper集群中，一个机器如果和集群中过半及以上的机器失去了网络连接，那么这个机器将不再处理客户端请求。但在某些使用场景下，当zookeeper服务器发生此类故障的时候，我们还是希望zookeeper服务器能够提供读服务，此参数是否开启此功能
+. `sessionId` 和 `sessionPasswd` : 代表会话的id和会话密钥，这两个参数能够唯一确定一个会话。同时客户端使用这两个参数可以实现客户端会话的复用，从而达到恢复会话的效果。
+
+[NOTE]
+.注意事项
+====
+
+zookeeper客户端和服务端会话的建立是一个异步的过程，构造方法在处理完客户端初始化工作后立即返回，在大多数情况下，此时并没有真正建立好一个会话，在会话的声明周期中处于 `CONNECTING` 的状态。当会话真正创建完毕后，zookeeper服务端会向会话对应的客户端发送一个事件通知，客户端在获取这个通知之后，才算真正建立了会话。
+
+====
+
+增删改查接口都有
+
+
+
+
+
