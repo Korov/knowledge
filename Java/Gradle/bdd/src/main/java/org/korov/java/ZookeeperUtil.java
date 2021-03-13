@@ -37,7 +37,7 @@ public class ZookeeperUtil {
         Stat stat = null;
         if ((stat = existsBuilder.forPath("/curator-test")) != null) {
             logger.info("version:{}", stat.getVersion());
-            System.out.println(String.format("version:%s", stat.getVersion()));
+            System.out.printf("version:%s%n", stat.getVersion());
         }
 
         client.close();
