@@ -268,9 +268,68 @@ zookeeper客户端和服务端会话的建立是一个异步的过程，构造�
 
 还有一个 `zkclient` 的开源包对原有的包的功能进行了升级， `Curator` 更强的开源包
 
+== zookeeper技术内幕 ==
 
+=== 系统模型 ===
 
+==== 数据模型 ====
 
+ZNode（数据节点），ZNode是zookeeper中数据的最小单元，每个ZNode上都可以保存数据，同时还可以挂载子节点，因此构成了一个层次化的命名空间，我们称之为树
+
+事务ID：在zookeeper中，事务是指能够改变zookeeper服务器状态的操作，我们称之为事务操作或更新操作，一般包括数据节点创建与删除、数据节点内容更新和客户端会话的创建与失效等操作。对于每一个事务请求，zookeeper都会为其分配一个全局唯一的事务id，用ZXID来表示，通常是一个64位的数字。每一个ZXID对应一次更新操作，从这些ZXID中可以间接的识别出zookeeper处理这些更新操作请求的全局顺序。
+
+==== 节点特性 ====
+
+. 持久节点（PERSISTENT）：数据节点被创建之后，就会一直存在于zookeeper服务器上，直到有删除操作来主动清除这个节点
+. 持久顺序节点（PERSISTENT_SEQUENTIAL）：基本特性和持久节点一致，在每个父节点都会为它的第一级子节点维护一份顺序，用于记录下每个子节点创建的先后顺序。基于这个顺序特性，在创建子节点的时候，可以设置这个标记，那么在创建节点的过程中，zookeeper会自动为给定节点名加上一个数字后缀，作为一个新的、完整的节点名，数字后缀的上限是整形的最大值。
+. 临时节点（EPHEMERAL）：客户端会话失效这个节点就会被自动清理掉
+. 临时顺序节点（EPHEMERAL_SEQUENTIAL）：基本特性和临时节点是一致的，在此基础上添加了顺序的特性
+
+[source,bash]
+----
+[zk: localhost:2181(CONNECTED) 7] get -s /zk-book
+null
+cZxid = 0x37
+ctime = Mon Mar 15 12:50:20 UTC 2021
+mZxid = 0x37
+mtime = Mon Mar 15 12:50:20 UTC 2021
+pZxid = 0x37
+cversion = 0
+dataVersion = 0
+aclVersion = 0
+ephemeralOwner = 0x0
+dataLength = 0
+numChildren = 0
+----
+
+.对象状态属性说明
+[width="100%",options="header,footer"]
+|====================
+|状态属性  |说明  
+|cZxid  |CreateZXID，表示该数据节点被创建时的事务id  
+|ctime  |节点被创建的时间  
+|mZxid  |ModifiedZXID，该节点最后一次被更新时的事务id  
+|mtime  |最后一次被更新的时间  
+|pZxid  |该节点的子节点列表最后一次被修改时的事务id，子节点列表变更才会改变此id，内容改变不会  
+|cversion  |子节点版本号  
+|dataVersion  |节点内容版本号  
+|aclVersion  |权限列表版本号  
+|ephemeralOwner  |创建该临时节点的会话的sessionID，如果该节点时持久节点，那么这个属性值为0  
+|dataLength  |数据内容的长度  
+|numChildren  |子节点个数  
+|====================
+
+==== 版本 ====
+
+版本表示的时对数据节点的数据内容，子节点列表，或是节点ACL信息的修改次数。通过乐观锁的方式来确保版本一致
+
+==== Watcher数据变更的通知 ====
+
+zookeeper中，引入Watcher机制来实现这种分布式的通知功能。Zookeeper允许客户端向服务端注册一个Watcher监听，当服务端的一些指定事件触发了这个watcher那么就会向指定客户端发送一个事件通知来实现分布式的通知功能。
+
+=== 序列化与协议 ===
+
+zookeeper使用Jute这一序列化组件来进行数据的序列化和反序列化操作。
 
 
 
