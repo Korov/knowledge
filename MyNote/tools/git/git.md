@@ -902,7 +902,7 @@ git中整合来自不同分支的修改主要有两种方法：merge和rebase。
 ```bash
 # 将develop分支上的所有commit rebase到master分支上
 git checkout master
-git rebase develop
+git rebase master develop
 First, rewinding head to replay your work on top of it...
 Applying: added staged command
 ```
