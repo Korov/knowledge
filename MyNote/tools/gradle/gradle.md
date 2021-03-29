@@ -721,6 +721,6 @@ systemProp.socks.proxyPort=1089
 ## gradle debug
 
 ```bash
-./gradlew build -x test -Dorg.gradle.debug=true -d
+./gradlew build -x test -d -Dorg.gradle.debug=true -Dorg.gradle.daemon=false
 ```
 
