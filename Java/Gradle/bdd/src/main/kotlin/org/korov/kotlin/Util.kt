@@ -1,5 +1,9 @@
 package org.korov.kotlin
 
-fun length(value: String): Int {
-    return value.length
+class Util {
+    companion object {
+        fun length(value: String): Int {
+            return value.length
+        }
+    }
 }

@@ -1,7 +1,7 @@
-import org.korov.kotlin.length
 import org.spekframework.spek2.Spek
 import org.spekframework.spek2.style.gherkin.Feature
 import kotlin.test.assertEquals
+import org.korov.kotlin.Util
 
 
 class UtilFeature : Spek({
@@ -14,7 +14,7 @@ class UtilFeature : Spek({
             }
 
             Then("should equal 3") {
-                assertEquals(3, length(value), "length error")
+                assertEquals(3, Util.length(value), "length error")
             }
         }
 
@@ -25,7 +25,7 @@ class UtilFeature : Spek({
             }
 
             Then("should equal 4") {
-                assertEquals(4, length(value), "length error")
+                assertEquals(4, Util.length(value), "length error")
             }
         }
     }
