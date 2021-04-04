@@ -47,8 +47,8 @@ var _ = Describe("Array", func() {
 			})
 			It("insertion_sort", func() {
 				v, _ := InsertionSort(input)
-				Logger.Info("result:", v)
-				Logger.Flush()
+				var logger = GetLogger()
+				logger.Info("result:")
 				Expect(v).To(Equal(result))
 			})
 		})

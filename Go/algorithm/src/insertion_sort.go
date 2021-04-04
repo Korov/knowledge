@@ -1,11 +1,7 @@
 package src
 
-import (
-	"time"
-)
-
 func InsertionSort(values []int) (ret []int, err error) {
-	start := time.Now()
+	//start := time.Now()
 	for i := 1; i < len(values); i++ {
 		for j := i - 1; j >= 0; j-- {
 			if values[j] > values[j+1] {
@@ -17,7 +13,7 @@ func InsertionSort(values []int) (ret []int, err error) {
 			}
 		}
 	}
-	Logger.Info("insertion sort cost:", time.Since(start))
-	Logger.Flush()
+	var logger = GetLogger()
+	logger.Info("insertion sort cost:")
 	return values, nil
 }

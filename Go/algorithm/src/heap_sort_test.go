@@ -12,6 +12,8 @@ import (
 
 // 单元测试，必须 Test 开头
 func TestHeapSort(t *testing.T) {
+	var logger = GetLogger()
+	logger.Info("start heap sort test")
 	var expect = "1,3,4,6,7,9,"
 
 	var values = []int{3, 4, 1, 9, 7, 6}

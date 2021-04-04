@@ -20,8 +20,8 @@ var _ = Describe("Merge Sort Test", func() {
 			})
 			It("merge_sort", func() {
 				v, _ := MergeSort(input)
-				Logger.Info("result:", v)
-				Logger.Flush()
+				var logger = GetLogger()
+				logger.Info("result:")
 				Expect(v).To(Equal(result))
 			})
 		})
