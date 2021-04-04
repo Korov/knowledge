@@ -57,8 +57,8 @@ go tool cover -html=../report/covprofile -o ../report/coverage.html
 ```bash
 # ginkgo执行所有测试
 ~/go/bin/ginkgo ./src
-# 生成测试覆盖率
-~/go/bin/ginkgo ./src -cover
+# 生成测试覆盖率，需要进入到代码路径才能生成测试覆盖率报告
+~/go/bin/ginkgo ./src -cover -coverprofile=./PACKAGE.coverprofile
 # 执行指定的It，通过It第一个字符串的正则匹配
 ~/go/bin/ginkgo -focus="merge_sort" ./src
 # 跳过指定的It，通过It的第一个字符串的正则匹配

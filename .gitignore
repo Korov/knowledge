@@ -83,3 +83,5 @@ Python/scrapy/**/dbs
 MyNote/tools/docker/examples/arangodb/cluster/standalone_cluster/*/agency/*
 MyNote/tools/docker/examples/arangodb/cluster/standalone_cluster/*/coordinator/*
 MyNote/tools/docker/examples/arangodb/cluster/standalone_cluster/*/dbserver/*
+
+*.coverprofile
