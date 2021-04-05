@@ -20,3 +20,15 @@ from demo where name = 'minions';
 explain analyze select *
 from demo where name = 'minions';
 ```
+
+
+
+# 索引
+
+### 索引的分类
+
+在PostgreSQL中，支持以下几类索引
+
+- B-tree：最常用的索引，适合处理等值查询和范围查询
+- Hash：只能处理简单的等值查询
+- GiST：不是一种单独的索引类型，而是一种架构，可以在这种架构上实现很多不同的索引策略。GiST索引定义的特定操作符可以用于特定索引策略。
