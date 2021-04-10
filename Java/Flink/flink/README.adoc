@@ -1,0 +1,6 @@
+[source,bash]
+----
+docker-compose up -d
+----
+
+打开网页 `loclhost:8081`
