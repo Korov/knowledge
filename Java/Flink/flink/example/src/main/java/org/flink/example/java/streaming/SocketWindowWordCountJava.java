@@ -5,6 +5,7 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
 
@@ -40,9 +41,7 @@ public class SocketWindowWordCountJava {
             public Object getKey(WordWithCount value) throws Exception {
                 return value.word;
             }
-        })
-                // 指定时间窗口大小为2秒，指定时间间隔为1秒
-                .timeWindow(Time.seconds(2), Time.seconds(1))
+        }).window(SlidingEventTimeWindows.of(Time.seconds(2), Time.seconds(1)))// 指定时间窗口大小为2秒，指定时间间隔为1秒
                 .sum("count");
 
         /* 使用reduce函数
