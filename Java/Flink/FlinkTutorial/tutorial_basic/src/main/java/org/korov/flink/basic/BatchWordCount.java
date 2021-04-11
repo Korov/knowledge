@@ -1,15 +1,16 @@
-package org.korov.flink.wordcount;
+package org.korov.flink.basic;
 
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.util.Collector;
 
 import java.io.File;
 
 /**
- * 批处理方式计算字符数量
+ * 批处理方式计算字符数量，此种处理方式已经不被推荐
  *
  * @author korov
  * @date 2020/7/12
@@ -20,8 +21,9 @@ public class BatchWordCount {
         ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(1);
         // 从文件中读取数据
-        String filePath = String.join(File.separator, "file", "data.txt");
-        DataSet<String> inputDataSet = env.readTextFile(filePath);
+        File file = new File("tutorial_basic/src/main/resources/world_count/hello.txt");
+
+        DataSet<String> inputDataSet = env.readTextFile(file.getAbsoluteFile().getPath());
         DataSet<Tuple2<String, Integer>> resultDataSet = inputDataSet
                 .flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
                     private static final long serialVersionUID = -249748905332135566L;

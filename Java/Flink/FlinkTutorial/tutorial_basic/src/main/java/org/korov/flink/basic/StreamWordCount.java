@@ -1,5 +1,6 @@
-package org.korov.flink.wordcount;
+package org.korov.flink.basic;
 
+import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple2;
@@ -15,13 +16,12 @@ import org.slf4j.LoggerFactory;
  * 在服务端键入字符此处会将统计结果打印出来
  *
  * @author korov
- * @date 2020/7/12
  */
 public class StreamWordCount {
     private static final Logger logger = LoggerFactory.getLogger(StreamWordCount.class);
 
     public static void main(String[] args) throws Exception {
-        String hostname = "localhost";
+        String hostname = "127.0.0.1";
         int port = 9999;
 
         if (args.length == 2) {
@@ -30,18 +30,24 @@ public class StreamWordCount {
         }
 
         logger.info("host:{}, port:{}", hostname, port);
-
         // 1.初始化流计算的环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
+        env.setRuntimeMode(RuntimeExecutionMode.STREAMING);
         // 默认开启多线程，线程数与CPU数量相等，可以手动指定开启线程数量
         env.setParallelism(2);
-
-        // 2.导入隐式转换
 
         // 3.读取数据
         DataStream<Tuple2<String, Integer>> dataStream = env
                 .socketTextStream(hostname, port)
-                .flatMap(new Splitter())
+                .flatMap(new FlatMapFunction<String, Tuple2<String, Integer>>() {
+                    @Override
+                    public void flatMap(String value, Collector<Tuple2<String, Integer>> out) throws Exception {
+                        for (String word : value.split(" ")) {
+                            logger.info("get:{}", word);
+                            out.collect(new Tuple2<String, Integer>(word, 1));
+                        }
+                    }
+                })
                 .keyBy(new KeySelector<Tuple2<String, Integer>, Object>() {
                     private static final long serialVersionUID = 1136154280689082856L;
 
@@ -57,23 +63,10 @@ public class StreamWordCount {
                 //.timeWindow(Time.seconds(5))
                 .sum(1);
 
-        // 4.转换和处理数据
-
         // 5.打印结果
         dataStream.print();
-        // 6.启动流计算程序
-        env.execute("WordCount");
+        // 流式处理必须显示执行
+        env.execute("StreamWordCount");
     }
 
-    public static class Splitter implements FlatMapFunction<String, Tuple2<String, Integer>> {
-        private static final long serialVersionUID = -8930813781257644186L;
-
-        @Override
-        public void flatMap(String sentence, Collector<Tuple2<String, Integer>> out) throws Exception {
-            for (String word : sentence.split(" ")) {
-                logger.info("get:{}", word);
-                out.collect(new Tuple2<String, Integer>(word, 1));
-            }
-        }
-    }
 }
