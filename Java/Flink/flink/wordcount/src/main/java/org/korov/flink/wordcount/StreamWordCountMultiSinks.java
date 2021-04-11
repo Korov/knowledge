@@ -1,11 +1,5 @@
 package org.korov.flink.wordcount;
 
-import org.apache.flink.core.fs.FileSystem;
-import org.apache.flink.streaming.api.datastream.DataStream;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * 先使用 nc -lp 9999 模拟服务器发送数据
  * 启动本程序
@@ -15,10 +9,10 @@ import org.slf4j.LoggerFactory;
  * @date 2020/7/12
  */
 public class StreamWordCountMultiSinks {
-    private static final Logger logger = LoggerFactory.getLogger(StreamWordCountMultiSinks.class);
+    // private static final Logger logger = LoggerFactory.getLogger(StreamWordCountMultiSinks.class);
 
     public static void main(String[] args) throws Exception {
-        // 1.初始化流计算的环境
+        /*// 1.初始化流计算的环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setParallelism(2);
         // 2.导入隐式转换
@@ -36,6 +30,6 @@ public class StreamWordCountMultiSinks {
         //StreamingFileSink sink = StreamingFileSink.forRowFormat(new Path("file:///home/korov/work/gitrepo/knowledge/Java/Flink/flink/demo1"), new SimpleStringEncoder<String>("UTF-8")).build();
         //dataStream.addSink(sink);
         // 6.启动流计算程序
-        env.execute("WordCount");
+        env.execute("WordCount");*/
     }
 }
