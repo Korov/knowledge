@@ -720,3 +720,17 @@ bin/kafka-config.sh --zookeeper zoo1:2181,zoo2:2181 --alter --entity-type topics
 
 
 # 自我总结
+
+```bash
+# 查看每次消费的offset值变化
+./kafka-simple-consumer-shell.sh --topic __consumer_offsets --partition 6 --broker-list localhost:9092 --formatter "kafka.coordinator.group.GroupMetadataManager\$OffsetsMessageFormatter"
+
+# 查看对应消费者组的offset值，是否有lag
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --group my-group
+
+./kafka-consumer-groups.sh --bootstrap-server localhost:9092 --describe --all-groups
+
+# 直接将kafka中的二进制文件转化为可读的数据
+/opt/kafka/bin/kafka-run-class.sh kafka.tools.DumpLogSegments  --deep-iteration --print-data-log --files /kafka/kafka-logs-c84182bfbf07/__consumer_offsets-21/00000000000000000000.log
+```
+
