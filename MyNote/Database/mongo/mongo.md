@@ -1,18 +1,16 @@
  
 
-https://docs.mongoing.com/mongodb-crud-operations/query-documents
+# [Mongo](https://docs.mongoing.com/mongodb-crud-operations/query-documents)
 
-# mongo shell操作mongodb
+# mongo shell
 
-## mongo shell里使用CRUD
-
-启动shell：
+## 启动shell：
 
 ```bash
 mongo --username alice --password --authenticationDatabase admin --host mongodb0.examples.com --port 28015
 ```
 
-切换数据库
+## 切换数据库
 
 ```bash
 # 数据库不需要手动创建，切换的时候会自动创建数据库
@@ -56,11 +54,12 @@ db.user.find({"favorites.movies":"Casablanca"})
 
 ```
 
-```
-# 显示正在使用的数据库
+## 显示正在使用的数据库
+```javascript
 db
-
 ```
+
+
 
 ### 插入一个文件
 
