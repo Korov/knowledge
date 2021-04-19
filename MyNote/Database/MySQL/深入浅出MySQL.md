@@ -1346,3 +1346,8 @@ mysqlbinlog --stop-position="368312" /var/log/mysql/bin.123456 | mysql -uroot -p
 mysqlbinlog --start-position="368315" /var/log/mysql/bin.123456 | mysql -uroot -p
 ```
 
+# 自我总结
+
+## cardinality
+
+索引相对值，它记录索引中不重复记录的数量，如果这个值很小要评估索引是否由意义。在innodb中，如果表中1/16的数据发生变化或者stat_modified_counter>200 000 000就会重新计算cardinality
