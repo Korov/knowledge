@@ -46,6 +46,8 @@ db.user.updateOne({_id:ObjectId("5ff495366341e441451e17bd")}, {$unset:{lalla:"ll
 db.user.updateOne({username:"korov1"}, {$set:{favorites:{cities:["Chicago", "Cheyenne"],movies:["Casablanca","For a Few Dollars More","The Sting"]}}})
 # 查询一个键名为favorites的对象，内部键名为movies作为新的匹配条件
 db.user.find({"favorites.movies":"Casablanca"})
+# 查询num 大于1995并且小于19995的数据， $gte,$lte分别式大于等于和小于等于
+db.user.find({num: {"$gt":1995， "$lt":19995}})
 ```
 
 高级更新
@@ -57,9 +59,9 @@ db.user.find({"favorites.movies":"Casablanca"})
 ## 显示正在使用的数据库
 ```javascript
 db
+#展示所有的db
+show dbs;
 ```
-
-
 
 ### 插入一个文件
 
@@ -77,5 +79,346 @@ db.inventory.insertMany([
         { item: "mat", qty: 85, tags: ["gray"], size: { h: 27.9, w: 35.5, uom: "cm" } },
         { item: "mousepad", qty: 25, tags: ["gel", "blue"], size: { h: 19, w: 22.85, uom: "cm" } }
     ])
+```
+
+# 使用索引创建和查询
+
+## explain
+
+explain展示查询语句的执行过程
+
+使用索引的explain
+
+```javascript
+db.alert.find({_id:ObjectId("607a9d48136fac5326b2e1ea")}).explain()
+```
+
+结果：（totalKeysExamined使用了一个索引，totalDocsExamined显示只扫描了一个docs）
+
+```json
+{
+  "queryPlanner": {
+    "plannerVersion": 1,
+    "namespace": "admin.alert",
+    "indexFilterSet": false,
+    "parsedQuery": {
+      "_id": {
+        "$eq": "607a9d48136fac5326b2e1ea"
+      }
+    },
+    "winningPlan": {
+      "stage": "IDHACK"
+    },
+    "rejectedPlans": []
+  },
+  "executionStats": {
+    "executionSuccess": true,
+    "nReturned": 1,
+    "executionTimeMillis": 0,
+    "totalKeysExamined": 1,
+    "totalDocsExamined": 1,
+    "executionStages": {
+      "stage": "IDHACK",
+      "nReturned": 1,
+      "executionTimeMillisEstimate": 0,
+      "works": 2,
+      "advanced": 1,
+      "needTime": 0,
+      "needYield": 0,
+      "saveState": 0,
+      "restoreState": 0,
+      "isEOF": 1,
+      "keysExamined": 1,
+      "docsExamined": 1
+    },
+    "allPlansExecution": []
+  },
+  "serverInfo": {
+    "host": "6c0425b9ab19",
+    "port": 27017,
+    "version": "4.4.5",
+    "gitVersion": "ff5cb77101b052fa02da43b8538093486cf9b3f7"
+  },
+  "ok": 1.0
+}
+```
+
+未使用索引的查询
+
+```javascript
+totalDocsExamined
+```
+
+结果（totalKeysExamined使用了0个索引，totalDocsExamined扫描了2171905个docs）
+
+```json
+{
+  "queryPlanner": {
+    "plannerVersion": 1,
+    "namespace": "admin.alert",
+    "indexFilterSet": false,
+    "parsedQuery": {
+      "key": {
+        "$eq": "spl_alert"
+      }
+    },
+    "winningPlan": {
+      "stage": "PROJECTION_DEFAULT",
+      "transformBy": {
+        "value.alertName": "同一源IP针对多目标进行高危端口攻击告警"
+      },
+      "inputStage": {
+        "stage": "COLLSCAN",
+        "filter": {
+          "key": {
+            "$eq": "spl_alert"
+          }
+        },
+        "direction": "forward"
+      }
+    },
+    "rejectedPlans": []
+  },
+  "executionStats": {
+    "executionSuccess": true,
+    "nReturned": 303190,
+    "executionTimeMillis": 1097,
+    "totalKeysExamined": 0,
+    "totalDocsExamined": 2171905,
+    "executionStages": {
+      "stage": "PROJECTION_DEFAULT",
+      "nReturned": 303190,
+      "executionTimeMillisEstimate": 104,
+      "works": 2171907,
+      "advanced": 303190,
+      "needTime": 1868716,
+      "needYield": 0,
+      "saveState": 2171,
+      "restoreState": 2171,
+      "isEOF": 1,
+      "transformBy": {
+        "value.alertName": "同一源IP针对多目标进行高危端口攻击告警"
+      },
+      "inputStage": {
+        "stage": "COLLSCAN",
+        "filter": {
+          "key": {
+            "$eq": "spl_alert"
+          }
+        },
+        "nReturned": 303190,
+        "executionTimeMillisEstimate": 70,
+        "works": 2171907,
+        "advanced": 303190,
+        "needTime": 1868716,
+        "needYield": 0,
+        "saveState": 2171,
+        "restoreState": 2171,
+        "isEOF": 1,
+        "direction": "forward",
+        "docsExamined": 2171905
+      }
+    },
+    "allPlansExecution": []
+  },
+  "serverInfo": {
+    "host": "6c0425b9ab19",
+    "port": 27017,
+    "version": "4.4.5",
+    "gitVersion": "ff5cb77101b052fa02da43b8538093486cf9b3f7"
+  },
+  "ok": 1.0
+}
+```
+
+## 创建索引
+
+```javascript
+# keys为你要创建的索引字段，1为指定按升序创建索引，-1降序
+db.collection.createIndex(keys, options)
+# 给alert集合中的所有文档的key键建立升序索引
+db.alert.createIndex({key:1})
+# 给alert集合中的所有文档的key键建立升序索引，value键建立降序索引
+db.alert.createIndex({key:1，value：-1})
+# 后台创建索引
+db.values.createIndex({open: 1, close: 1}, {background: true})
+```
+
+`createIndex()`接收可选参数，可选参数列表如下：
+
+| parameter          | type          | description                                                  |
+| ------------------ | ------------- | ------------------------------------------------------------ |
+| background         | Boolean       | 创建索引过程会阻塞其他数据库操作，true指定为以后台方式创建索引，默认false |
+| unique             | Boolean       | 建立的所以是否为唯一索引，默认false                          |
+| name               | string        | 索引的名称，如果未指定默认通过连接索引的字段名和排序顺序生成一个索引名称 |
+| dropDups           | Boolean       | 3.0+版本已废弃。在建立唯一索引时是否删除重复记录,指定 true 创建唯一索引。默认值为 **false**. |
+| sparse             | Boolean       | 对文档中不存在的字段数据不启用索引；这个参数需要特别注意，如果设置为true的话，在索引字段中不会查询出不包含对应字段的文档.。默认值为 **false**. |
+| expireAfterSeconds | integer       | 指定一个以秒为单位的数值，完成 TTL设定，设定集合的生存时间。 |
+| v                  | index version | 索引的版本号。默认的索引版本取决于mongod创建索引时运行的版本。 |
+| weights            | document      | 索引权重值，数值在 1 到 99,999 之间，表示该索引相对于其他索引字段的得分权重。 |
+| default_language   | string        | 对于文本索引，该参数决定了停用词及词干和词器的规则的列表。 默认为英语 |
+| language_override  | string        | 对于文本索引，该参数指定了包含在文档中的字段名，语言覆盖默认的language，默认值为 language. |
+
+
+
+```javascript
+# 查看所有index
+db.alert.getIndexes()
+
+[
+  {
+    "key": {
+      "_id": 1
+    },
+    "name": "_id_",
+    "v": 2
+  },
+  {
+    "key": {
+      "key": 1
+    },
+    "name": "key_1",
+    "v": 2
+  }
+]
+
+# 查看索引的大小
+db.alert.totalIndexSize();
+# 通过索引名称删除对应索引
+db.alert.dropIndex("index_name")
+# 删除集合中的索引索引
+db.alert.dropIndexes()
+```
+
+创建索引之后的查询
+
+```javascript
+db.alert.find({key:"spl_alert"}, {"value.alertName":"同一源IP针对多目标进行高危端口攻击告警"}).explain()
+```
+
+结果（使用了索引相比于上一次的查询使用了200百万数据，这次只查询了30万的数据）
+
+```json
+{
+  "queryPlanner": {
+    "plannerVersion": 1,
+    "namespace": "admin.alert",
+    "indexFilterSet": false,
+    "parsedQuery": {
+      "key": {
+        "$eq": "spl_alert"
+      }
+    },
+    "winningPlan": {
+      "stage": "PROJECTION_DEFAULT",
+      "transformBy": {
+        "value.alertName": "同一源IP针对多目标进行高危端口攻击告警"
+      },
+      "inputStage": {
+        "stage": "FETCH",
+        "inputStage": {
+          "stage": "IXSCAN",
+          "keyPattern": {
+            "key": 1
+          },
+          "indexName": "key_1",
+          "isMultiKey": false,
+          "multiKeyPaths": {
+            "key": []
+          },
+          "isUnique": false,
+          "isSparse": false,
+          "isPartial": false,
+          "indexVersion": 2,
+          "direction": "forward",
+          "indexBounds": {
+            "key": [
+              "[\"spl_alert\", \"spl_alert\"]"
+            ]
+          }
+        }
+      }
+    },
+    "rejectedPlans": []
+  },
+  "executionStats": {
+    "executionSuccess": true,
+    "nReturned": 303190,
+    "executionTimeMillis": 480,
+    "totalKeysExamined": 303190,
+    "totalDocsExamined": 303190,
+    "executionStages": {
+      "stage": "PROJECTION_DEFAULT",
+      "nReturned": 303190,
+      "executionTimeMillisEstimate": 66,
+      "works": 303191,
+      "advanced": 303190,
+      "needTime": 0,
+      "needYield": 0,
+      "saveState": 303,
+      "restoreState": 303,
+      "isEOF": 1,
+      "transformBy": {
+        "value.alertName": "同一源IP针对多目标进行高危端口攻击告警"
+      },
+      "inputStage": {
+        "stage": "FETCH",
+        "nReturned": 303190,
+        "executionTimeMillisEstimate": 40,
+        "works": 303191,
+        "advanced": 303190,
+        "needTime": 0,
+        "needYield": 0,
+        "saveState": 303,
+        "restoreState": 303,
+        "isEOF": 1,
+        "docsExamined": 303190,
+        "alreadyHasObj": 0,
+        "inputStage": {
+          "stage": "IXSCAN",
+          "nReturned": 303190,
+          "executionTimeMillisEstimate": 19,
+          "works": 303191,
+          "advanced": 303190,
+          "needTime": 0,
+          "needYield": 0,
+          "saveState": 303,
+          "restoreState": 303,
+          "isEOF": 1,
+          "keyPattern": {
+            "key": 1
+          },
+          "indexName": "key_1",
+          "isMultiKey": false,
+          "multiKeyPaths": {
+            "key": []
+          },
+          "isUnique": false,
+          "isSparse": false,
+          "isPartial": false,
+          "indexVersion": 2,
+          "direction": "forward",
+          "indexBounds": {
+            "key": [
+              "[\"spl_alert\", \"spl_alert\"]"
+            ]
+          },
+          "keysExamined": 303190,
+          "seeks": 1,
+          "dupsTested": 0,
+          "dupsDropped": 0
+        }
+      }
+    },
+    "allPlansExecution": []
+  },
+  "serverInfo": {
+    "host": "6c0425b9ab19",
+    "port": 27017,
+    "version": "4.4.5",
+    "gitVersion": "ff5cb77101b052fa02da43b8538093486cf9b3f7"
+  },
+  "ok": 1.0
+}
 ```
 
