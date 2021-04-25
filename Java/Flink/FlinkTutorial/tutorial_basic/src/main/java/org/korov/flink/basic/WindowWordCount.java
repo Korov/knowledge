@@ -78,11 +78,11 @@ public class WindowWordCount {
                                 return element.f1;
                             }
                         }))
-                .keyBy(new KeySelector<>() {
+                .keyBy(new KeySelector<Tuple3<String, Long, Integer>, String>() {
                     private static final long serialVersionUID = 1136154280689082856L;
 
                     @Override
-                    public Object getKey(Tuple3<String, Long, Integer> stringIntegerTuple3) {
+                    public String getKey(Tuple3<String, Long, Integer> stringIntegerTuple3) {
                         return stringIntegerTuple3.getField(0);
                     }
                 })
@@ -128,11 +128,11 @@ public class WindowWordCount {
                         }
                     }
                 })
-                .keyBy(new KeySelector<>() {
+                .keyBy(new KeySelector<Tuple2<String, Integer>, String>() {
                     private static final long serialVersionUID = 1136154280689082856L;
 
                     @Override
-                    public Object getKey(Tuple2<String, Integer> stringIntegerTuple2) {
+                    public String getKey(Tuple2<String, Integer> stringIntegerTuple2) {
                         return stringIntegerTuple2.getField(0);
                     }
                 })
