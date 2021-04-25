@@ -87,8 +87,8 @@ public class WindowWordCount {
                     }
                 })
                 // 一个滚动窗口，每分钟的20秒开始，例如第一分钟的20秒开始，第二分钟的20秒开始另一个窗口，默认的offset为0
-                .window(TumblingEventTimeWindows.of(Time.of(20, TimeUnit.SECONDS)))
-                .sum(1);
+                .window(TumblingEventTimeWindows.of(Time.of(1, MINUTES)))
+                .sum(2);
 
         // 5.打印结果
         dataStream.print();
