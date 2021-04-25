@@ -1,0 +1,71 @@
+version: "3.8"
+services:
+  zookeeper:
+    container_name: zookeeper-flink
+    image: zookeeper:3.5.8
+    ports:
+      - "2181:2181"
+
+  kafka:
+    container_name: kafka-flink
+    image: wurstmeister/kafka:2.13-2.6.0
+    expose:
+      - 9999
+    ports:
+      - 9092:9092
+      - 9999:9999
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: korov-linux.org
+      KAFKA_ADVERTISED_PORT: 9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_CREATE_TOPICS: "test:1:1"
+      JMX_PORT: 9999
+    links:
+      - zookeeper:zookeeper
+
+  mongo:
+    container_name: mongo-flink
+    image: mongo:4.4.5
+    expose:
+      - 27017
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "admin"
+      MONGO_INITDB_ROOT_PASSWORD: "admin"
+
+  jobmanager:
+    image: flink:1.12.2-scala_2.12-java11
+    container_name: flink-jobmanager-flink
+    expose:
+      - "6123"
+    ports:
+      - "8081:8081"
+    command: jobmanager
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=jobmanager
+  taskmanager:
+    image: flink:1.12.2-scala_2.12-java11
+    container_name: flink-taskmanager-flink
+    expose:
+      - "6121"
+      - "6122"
+    command: taskmanager
+    depends_on:
+      - jobmanager
+    links:
+      - "jobmanager:jobmanager"
+    environment:
+      - JOB_MANAGER_RPC_ADDRESS=jobmanager
+
+  cmak:
+    image: korov/cmak:3.0.0.5
+    container_name: cmak-flink
+    expose:
+      - 9000
+    ports:
+      - 9000:9000
+    environment:
+      ZK_HOSTS: zookeeper:2181
+    links:
+      - zookeeper:zookeeper
