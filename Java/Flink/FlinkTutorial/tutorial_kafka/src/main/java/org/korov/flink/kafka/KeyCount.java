@@ -8,6 +8,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.util.serialization.TypeInformationKeyValueSerializationSchema;
 import org.korov.flink.deserialization.KeyValueDeserializer;
+import org.korov.flink.sink.MongoSink;
 
 import java.util.Properties;
 
@@ -24,7 +25,8 @@ public class KeyCount {
         consumer.setStartFromLatest();
 
         DataStream<Tuple3<String, String, Long>> stream = env.addSource(consumer);
-        stream.print();
+        MongoSink mongoSink = new MongoSink();
+        stream.addSink(mongoSink);
         env.execute();
     }
 }

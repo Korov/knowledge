@@ -1,3 +1,4 @@
 from util.kafka_producer import send_msg
 
-send_msg("test", "key", "value")
+for i in range(0, 100):
+    send_msg("test", "key", "value_" + str(i))
