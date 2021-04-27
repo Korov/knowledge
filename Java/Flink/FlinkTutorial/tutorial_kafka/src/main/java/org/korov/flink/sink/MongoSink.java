@@ -22,7 +22,7 @@ public class MongoSink extends RichSinkFunction<Tuple3<String, String, Long>> {
     public void invoke(Tuple3<String, String, Long> value, Context context) {
         if (mongoClient != null) {
             MongoDatabase db = mongoClient.getDatabase("admin");
-            MongoCollection<Document> mongoCollection = db.getCollection("alert");
+            MongoCollection<Document> mongoCollection = db.getCollection("flink-test");
             List<Document> documents = new ArrayList<>();
             Document document = new Document();
             document.append("key", value.f0);
