@@ -422,3 +422,29 @@ db.alert.find({key:"spl_alert"}, {"value.alertName":"同一源IP针对多目标�
 }
 ```
 
+# 备份恢复
+
+## mongodump
+
+```bash
+mongodump --uri="mongodb://admin:admin@127.0.0.1:27017/admin"  --authenticationDatabase="admin" --authenticationMechanism="SCRAM-SHA-256" --collection="alert" --gzip --out="/alert.gz"
+```
+
+## mongorestore
+
+```bash
+mongorestore --uri="mongodb://admin:admin@127.0.0.1:27017/admin" --authenticationDatabase="admin" --authenticationMechanism="SCRAM-SHA-256" --collection="alert" --gzip  --dir="/alert.gz"
+```
+
+## mongoexport
+
+```bash
+mongoexport --uri="mongodb://admin:admin@127.0.0.1:27017/admin" --authenticationDatabase="admin" --authenticationMechanism="SCRAM-SHA-256" --collection="logriver" --type="json" --out="/logriver.json"
+```
+
+## mongoimport
+
+```bash
+mongoimport --uri="mongodb://admin:admin@127.0.0.1:27017/admin" --authenticationDatabase="admin" --authenticationMechanism="SCRAM-SHA-256" --collection="logriver" --type="json" --file="/logriver.json"
+```
+
