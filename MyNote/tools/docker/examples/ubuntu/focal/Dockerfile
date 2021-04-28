@@ -1,4 +1,4 @@
-FROM ubuntu:focal
+FROM --platform=linux/amd64 ubuntu:focal
 
 LABEL author="korov" email="korov9@163.com" version="1.0.0"
 
