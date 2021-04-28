@@ -87,6 +87,12 @@
                 <artifactId>mongo-java-driver</artifactId>
                 <version>3.12.8</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.apache.flink</groupId>
+                <artifactId>flink-statebackend-rocksdb_2.12</artifactId>
+                <version>1.12.2</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 

@@ -16,7 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MongoSink extends RichSinkFunction<Tuple3<String, String, Long>> {
+    private final String host;
+    private final int port;
     MongoClient mongoClient = null;
+
+    public MongoSink(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
 
     @Override
     public void invoke(Tuple3<String, String, Long> value, Context context) {
@@ -36,7 +43,7 @@ public class MongoSink extends RichSinkFunction<Tuple3<String, String, Long>> {
     @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
-        ServerAddress serverAddress = new ServerAddress("korov-linux.org", 27017);
+        ServerAddress serverAddress = new ServerAddress(host, port);
         List<MongoCredential> credential = new ArrayList<MongoCredential>();
 
         //MongoCredential.createScramSha1Credential()三个参数分别为 用户名 数据库名称 密码
