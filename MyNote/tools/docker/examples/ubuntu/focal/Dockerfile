@@ -14,5 +14,6 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list; \
 		apt-get install -y --no-install-recommends dirmngr; \
 	fi; \
     apt-get upgrade -y; \
-    apt-get install language-pack-zh-hans
+    apt-get install -y language-pack-zh-hans; \
+	rm -rf /var/lib/apt/lists/*
    
