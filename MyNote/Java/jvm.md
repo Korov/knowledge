@@ -1823,3 +1823,51 @@ dump文件中对象有Shallow Heap和Retained Heap，Shallow Heap表明对象自
 ./profiler.sh -d 10 -i 500us -f 111.svg 3537
 ```
 
+## JFR使用
+
+通过`jsp`找到对应程序的`PID`
+
+```
+[rizhiyi@192-168-1-19 rizhiyi]$ jps
+351877 FrontendServer
+450339 Main
+317553 SiemApplication
+105702 jar
+327059 Elasticsearch
+319139 Jps
+250090 Application
+181595 StandaloneSessionClusterEntrypoint
+181951 TaskManagerRunner
+```
+
+这里面我们想要监控的是`SiemApplication`这个程序
+
+通过命令启动`jfr`
+
+```
+# 采集一个小时的数据，数据保存时间2天，jfr文件最大2GB，保存的文件名称为siem.jfr，在程序退出的时候将jfr数据dump出来
+jcmd 317553 JFR.start name=siem maxage=2d maxsize=2g duration=1h filename=siem.jfr dumponexit=true
+# 查看采集的状态
+jcmd 317553 JFR.check
+# 将采集的数据立即dump出来，给一个新的名字
+jcmd 317553 JFR.dump filename=siem-1.jfr
+# 停止采集，必须指定name
+jcmd 317553 JFR.stop name=siem
+```
+
+常用配置：
+
+| 配置key          | 默认值                                                       | 说明                                                         |
+| ---------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
+| delay            | 0                                                            | 延迟多久后启动 JFR 记录，支持带单位配置， 例如 delay=60s（秒）， delay=20m（分钟）， delay=1h（小时）， delay=1d（天），不带单位就是秒， 0就是没有延迟直接开始记录。一般为了避免框架初始化等影响，我们会延迟 1 分钟开始记录（例如Spring cloud应用，可以看下日志中应用启动耗时，来决定下这个时间）。 |
+| disk             | true                                                         | 是否写入磁盘，这个就是上文提到的， global buffer 满了之后，是直接丢弃还是写入磁盘文件。 |
+| dumponexit       | false                                                        | 程序退出时，是否要dump出 .jfr文件                            |
+| duration         | 0                                                            | JFR 记录持续时间，同样支持单位配置，不带单位就是秒，0代表不限制持续时间，一直记录。duration=60s（秒）， duration=20m（分钟）， duration=1h（小时）， duration=1d（天），不带单位就是秒 |
+| filename         | 启动目录/hotspot-pid-26732-id-1-2020_03_12_10_07_22.jfr，pid 后面就是 pid， id 后面是第几个 JFR 记录，可以启动多个 JFR 记录。最后就是时间。 | dump的输出文件                                               |
+| name             | 无                                                           | 记录名称，由于可以启动多个 JFR 记录，这个名称用于区分，否则只能看到一个记录 id，不好区分。 |
+| maxage           | 0                                                            | 这个参数只有在 disk 为 true 的情况下才有效。最大文件记录保存时间，就是 global buffer 满了需要刷入本地临时目录下保存，这些文件最多保留多久的。也可以通过单位配置，没有单位就是秒，默认是0，就是不限制 |
+| maxsize          | 250MB                                                        | 这个参数只有在 disk 为 true 的情况下才有效。最大文件大小，支持单位配置， 不带单位是字节，m或者M代表MB，g或者G代表GB。设置为0代表不限制大小**。虽然官网说默认就是0，但是实际用的时候，不设置会有提示**： No limit specified, using maxsize=250MB as default. 注意，这个配置不能小于后面将会提到的 maxchunksize 这个参数。 |
+| path-to-gc-roots | false                                                        | 是否记录GC根节点到活动对象的路径，一般不打开这个，首先这个在我个人定位问题的时候，很难用到，只要你的编程习惯好。还有就是打开这个，性能损耗比较大，会导致FullGC一般是在怀疑有内存泄漏的时候热启动这种采集，并且通过产生对象堆栈无法定位的时候，动态打开即可。一般通过产生这个对象的堆栈就能定位，如果定位不到，怀疑有其他引用，例如 ThreadLocal 没有释放这样的，可以在 dump 的时候采集 gc roots |
+| settings         | 默认是 default.jfc，这个位于 `$JAVA_HOME/lib/jfr/default.jfc` | 采集 Event 的详细配置，采集的每个 Event 都有自己的详细配置。另一个 JDK 自带的配置是 profile.jfc，位于 `$JAVA_HOME/lib/jfr/profile.jfc`。这个配置文件里面的配置是怎么回事，我们后面会涉及。 |
+
+ 
