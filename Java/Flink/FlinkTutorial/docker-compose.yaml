@@ -54,6 +54,14 @@ services:
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
 
+  postgres:
+    image: postgres:12.4
+    container_name: postgres-flink
+    ports:
+    - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+
   cmak:
     image: korov/cmak:3.0.0.5
     container_name: cmak-flink
