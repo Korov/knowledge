@@ -58,7 +58,7 @@ public class KeyCount {
         consumer.setCommitOffsetsOnCheckpoints(true);
 
         DataStream<Tuple3<String, String, Long>> stream = env.addSource(consumer, "kafka-source");
-        MongoSink mongoSink = new MongoSink(args[1], Integer.parseInt(args[2]));
+        MongoSink mongoSink = new MongoSink(args[1], Integer.parseInt(args[2]), "admin", "alert");
         stream.addSink(mongoSink).name("mongo-sink");
         env.execute("kafka-to-mongo");
     }

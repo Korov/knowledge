@@ -1,47 +1,39 @@
-package org.korov.flink.common.sink;
+package org.korov.flink.common.source;
 
 import com.google.common.collect.ImmutableList;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
+import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
+import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 import org.bson.Document;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MongoSink extends RichSinkFunction<Tuple3<String, String, Long>> {
+/**
+ * @author zhu.lei
+ * @date 2021-05-05 13:26
+ */
+public class MongoSource extends RichSourceFunction<Tuple3<String, String, Long>> {
     private final String host;
     private final int port;
     private final String dbname;
     private final String collection;
     MongoClient mongoClient = null;
+    private AtomicBoolean isRunning = new AtomicBoolean(false);
 
-    public MongoSink(String host, int port, String dbname, String collection) {
+    public MongoSource(String host, int port, String dbname, String collection) {
         this.host = host;
         this.port = port;
         this.dbname = dbname;
         this.collection = collection;
-    }
-
-    @Override
-    public void invoke(Tuple3<String, String, Long> value, Context context) {
-        if (mongoClient != null) {
-            MongoDatabase db = mongoClient.getDatabase(dbname);
-            MongoCollection<Document> mongoCollection = db.getCollection(collection);
-            List<Document> documents = new ArrayList<>();
-            Document document = new Document();
-            document.append("key", value.f0);
-            document.append("value", value.f1);
-            documents.add(document);
-
-            mongoCollection.insertMany(documents);
-        }
     }
 
     @Override
@@ -59,6 +51,26 @@ public class MongoSink extends RichSinkFunction<Tuple3<String, String, Long>> {
         mongoClient = new MongoClient(ImmutableList.of(serverAddress), credential, options);
     }
 
+    @Override
+    public void run(SourceContext<Tuple3<String, String, Long>> ctx) throws Exception {
+        if (mongoClient != null) {
+            MongoDatabase db = mongoClient.getDatabase(dbname);
+            MongoCollection<Document> mongoCollection = db.getCollection(collection);
+            FindIterable<Document> documents =  mongoCollection.find();
+            for (Document document : documents) {
+                Tuple3<String, String, Long> value = new Tuple3<>();
+                value.setFields(document.getString("key"), document.getString("value"), System.currentTimeMillis());
+                ctx.collectWithTimestamp(value, value.f2);
+            }
+        }
+    }
+
+    @Override
+    public void cancel() {
+        if (!isRunning.get()) {
+            isRunning.compareAndSet(false, true);
+        }
+    }
 
     @Override
     public void close() {
