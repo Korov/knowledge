@@ -1,4 +1,4 @@
-package org.korov.flink.deserialization;
+package org.korov.flink.common.deserialization;
 
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;

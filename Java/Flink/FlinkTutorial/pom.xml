@@ -10,6 +10,7 @@
     <modules>
         <module>tutorial_basic</module>
         <module>tutorial_kafka</module>
+        <module>common</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -1,4 +1,4 @@
-package org.korov.flink.sink;
+package org.korov.flink.common.sink;
 
 import com.google.common.collect.ImmutableList;
 import com.mongodb.MongoClient;

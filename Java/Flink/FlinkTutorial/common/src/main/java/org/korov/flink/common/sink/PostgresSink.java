@@ -1,4 +1,4 @@
-package org.korov.flink.sink;
+package org.korov.flink.common.sink;
 
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;

@@ -1,18 +1,15 @@
 package org.korov.flink.kafka;
 
 import org.apache.flink.api.common.RuntimeExecutionMode;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.contrib.streaming.state.RocksDBStateBackend;
-import org.apache.flink.runtime.state.filesystem.FsStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
-import org.apache.flink.streaming.util.serialization.TypeInformationKeyValueSerializationSchema;
-import org.korov.flink.deserialization.KeyValueDeserializer;
-import org.korov.flink.sink.MongoSink;
+import org.korov.flink.common.deserialization.KeyValueDeserializer;
+import org.korov.flink.common.sink.MongoSink;
 
 import java.util.Properties;
 
