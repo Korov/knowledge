@@ -11,7 +11,7 @@ consumer = KafkaConsumer("logriver_siem", bootstrap_servers="192.168.1.19:9092",
 docs = []
 for msg in consumer:
     if len(docs) == 1000 :
-        db.logriver.insert_many(docs)
+        # db.logriver.insert_many(docs)
         print("%s :insert count %s"%(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()), len(docs)))
         docs = []
     else:
