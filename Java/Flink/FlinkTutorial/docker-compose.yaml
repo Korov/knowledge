@@ -40,7 +40,7 @@ services:
     command: jobmanager
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
-      - DEFAULT_PARALLELISM=4
+      - TASK_MANAGER_NUMBER_OF_TASK_SLOTS=4
   taskmanager:
     image: flink:1.12.2-scala_2.12-java11
     container_name: flink-taskmanager-flink
@@ -54,7 +54,7 @@ services:
       - "jobmanager:jobmanager"
     environment:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
-      - DEFAULT_PARALLELISM=4
+      - TASK_MANAGER_NUMBER_OF_TASK_SLOTS=4
 
   postgres:
     image: postgres:12.4
