@@ -1363,8 +1363,11 @@ x\{m,n\} 重复字符x，至少m次，不多于n次，如：/0\{5,10\}/匹配5~1
 
 示例：
 
-```
+```bash
 # 将file中的book替换成books
 sed 's/book/books/' file
+
+# 使用?代替原有的/分隔符防止大量转义，使用正则中的子串替换
+sed 's?\(<url>\).*\(</url>\)?\1https://updates.jenkins-zh.cn/update-center.json\2?g' /var/jenkins_home/hudson.model.UpdateCenter.xml
 ```
 

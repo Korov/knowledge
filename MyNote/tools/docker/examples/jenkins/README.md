@@ -3,10 +3,10 @@
 （推荐使用这种，可以安装全部插件，有卷的好像权限不行，有些插件装不了）
 
 ```bash
-docker run -d -p 18080:8080 -p 50000:50000 --name jenkins jenkinsci/blueocean:1.24.4
-docker exec -it jenkins bash
+docker run -d -p 8080:8080 -p 50000:50000 --name jenkins jenkins/jenkins:lts
+docker exec -it --user root jenkins bash
 #修改镜像 https://updates.jenkins-zh.cn/update-center.json
-vi /var/jenkins_home/hudson.model.UpdateCenter.xml
+sed -i 's?\(<url>\).*\(</url>\)?\1https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json\2?g' /var/jenkins_home/hudson.model.UpdateCenter.xml
 docker restart jenkins
 ```
 
