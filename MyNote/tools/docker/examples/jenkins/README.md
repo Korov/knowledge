@@ -27,5 +27,7 @@ docker run -d -p 9080:8080 --name jenkins -v `pwd`/jenkins-data:/var/jenkins_hom
 
 首次进入需要密码，密码所在文件`/var/jenkins_home/secrets/initialAdminPassword`。或者通过`docker logs jenkins`查看日志输出的密码。
 
+重新设置帐号密码：`korov/korov`
+
 # 集成GitLab
 
