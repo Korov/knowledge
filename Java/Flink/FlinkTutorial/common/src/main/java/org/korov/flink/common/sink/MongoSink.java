@@ -38,6 +38,7 @@ public class MongoSink extends RichSinkFunction<Tuple3<String, String, Long>> {
             Document document = new Document();
             document.append("key", value.f0);
             document.append("value", value.f1);
+            document.append("timestamp", value.f2);
             documents.add(document);
 
             mongoCollection.insertMany(documents);

@@ -37,8 +37,7 @@ public class MongoSourceDemo {
         MongoSource mongoSource = new MongoSource("localhost", 27017, "admin", "alert");
 
         DataStream<Tuple3<String, String, Long>> stream = env.addSource(mongoSource, "mongo-source");
-        MongoSink mongoSink = new MongoSink("localhost", 27017, "admin", "alert-test1");
-        stream.addSink(mongoSink).name("mongo-sink");
+
 
         DataStream<KeyValue> keyValueDataStream = stream.flatMap(new FlatMapFunction<Tuple3<String, String, Long>, KeyValue>() {
             @Override
@@ -64,11 +63,11 @@ public class MongoSourceDemo {
             }
         });
 
-        keyValueDataStream.assignTimestampsAndWatermarks(WatermarkStrategy.<KeyValue>forBoundedOutOfOrderness(Duration.ofMinutes(1))
+        keyValueDataStream.assignTimestampsAndWatermarks(WatermarkStrategy.<KeyValue>forBoundedOutOfOrderness(Duration.ofMinutes(5))
                 .withTimestampAssigner(new SerializableTimestampAssigner<KeyValue>() {
                     @Override
                     public long extractTimestamp(KeyValue element, long recordTimestamp) {
-                        return element.getTimestamp();
+                        return System.currentTimeMillis();
                     }
                 }))
                 .keyBy(new KeySelector<KeyValue, Object>() {
@@ -77,7 +76,7 @@ public class MongoSourceDemo {
                         return value.getKey();
                     }
                 })
-                .window(TumblingProcessingTimeWindows.of(Time.minutes(1), Time.seconds(0)))
+                .window(TumblingProcessingTimeWindows.of(Time.minutes(1)))
                 .reduce(new ReduceFunction<KeyValue>() {
                     @Override
                     public KeyValue reduce(KeyValue value1, KeyValue value2) throws Exception {
@@ -88,7 +87,18 @@ public class MongoSourceDemo {
                         return keyValue;
                     }
                 });
+
+        DataStream<Tuple3<String, String, Long>> resultStream = keyValueDataStream.flatMap(new FlatMapFunction<KeyValue, Tuple3<String, String, Long>>() {
+            @Override
+            public void flatMap(KeyValue value, Collector<Tuple3<String, String, Long>> out) throws Exception {
+                Tuple3<String, String, Long> result = new Tuple3<>();
+                result.setFields(value.getKey(), value.getTimestamp().toString(), value.getCount());
+                out.collect(result);
+            }
+        });
         keyValueDataStream.print();
+        MongoSink mongoSink = new MongoSink("localhost", 27017, "admin", "alert-count");
+        resultStream.addSink(mongoSink).name("mongo-sink");
         env.execute("mongo-to-mongo");
     }
 
