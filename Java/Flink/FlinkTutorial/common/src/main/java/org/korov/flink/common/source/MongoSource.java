@@ -1,6 +1,5 @@
 package org.korov.flink.common.source;
 
-import com.google.common.collect.ImmutableList;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
 import com.mongodb.MongoCredential;
@@ -13,8 +12,6 @@ import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 import org.bson.Document;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -40,23 +37,21 @@ public class MongoSource extends RichSourceFunction<Tuple3<String, String, Long>
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
         ServerAddress serverAddress = new ServerAddress(host, port);
-        List<MongoCredential> credential = new ArrayList<MongoCredential>();
 
         //MongoCredential.createScramSha1Credential()三个参数分别为 用户名 数据库名称 密码
-        MongoCredential mongoCredential = MongoCredential.createScramSha256Credential("admin", "admin", "admin".toCharArray());
+        MongoCredential credential = MongoCredential.createScramSha256Credential("admin", "admin", "admin".toCharArray());
 
-        credential.add(mongoCredential);
         MongoClientOptions options = MongoClientOptions.builder().maxConnectionIdleTime(6000).build();
         //通过连接认证获取MongoDB连接
-        mongoClient = new MongoClient(ImmutableList.of(serverAddress), credential, options);
+        mongoClient = new MongoClient(serverAddress, credential, options);
     }
 
     @Override
-    public void run(SourceContext<Tuple3<String, String, Long>> ctx) throws Exception {
+    public void run(SourceContext<Tuple3<String, String, Long>> ctx) {
         if (mongoClient != null) {
             MongoDatabase db = mongoClient.getDatabase(dbname);
             MongoCollection<Document> mongoCollection = db.getCollection(collection);
-            FindIterable<Document> documents =  mongoCollection.find();
+            FindIterable<Document> documents = mongoCollection.find();
             for (Document document : documents) {
                 Tuple3<String, String, Long> value = new Tuple3<>();
                 value.setFields(document.getString("key"), document.getString("value"), System.currentTimeMillis());
