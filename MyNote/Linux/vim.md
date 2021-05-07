@@ -396,7 +396,6 @@ g ^g可以统计文档字符数，行数。 将光标放在最后一个字符上
 
 - :vsplit(:vsp) -- 把当前窗口分割成水平分布的两个窗口。 (CTRL-W v或CTRL CTRL-V)
 - :[N]vne[w] -- 垂直分割出一个新窗口。
-- :vertical 水平分割的命令： 相应的垂直分割。
 
 ## [10.3 关闭子窗口](http://www.cnblogs.com/jiqingwu/archive/2012/06/14/vim_notes.html#id89)
 
