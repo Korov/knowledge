@@ -54,7 +54,7 @@ public class MongoSource extends RichSourceFunction<Tuple3<String, String, Long>
             FindIterable<Document> documents = mongoCollection.find();
             for (Document document : documents) {
                 Tuple3<String, String, Long> value = new Tuple3<>();
-                value.setFields(document.getString("key"), document.getString("value"), System.currentTimeMillis());
+                value.setFields(document.getString("key"), document.getString("value"), 1L);
                 ctx.collectWithTimestamp(value, value.f2);
             }
         }
