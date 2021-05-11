@@ -16,7 +16,7 @@ public class KeyValueDeserializer implements KafkaDeserializationSchema<Tuple3<S
     public Tuple3<String, String, Long> deserialize(ConsumerRecord<byte[], byte[]> record) throws Exception {
         String key = new String(record.key());
         String value = new String(record.value());
-        return new Tuple3<>(key, value, System.currentTimeMillis());
+        return new Tuple3<>(key, value, 1L);
     }
 
     @Override
