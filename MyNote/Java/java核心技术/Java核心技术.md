@@ -1682,10 +1682,28 @@ jlink相关使用看single_module的示例
 
 ## 替换jar中的class文件
 
+查看jar包中的文件
+
+```bash
+~/Desktop/temp/ChangeClass jar -xvf ./target/ChangeClass-1.0-SNAPSHOT.jar
+ inflated: META-INF/MANIFEST.MF
+  created: META-INF/
+  created: org/
+  created: org/korov/
+  created: org/korov/change/
+ inflated: org/korov/change/Demo.class
+  created: META-INF/maven/
+  created: META-INF/maven/org.korov/
+  created: META-INF/maven/org.korov/ChangeClass/
+ inflated: META-INF/maven/org.korov/ChangeClass/pom.xml
+ inflated: META-INF/maven/org.korov/ChangeClass/pom.properties
+```
+
 新创建一个包名类名一致的.java *[确保jar中有对应的class]
 
 ```bash
-jar uvf ~/Documents/baidu-license-10.1.2.jar com/baidu/license/LicenseVerifier.class
+# 需要创建对应包文件夹，然后才能将calss放到对应的位置
+jar uvf ~/Documents/baidu-license-10.1.2.jar ./com/baidu/license/LicenseVerifier.class
 ```
 
 jar包是一中压缩文件，`u`添加文件到jar包中，`v`生成详细的报告，并输出到标准设备，`f`制定jar包的文件名
