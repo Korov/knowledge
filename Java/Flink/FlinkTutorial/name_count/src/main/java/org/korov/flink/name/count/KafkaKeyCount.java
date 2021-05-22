@@ -1,7 +1,8 @@
-package org.korov.flink.key.count;
+package org.korov.flink.name.count;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Joiner;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
@@ -37,7 +38,7 @@ public class KafkaKeyCount {
 
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", "192.168.1.19:9092");
-        properties.setProperty("group.id", "kafka-key-count");
+        properties.setProperty("group.id", "kafka-name-count");
         properties.setProperty("auto.offset.reset", "earliest");
         KeyAlertDeserializer serializationSchema = new KeyAlertDeserializer();
         FlinkKafkaConsumer<Tuple3<String, NameModel, Long>> consumer = new FlinkKafkaConsumer<Tuple3<String, NameModel, Long>>("flink_siem", serializationSchema, properties);
@@ -54,7 +55,7 @@ public class KafkaKeyCount {
                 })).keyBy(new KeySelector<Tuple3<String, NameModel, Long>, Object>() {
             @Override
             public Object getKey(Tuple3<String, NameModel, Long> value) throws Exception {
-                return value.f0;
+                return Joiner.on("-").join(value.f0, value.f1.getName());
             }
         }).window(TumblingProcessingTimeWindows.of(Time.minutes(1)))
                 .reduce(new ReduceFunction<Tuple3<String, NameModel, Long>>() {
@@ -65,6 +66,6 @@ public class KafkaKeyCount {
                 })
                 .addSink(mongoSink).name("mongo-sink");
         stream.print();
-        env.execute("kafka-key-count");
+        env.execute("kafka-name-count");
     }
 }

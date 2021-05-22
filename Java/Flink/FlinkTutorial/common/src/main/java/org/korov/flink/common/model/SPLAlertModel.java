@@ -6,11 +6,14 @@ import lombok.Data;
 
 /**
  * @author zhu.lei
- * @date 2021-05-07 17:39
+ * @date 2021-05-22 12:37
  */
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class MetaModel {
-    @JsonProperty("timestamp")
-    private Long timestamp;
+public class SPLAlertModel {
+    @JsonProperty("alertName")
+    private String alertName;
+
+    @JsonProperty("createTime")
+    private Long createTime;
 }

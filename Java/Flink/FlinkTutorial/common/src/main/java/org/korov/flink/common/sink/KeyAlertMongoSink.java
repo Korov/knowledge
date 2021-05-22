@@ -11,18 +11,19 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.bson.Document;
+import org.korov.flink.common.model.NameModel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MongoSink extends RichSinkFunction<Tuple3<String, String, Long>> {
+public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel, Long>> {
     private final String host;
     private final int port;
     private final String dbname;
     private final String collection;
     MongoClient mongoClient = null;
 
-    public MongoSink(String host, int port, String dbname, String collection) {
+    public KeyAlertMongoSink(String host, int port, String dbname, String collection) {
         this.host = host;
         this.port = port;
         this.dbname = dbname;
@@ -30,13 +31,15 @@ public class MongoSink extends RichSinkFunction<Tuple3<String, String, Long>> {
     }
 
     @Override
-    public void invoke(Tuple3<String, String, Long> value, Context context) {
+    public void invoke(Tuple3<String, NameModel, Long> value, Context context) {
         if (mongoClient != null) {
             MongoDatabase db = mongoClient.getDatabase(dbname);
             MongoCollection<Document> mongoCollection = db.getCollection(collection);
             List<Document> documents = new ArrayList<>();
             Document document = new Document();
             document.append("key", value.f0);
+            document.append("name", value.f1.getName());
+            document.append("timestamp", value.f1.getTimestamp());
             document.append("value", value.f1);
             document.append("count", value.f2);
             documents.add(document);

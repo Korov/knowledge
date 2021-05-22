@@ -15,14 +15,11 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
-import org.korov.flink.common.model.AlertModel;
+import org.korov.flink.common.model.FlinkAlertModel;
 import org.korov.flink.common.sink.MongoSink;
 import org.korov.flink.common.source.MongoSource;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * @author zhu.lei
@@ -47,9 +44,9 @@ public class MongoSourceDemo {
                 keyValue.setCount(1L);
 
                 ObjectMapper mapper = new ObjectMapper();
-                AlertModel alert = null;
+                FlinkAlertModel alert = null;
                 try {
-                    alert = mapper.readValue(value.f1, AlertModel.class);
+                    alert = mapper.readValue(value.f1, FlinkAlertModel.class);
                 } catch (JsonProcessingException e) {
                     keyValue.setTimestamp(System.currentTimeMillis());
                 }
