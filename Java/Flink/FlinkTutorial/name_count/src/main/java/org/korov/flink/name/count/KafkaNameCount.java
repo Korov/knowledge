@@ -30,7 +30,7 @@ import java.util.Properties;
  * @date 2021-05-05 14:00
  */
 @Slf4j
-public class KafkaKeyCount {
+public class KafkaNameCount {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setRuntimeMode(RuntimeExecutionMode.STREAMING);
@@ -45,7 +45,7 @@ public class KafkaKeyCount {
 
         DataStream<Tuple3<String, NameModel, Long>> stream = env.addSource(consumer, "kafka-source");
 
-        KeyAlertMongoSink mongoSink = new KeyAlertMongoSink("mongo-flink", 27017, "admin", "kafka-key-count");
+        KeyAlertMongoSink mongoSink = new KeyAlertMongoSink("mongo-flink", 27017, "admin", "kafka-name-count");
         stream.assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple3<String, NameModel, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
                 .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, NameModel, Long>>() {
                     @Override

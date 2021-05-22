@@ -1,5 +1,7 @@
 package org.korov.flink.common.sink;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
@@ -40,7 +42,12 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
             document.append("key", value.f0);
             document.append("name", value.f1.getName());
             document.append("timestamp", value.f1.getTimestamp());
-            document.append("value", value.f1);
+            ObjectMapper mapper = new ObjectMapper();
+            try {
+                document.append("value", mapper.writeValueAsString(value.f1));
+            } catch (JsonProcessingException e) {
+                document.append("exception", e.toString());
+            }
             document.append("count", value.f2);
             documents.add(document);
 
