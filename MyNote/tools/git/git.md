@@ -1170,3 +1170,11 @@ scp -r my_project user@git.example.com:/srv/git
 git remote add server user@git.example.com:/srv/git/my_project
 ```
 
+## git cherry-pick多个commit
+
+```bash
+git cherry-pick commit1 commit2
+# 将(commit1,commit10]中的commit迁移过去
+git cherry-pick commit1..commit10
+```
+
