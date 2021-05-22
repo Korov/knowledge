@@ -2,7 +2,6 @@ package org.korov.flink.kafka;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
@@ -21,9 +20,7 @@ import org.apache.flink.util.Collector;
 import org.korov.flink.common.deserialization.KeyValueDeserializer;
 import org.korov.flink.common.model.AlertModel;
 import org.korov.flink.common.model.KeyValue;
-import org.korov.flink.common.sink.MongoFlinkSink;
 import org.korov.flink.common.sink.MongoSink;
-import org.korov.flink.common.source.MongoSource;
 
 import java.time.Duration;
 import java.util.Properties;
@@ -37,7 +34,7 @@ public class KafkaSourceDemo {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setRuntimeMode(RuntimeExecutionMode.STREAMING);
-        env.setParallelism(1);
+        env.setParallelism(2);
 
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", "192.168.1.19:9092");
@@ -50,91 +47,36 @@ public class KafkaSourceDemo {
 
         MongoSink mongoSink = new MongoSink("localhost", 27017, "admin", "alert-count-flink");
         stream.assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple3<String, String, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
-        .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, String, Long>>() {
-            @Override
-            public long extractTimestamp(Tuple3<String, String, Long> element, long recordTimestamp) {
-                ObjectMapper mapper = new ObjectMapper();
-                AlertModel alert = null;
-                try {
-                    alert = mapper.readValue(element.f1, AlertModel.class);
-                } catch (JsonProcessingException e) {
-                    return System.currentTimeMillis();
-                }
-                if (alert == null || alert.getMetaModel() == null || alert.getMetaModel().getTimestamp() == null) {
-                    return System.currentTimeMillis();
-                } else {
-                    return alert.getMetaModel().getTimestamp();
-                }
-            }
-        })).keyBy(new KeySelector<Tuple3<String, String, Long>, Object>() {
+                .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, String, Long>>() {
+                    @Override
+                    public long extractTimestamp(Tuple3<String, String, Long> element, long recordTimestamp) {
+                        ObjectMapper mapper = new ObjectMapper();
+                        AlertModel alert = null;
+                        try {
+                            alert = mapper.readValue(element.f1, AlertModel.class);
+                        } catch (JsonProcessingException e) {
+                            return System.currentTimeMillis();
+                        }
+                        if (alert == null || alert.getMetaModel() == null || alert.getMetaModel().getTimestamp() == null) {
+                            return System.currentTimeMillis();
+                        } else {
+                            return alert.getMetaModel().getTimestamp();
+                        }
+                    }
+                })).keyBy(new KeySelector<Tuple3<String, String, Long>, Object>() {
             @Override
             public Object getKey(Tuple3<String, String, Long> value) throws Exception {
                 return value.f0;
             }
-        }).window(TumblingProcessingTimeWindows.of(Time.minutes(1))).sum(2).addSink(mongoSink).name("mongo-sink");
-        stream.print();
-
-
-
-        DataStream<KeyValue> keyValueDataStream = stream.flatMap(new FlatMapFunction<Tuple3<String, String, Long>, KeyValue>() {
-            @Override
-            public void flatMap(Tuple3<String, String, Long> value, Collector<KeyValue> out) throws Exception {
-                KeyValue keyValue = new KeyValue();
-                keyValue.setKey(value.f0);
-                keyValue.setCount(1L);
-
-                ObjectMapper mapper = new ObjectMapper();
-                AlertModel alert = null;
-                try {
-                    alert = mapper.readValue(value.f1, AlertModel.class);
-                } catch (JsonProcessingException e) {
-                    keyValue.setTimestamp(System.currentTimeMillis());
-                }
-                if (alert == null || alert.getMetaModel() == null || alert.getMetaModel().getTimestamp() == null) {
-                    keyValue.setTimestamp(System.currentTimeMillis());
-                } else {
-                    keyValue.setTimestamp(alert.getMetaModel().getTimestamp());
-                }
-
-                out.collect(keyValue);
-            }
-        });
-
-        DataStream<Tuple3<String, String, Long>> resultStream = keyValueDataStream.assignTimestampsAndWatermarks(WatermarkStrategy.<KeyValue>forBoundedOutOfOrderness(Duration.ofMinutes(5))
-                .withTimestampAssigner(new SerializableTimestampAssigner<KeyValue>() {
+        }).window(TumblingProcessingTimeWindows.of(Time.minutes(1)))
+                .reduce(new ReduceFunction<Tuple3<String, String, Long>>() {
                     @Override
-                    public long extractTimestamp(KeyValue element, long recordTimestamp) {
-                        return element.getTimestamp();
-                    }
-                }))
-                .keyBy(new KeySelector<KeyValue, Object>() {
-                    @Override
-                    public Object getKey(KeyValue value) throws Exception {
-                        return value.getKey();
+                    public Tuple3<String, String, Long> reduce(Tuple3<String, String, Long> value1, Tuple3<String, String, Long> value2) throws Exception {
+                        return new Tuple3<>(value1.f0, value1.f1, value1.f2 + value2.f2);
                     }
                 })
-                .window(TumblingEventTimeWindows.of(Time.minutes(1)))
-                .reduce(new ReduceFunction<KeyValue>() {
-                    @Override
-                    public KeyValue reduce(KeyValue value1, KeyValue value2) throws Exception {
-                        KeyValue keyValue = new KeyValue();
-                        keyValue.setKey(value2.getKey());
-                        keyValue.setTimestamp(value2.getTimestamp());
-                        keyValue.setCount(value1.getCount() + value2.getCount());
-                        log.info("key [{}], count [{}]", keyValue.getKey(), keyValue.getCount());
-                        return keyValue;
-                    }
-                }).flatMap(new FlatMapFunction<KeyValue, Tuple3<String, String, Long>>() {
-            @Override
-            public void flatMap(KeyValue value, Collector<Tuple3<String, String, Long>> out) throws Exception {
-                Tuple3<String, String, Long> result = new Tuple3<>();
-                result.setFields(value.getKey(), value.getTimestamp().toString(), value.getCount());
-                out.collect(result);
-            }
-        });
-        resultStream.addSink(mongoSink).name("mongo-sink");
-
-        keyValueDataStream.print();
+                .addSink(mongoSink).name("mongo-sink");
+        stream.print();
         env.execute("mongo-to-mongo");
     }
 }
