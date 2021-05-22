@@ -11,6 +11,8 @@
         <module>tutorial_basic</module>
         <module>tutorial_kafka</module>
         <module>common</module>
+        <module>kafka_key_count</module>
+        <module>name_count</module>
     </modules>
     <packaging>pom</packaging>
 

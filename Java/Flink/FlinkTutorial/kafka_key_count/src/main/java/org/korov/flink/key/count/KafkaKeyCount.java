@@ -1,4 +1,4 @@
-package org.korov.flink.kafka;
+package org.korov.flink.key.count;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +30,7 @@ import java.util.Properties;
  * @date 2021-05-05 14:00
  */
 @Slf4j
-public class KafkaSourceDemo {
+public class KafkaKeyCount {
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setRuntimeMode(RuntimeExecutionMode.STREAMING);
@@ -45,7 +45,7 @@ public class KafkaSourceDemo {
 
         DataStream<Tuple3<String, String, Long>> stream = env.addSource(consumer, "kafka-source");
 
-        MongoSink mongoSink = new MongoSink("localhost", 27017, "admin", "alert-count-flink");
+        MongoSink mongoSink = new MongoSink("localhost", 27017, "admin", "kafka-key-count");
         stream.assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple3<String, String, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
                 .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, String, Long>>() {
                     @Override
