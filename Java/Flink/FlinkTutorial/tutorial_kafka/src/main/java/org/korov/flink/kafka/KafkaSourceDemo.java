@@ -13,6 +13,7 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
@@ -47,7 +48,7 @@ public class KafkaSourceDemo {
 
         DataStream<Tuple3<String, String, Long>> stream = env.addSource(consumer, "kafka-source");
 
-        MongoSink mongoSink = new MongoSink("localhost", 27017, "admin", "alert-count-flink1");
+        MongoSink mongoSink = new MongoSink("localhost", 27017, "admin", "alert-count-flink");
         stream.assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple3<String, String, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
         .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, String, Long>>() {
             @Override
@@ -75,7 +76,7 @@ public class KafkaSourceDemo {
 
 
 
-        /*DataStream<KeyValue> keyValueDataStream = stream.flatMap(new FlatMapFunction<Tuple3<String, String, Long>, KeyValue>() {
+        DataStream<KeyValue> keyValueDataStream = stream.flatMap(new FlatMapFunction<Tuple3<String, String, Long>, KeyValue>() {
             @Override
             public void flatMap(Tuple3<String, String, Long> value, Collector<KeyValue> out) throws Exception {
                 KeyValue keyValue = new KeyValue();
@@ -99,7 +100,7 @@ public class KafkaSourceDemo {
             }
         });
 
-        keyValueDataStream.assignTimestampsAndWatermarks(WatermarkStrategy.<KeyValue>forBoundedOutOfOrderness(Duration.ofMinutes(5))
+        DataStream<Tuple3<String, String, Long>> resultStream = keyValueDataStream.assignTimestampsAndWatermarks(WatermarkStrategy.<KeyValue>forBoundedOutOfOrderness(Duration.ofMinutes(5))
                 .withTimestampAssigner(new SerializableTimestampAssigner<KeyValue>() {
                     @Override
                     public long extractTimestamp(KeyValue element, long recordTimestamp) {
@@ -112,7 +113,7 @@ public class KafkaSourceDemo {
                         return value.getKey();
                     }
                 })
-                .window(TumblingProcessingTimeWindows.of(Time.minutes(1)))
+                .window(TumblingEventTimeWindows.of(Time.minutes(1)))
                 .reduce(new ReduceFunction<KeyValue>() {
                     @Override
                     public KeyValue reduce(KeyValue value1, KeyValue value2) throws Exception {
@@ -130,10 +131,10 @@ public class KafkaSourceDemo {
                 result.setFields(value.getKey(), value.getTimestamp().toString(), value.getCount());
                 out.collect(result);
             }
-        })
-        .addSink(mongoSink).name("mongo-sink");
+        });
+        resultStream.addSink(mongoSink).name("mongo-sink");
 
-        keyValueDataStream.print();*/
+        keyValueDataStream.print();
         env.execute("mongo-to-mongo");
     }
 }
