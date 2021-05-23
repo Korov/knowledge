@@ -1,7 +1,5 @@
 package org.korov.flink.name.count;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Joiner;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.RuntimeExecutionMode;
@@ -16,11 +14,8 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTime
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.korov.flink.common.deserialization.KeyAlertDeserializer;
-import org.korov.flink.common.deserialization.KeyValueDeserializer;
-import org.korov.flink.common.model.FlinkAlertModel;
 import org.korov.flink.common.model.NameModel;
 import org.korov.flink.common.sink.KeyAlertMongoSink;
-import org.korov.flink.common.sink.MongoSink;
 
 import java.time.Duration;
 import java.util.Properties;
@@ -31,6 +26,9 @@ import java.util.Properties;
  */
 @Slf4j
 public class KafkaNameCount {
+    // private static final String MONGO_HOST = "localhost";
+    private static final String MONGO_HOST = "mongo-flink";
+
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setRuntimeMode(RuntimeExecutionMode.STREAMING);
@@ -45,17 +43,27 @@ public class KafkaNameCount {
 
         DataStream<Tuple3<String, NameModel, Long>> stream = env.addSource(consumer, "kafka-source");
 
-        KeyAlertMongoSink mongoSink = new KeyAlertMongoSink("mongo-flink", 27017, "admin", "kafka-name-count");
+        KeyAlertMongoSink mongoNameSink = new KeyAlertMongoSink(MONGO_HOST, 27017, "admin", "kafka-name-count");
         stream.assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple3<String, NameModel, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
                 .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, NameModel, Long>>() {
                     @Override
                     public long extractTimestamp(Tuple3<String, NameModel, Long> element, long recordTimestamp) {
-                        return element.f1.getTimestamp();
+                        try {
+                            return element.f1.getTimestamp();
+                        } catch (Exception e) {
+                            log.error("get name key timestamp failed", e);
+                            return System.currentTimeMillis();
+                        }
                     }
                 })).keyBy(new KeySelector<Tuple3<String, NameModel, Long>, Object>() {
             @Override
             public Object getKey(Tuple3<String, NameModel, Long> value) throws Exception {
-                return Joiner.on("-").join(value.f0, value.f1.getName());
+                try {
+                    return Joiner.on("-").join(value.f0, value.f1.getName());
+                } catch (Exception e) {
+                    log.error("get name key failed", e);
+                    return value.f0 + "null";
+                }
             }
         }).window(TumblingProcessingTimeWindows.of(Time.minutes(1)))
                 .reduce(new ReduceFunction<Tuple3<String, NameModel, Long>>() {
@@ -64,8 +72,38 @@ public class KafkaNameCount {
                         return new Tuple3<>(value1.f0, value1.f1, value1.f2 + value2.f2);
                     }
                 })
-                .addSink(mongoSink).name("mongo-sink");
-        stream.print();
+                .addSink(mongoNameSink).name("mongo-name-sink");
+
+        KeyAlertMongoSink mongoKeySink = new KeyAlertMongoSink(MONGO_HOST, 27017, "admin", "kafka-key-count");
+        stream.assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple3<String, NameModel, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
+                .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, NameModel, Long>>() {
+                    @Override
+                    public long extractTimestamp(Tuple3<String, NameModel, Long> element, long recordTimestamp) {
+                        try {
+                            return element.f1.getTimestamp();
+                        } catch (Exception e) {
+                            log.error("get key timestamp failed", e);
+                            return System.currentTimeMillis();
+                        }
+                    }
+                })).keyBy(new KeySelector<Tuple3<String, NameModel, Long>, Object>() {
+            @Override
+            public Object getKey(Tuple3<String, NameModel, Long> value) throws Exception {
+                try {
+                    return value.f0;
+                } catch (Exception e) {
+                    log.error("get key failed", e);
+                    return "null";
+                }
+            }
+        }).window(TumblingProcessingTimeWindows.of(Time.minutes(1)))
+                .reduce(new ReduceFunction<Tuple3<String, NameModel, Long>>() {
+                    @Override
+                    public Tuple3<String, NameModel, Long> reduce(Tuple3<String, NameModel, Long> value1, Tuple3<String, NameModel, Long> value2) throws Exception {
+                        return new Tuple3<>(value1.f0, value1.f1, value1.f2 + value2.f2);
+                    }
+                })
+                .addSink(mongoKeySink).name("mongo-key-sink");
         env.execute("kafka-name-count");
     }
 }
