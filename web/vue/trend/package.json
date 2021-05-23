@@ -9,7 +9,10 @@
   },
   "dependencies": {
     "core-js": "^3.6.5",
+    "node-sass": "^6.0.0",
+    "sass-loader": "10.x",
     "vue": "^2.6.11",
+    "vue-popperjs": "^2.3.0",
     "vue-router": "^3.5.1",
     "vue-trend-chart": "^0.15.3"
   },
