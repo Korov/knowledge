@@ -22,6 +22,8 @@ db.user.find()
 db.user.find().pretty()
 # 统计user集合中数据的数量
 db.user.count()
+# 若collection中有特殊字符
+db.getCollection("key-count").find()
 
 # 条件查询，查询user集合中username为korov1的数据
 db.user.insertOne({username:"korov1"})
@@ -50,7 +52,36 @@ db.user.find({"favorites.movies":"Casablanca"})
 db.user.find({num: {"$gt":1995， "$lt":19995}})
 ```
 
-高级更新
+## 修改数据名，collection名
+
+```javascript
+db.copyDatabase('old_name', 'new_name');
+use old_name;
+db.dropDatabase('old_name');
+
+db.adminCommand({renameCollection: "db.collection1", to:"db.collection2"})
+```
+
+## 修改collection中的字段
+
+### 删除字段
+
+The above link no longer covers '$unset'ing. Nic Cottrell's comment below is the way to go now. Be sure to add {multi: true} if you want to remove this field from all of the documents in the  collection; otherwise, it will only remove it from the first document it finds that matches. See this for updated documentation: 
+
+```javascript
+db.example.update({},{$unset:{words:1}},false,true)
+db.example.update({}, {$unset: {words:1}} , {multi: true});
+```
+
+### 重命名字段
+
+```javascript
+db.user.updateMany( {}, { $rename: { "user": "name" } } )
+```
+
+
+
+## 高级更新
 
 ```
 
@@ -59,8 +90,10 @@ db.user.find({num: {"$gt":1995， "$lt":19995}})
 ## 显示正在使用的数据库
 ```javascript
 db
-#展示所有的db
+# 展示所有的db
 show dbs;
+# 展示所有collection
+show collections;
 ```
 
 ### 插入一个文件
