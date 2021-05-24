@@ -1,13 +1,27 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
-import router from "@/router";
-import TrendChart from "vue-trend-chart";
+import ECharts from "vue-echarts"
+import { use } from "echarts/core"
+import {router} from "@/router";
 
-Vue.config.productionTip = false
+import {
+    CanvasRenderer
+} from 'echarts/renderers'
+import {
+    BarChart, LinesChart
+} from 'echarts/charts'
+import {
+    GridComponent,
+    TooltipComponent
+} from 'echarts/components'
 
-Vue.use(TrendChart)
+use([
+    CanvasRenderer,
+    BarChart,
+    LinesChart,
+    GridComponent,
+    TooltipComponent
+])
 
-new Vue({
-    router,
-    render: h => h(App),
-}).$mount('#app')
+
+createApp(App).use(router).component('v-chart', ECharts).mount('#app')

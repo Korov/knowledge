@@ -1,225 +1,78 @@
 <template>
-  <div class="trend">
-    <h1>Trend</h1>
-
-    <trend-chart :datasets="datasets" :grid="grid" :interactive="true" :labels="labels" :min="0"
-                class="random-chart" @mouse-move="onMouseMove" id="random-chart"></trend-chart>
-    <div id="pop" ref="tooltip" :class="{'is-active': tooltipData}" class="tooltip" role="tooltip">
-      <div v-if="tooltipData" class="tooltip-container">
-        <strong>{{ labels.xLabels[tooltipData.index] }}</strong>
-        <div class="tooltip-data">
-          <div class="tooltip-data-item tooltip-data-item--1">{{ tooltipData.data[0] }}</div>
-          <div class="tooltip-data-item tooltip-data-item--2">{{ tooltipData.data[1] }}</div>
-          <div class="tooltip-data-item tooltip-data-item--3">{{ tooltipData.data[2] }}</div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <v-chart :option="option_pipe" class="chart"/>
 </template>
 
 <script>
-import Popper from 'vue-popperjs';
-import 'vue-popperjs/dist/vue-popper.css';
+import {use} from "echarts/core";
+import {CanvasRenderer} from "echarts/renderers";
+import {PieChart} from "echarts/charts";
+import {LegendComponent, TitleComponent, TooltipComponent} from "echarts/components";
+import VChart, {THEME_KEY} from "vue-echarts";
+import {defineComponent, ref} from "vue";
 
-export default {
-  data() {
-    return {
-      datasets: [
-        {
-          data: [70, 100, 400, 180, 100, 300, 500],
-          smooth: true,
-          showPoints: true,
-          fill: true,
-          className: "curve1"
-        },
-        {
-          data: [150, 300, 350, 100, 350, 100, 15],
-          smooth: true,
-          showPoints: true,
-          className: "curve2"
-        },
-        {
-          data: [50, 150, 200, 50, 120, 250, 200],
-          smooth: true,
-          showPoints: true,
-          className: "curve3"
-        }
-      ],
-      grid: {
-        verticalLines: true,
-        horizontalLines: true
-      },
-      labels: {
-        xLabels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
-        yLabels: 5,
-        yLabelsTextFormatter: val => Math.round(val * 100) / 100
-      },
-      tooltipData: null,
-      popper: null,
-      popperIsActive: false
-    };
+use([
+  CanvasRenderer,
+  PieChart,
+  TitleComponent,
+  TooltipComponent,
+  LegendComponent
+]);
+
+export default defineComponent({
+  name: "Trend",
+  components: {
+    VChart
   },
-  methods: {
-    initPopper() {
-      const chart = document.querySelector("#random-chart");
-      const ref = chart.querySelector(".active-line");
-      const tooltip = this.$refs.tooltip;
-      this.popper = new Popper(ref, tooltip, {
-        placement: "right",
-        modifiers: {
-          offset: {offset: "0,10"},
-          preventOverflow: {
-            boundariesElement: chart
+  provide: {
+    [THEME_KEY]: "dark"
+  },
+  setup: () => {
+    const option_pipe = ref({
+      title: {
+        text: "Traffic Sources",
+        left: "center"
+      },
+      tooltip: {
+        trigger: "item",
+        formatter: "{a} <br/>{b} : {c} ({d}%)"
+      },
+      legend: {
+        orient: "vertical",
+        left: "left",
+        data: ["Direct", "Email", "Ad Networks", "Video Ads", "Search Engines"]
+      },
+      series: [
+        {
+          name: "Traffic Sources",
+          type: "pie",
+          radius: "55%",
+          center: ["50%", "60%"],
+          data: [
+            {value: 335, name: "Direct"},
+            {value: 310, name: "Email"},
+            {value: 234, name: "Ad Networks"},
+            {value: 135, name: "Video Ads"},
+            {value: 1548, name: "Search Engines"}
+          ],
+          emphasis: {
+            itemStyle: {
+              shadowBlur: 10,
+              shadowOffsetX: 0,
+              shadowColor: "rgba(0, 0, 0, 0.5)"
+            }
           }
         }
-      });
-    },
-    onMouseMove(params) {
-      this.popperIsActive = !!params;
-      this.popper.scheduleUpdate();
-      this.tooltipData = params || null;
-    }
-  },
-  mounted() {
-    this.initPopper();
-  }
-}
+      ]
+    });
 
+    return {option_pipe};
+  }
+});
 </script>
 
-<style lang="scss" scoped>
-* {
-  box-sizing: border-box;
-}
-
-strong {
-  font-weight: 600;
-}
-
-body {
-  padding: 0;
-  margin: 0;
-  font-family: "Source Sans Pro", sans-serif;
-  color: #2f4053;
-}
-
-#app {
-  margin: 0 auto;
-  padding: 20px;
-  max-width: 600px;
-}
-
-.random {
-  width: 100%;
-
-  .vtc {
-    height: 250px;
-    font-size: 12px;
-    @media (min-width: 699px) {
-      height: 320px;
-    }
-  }
-
-  .labels {
-    stroke: rgba(0, 0, 0, 0.05);
-  }
-
-  .active-line {
-    stroke: rgba(0, 0, 0, 0.2);
-  }
-
-  .point {
-    stroke-width: 2;
-    transition: stroke-width 0.2s;
-  }
-
-  .point.is-active {
-    stroke-width: 5;
-  }
-
-  .curve1 {
-    .stroke {
-      stroke: #fbac91;
-      stroke-width: 2;
-    }
-
-    .fill {
-      fill: #fbac91;
-      opacity: 0.05;
-    }
-
-    .point {
-      fill: #fbac91;
-      stroke: #fbac91;
-    }
-  }
-
-  .curve2 {
-    .stroke {
-      stroke: #fbe1b6;
-      stroke-width: 2;
-    }
-
-    .point {
-      fill: #fbe1b6;
-      stroke: #fbe1b6;
-    }
-  }
-
-  .curve3 {
-    .stroke {
-      stroke: #7fdfd4;
-      stroke-width: 2;
-    }
-
-    .point {
-      fill: #7fdfd4;
-      stroke: #7fdfd4;
-    }
-  }
-
-  .tooltip {
-    &:not(.is-active) {
-      display: none;
-    }
-
-    padding: 10px;
-    background: #fff;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
-    pointer-events: none;
-
-    &-data {
-      display: flex;
-
-      &-item {
-        display: flex;
-        align-items: center;
-
-        &:not(:first-child) {
-          margin-left: 20px;
-        }
-
-        &:before {
-          content: "";
-          display: block;
-          width: 15px;
-          height: 15px;
-          margin-right: 5px;
-        }
-
-        &--1:before {
-          background: #fbac91;
-        }
-
-        &--2:before {
-          background: #fbe1b6;
-        }
-
-        &--3:before {
-          background: #7fdfd4;
-        }
-      }
-    }
-  }
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style scoped>
+.chart {
+  height: 400px;
 }
 </style>
