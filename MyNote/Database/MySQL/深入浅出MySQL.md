@@ -1351,3 +1351,20 @@ mysqlbinlog --start-position="368315" /var/log/mysql/bin.123456 | mysql -uroot -
 ## cardinality
 
 索引相对值，它记录索引中不重复记录的数量，如果这个值很小要评估索引是否由意义。在innodb中，如果表中1/16的数据发生变化或者stat_modified_counter>200 000 000就会重新计算cardinality
+
+## 通过frm快速修改表结构
+
+```mysql
+create table tb_enum_test_new like tb_enum_test;
+
+alter table tb_enum_test_new modify e enum('fish','apple','dog','pig') default 'pig';
+
+flush tables with read lock;
+
+mv tb_enum_test.frm tb_enum_test_tmp.frm
+mv tb_enum_test_new.frm tb_enum_test.frm
+mv tb_enum_test_tmp.frm tb_enum_test_new.frm
+
+unlock tables;
+```
+
