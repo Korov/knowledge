@@ -3,6 +3,8 @@ import App from './App.vue'
 import ECharts from "vue-echarts"
 import { use } from "echarts/core"
 import {router} from "@/router";
+import axios from 'axios'
+axios.defaults.baseURL = 'http://localhost:8085'
 
 import {
     CanvasRenderer
@@ -23,5 +25,4 @@ use([
     TooltipComponent
 ])
 
-
-createApp(App).use(router).component('v-chart', ECharts).mount('#app')
+createApp(App).use(router, axios).component('v-chart', ECharts).mount('#app')

@@ -6,13 +6,15 @@
     <p>
       <router-link to="/line">Line</router-link>
     </p>
+
     <router-view></router-view>
   </div>
 </template>
 
 <script>
+
 export default {
-  name: 'App'
+  name: 'App',
 }
 </script>
 

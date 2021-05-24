@@ -1,5 +1,6 @@
 <template>
   <v-chart :option="option_line" class="chart"/>
+  <button @click="getData">test</button>
 </template>
 
 <script>
@@ -9,6 +10,7 @@ import {LineChart} from "echarts/charts";
 import {LegendComponent, TitleComponent, TooltipComponent} from "echarts/components";
 import VChart, {THEME_KEY} from "vue-echarts";
 import {defineComponent, ref} from "vue";
+import axios from 'axios'
 
 use([
   CanvasRenderer,
@@ -26,35 +28,34 @@ function getCategory() {
   return ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
 }
 
-function getSeries() {
-  return [
-    {
-      name: "邮件营销",
-      type: "line",
-      data: [120, 132, 101, 134, 90, 230, 210]
-    },
-    {
-      name: '联盟广告',
-      type: 'line',
-      data: [220, 182, 191, 234, 290, 330, 310]
-    },
-    {
-      name: '视频广告',
-      type: 'line',
-      data: [150, 232, 201, 154, 190, 330, 410]
-    },
-    {
-      name: '直接访问',
-      type: 'line',
-      data: [320, 332, 301, 334, 390, 330, 320]
-    },
-    {
-      name: '搜索引擎',
-      type: 'line',
-      data: [820, 932, 901, 934, 1290, 1330, 1320]
-    }
-  ]
-}
+var option_line
+var series = [
+  {
+    name: "邮件营销",
+    type: "line",
+    data: [120, 132, 101, 134, 90, 230, 210]
+  },
+  {
+    name: '联盟广告',
+    type: 'line',
+    data: [220, 182, 191, 234, 290, 330, 310]
+  },
+  {
+    name: '视频广告',
+    type: 'line',
+    data: [150, 232, 201, 154, 190, 330, 410]
+  },
+  {
+    name: '直接访问',
+    type: 'line',
+    data: [320, 332, 301, 334, 390, 330, 320]
+  },
+  {
+    name: '搜索引擎',
+    type: 'line',
+    data: [820, 932, 901, 934, 1290, 1330, 1320]
+  }
+]
 
 export default defineComponent({
   name: "Line",
@@ -64,8 +65,43 @@ export default defineComponent({
   provide: {
     [THEME_KEY]: "dark"
   },
+  methods: {
+    getData() {
+      axios.get("http://localhost:8085/get/series").then((response) => {
+        series = [
+          {
+            name: "邮件营销",
+            type: "line",
+            data: response.data
+          },
+          {
+            name: '联盟广告',
+            type: 'line',
+            data: [220, 182, 191, 234, 290, 330, 310]
+          },
+          {
+            name: '视频广告',
+            type: 'line',
+            data: [150, 232, 201, 154, 190, 330, 410]
+          },
+          {
+            name: '直接访问',
+            type: 'line',
+            data: [320, 332, 301, 334, 390, 330, 320]
+          },
+          {
+            name: '搜索引擎',
+            type: 'line',
+            data: [820, 932, 901, 934, 1290, 1330, 1320]
+          }
+        ]
+        console.log(response.data)
+      })
+      option_line.value.series = series
+    }
+  },
   setup: () => {
-    const option_line = ref({
+    option_line = ref({
       title: {
         text: "Traffic Sources",
         left: "center"
@@ -90,7 +126,7 @@ export default defineComponent({
           type: 'value',
         }
       ],
-      series: getSeries()
+      series: series
     });
 
     return {option_line};
