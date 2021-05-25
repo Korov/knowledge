@@ -1077,7 +1077,7 @@ df -hT
 localhost :: ~ » du -h ./eggs 
 16K	./eggs/minions_spider
 16K	./eggs
-
+chmo
 #只报告目录使用的总空间
 du -s
 ```
