@@ -37,6 +37,6 @@ public class ValueRecord {
 
         KeyAlertMongoSink mongoNameSink = new KeyAlertMongoSink(MONGO_HOST, 27017, "admin", "value-record");
         stream.addSink(mongoNameSink).name("mongo-name-sink");
-        env.execute("kafka-name-count");
+        env.execute("value-record");
     }
 }
