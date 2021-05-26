@@ -57,7 +57,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.korov.flink.name.count.KafkaNameCount</mainClass>
+                            <mainClass>org.korov.flink.value.record.ValueRecord</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
