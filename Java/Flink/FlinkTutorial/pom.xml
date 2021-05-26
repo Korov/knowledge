@@ -12,6 +12,7 @@
         <module>tutorial_kafka</module>
         <module>common</module>
         <module>name_count</module>
+        <module>value_record</module>
     </modules>
     <packaging>pom</packaging>
 

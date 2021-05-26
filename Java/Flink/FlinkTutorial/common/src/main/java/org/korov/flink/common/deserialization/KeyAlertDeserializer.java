@@ -26,6 +26,7 @@ public class KeyAlertDeserializer implements KafkaDeserializationSchema<Tuple3<S
         String value = new String(record.value());
 
         NameModel nameModel = new NameModel();
+        nameModel.setMessage(value);
         ObjectMapper mapper = new ObjectMapper();
         switch (key) {
             case "flink_alert":

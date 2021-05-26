@@ -12,4 +12,5 @@ import lombok.Setter;
 public class NameModel {
     private String name;
     private Long timestamp;
+    private String message;
 }

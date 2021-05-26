@@ -48,6 +48,7 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
             } catch (JsonProcessingException e) {
                 document.append("exception", e.toString());
             }
+            document.append("message", value.f1.getMessage());
             document.append("count", value.f2);
             documents.add(document);
 
