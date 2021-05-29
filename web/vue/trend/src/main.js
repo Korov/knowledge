@@ -4,7 +4,7 @@ import ECharts from "vue-echarts"
 import { use } from "echarts/core"
 import {router} from "@/router";
 import axios from 'axios'
-axios.defaults.baseURL = 'http://localhost:8085'
+axios.defaults.baseURL = 'http://korov-linux.org:8180/v1'
 
 import {
     CanvasRenderer

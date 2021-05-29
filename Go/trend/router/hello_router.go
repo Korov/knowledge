@@ -12,16 +12,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func HelloDefault(c *gin.Context) {
-	c.JSON(http.StatusOK, gin.H{
+func HelloDefault(context *gin.Context) {
+	context.JSON(http.StatusOK, gin.H{
 		"message": "Hello Gin",
 	})
 }
 
-func HelloWithName(c *gin.Context) {
-	name := c.Param("name")
-	c.JSON(http.StatusOK, gin.H{
+func HelloWithName(context *gin.Context) {
+	name := context.Param("name")
+	context.JSON(http.StatusOK, gin.H{
 		"message": fmt.Sprintf("Hello %s", name),
+	})
+}
+
+func GetSeries(context *gin.Context) {
+	context.JSON(http.StatusOK, gin.H{
+		"data": "[220, 182, 191, 234, 290, 330, 310]",
 	})
 }
 
@@ -41,9 +47,9 @@ func GetKeyCount() {
 	collection = collection
 
 	type KeyCount struct {
-		Key string `bson:"key"`
+		Key   string `bson:"key"`
 		Value string `bson:"value"`
-		Count int64 `bson:"count"`
+		Count int64  `bson:"count"`
 	}
 
 	var results []KeyCount
@@ -53,6 +59,6 @@ func GetKeyCount() {
 	}
 	cur.All(context.TODO(), &results)
 	for index, result := range results {
-		fmt.Printf("index:%d, key:%s, value:%s, count:%d\n",index, result.Key, result.Value, result.Count)
+		fmt.Printf("index:%d, key:%s, value:%s, count:%d\n", index, result.Key, result.Value, result.Count)
 	}
 }

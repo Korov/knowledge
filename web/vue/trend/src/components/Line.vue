@@ -10,6 +10,7 @@ import {LineChart} from "echarts/charts";
 import {LegendComponent, TitleComponent, TooltipComponent} from "echarts/components";
 import VChart, {THEME_KEY} from "vue-echarts";
 import {defineComponent} from "vue";
+import axios from "axios";
 
 use([
   CanvasRenderer,
@@ -97,40 +98,12 @@ export default defineComponent({
   },
   methods: {
     getData() {
-      series = [
-        {
-          name: "邮件营销",
-          type: "line",
-          data: [520, 682, 191, 234, 290, 330, 310]
-        },
-        {
-          name: '联盟广告',
-          type: 'line',
-          data: [220, 182, 191, 234, 290, 330, 310]
-        },
-        {
-          name: '视频广告',
-          type: 'line',
-          data: [150, 232, 201, 154, 190, 330, 410]
-        },
-        {
-          name: '直接访问',
-          type: 'line',
-          data: [320, 332, 301, 334, 390, 330, 320]
-        },
-        {
-          name: '搜索引擎',
-          type: 'line',
-          data: [820, 932, 901, 934, 1290, 1330, 1320]
-        }
-      ]
-      this.option_line.series = series;
-      /*axios.get("http://localhost:8085/get/series").then((response) => {
+      axios.get("/get/series").then((response) => {
         series = [
           {
             name: "邮件营销",
             type: "line",
-            data: [520, 682, 191, 234, 290, 330, 310]
+            data: JSON.parse(response.data.data)
           },
           {
             name: '联盟广告',
@@ -153,8 +126,9 @@ export default defineComponent({
             data: [820, 932, 901, 934, 1290, 1330, 1320]
           }
         ]
-        this.setup()
-      })*/
+        this.option_line.series = series;
+        console.log(JSON.parse(response.data.data))
+      })
     }
   },
 });
