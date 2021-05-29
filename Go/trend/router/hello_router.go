@@ -18,13 +18,6 @@ func HelloDefault(context *gin.Context) {
 	})
 }
 
-func HelloWithName(context *gin.Context) {
-	name := context.Param("name")
-	context.JSON(http.StatusOK, gin.H{
-		"message": fmt.Sprintf("Hello %s", name),
-	})
-}
-
 func GetSeries(context *gin.Context) {
 	context.JSON(http.StatusOK, gin.H{
 		"data": "[220, 182, 191, 234, 290, 330, 310]",
