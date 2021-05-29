@@ -7,18 +7,12 @@
 import {use} from "echarts/core";
 import {CanvasRenderer} from "echarts/renderers";
 import {LineChart} from "echarts/charts";
-import {LegendComponent, TitleComponent, TooltipComponent} from "echarts/components";
+import {DataZoomComponent, GridComponent, TitleComponent, ToolboxComponent, TooltipComponent} from 'echarts/components';
 import VChart, {THEME_KEY} from "vue-echarts";
 import {defineComponent} from "vue";
 import axios from "axios";
 
-use([
-  CanvasRenderer,
-  LineChart,
-  TitleComponent,
-  TooltipComponent,
-  LegendComponent
-]);
+use([TitleComponent, ToolboxComponent, TooltipComponent, GridComponent, DataZoomComponent, LineChart, CanvasRenderer]);
 
 function getLegend() {
   return ['邮件营销', '联盟广告', '视频广告', '直接访问', '搜索引擎']
@@ -72,6 +66,15 @@ export default defineComponent({
           text: "Traffic Sources",
           left: "center"
         },
+        toolbox: {
+          feature: {
+            dataZoom: {
+              yAxisIndex: 'none'
+            },
+            restore: {},
+            saveAsImage: {}
+          }
+        },
         tooltip: {
           trigger: 'axis'
         },
@@ -80,18 +83,23 @@ export default defineComponent({
           left: "left",
           data: getLegend()
         },
-        xAxis: [
-          {
-            type: 'category',
-            name: '日期',
-            data: getCategory()
-          }
-        ],
-        yAxis: [
-          {
-            type: 'value',
-          }
-        ],
+        xAxis: {
+          type: 'category',
+          name: '日期',
+          data: getCategory()
+        },
+        yAxis: {
+          type: 'value',
+          boundaryGap: [0, '100%']
+        },
+        dataZoom: [{
+          type: 'inside',
+          start: 0,
+          end: 100
+        }, {
+          start: 0,
+          end: 100
+        }],
         series: series
       }
     };
@@ -107,7 +115,7 @@ export default defineComponent({
           }
         })
         this.option_line.series = series;
-        this.option_line.xAxis[0].data = response.data.timepoint
+        this.option_line.xAxis.data = response.data.timepoint
       })
     }
   },
@@ -117,7 +125,6 @@ export default defineComponent({
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .chart {
-  padding-top: 600px;
   height: 400px;
 }
 </style>
