@@ -35,6 +35,9 @@ db.user.find({$and: [{_id:ObjectId("5ff495366341e441451e17bd")}, {username:"koro
 # or的条件查询
 db.user.find({$or:[{username:"korov"},{username:"korov1"}]})
 
+# in, not in的条件查询
+db.user.find({username:{$in:["korov","korov1"]}})
+
 # 更新数据库，找到username为korov1，若set中的属性已经存在则更新，没有则新增
 db.user.updateOne({username:"korov1"}, {$set:{country:"china"}})
 # 更新所有符合条件的数据
