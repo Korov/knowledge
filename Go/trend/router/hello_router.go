@@ -89,7 +89,14 @@ func GetKeyCount() {
 	}
 }
 
-func GetNameByTime() {
+type KeyNameCount struct {
+	Name     string
+	Type     string
+	CountMap map[int64]int64
+	Count    []int64
+}
+
+func GetNameByTime(ginContext *gin.Context) {
 	var (
 		client     *mongo.Client
 		err        error
@@ -105,22 +112,59 @@ func GetNameByTime() {
 	collection = collection
 
 	var sortOption = options.Find().SetSort(bson.D{{"timestamp", -1}})
-	var endTime = time.Now().Unix() * 1000
-	var startTime = endTime - 24*60*60*1000
+	var endTime = time.Now().Unix()*1000 - 2*24*60*60*1000
+	var startTime = endTime - 1*24*60*60*1000
 
 	fmt.Printf("start time:%d, end time:%d\n", startTime, endTime)
+	var timePoint = make([]int64, 0, (endTime-startTime)/60000+100)
+	var startPoint = startTime / 60000
+	var entPoint = endTime / 60000
+	for point := startPoint; point <= entPoint; point = point + 1 {
+		timePoint = append(timePoint, point*60000)
+	}
 
 	var time_result []KeyCount
-	//var filter = bson.M{"timestamp": bson.M{"$gt": startTime, "$lt": endTime}, "key": bson.M{"$in": []string{"spl_alert", "flink_alert"}}}
-	var filter = bson.M{"timestamp": bson.M{"$gt": startTime}}
-	//var filter = bson.M{"key": bson.M{"$in": []string{"spl_alert", "flink_alert"}}}
+	var filter = bson.M{"timestamp": bson.M{"$gt": startTime}, "key": bson.M{"$in": []string{"spl_alert", "flink_alert"}}}
 	time_cur, err := collection.Find(context.TODO(), filter, sortOption)
 	if err != nil {
 		fmt.Println(err)
 	}
 	time_cur.All(context.TODO(), &time_result)
-	for index, result := range time_result {
-		//fmt.Printf("index:%d, key:%s, name:%s, message:%s, value:%s, timestamp:%d, count:%d\n", index, result.Key, result.Name, result.Message, result.Value, result.Timestamp, result.Count)
-		fmt.Printf("index:%d, key:%s, timestamp:%d, name:%s, count:%d\n", index, result.Key, result.Timestamp, result.Name, result.Count)
+
+	var keyNameMap = make(map[string]KeyNameCount)
+
+	for _, result := range time_result {
+		//fmt.Printf("index:%d, key:%s, timestamp:%d, name:%s, count:%d\n", index, result.Key, result.Timestamp, result.Name, result.Count)
+		nameMap, ok := keyNameMap[result.Key+"-"+result.Name]
+		if ok {
+			var timePoint = (result.Timestamp / 60000) * 60000
+			_, ok1 := nameMap.CountMap[timePoint]
+			if !ok1 {
+				nameMap.CountMap[timePoint] = result.Count
+			}
+		} else {
+			var timePoint = (result.Timestamp / 60000) * 60000
+			var nameCount = KeyNameCount{Name: result.Key + "-" + result.Name, Type: "line", CountMap: make(map[int64]int64), Count: make([]int64, 0, 0)}
+			nameCount.CountMap[timePoint] = result.Count
+			keyNameMap[result.Key+"-"+result.Name] = nameCount
+		}
 	}
+
+	var keyNameArray = make([]KeyNameCount, 0, len(keyNameMap))
+	for _, keyMap := range keyNameMap {
+		for _, point := range timePoint {
+			count, ok := keyMap.CountMap[point]
+			if ok {
+				keyMap.Count = append(keyMap.Count, count)
+			} else {
+				keyMap.Count = append(keyMap.Count, 0)
+			}
+		}
+		keyMap.CountMap = make(map[int64]int64)
+		keyNameArray = append(keyNameArray, keyMap)
+	}
+
+	ginContext.JSON(http.StatusOK, gin.H{
+		"datas": keyNameArray, "timepoint": timePoint,
+	})
 }

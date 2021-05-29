@@ -17,6 +17,7 @@ func GetRouter() *gin.Engine {
 		groupV1.GET("", HelloDefault)
 		// groupV1.GET("/:name", HelloWithName)
 		groupV1.GET("/get/series", GetSeries)
+		groupV1.GET("/get/name/time", GetNameByTime)
 	}
 
 	return router

@@ -65,7 +65,7 @@ export default defineComponent({
   provide: {
     [THEME_KEY]: "dark"
   },
-  data(){
+  data() {
     return {
       option_line: {
         title: {
@@ -98,36 +98,16 @@ export default defineComponent({
   },
   methods: {
     getData() {
-      axios.get("/get/series").then((response) => {
-        series = [
-          {
-            name: "邮件营销",
-            type: "line",
-            data: JSON.parse(response.data.data)
-          },
-          {
-            name: '联盟广告',
+      axios.get("/get/name/time").then((response) => {
+        series = response.data.datas.map(item => {
+          return {
+            name: item.Name,
             type: 'line',
-            data: [220, 182, 191, 234, 290, 330, 310]
-          },
-          {
-            name: '视频广告',
-            type: 'line',
-            data: [150, 232, 201, 154, 190, 330, 410]
-          },
-          {
-            name: '直接访问',
-            type: 'line',
-            data: [320, 332, 301, 334, 390, 330, 320]
-          },
-          {
-            name: '搜索引擎',
-            type: 'line',
-            data: [820, 932, 901, 934, 1290, 1330, 1320]
+            data: item.Count
           }
-        ]
+        })
         this.option_line.series = series;
-        console.log(JSON.parse(response.data.data))
+        this.option_line.xAxis[0].data = response.data.timepoint
       })
     }
   },
@@ -137,6 +117,7 @@ export default defineComponent({
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .chart {
+  padding-top: 600px;
   height: 400px;
 }
 </style>
