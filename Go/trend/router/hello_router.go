@@ -112,7 +112,7 @@ func GetNameByTime() {
 
 	var time_result []KeyCount
 	//var filter = bson.M{"timestamp": bson.M{"$gt": startTime, "$lt": endTime}, "key": bson.M{"$in": []string{"spl_alert", "flink_alert"}}}
-	var filter = bson.M{"timestamp": bson.M{"$gt": startTime, "$lt": endTime}}
+	var filter = bson.M{"timestamp": bson.M{"$gt": startTime}}
 	//var filter = bson.M{"key": bson.M{"$in": []string{"spl_alert", "flink_alert"}}}
 	time_cur, err := collection.Find(context.TODO(), filter, sortOption)
 	if err != nil {
