@@ -715,5 +715,7 @@ maven的bin目录下有mvnDebug命令，用这个命令执行编译过程就可�
 
 ```bash
 docker run -it --rm -u 1000 -v "$PWD":/usr/src/mymaven -v "$HOME/.m2":/var/maven/.m2 -e MAVEN_CONFIG=/var/maven/.m2 -w /usr/src/mymaven maven:3.6.3-adoptopenjdk-11 mvn -Duser.home=/var/maven clean package -DskipTests
+
+docker run -it --rm -u 1000 -v "$PWD":/usr/src/mymaven -w /usr/src/mymaven maven:3.6.3-adoptopenjdk-11 mvn  clean package -DskipTests
 ```
 
