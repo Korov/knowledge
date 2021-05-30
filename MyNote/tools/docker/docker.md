@@ -1162,3 +1162,17 @@ source /etc/profile
 apt-get install tzdata
 ```
 
+## docker开启远程访问
+
+```bash
+# 编辑文件
+sudo nvim /usr/lib/systemd/system/docker.service
+# 找到对应的行数加上 -H tcp://0.0.0.0:2375
+ExecStart=/usr/bin/dockerd -H tcp://0.0.0.0:2375
+
+# 重启docker
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
+
+访问`http://localhost:2375/images/json`
