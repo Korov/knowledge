@@ -3,7 +3,7 @@
 ```bash
 docker run -d --restart=always --name=gitea -p 10022:22 -p 10080:3000 -v `pwd`/gitea:/data gitea/gitea:1.14.2
 
-docker run -d --name=gitea -p 10022:22 -p 10080:3000 -v `pwd`/gitea:/data gitea/gitea:1.14.2
+docker run -d --name=gitea -p 10022:22 -p 10080:3000 gitea/gitea:1.14.2
 ```
 
 在配置界面中执行以下步骤：
