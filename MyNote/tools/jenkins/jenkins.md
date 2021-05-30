@@ -37,3 +37,17 @@ docker rm jenkins-blueocean
 
 配置好之后新建一个任务，里面会有相关设置，进行设置之后就可以将文件部署完成。
 
+# 问题解决
+
+## jenkins使用远程主机打包
+
+安装ssh插件，安装完成之后在`Dashboard->configuration`中配置`SSH remote hosts`。
+
+配置完成之后创建一个自由的`Item`，在Build中选择使用远程主机打包，选择对应的SSH site，然后输入需要执行的命令
+
+```bash
+cd /home/korov/Desktop/temp/demo
+# 不可以包含  -it  参数，路径必须都是绝对路径
+docker run --rm -u 1000 -v /home/korov/Desktop/temp/demo:/usr/src/mymaven -v /home/korov/.m2:/var/maven/.m2 -e MAVEN_CONFIG=/var/maven/.m2 -w /usr/src/mymaven maven:3.6.3-adoptopenjdk-11 mvn -Duser.home=/var/maven clean package -DskipTests
+```
+
