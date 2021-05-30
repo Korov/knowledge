@@ -710,3 +710,10 @@ mvn clean -pl 指定模块名 -al 依赖模块
 ## debug
 
 maven的bin目录下有mvnDebug命令，用这个命令执行编译过程就可以使用ide连接上调试器
+
+## docker打包maven项目
+
+```bash
+docker run -it --rm -u 1000 -v "$PWD":/usr/src/mymaven -v "$HOME/.m2":/var/maven/.m2 -e MAVEN_CONFIG=/var/maven/.m2 -w /usr/src/mymaven maven:3.6.3-adoptopenjdk-11 mvn -Duser.home=/var/maven clean package -DskipTests
+```
+
