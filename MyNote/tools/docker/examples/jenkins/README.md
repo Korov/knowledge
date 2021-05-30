@@ -1,11 +1,17 @@
+# 构建
+
+```
+docker build --build-arg JENKINS_VERSION=2.295 -t korov/jenkins:alpine-2.295 .
+```
+
 # 不需要卷
 
 （推荐使用这种，可以安装全部插件，有卷的好像权限不行，有些插件装不了）
 
 ```bash
-docker run -d -p 8080:8080 -p 50000:50000 --name jenkins korov/jenkins:alpine-2.291
+docker run -d -p 8080:8080 -p 50000:50000 --name jenkins korov/jenkins:alpine-2.295
 docker exec -it --user root jenkins bash
-#修改镜像 https://updates.jenkins-zh.cn/update-center.json
+# 修改镜像 https://updates.jenkins-zh.cn/update-center.json
 sed -i 's?\(<url>\).*\(</url>\)?\1https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json\2?g' /var/jenkins_home/hudson.model.UpdateCenter.xml
 docker restart jenkins
 ```

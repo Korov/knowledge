@@ -153,9 +153,9 @@ Dockerfile中的指令及说明
 
 1.ARG：
 定义创建镜像过程中使用的变量。
-格式为ARG <name>[=<default value>]
-在执行docker build 时， 可以通过-build-arg[=l 来为变量赋值。当镜像编译成功后， ARG 指定的变量将不再存在(ENV 指定的变量将在镜像中保留）。Docker 内置了一些镜像创建变量， 用户可以直接使用而无须声明， 包括（不区分大小
-写） HTTP PROXY 、HTTPS PROXY 、FTP PROXY 、NO PROXY。
+格式为`ARG <name>[=<default value>]`
+在执行docker build 时， 可以通过`docker build --build-arg  name=value` 来为变量赋值。当镜像编译成功后， ARG 指定的变量将不再存在(ENV 指定的变量将在镜像中保留）。Docker 内置了一些镜像创建变量， 用户可以直接使用而无须声明， 包括（不区分大小
+写 HTTP_PROXY 、HTTPS_PROXY 、FTP_PROXY 、NO_PROXY)。
 
 2. FROM
 指定所创建镜像的基础镜像。（若本地已经加载该镜像则from会从本地加载该镜像，本地未找到则从远端加载该镜像）
