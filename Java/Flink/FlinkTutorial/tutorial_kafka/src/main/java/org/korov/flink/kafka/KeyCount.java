@@ -2,6 +2,7 @@ package org.korov.flink.kafka;
 
 import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.contrib.streaming.state.EmbeddedRocksDBStateBackend;
 import org.apache.flink.contrib.streaming.state.RocksDBStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -11,6 +12,7 @@ import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.korov.flink.common.deserialization.KeyValueDeserializer;
 import org.korov.flink.common.sink.MongoSink;
 
+import java.net.URI;
 import java.util.Properties;
 
 public class KeyCount {
@@ -26,12 +28,11 @@ public class KeyCount {
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        if (args == null || args.length != 4) {
-            args = new String[4];
+        if (args == null || args.length != 3) {
+            args = new String[3];
             args[0] = "korov-linux.org:9092";
             args[1] = "korov-linux.org";
             args[2] = "27017";
-            args[3] = "file:///home/korov/Desktop/temp/flink";
         }
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -46,8 +47,9 @@ public class KeyCount {
         env.getCheckpointConfig().enableExternalizedCheckpoints(
                 CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
 
-        RocksDBStateBackend rocksDbStateBackend = new RocksDBStateBackend(args[3], true);
+        EmbeddedRocksDBStateBackend rocksDbStateBackend = new EmbeddedRocksDBStateBackend(true);
         env.setStateBackend(rocksDbStateBackend);
+
 
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", args[0]);

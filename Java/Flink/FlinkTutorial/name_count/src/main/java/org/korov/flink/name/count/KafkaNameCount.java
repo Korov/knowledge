@@ -8,7 +8,10 @@ import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.contrib.streaming.state.EmbeddedRocksDBStateBackend;
+import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
+import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -33,6 +36,17 @@ public class KafkaNameCount {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setRuntimeMode(RuntimeExecutionMode.STREAMING);
         env.setParallelism(2);
+        env.getConfig().setUseSnapshotCompression(true);
+        env.getCheckpointConfig().setCheckpointInterval(5 * 60000);
+        env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
+        env.getCheckpointConfig().setMinPauseBetweenCheckpoints(60000);
+        env.getCheckpointConfig().setCheckpointTimeout(5 * 60000);
+        env.getCheckpointConfig().setMaxConcurrentCheckpoints(1);
+        env.getCheckpointConfig().enableExternalizedCheckpoints(
+                CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
+
+        EmbeddedRocksDBStateBackend rocksDbStateBackend = new EmbeddedRocksDBStateBackend(true);
+        env.setStateBackend(rocksDbStateBackend);
 
         Properties properties = new Properties();
         properties.setProperty("bootstrap.servers", "192.168.1.19:9092");
@@ -104,6 +118,9 @@ public class KafkaNameCount {
                     }
                 })
                 .addSink(mongoKeySink).name("mongo-key-sink");
+
+        KeyAlertMongoSink mongoValueSink = new KeyAlertMongoSink(MONGO_HOST, 27017, "admin", "value-record");
+        stream.addSink(mongoValueSink).name("mongo-name-sink");
         env.execute("kafka-name-count");
     }
 }

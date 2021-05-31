@@ -12,7 +12,6 @@
         <module>tutorial_kafka</module>
         <module>common</module>
         <module>name_count</module>
-        <module>value_record</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -21,6 +20,7 @@
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
         <maven.compiler.compilerVersion>11</maven.compiler.compilerVersion>
+        <flink.version>1.13.0</flink.version>
     </properties>
 
     <dependencyManagement>
@@ -28,17 +28,17 @@
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-java</artifactId>
-                <version>1.12.2</version>
+                <version>${flink.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-streaming-java_2.11</artifactId>
-                <version>1.12.2</version>
+                <version>${flink.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-clients_2.11</artifactId>
-                <version>1.12.2</version>
+                <version>${flink.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.junit.jupiter</groupId>
@@ -86,13 +86,13 @@
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-connector-kafka_2.12</artifactId>
-                <version>1.12.2</version>
+                <version>${flink.version}</version>
             </dependency>
 
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-avro</artifactId>
-                <version>1.12.0</version>
+                <version>${flink.version}</version>
             </dependency>
 
             <dependency>
@@ -104,7 +104,7 @@
             <dependency>
                 <groupId>org.apache.flink</groupId>
                 <artifactId>flink-statebackend-rocksdb_2.12</artifactId>
-                <version>1.12.2</version>
+                <version>${flink.version}</version>
             </dependency>
 
             <dependency>
