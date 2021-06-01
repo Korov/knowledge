@@ -8,3 +8,4 @@
  */
 
 rootProject.name = "oauth"
+include("shiro-demo")
