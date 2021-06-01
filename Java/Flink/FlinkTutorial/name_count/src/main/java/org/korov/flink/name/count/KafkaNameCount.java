@@ -17,6 +17,7 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTime
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.korov.flink.common.deserialization.KeyAlertDeserializer;
+import org.korov.flink.common.enums.SinkType;
 import org.korov.flink.common.model.NameModel;
 import org.korov.flink.common.sink.KeyAlertMongoSink;
 
@@ -57,7 +58,7 @@ public class KafkaNameCount {
 
         DataStream<Tuple3<String, NameModel, Long>> stream = env.addSource(consumer, "kafka-source");
 
-        KeyAlertMongoSink mongoNameSink = new KeyAlertMongoSink(MONGO_HOST, 27017, "admin", "kafka-name-count");
+        KeyAlertMongoSink mongoNameSink = new KeyAlertMongoSink(MONGO_HOST, 27017, "admin", "kafka-name-count", SinkType.KEY_NAME);
         stream.assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple3<String, NameModel, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
                 .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, NameModel, Long>>() {
                     @Override
@@ -88,7 +89,7 @@ public class KafkaNameCount {
                 })
                 .addSink(mongoNameSink).name("mongo-name-sink");
 
-        KeyAlertMongoSink mongoKeySink = new KeyAlertMongoSink(MONGO_HOST, 27017, "admin", "kafka-key-count");
+        KeyAlertMongoSink mongoKeySink = new KeyAlertMongoSink(MONGO_HOST, 27017, "admin", "kafka-key-count", SinkType.KEY);
         stream.assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple3<String, NameModel, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
                 .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, NameModel, Long>>() {
                     @Override
@@ -119,7 +120,7 @@ public class KafkaNameCount {
                 })
                 .addSink(mongoKeySink).name("mongo-key-sink");
 
-        KeyAlertMongoSink mongoValueSink = new KeyAlertMongoSink(MONGO_HOST, 27017, "admin", "value-record");
+        KeyAlertMongoSink mongoValueSink = new KeyAlertMongoSink(MONGO_HOST, 27017, "admin", "value-record", SinkType.KEY_NAME_VALUE);
         stream.addSink(mongoValueSink).name("mongo-name-sink");
         env.execute("kafka-name-count");
     }

@@ -13,6 +13,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.bson.Document;
+import org.korov.flink.common.enums.SinkType;
 import org.korov.flink.common.model.NameModel;
 
 import java.util.ArrayList;
@@ -23,13 +24,15 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
     private final int port;
     private final String dbname;
     private final String collection;
+    private final SinkType sinkType;
     MongoClient mongoClient = null;
 
-    public KeyAlertMongoSink(String host, int port, String dbname, String collection) {
+    public KeyAlertMongoSink(String host, int port, String dbname, String collection, SinkType sinkType) {
         this.host = host;
         this.port = port;
         this.dbname = dbname;
         this.collection = collection;
+        this.sinkType = sinkType;
     }
 
     @Override
@@ -40,16 +43,14 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
             List<Document> documents = new ArrayList<>();
             Document document = new Document();
             document.append("key", value.f0);
-            document.append("name", value.f1.getName());
             document.append("timestamp", value.f1.getTimestamp());
-            ObjectMapper mapper = new ObjectMapper();
-            try {
-                document.append("value", mapper.writeValueAsString(value.f1));
-            } catch (JsonProcessingException e) {
-                document.append("exception", e.toString());
-            }
-            document.append("message", value.f1.getMessage());
             document.append("count", value.f2);
+            if (sinkType == SinkType.KEY_NAME) {
+                document.append("name", value.f1.getName());
+            } else if (sinkType == SinkType.KEY_NAME_VALUE) {
+                document.append("name", value.f1.getName());
+                document.append("message", value.f1.getMessage());
+            }
             documents.add(document);
 
             mongoCollection.insertMany(documents);
