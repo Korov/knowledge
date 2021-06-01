@@ -117,6 +117,14 @@ db.inventory.insertMany([
     ])
 ```
 
+## 查看db和collection状态
+
+```javascript
+db.stats();
+
+db.getCollection("kafka-key-count").stats();
+```
+
 # 使用索引创建和查询
 
 ## explain
