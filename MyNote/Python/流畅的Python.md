@@ -26,6 +26,27 @@ pip freeze > requirements.txt
 pip install -r requirements.txt
 ```
 
+## pipenv使用
+
+```bash
+# 项目初始化
+pipenv install
+# 安装包  pipenv install requests==2.13.0
+pipenv install <package>
+# 卸载
+pipenv uninstall <package>
+# 更新所有需要更新的包
+pipenv update --outdated
+# 更新所有包
+pipenv update
+# 更新指定包
+pipenv update <package>
+# 从requirements.txt导入
+pipenv install -r path/to/requirements.txt
+# 导出requirements.txt  --dev导出开发用的包
+pipenv lock -r --dev
+```
+
 ## 测试
 
  一个全功能的测试框架pytest，pip install pytest-html生成html报告，coverage测试代码覆盖率
