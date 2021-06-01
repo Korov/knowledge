@@ -1,8 +1,8 @@
-# nginx准备工作
+# `nginx`准备工作
 
-## linux内核参数的优化
+## `linux`内核参数的优化
 
-这里针对最通用，使用nginx支持更多并发的tcp网络参数做简单的说明
+这里针对最通用，使用`nginx`支持更多并发的`tcp`网络参数做简单的说明
 
 修改`/etc/sysctl.conf`来更改内核参数，例如最常用的配置：
 
@@ -26,7 +26,7 @@ net.ipv4.tcp_max_syn.backlog=1024
 
 然后执行`sysctl-p`命令，使上述修改生效
 
-- file-max：表示进程可以同时打开最大的句柄数，这个参数直接限制最大并发连接数，根据实际情况配置
+- `file-max`：表示进程可以同时打开最大的句柄数，这个参数直接限制最大并发连接数，根据实际情况配置
 - tcp_tw_reuse：1表示允许将TIME-WAIT状态的socket重新用于新的TCP连接，这对于服务器来说很有意义，因为服务器上总会有大量TIME-WAIT状态的连接
 - tcp_keepalive_time：表示当keepalive启用时，TCP发送keepalive消息的频率，默认2小时，若将其设置的小一些，可以更快的清理无效的连接
 - tcp_fin_timeout：表示当前服务器主动关闭连接时，socket保持在FIN-WAIT-2状态的最大时间
@@ -86,7 +86,7 @@ nginx -s reload
 
 块配置项由一个块配置项名和一对大括号组成。具体示例如下：
 
-```
+```java
 events {
     ...
 }
