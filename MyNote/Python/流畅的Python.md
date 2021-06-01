@@ -10,6 +10,11 @@ chmod 744 ./venv/bin/activate
 source ./venv/bin/activate
 # 取消激活
 deactivate
+
+# windows
+python -m venv .\venv
+.\venv\Scripts\Activate.ps1
+deactivate
 ```
 
 ## pip使用
