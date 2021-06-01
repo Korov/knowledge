@@ -29,7 +29,7 @@ import java.util.Properties;
  * @date 2021-05-05 14:00
  */
 @Slf4j
-public class KafkaNameCount {
+public class KafkaCount {
     // private static final String MONGO_HOST = "localhost";
     private static final String MONGO_HOST = "mongo-flink";
 
@@ -121,7 +121,7 @@ public class KafkaNameCount {
                 .addSink(mongoKeySink).name("mongo-key-sink");
 
         KeyAlertMongoSink mongoValueSink = new KeyAlertMongoSink(MONGO_HOST, 27017, "admin", "value-record", SinkType.KEY_NAME_VALUE);
-        stream.addSink(mongoValueSink).name("mongo-name-sink");
-        env.execute("kafka-name-count");
+        stream.addSink(mongoValueSink).name("mongo-value-sink");
+        env.execute("kafka-count");
     }
 }

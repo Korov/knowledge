@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>name_count</artifactId>
+    <artifactId>kafka_count</artifactId>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -57,7 +57,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.korov.flink.name.count.KafkaNameCount</mainClass>
+                            <mainClass>org.korov.flink.name.count.KafkaCount</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
