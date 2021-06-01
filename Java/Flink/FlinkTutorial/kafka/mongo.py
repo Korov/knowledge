@@ -1,4 +1,4 @@
-import pymongo;
+import pymongo
 
 client = pymongo.MongoClient("192.168.50.95", 27017)
 db = client.admin

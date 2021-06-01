@@ -2,6 +2,7 @@ from kafka import KafkaConsumer
 
 
 def consumer_msg(topic, server, group_id="test", auto_offset_reset="earliest"):
+    global consumer
     if (not topic is None) and (not server is None):
         consumer = KafkaConsumer(topic, bootstrap_servers=server, group_id=group_id,
                                  auto_offset_reset=auto_offset_reset)
