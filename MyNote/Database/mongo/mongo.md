@@ -477,6 +477,7 @@ mongodump --uri="mongodb://admin:admin@127.0.0.1:27017/admin"  --authenticationD
 ## mongorestore
 
 ```bash
+# 若没有指定--nsInclude="admin.alert"，则恢复所有
 mongorestore --uri="mongodb://admin:admin@127.0.0.1:27017/admin" --authenticationDatabase="admin" --authenticationMechanism="SCRAM-SHA-256" --nsInclude="admin.alert" --gzip  --dir="/alert/admin"
 ```
 
