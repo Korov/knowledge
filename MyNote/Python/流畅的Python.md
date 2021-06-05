@@ -29,6 +29,9 @@ pip install -r requirements.txt
 ## pipenv使用
 
 ```bash
+# 安装和更新pipenv
+pip install pipenv
+pip install --user --upgrade pipenv
 # 项目初始化
 pipenv install
 # 安装包  pipenv install requests==2.13.0

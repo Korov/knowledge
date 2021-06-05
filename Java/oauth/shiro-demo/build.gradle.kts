@@ -46,8 +46,8 @@ tasks.jacocoTestReport {
 }
 
 dependencies {
-    compileOnly("org.springframework.boot:spring-boot-starter-logging")
-    compileOnly("com.squareup.okhttp3:okhttp")
-    compileOnly("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-logging")
+    implementation("com.squareup.okhttp3:okhttp")
+    implementation("org.springframework.boot:spring-boot-starter-web")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
