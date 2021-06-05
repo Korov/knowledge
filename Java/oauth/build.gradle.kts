@@ -28,12 +28,35 @@ allprojects {
     group = "org.oauth"
     version = "0.0.1-SNAPSHOT"
 
-    // 此插件来实现类似maven中的dependencyManagement功能
-    apply(plugin = "io.spring.dependency-management")
-    apply(plugin = "jacoco")
-    apply(plugin = "idea")
-    apply(plugin = "java")
-    apply(plugin = "java-library")
+    repositories {
+        mavenLocal()
+        maven {
+            setUrl("https://maven.aliyun.com/repository/central")
+        }
+        maven {
+            setUrl("https://maven.aliyun.com/repository/gradle-plugin")
+        }
+    }
 
-    //设置项目字符集为UTF-8
+    // 此插件来实现类似maven中的dependencyManagement功能
+    apply {
+        plugin("java")
+        plugin("jacoco")
+        plugin("idea")
+        plugin("io.spring.dependency-management")
+    }
+
+    tasks.withType<JavaCompile> {
+        options.encoding = "UTF-8"
+        sourceCompatibility = "11"
+    }
+
+    tasks.withType<Test> {
+        systemProperty("file.encoding", "UTF-8")
+    }
+
+    tasks.withType<Javadoc>{
+        options.encoding = "UTF-8"
+    }
+
 }
