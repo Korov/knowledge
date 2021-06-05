@@ -4,7 +4,14 @@
  * This is a general purpose Gradle build.
  * Learn more about Gradle by exploring our samples at https://docs.gradle.org/7.0.2/samples
  */
+import org.gradle.plugins.ide.idea.model.Module
+
 buildscript {
+    extra.apply {
+        set("springbootVersion", "2.4.6")
+        set("springCloudVersion", "2020.0.3")
+    }
+    val springbootVersion: String by rootProject.extra
     repositories {
         mavenLocal()
         maven {
@@ -14,17 +21,20 @@ buildscript {
             setUrl("https://maven.aliyun.com/repository/gradle-plugin")
         }
     }
+
     dependencies {
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.4.3")
-        classpath("gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.6.0")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springbootVersion}")
+        classpath("gradle.plugin.com.github.spotbugs.snom:spotbugs-gradle-plugin:4.7.1")
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springbootVersion}")
         classpath("io.spring.gradle:dependency-management-plugin:1.0.11.RELEASE")
-        classpath("org.springframework.boot:spring-boot-gradle-plugin:2.4.3")
         classpath("gradle.plugin.com.thinkimi.gradle:mybatis-generator-plugin:2.2")
     }
 }
 
 //所有项目共用的设置
 allprojects {
+    val springbootVersion: String by rootProject.extra
+    val springCloudVersion: String by rootProject.extra
     group = "org.oauth"
     version = "0.0.1-SNAPSHOT"
 
@@ -41,7 +51,6 @@ allprojects {
     // 此插件来实现类似maven中的dependencyManagement功能
     apply {
         plugin("java")
-        plugin("jacoco")
         plugin("idea")
         plugin("io.spring.dependency-management")
     }
@@ -55,8 +64,27 @@ allprojects {
         systemProperty("file.encoding", "UTF-8")
     }
 
-    tasks.withType<Javadoc>{
+    tasks.withType<Javadoc> {
         options.encoding = "UTF-8"
     }
 
+    // io.spring.dependency-management插件的功能
+    the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
+        imports {
+            // mavenBom(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
+            mavenBom("org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}")
+            mavenBom("org.springframework.boot:spring-boot-dependencies:${springbootVersion}")
+        }
+        dependencies {
+            dependency("com.squareup.okhttp3:okhttp:4.9.1")
+        }
+    }
+}
+
+subprojects {
+    apply {
+        plugin("jacoco")
+        plugin("org.springframework.boot")
+        plugin("com.github.spotbugs")
+    }
 }
