@@ -4,8 +4,6 @@
  * This is a general purpose Gradle build.
  * Learn more about Gradle by exploring our samples at https://docs.gradle.org/7.0.2/samples
  */
-import org.gradle.plugins.ide.idea.model.Module
-
 buildscript {
     extra.apply {
         set("springbootVersion", "2.4.6")
