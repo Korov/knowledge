@@ -119,7 +119,9 @@ pyenv virtualenvs
 需要将启动文件添加到shell的启动文件中
 
 ```bash
-eval "$(pyenv init -)"
+export PYENV_ROOT="$HOME/.pyenv"
+export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init --path)"
 eval "$(pyenv virtualenv-init -)"
 ```
 
