@@ -471,7 +471,7 @@ db.alert.find({key:"spl_alert"}, {"value.alertName":"同一源IP针对多目标�
 ## mongodump
 
 ```bash
-mongodump --uri="mongodb://admin:admin@127.0.0.1:27017/admin"  --authenticationDatabase="admin" --authenticationMechanism="SCRAM-SHA-256" --collection="alert" --gzip --out="/alert"
+mongodump --uri="mongodb://admin:admin@127.0.0.1:27017/admin"  --authenticationDatabase="admin" --authenticationMechanism="SCRAM-SHA-256" --collection="alert" --gzip --out="/backup"
 ```
 
 ## mongorestore
