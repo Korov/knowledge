@@ -24,7 +24,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("org.codehaus.groovy:groovy:3.0.7")
+    testImplementation("org.codehaus.groovy:groovy:3.0.7")
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.apache.curator:curator-framework:5.1.0")

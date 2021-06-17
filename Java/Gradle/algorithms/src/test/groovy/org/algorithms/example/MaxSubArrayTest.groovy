@@ -1,19 +1,13 @@
-package org.algorithms.example;
+package org.algorithms.example
 
-import org.junit.jupiter.api.Test;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.Arrays;
+import org.junit.jupiter.api.Test
 
 /**
- * @author zhu.lei
- * @date 2021-06-17 15:49
+ * @author zhu.lei* @date 2021-06-17 16:04
  */
 class MaxSubArrayTest {
     @Test
-    public void test() throws Exception {
+    void test() throws Exception {
         File file = new File("src/test/resources/array.txt");
         try (BufferedReader br = new BufferedReader(new FileReader(file))) {
             String line = null;
