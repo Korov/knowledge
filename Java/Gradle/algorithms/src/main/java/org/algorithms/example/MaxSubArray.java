@@ -1,39 +1,11 @@
-package org.designpatterns.example;
-
-import org.junit.jupiter.api.Test;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.Arrays;
+package org.algorithms.example;
 
 /**
  * @author zhu.lei
- * @date 2021-06-17 13:26
+ * @date 2021-06-17 15:48
  */
-public class Test1 {
-    @Test
-    public void test() throws Exception {
-        File file = new File("src/test/resources/array.txt");
-        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-            String line = null;
-            while ((line = br.readLine()) != null) {
-                int[] array = Arrays.stream(line.split(",")).mapToInt(Integer::valueOf).toArray();
-                long start = System.nanoTime();
-                Result result = getMaxSubArray(array, 0, array.length - 1);
-                long end = System.nanoTime();
-                System.out.println(String.format("cost:%s, sum:%s, left:%s, right:%s", end - start, result.getSum(), result.getLeft(), result.getRight()));
-
-                long start1 = System.nanoTime();
-                Result result1 = maxSubArray(array, 0, array.length - 1);
-                long end1 = System.nanoTime();
-                System.out.println(String.format("cost:%s, sum:%s, left:%s, right:%s", end1 - start1, result1.getSum(), result1.getLeft(), result1.getRight()));
-            }
-        }
-    }
-
-
-    public Result getMaxSubArray(int[] array, int left, int right) throws Exception {
+public class MaxSubArray {
+    public static Result getMaxSubArray(int[] array, int left, int right) throws Exception {
         if (left > right) {
             throw new Exception("error input");
         }
@@ -54,7 +26,7 @@ public class Test1 {
         }
     }
 
-    private Result getMaxMiddleArray(int[] array, int left, int right, int middle) {
+    private static Result getMaxMiddleArray(int[] array, int left, int right, int middle) {
         int max = Integer.MIN_VALUE;
         int lefIndex = left;
         int rightIndex = right;
@@ -78,7 +50,7 @@ public class Test1 {
         return new Result(array, lefIndex, rightIndex);
     }
 
-    public Result maxSubArray(int[] array, int left, int right) {
+    public static Result maxSubArray(int[] array, int left, int right) {
         if (left == right) {
             return new Result(array, left, right);
         } else {
@@ -95,7 +67,7 @@ public class Test1 {
         }
     }
 
-    class Result {
+    static class Result {
         int sum;
         int left;
         int right;
