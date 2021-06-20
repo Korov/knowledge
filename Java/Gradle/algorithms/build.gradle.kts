@@ -21,8 +21,8 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.14.1")
     testImplementation(platform("org.junit:junit-bom:5.7.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-    testCompileOnly(platform("org.spockframework:spock-bom:2.0-M4-groovy-3.0"))
-    testCompileOnly("org.spockframework:spock-core")
+    testImplementation(platform("org.spockframework:spock-bom:2.0-M4-groovy-3.0"))
+    testImplementation("org.spockframework:spock-core")
 }
 
 repositories {
@@ -48,9 +48,7 @@ idea {
 }
 
 tasks.test {
-    useJUnitPlatform {
-        includeEngines("junit-jupiter")
-    }
+    useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)
 }
 
