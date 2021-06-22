@@ -34,16 +34,16 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-core:2.14.1")
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.14.1")
 
-    testCompileOnly(platform("org.spockframework:spock-bom:2.0-M4-groovy-3.0"))
-    testCompileOnly("org.spockframework:spock-core")
-    testCompileOnly("org.junit.platform:junit-platform-launcher:1.8.0-M1")
-    testCompileOnly("org.junit.jupiter:junit-jupiter-engine:5.8.0-M1")
-    testCompileOnly("org.jetbrains.kotlin:kotlin-test")
-    testCompileOnly("org.jetbrains.kotlin:kotlin-test-junit")
+    testImplementation(platform("org.spockframework:spock-bom:2.0-M4-groovy-3.0"))
+    testImplementation("org.spockframework:spock-core")
+    testImplementation("org.junit.platform:junit-platform-launcher:1.8.0-M1")
+    testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.0-M1")
+    testImplementation("org.jetbrains.kotlin:kotlin-test")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 
-    testCompileOnly("org.spekframework.spek2:spek-dsl-jvm:2.0.15")
-    testRuntimeOnly("org.spekframework.spek2:spek-runner-junit5:2.0.15")
-    testRuntimeOnly("org.jetbrains.kotlin:kotlin-reflect:1.4.20")
+    testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.15")
+    testImplementation("org.spekframework.spek2:spek-runner-junit5:2.0.15")
+    testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.4.20")
 }
 
 tasks.compileJava {
