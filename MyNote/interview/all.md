@@ -190,7 +190,7 @@ get：
 
 ### HashMap为什么只允许一个key为null
 
-如果key为null，hash这个key会返回0，而且是在链表最前面。
+如果key为null，hash这个key会返回0，然后null == null为true，null的可以一直放在第一个桶里。
 
 ## HashMap在高并发下如果没有处理线程安全会有怎样的安全隐患，具体表现是什么
 
@@ -223,7 +223,7 @@ get：
 
 PriorityQueue 保证最高或者最低优先级的的元素总是在队列头部，但是 LinkedHashMap 维持的顺序是元素插入的顺序。当遍历一个 PriorityQueue 时，没有任何顺序保证，但是 LinkedHashMap 课保证遍历顺序是元素插入的顺序。
 
-LinkedHashMap存储数据的结构继承自HashMap，但是多维护了一个双向链表来记录各个节点之间的顺序。
+LinkedHashMap存储数据的结构继承自HashMap，但是重新实现了Entry（多了before和after），以及newNode方法，使用newNode方法时会维护一个Node的双向链表。
 
 ## Iterator有什么特点
 
