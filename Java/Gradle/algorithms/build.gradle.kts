@@ -23,6 +23,11 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation(platform("org.spockframework:spock-bom:2.0-M4-groovy-3.0"))
     testImplementation("org.spockframework:spock-core")
+    compileOnly("org.projectlombok:lombok:1.18.20")
+    annotationProcessor("org.projectlombok:lombok:1.18.20")
+
+    testCompileOnly("org.projectlombok:lombok:1.18.20")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.20")
 }
 
 repositories {
