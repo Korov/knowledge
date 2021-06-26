@@ -22,11 +22,10 @@ class MaxSubArrayTest extends Specification {
             long start = System.nanoTime()
             MaxSubArray.Result result = MaxSubArray.getMaxSubArray(array, 0, array.length - 1)
             long end = System.nanoTime()
-            logger.info("cost:{}, sum:{}, left:{}, right:{}", end - start, result.getSum(), result.getLeft(), result.getRight())
+            logger.info("cost:{}, sum:{}, left:{}, right:{}", end - start, result.sum(), result.sum(), result.sum())
         }
 
         then:
         notThrown(Exception)
-
     }
 }

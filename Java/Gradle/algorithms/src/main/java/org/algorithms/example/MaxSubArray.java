@@ -16,9 +16,9 @@ public class MaxSubArray {
             Result leftResult = getMaxSubArray(array, left, middle);
             Result rightResult = getMaxSubArray(array, middle + 1, right);
             Result middleResult = getMaxMiddleArray(array, left, right, middle);
-            if (leftResult.getSum() >= middleResult.getSum() && leftResult.getSum() >= rightResult.getSum()) {
+            if (leftResult.sum() >= middleResult.sum() && leftResult.sum() >= rightResult.sum()) {
                 return leftResult;
-            } else if (middleResult.getSum() >= leftResult.getSum() && middleResult.getSum() >= rightResult.getSum()) {
+            } else if (middleResult.sum() >= leftResult.sum() && middleResult.sum() >= rightResult.sum()) {
                 return middleResult;
             } else {
                 return rightResult;
@@ -57,9 +57,9 @@ public class MaxSubArray {
             Result leftResult = maxSubArray(array, left, right - 1);
             Result rightResult = maxSubArray(array, left, left + 1);
             Result all = new Result(array, left, right);
-            if (all.getSum() > leftResult.getSum() && all.getSum() > rightResult.getSum()) {
+            if (all.sum() > leftResult.sum() && all.sum() > rightResult.sum()) {
                 return all;
-            } else if (leftResult.getSum() >= rightResult.getSum()) {
+            } else if (leftResult.sum() >= rightResult.sum()) {
                 return leftResult;
             } else {
                 return rightResult;
@@ -67,45 +67,17 @@ public class MaxSubArray {
         }
     }
 
-    static class Result {
-        int sum;
-        int left;
-        int right;
-
-        public Result() {
+    static record Result(int sum, int left, int right) {
+        public Result(int[] array, int lefIndex, int rightIndex) {
+            this(sumArray(array), lefIndex, rightIndex);
         }
 
-        public Result(int[] array, int left, int right) {
-            this.left = left;
-            this.right = right;
-            this.sum = 0;
-            for (int i = left; i <= right; i++) {
-                sum += array[i];
+        private static int sumArray(int[] array) {
+            int sum = 0;
+            for (int value : array) {
+                sum += value;
             }
-        }
-
-        public int getLeft() {
-            return left;
-        }
-
-        public void setLeft(int left) {
-            this.left = left;
-        }
-
-        public int getRight() {
-            return right;
-        }
-
-        public void setRight(int right) {
-            this.right = right;
-        }
-
-        public int getSum() {
             return sum;
-        }
-
-        public void setSum(int sum) {
-            this.sum = sum;
         }
     }
 }
