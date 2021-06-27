@@ -10,9 +10,16 @@ public class QuickSort {
         quickSort(array, q + 1, right);
     }
 
+    /**
+     * 需要优化获取中位数的方法，确保数据划分的更均衡
+     * @param array
+     * @param left
+     * @param right
+     * @return
+     */
     private static int partition(int[] array, int left, int right) {
         int i = left - 1;
-        for (int j = left; j < right - 1; j++) {
+        for (int j = left; j <= right - 1; j++) {
             if (array[j] < array[right] && ++i < j) {
                 int temp = array[i];
                 array[i] = array[j];

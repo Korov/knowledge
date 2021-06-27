@@ -16,10 +16,10 @@ class MaxSubArrayTest extends Specification {
 
         when:
         while (data.hasNext()) {
-            int[] array = data.next()
-            long start = System.nanoTime()
+            def array = data.next() as int[]
+            def start = System.nanoTime()
             MaxSubArray.Result result = MaxSubArray.getMaxSubArray(array, 0, array.length - 1)
-            long end = System.nanoTime()
+            def end = System.nanoTime()
             log.info("cost:{}, sum:{}, left:{}, right:{}", end - start, result.sum(), result.sum(), result.sum())
         }
 
