@@ -1,7 +1,7 @@
 package org.algorithms.example
 
 import groovy.util.logging.Slf4j
-import org.algorithms.example.util.FileIterable
+import org.algorithms.example.util.FileUtil
 import spock.lang.Specification
 
 /**
@@ -11,7 +11,7 @@ import spock.lang.Specification
 class MaxSubArrayTest extends Specification {
     def "test read data from file"() {
         given:
-        FileIterable fileIterable = new FileIterable("src/test/resources/array.txt")
+        FileUtil fileIterable = new FileUtil("src/test/resources/array.txt")
         Iterator<int[]> data = fileIterable.iterator()
 
         when:

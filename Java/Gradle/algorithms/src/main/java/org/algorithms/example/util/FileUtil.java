@@ -9,10 +9,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class FileIterable implements Iterable<int[]> {
+public class FileUtil implements Iterable<int[]> {
     private final String fileName;
 
-    public FileIterable(String fileName) {
+    public FileUtil(String fileName) {
         this.fileName = fileName;
     }
 
