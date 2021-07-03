@@ -11,6 +11,10 @@ docker build --build-arg JENKINS_VERSION=2.295 -t korov/jenkins:alpine-2.295 .
 ```bash
 docker run -d -p 8080:8080 -p 50000:50000 --name jenkins korov/jenkins:alpine-2.295
 docker exec -it --user root jenkins bash
+
+# 修改国内镜像源
+sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories
+
 # 修改镜像 https://updates.jenkins-zh.cn/update-center.json
 sed -i 's?\(<url>\).*\(</url>\)?\1https://mirrors.tuna.tsinghua.edu.cn/jenkins/updates/update-center.json\2?g' /var/jenkins_home/hudson.model.UpdateCenter.xml
 docker restart jenkins

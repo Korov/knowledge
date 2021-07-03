@@ -1,16 +1,15 @@
 FROM adoptopenjdk/openjdk11:jdk-11.0.11_9-alpine
 
-RUN apk add --no-cache \
-  bash \
-  coreutils \
-  curl \
-  git \
-  git-lfs \
-  openssh-client \
-  tini \
-  ttf-dejavu \
-  tzdata \
-  unzip
+LABEL author="korov" email="korov9@163.com" version="1.0.0"
+
+RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
+  && apk add --no-cache bash zsh coreutils curl git vim htop git-lfs openssh-client tini ttf-dejavu tzdata unzip \
+  && git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh && cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc \
+  && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting \
+  && git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
+  && git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions \
+  && sed -i 's/plugins=(git)/plugins=(git z extract history zsh-autosuggestions zsh-syntax-highlighting zsh-completions)/g' ~/.zshrc
+   
 
 ARG user=jenkins
 ARG group=jenkins
