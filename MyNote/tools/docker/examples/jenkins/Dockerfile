@@ -4,11 +4,11 @@ LABEL author="korov" email="korov9@163.com" version="1.0.0"
 
 RUN sed -i 's/dl-cdn.alpinelinux.org/mirrors.aliyun.com/g' /etc/apk/repositories \
   && apk add --no-cache bash zsh coreutils curl git vim htop git-lfs openssh-client tini ttf-dejavu tzdata unzip \
-  && git clone https://github.com/ohmyzsh/ohmyzsh.git ~/.oh-my-zsh && cp ~/.oh-my-zsh/templates/zshrc.zsh-template ~/.zshrc \
-  && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting \
-  && git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
-  && git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=~/.oh-my-zsh/custom}/plugins/zsh-completions \
-  && sed -i 's/plugins=(git)/plugins=(git z extract history zsh-autosuggestions zsh-syntax-highlighting zsh-completions)/g' ~/.zshrc
+  && git clone https://github.com/ohmyzsh/ohmyzsh.git root/.oh-my-zsh && cp root/.oh-my-zsh/templates/zshrc.zsh-template root/.zshrc \
+  && git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ${ZSH_CUSTOM:=root/.oh-my-zsh/custom}/plugins/zsh-syntax-highlighting \
+  && git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:=root/.oh-my-zsh/custom}/plugins/zsh-autosuggestions \
+  && git clone https://github.com/zsh-users/zsh-completions ${ZSH_CUSTOM:=root/.oh-my-zsh/custom}/plugins/zsh-completions \
+  && sed -i 's/plugins=(git)/plugins=(git z extract history zsh-autosuggestions zsh-syntax-highlighting zsh-completions)/g' root/.zshrc
    
 
 ARG user=jenkins
