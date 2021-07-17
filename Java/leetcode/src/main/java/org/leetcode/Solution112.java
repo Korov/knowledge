@@ -1,6 +1,6 @@
 package org.leetcode;
 
-import java.util.Stack;
+import java.util.*;
 
 /**
  * https://leetcode-cn.com/problems/path-sum/
@@ -8,35 +8,34 @@ import java.util.Stack;
 public class Solution112 {
     private static final Stack<TreeNode> stack = new Stack<>();
 
-    public boolean hasPathSum(TreeNode root, int targetSum) {
-        int sum = root.val;
-        if (root.left == null && root.right == null) {
-            return sum == targetSum;
-        }
-        stack.add(root);
-        while (stack.size() > 1 && (stack.peek().left != null || stack.peek().right != null)) {
-            TreeNode topNode = stack.peek();
+    private static final Map<TreeNode, Integer> treeMap = new HashMap<>();
 
-            if (topNode.left == null && topNode.right == null) {
-                if (sum == targetSum) {
-                    return true;
-                } else {
-                    sum -= topNode.val;
-                    stack.pop();
-                    TreeNode topParent = stack.peek();
-                    if (topParent.left == topNode) {
-                        topParent.left = null;
-                    } else if (topParent.right == topNode) {
-                        topParent.right = null;
-                    }
+    public boolean hasPathSum(TreeNode root, int targetSum) {
+        if (root == null) {
+            return false;
+        } else if (root.left == null && root.right == null) {
+            return root.val == targetSum;
+        }
+        List<TreeNode> trees = new ArrayList<>();
+        trees.add(root);
+        treeMap.put(root, root.val);
+        while (!trees.isEmpty()) {
+            List<TreeNode> temp = new ArrayList<>();
+            for (TreeNode treeNode : trees) {
+                int parentSum = treeMap.get(treeNode);
+                if (treeNode.left != null) {
+                    temp.add(treeNode.left);
+                    treeMap.put(treeNode.left, parentSum + treeNode.left.val);
                 }
-            } else if (topNode.left != null) {
-                stack.add(topNode.left);
-                sum += topNode.left.val;
-            } else {
-                stack.add(topNode.right);
-                sum += topNode.right.val;
+                if (treeNode.right != null) {
+                    temp.add(treeNode.right);
+                    treeMap.put(treeNode.right, parentSum + treeNode.right.val);
+                }
+                if (treeNode.left == null && treeNode.right == null && treeMap.get(treeNode) == targetSum) {
+                    return true;
+                }
             }
+            trees = temp;
         }
 
         return false;
