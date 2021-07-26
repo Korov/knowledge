@@ -14,19 +14,89 @@
 
 # 1 走近Java
 
-## 1.1自己编译jdk
+## 1.4 Java虚拟机家族
 
-### 1.1.1 获取jdk源码
+### 1.4.6 Dalvik虚拟机
 
-http://jdk7.java.net/source.html
+Dalvik使用寄存器架构而不是Java虚拟机中常见的栈架构。
 
-### 1.1.2 构建编译环境
+寄存器架构：
 
-需要安装Bootstrap JDK和Ant以及GCC（一般默认安装）
+1. 典型的应用是x86的二进制指令集
+2. **指令集架构完全依赖硬件，可移植性差**
+3. **性能优秀，执行效率高**
+4. 花费更少的指令去完成一项操作
+5. 在大部分情况下，基于寄存器架构的指令集往往都是以一地址指令、二地址指令和三地址指令为主，而基于栈式架构的指令集却是以零地址指令为主
+
+栈式架构的特点：
+
+1. 设计和实现更简单，适用于资源受限的系统
+2. 避开了寄存器的分配难题：使用零地址指令方式分配
+3. 指令流中的指令大部分是零地址指令，其执行过程依赖于操作栈。指令集更小，编译器更容易实现
+4. **不需要硬件支持，可移植性更好，更好实现跨平台**
+
+#### java栈式架构示例：
+
+```java
+public int test() {
+    int i = 2;
+    int j = 3;
+    return i + j;
+}
+```
+
+字节码（ILOAD将一个局部变量加载到操作栈，ISTORE将一个数值从操作数栈存储到局部变量表）
+
+```
+  public test()I
+   L0
+    LINENUMBER 14 L0
+    ICONST_2 // 常量2入栈
+    ISTORE 1 // 将常量2存储到局部变量表位置1
+   L1
+    LINENUMBER 15 L1
+    ICONST_3
+    ISTORE 2
+   L2
+    LINENUMBER 16 L2
+    ILOAD 1 // 将局部变量表位置1的数加载到操作栈
+    ILOAD 2 // 将局部变量表位置2的数加载到操作栈
+    IADD // 将操作数栈中的前两个int相加，并将结果压入栈顶
+    IRETURN // 返回
+   L3
+    LOCALVARIABLE this Lcn/yottabyte/siem/Demo; L0 L3 0
+    LOCALVARIABLE i I L1 L3 1
+    LOCALVARIABLE j I L2 L3 2
+    MAXSTACK = 2
+    MAXLOCALS = 3
+```
+
+#### 基于寄存器的计算流程
+
+```
+mov eax,2 // 将eax寄存器的值设为2 
+add eax,3 // 将eax寄存器的值加3
+```
+
+#### 总结
+
+寄存器速度快效率高，但是依赖硬件；栈式简单，可移植性高。所以Java是已于栈式的。
+
+## 1.6自己编译jdk
+
+### 1.6.1 获取OpenJDK源码
 
 ```bash
-sudo apt-get install -y zip unzip build-essential libx11-dev libxext-dev libxrender-dev libxtst-dev libxt-dev libcups2-dev libfreetype6-dev libasound2-dev ccache gawk m4 libasound2-dev  libxrender-dev xutils-dev binutils libmotif-dev ant
-sudo apt-get install openjdk-7-jdk 
+hg clone https://hg.openjdk.java.net/jdk/jdk12
+```
+
+### 1.6.2 构建编译环境
+
+需要安装Bootstrap JDK和Ant以及GCC（Ubuntu 18.04 一般默认安装）
+
+```bash
+sudo apt-get install -y build-essential libfreetype6-dev libcups2-dev libx11-dev libxext-dev libxrender-dev libxtst-dev libxt-dev libasound2-dev libffi-dev autoconf
+sudo apt-get install openjdk-11-jdk 
 ```
 
 ### 1.1.3 进行编译
@@ -549,6 +619,10 @@ Major GC/Full GC（老年代GC）：指发生在老年代的GC，出现了Major 
 ### 3.5.5 空间分配担保
 
 在发生Minor GC之前，虚拟机会先检查老奶奶带最大可用的连续空间是否大于新生代所有对象总空间，如果这个条件成立，那么Minor GC可以确保是安全的。如果不成立，则虚拟机会查看HandlePromotionFailure设置值是否允许担保失败。如果允许，那么会继续检查老年代最大可用的连续空间是否大于历次晋升到老年代对象的平均大小，如果大于，将尝试着进行一次MinorGC，尽管这次MinorGC是有风险的；如果小于，或者HandlePromotionFailure设置不允许冒险，那这时也要改为进行一次FullGC。
+
+## 3.6 HotSpot的算法细节实现
+
+
 
 # 4 虚拟机性能监控与故障处理工具
 
