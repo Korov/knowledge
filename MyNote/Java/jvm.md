@@ -2054,15 +2054,15 @@ dump文件中对象有Shallow Heap和Retained Heap，Shallow Heap表明对象自
 
 通过命令启动`jfr`
 
-```
+```bash
 # 采集一个小时的数据，数据保存时间2天，jfr文件最大2GB，保存的文件名称为siem.jfr，在程序退出的时候将jfr数据dump出来
-jcmd 317553 JFR.start name=siem maxage=2d maxsize=2g duration=1h filename=siem.jfr dumponexit=true
+jcmd 317553 JFR.start name=jfr-dump maxage=2d maxsize=2g duration=2h filename=jfr-dump.jfr dumponexit=true
 # 查看采集的状态
 jcmd 317553 JFR.check
 # 将采集的数据立即dump出来，给一个新的名字
-jcmd 317553 JFR.dump filename=siem-1.jfr
+jcmd 317553 JFR.dump filename=jfr-dump-1.jfr
 # 停止采集，必须指定name
-jcmd 317553 JFR.stop name=siem
+jcmd 317553 JFR.stop name=jfr-dump
 ```
 
 常用配置：
