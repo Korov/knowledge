@@ -69,6 +69,10 @@ Basically Available（基本可用）、Soft state（软状态）和Eventually c
 . 单调读一致性（Monotonic read consistency）：如果一个进程从系统中读取一个数据项的某个值后，那么系统对于该进程后续的任何数据访问都不应该返回更旧的值。
 . 单调写一致性（Monotonic write consistency）：一个系统需要能够确保来自同一个进程的写操作被顺序的执行。
 
+== 一致性协议 ==
+
+=== 2PC与3PC ===
+
 
 
 
