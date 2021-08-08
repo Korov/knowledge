@@ -179,16 +179,16 @@ innobackupex --user=root --password=abc123456 --copy-back /data/backup/full/2018
 #### 2 Replication
 
 ```bash
-docker pull mysql
+docker pull mysql:8.0.26
 ```
 
 启动主从服务器（注意启动之前要确保my.cnf的权限是644，否则会被忽略，卡了我一天）
 
 ```bash
-chown -R root master/config
-chgrp -R root master/config
-chown -R root slave/config
-chgrp -R root slave/config
+sudo chown -R root master/config
+sudo chgrp -R root master/config
+sudo chown -R root slave/config
+sudo chgrp -R root slave/config
 
 #创建一个MySQL使用的网络
 docker network create --driver bridge --subnet 172.20.0.0/16 net_mysql
@@ -199,9 +199,6 @@ docker-compose -f docker-compose.yaml up -d
 使用数据库连接工具进行连接，先连接主服务器的数据库依次执行
 
 ```MySQL 
-#修改添加用户的加密方式
-CREATE USER 'korov'@'%' IDENTIFIED WITH mysql_native_password BY 'korov';
-
 GRANT REPLICATION SLAVE ON *.* TO 'root'@'%';
 flush privileges;
 show master status;#可以看到主数据库的状态
