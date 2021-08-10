@@ -1308,10 +1308,10 @@ MySQL 可以自动地监测行锁导致的死锁并进行相应的处理，但�
 
 **备份**
 
-备份指定的数据库，或者此数据库中某些表。
+备份指定的数据库，或者此数据库中某些表。(使用mysqldump8之后导出8之前版本数据的时候需要加上--column-statistics=0)
 
 ```bash
-mysqldump -h 192.168.1.19 -P 3306 -uroot -p [options] db_name [tables] > /var/backup/demo.sql
+mysqldump [--column-statistics=0] -h 192.168.1.19 -P 3306 -uroot -p [options] db_name [tables] > /var/backup/demo.sql
 ```
 
 备份指定的一个或多个数据库。
@@ -1331,7 +1331,7 @@ mysqldump [options] --all-databases
 mysqldump的恢复很简单，将备份文件作为输入执行即可：
 
 ```shell
-mysql -uroot -p [dbname] < bakfile
+mysql -h 192.168.1.19 -P 3306 -uroot -p [dbname] < bakfile
 ```
 
 ### 27.2.3 基于时间点恢复
