@@ -1,4 +1,4 @@
- groups:
+groups:
 - name: alert.rules
   rules:
   - alert: PD_cluster_offline_tikv_nums
