@@ -5,6 +5,8 @@ v1.0 2020-12-20
 :toc: right
 :imagesdir: assets/images
 :homepage: http://asciidoctor.org
+:source-highlighter: pygments
+:source-language: java
 
 
 == 段落标题 (1级) ==
