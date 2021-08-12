@@ -55,6 +55,11 @@ services:
       - "tikv0"
     restart: on-failure
 
+  pushgateway:
+    image: prom/pushgateway:v0.3.1
+    command:
+      - --log.level=error
+    restart: on-failure
   prometheus:
     user: root
     image: prom/prometheus:v2.2.1
