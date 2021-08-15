@@ -1,215 +1,143 @@
 version: "3.8"
 services:
-# sharding 副本集 rs1
-    mongo-1-2:
-        container_name: "mongo-1-2"
-        image: mongo:4.4.6
-        # volumes:
-        #     - ./data/mongo-1-2:/data/db
-        ports:
-            - "30012:27017"
-        command: mongod --replSet rs1 --dbpath /data/db --shardsvr --port 27017 --nojournal --oplogSize 16
-        restart: always
+router01:
+    image: mongo:4.4.6
+    container_name: rydell-router-01
+    command: mongos --port 27017 --configdb rs-config-server/configsvr01:27017,configsvr02:27017,configsvr03:27017 --bind_ip_all
+    ports:
+      - 27117:27017
+    volumes:
+      - ./scripts:/scripts
+  router02:
+    image: mongo:4.4.6
+    container_name: rydell-router-02
+    command: mongos --port 27017 --configdb rs-config-server/configsvr01:27017,configsvr02:27017,configsvr03:27017 --bind_ip_all
+    volumes:
+      - ./scripts:/scripts
+    ports:
+      - 27118:27017
+    links:
+      - router01
 
-    mongo-1-3:
-        container_name: "mongo-1-3"
-        image: mongo:4.4.6
-        # volumes:
-        #     - ./data/mongo-1-3:/data/db
-        ports:
-            - "30013:27017"
-        command: mongod --replSet rs1 --dbpath /data/db --shardsvr --port 27017 --nojournal --oplogSize 16
-        restart: always 
+## Config Servers
+  configsvr01:
+    image: mongo:4.4.6
+    container_name: rydell-mongo-config-01 
+    command: mongod --port 27017 --configsvr --replSet rs-config-server
+    volumes:
+      - ./scripts:/scripts 
+    ports:
+      - 27119:27017
+    links:
+      - shard01-a
+      - shard02-a
+      - shard03-a
+  configsvr02:
+    image: mongo:4.4.6
+    container_name: rydell-mongo-config-02 
+    command: mongod --port 27017 --configsvr --replSet rs-config-server
+    volumes:
+      - ./scripts:/scripts
+    ports:
+      - 27120:27017
+    links:
+      - configsvr01
+  configsvr03:
+    image: mongo:4.4.6
+    container_name: rydell-mongo-config-03 
+    command: mongod --port 27017 --configsvr --replSet rs-config-server
+    volumes:
+      - ./scripts:/scripts
+    ports:
+      - 27121:27017
+    links:
+      - configsvr02
 
-    mongo-1-1:
-        container_name: "mongo-1-1"
-        image: mongo:4.4.6
-        # volumes:
-        #     - ./data/mongo-1-1:/data/db
-        ports:
-            - "30011:27017"
-        command: mongod --replSet rs1 --dbpath /data/db --shardsvr --port 27017 --nojournal --oplogSize 16
-        links:
-            - mongo-1-2:mongo-1-2
-            - mongo-1-3:mongo-1-3
-        restart: always
+## Shards
+  ## Shards 01
+   
+  shard01-a:
+    image: mongo:4.4.6
+    container_name: rydell-shard-01-node-a
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-01
+    volumes:
+      - ./scripts:/scripts
+    ports:
+      - 27122:27017
+    links:
+      - shard01-b
+      - shard01-c
+  shard01-b:
+    image: mongo:4.4.6
+    container_name: rydell-shard-01-node-b
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-01
+    volumes:
+      - ./scripts:/scripts
+    ports:
+      - 27123:27017
+  shard01-c:
+    image: mongo:4.4.6
+    container_name: rydell-shard-01-node-c
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-01
+    volumes:
+      - ./scripts:/scripts
+    ports:
+      - 27124:27017
 
-    mongo-rs1-setup:
-        container_name: "mongo-rs1-setup"
-        image: mongo:4.4.6
-        depends_on:
-            - "mongo-1-1"
-            - "mongo-1-2"
-            - "mongo-1-3"
-        links:
-            - mongo-1-1:mongo-1-1
-            - mongo-1-2:mongo-1-2
-            - mongo-1-3:mongo-1-3
-        volumes:
-            - ./scripts:/scripts
-        environment: 
-            - MONGO1=mongo-1-1
-            - MONGO2=mongo-1-2
-            - MONGO3=mongo-1-3
-            - RS=rs1
-        entrypoint: [ "/scripts/setup.sh" ]
+  ## Shards 02
+  shard02-a:
+    image: mongo:4.4.6
+    container_name: rydell-shard-02-node-a
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-02
+    volumes:
+      - ./scripts:/scripts
+    ports:
+      - 27125:27017
+    links:
+      - shard02-b
+      - shard02-c
+  shard02-b:
+    image: mongo:4.4.6
+    container_name: rydell-shard-02-node-b
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-02
+    volumes:
+      - ./scripts:/scripts
+    ports:
+      - 27126:27017
+  shard02-c:
+    image: mongo:4.4.6
+    container_name: rydell-shard-02-node-c
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-02
+    volumes:
+      - ./scripts:/scripts
+    ports:
+      - 27127:27017
 
-# sharding 副本集 rs2
-    mongo-2-2:
-        container_name: "mongo-2-2"
-        image: mongo:4.4.6
-        # volumes:
-        #     - ./data/mongo-2-2:/data/db
-        ports:
-            - "30022:27017"
-        command: mongod --replSet rs2 --dbpath /data/db --shardsvr --port 27017 --nojournal --oplogSize 16
-        restart: always
-
-    mongo-2-3:
-        container_name: "mongo-2-3"
-        image: mongo:4.4.6
-        # volumes:
-        #     - ./data/mongo-2-3:/data/db
-        ports:
-            - "30023:27017"
-        command: mongod --replSet rs2 --dbpath /data/db --shardsvr --port 27017 --nojournal --oplogSize 16
-        restart: always 
-
-    mongo-2-1:
-        container_name: "mongo-2-1"
-        image: mongo:4.4.6
-        # volumes:
-        #     - ./data/mongo-2-1:/data/db
-        ports:
-            - "30021:27017"
-        command: mongod --replSet rs2 --dbpath /data/db --shardsvr --port 27017 --nojournal --oplogSize 16
-        links:
-            - mongo-2-2:mongo-2-2
-            - mongo-2-3:mongo-2-3
-        restart: always
-
-    mongo-rs2-setup:
-        container_name: "mongo-rs2-setup"
-        image: mongo:4.4.6
-        depends_on:
-            - "mongo-2-1"
-            - "mongo-2-2"
-            - "mongo-2-3"
-        links:
-            - mongo-2-1:mongo-2-1
-            - mongo-2-2:mongo-2-2
-            - mongo-2-3:mongo-2-3
-        volumes:
-            - ./scripts:/scripts
-        environment: 
-            - MONGO1=mongo-2-1
-            - MONGO2=mongo-2-2
-            - MONGO3=mongo-2-3
-            - RS=rs2
-        entrypoint: [ "/scripts/setup.sh" ]
-        
-#config 副本集 cnf-serv
-    mongo-cnf-2:
-        container_name: "mongo-cnf-2"
-        image: mongo:4.4.6
-        # volumes:
-        #     - ./data/mongo-cnf-2:/data/db
-        ports:
-            - "30002:27017"
-        command: mongod --replSet cnf-serv --dbpath /data/db --configsvr --port 27017 --oplogSize 16
-        restart: always
-
-    mongo-cnf-3:
-        container_name: "mongo-cnf-3"
-        image: mongo:4.4.6
-        # volumes:
-        #     - ./data/mongo-cnf-3:/data/db
-        ports:
-            - "30003:27017"
-        command: mongod --replSet cnf-serv --dbpath /data/db --configsvr --port 27017 --oplogSize 16
-        restart: always 
-
-    mongo-cnf-1:
-        container_name: "mongo-cnf-1"
-        image: mongo:4.4.6
-        # volumes:
-        #     - ./data/mongo-cnf-1:/data/db
-        ports:
-            - "30001:27017"
-        command: mongod --replSet cnf-serv --dbpath /data/db --configsvr --port 27017 --oplogSize 16
-        links:
-            - mongo-cnf-2:mongo-cnf-2
-            - mongo-cnf-3:mongo-cnf-3
-        restart: always
-
-    mongo-cnf-setup:
-        container_name: "mongo-cnf-setup"
-        image: mongo:4.4.6
-        depends_on:
-            - "mongo-cnf-1"
-            - "mongo-cnf-2"
-            - "mongo-cnf-3"
-        links:
-            - mongo-cnf-1:mongo-cnf-1
-            - mongo-cnf-2:mongo-cnf-2
-            - mongo-cnf-3:mongo-cnf-3
-        volumes:
-            - ./scripts:/scripts
-        environment: 
-            - MONGO1=mongo-cnf-1
-            - MONGO2=mongo-cnf-2
-            - MONGO3=mongo-cnf-3
-            - RS=cnf-serv
-            - PORT=27017
-        entrypoint: [ "/scripts/setup-cnf.sh" ]
-
-# 创建router
-    mongo-router:
-        container_name: "mongo-router"
-        image: mongo:4.4.6
-        volumes:
-            - ./data/mongo-router:/data/db
-        ports:
-            - "40000:27017"
-        depends_on:
-            - "mongo-rs1-setup"
-            - "mongo-rs2-setup"
-            - "mongo-cnf-setup"
-        links:
-            - mongo-cnf-1:mongo-cnf-1
-            - mongo-cnf-2:mongo-cnf-2
-            - mongo-cnf-3:mongo-cnf-3
-            - mongo-1-1:mongo-1-1
-            - mongo-1-2:mongo-1-2
-            - mongo-1-3:mongo-1-3
-            - mongo-2-1:mongo-2-1
-            - mongo-2-2:mongo-2-2
-            - mongo-2-3:mongo-2-3
-        command: mongos --configdb cnf-serv/mongo-cnf-1:27017,mongo-cnf-2:27017,mongo-cnf-3:27017
-        restart: always
-
-    mongo-shard-setup:
-        container_name: "mongo-shard-setup"
-        image: mongo:4.4.6
-        depends_on:
-            - "mongo-router"
-        links:
-            - mongo-router:mongo-router
-        volumes:
-            - ./scripts:/scripts
-        environment: 
-            - MONGOS=mongo-router
-            - MONGO11=mongo-1-1
-            - MONGO12=mongo-1-2
-            - MONGO13=mongo-1-3
-            - MONGO21=mongo-2-1
-            - MONGO22=mongo-2-2
-            - MONGO23=mongo-2-3
-            - RS1=rs1
-            - RS2=rs2
-            - PORT=27017
-            - PORT1=27017
-            - PORT2=27017
-            - PORT3=27017
-        entrypoint: [ "/scripts/init-shard.sh" ]
-        restart: on-failure:20
+  ## Shards 03
+  shard03-a:
+    image: mongo:4.4.6
+    container_name: rydell-shard-03-node-a
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-03
+    volumes:
+      - ./scripts:/scripts
+    ports:
+      - 27128:27017
+    links:
+      - shard03-b
+      - shard03-c
+  shard03-b:
+    image: mongo:4.4.6
+    container_name: rydell-shard-03-node-b
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-03
+    volumes:
+      - ./scripts:/scripts
+    ports:
+      - 27129:27017
+  shard03-c:
+    image: mongo:4.4.6
+    container_name: rydell-shard-03-node-c
+    command: mongod --port 27017 --shardsvr --replSet rs-shard-03
+    volumes:
+      - ./scripts:/scripts
+    ports:
+      - 27130:27017
