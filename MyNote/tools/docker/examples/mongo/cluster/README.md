@@ -1,3 +1,12 @@
-# 架构
+```bash
+docker-compose up -d
 
-三台`Config Server`,三台`Mongos`(路由),三台`Mongod`.
+# 为某个Collection设置分片
+docker-compose exec mongo-router mongo
+use admin
+# 查看分片状态
+sh.status()
+# 对test Collection数据库分片
+db.runCommand({ enablesharding: 'test'})
+```
+
