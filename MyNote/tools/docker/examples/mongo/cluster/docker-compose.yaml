@@ -1,6 +1,6 @@
 version: "3.8"
 services:
-router01:
+  router01:
     image: mongo:4.4.6
     container_name: rydell-router-01
     command: mongos --port 27017 --configdb rs-config-server/configsvr01:27017,configsvr02:27017,configsvr03:27017 --bind_ip_all
