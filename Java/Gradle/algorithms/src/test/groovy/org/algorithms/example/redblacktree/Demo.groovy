@@ -1,10 +1,10 @@
-package org.algorithms.example.redblacktree;
+package org.algorithms.example.redblacktree
 
-import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
+import groovy.util.logging.Slf4j
+import org.junit.jupiter.api.Test
 
 @Slf4j
-public class Demo {
+class Demo {
     @Test
     void test() {
         RedBlackNode parent = new RedBlackNode(Color.BLACK, 5);
