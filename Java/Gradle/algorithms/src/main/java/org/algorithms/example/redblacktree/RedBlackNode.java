@@ -1,5 +1,8 @@
 package org.algorithms.example.redblacktree;
 
+import com.google.common.base.MoreObjects;
+import lombok.ToString;
+
 /**
  * @author korov
  */
@@ -11,7 +14,6 @@ public class RedBlackNode {
     public Integer value;
 
     public RedBlackNode() {
-
     }
 
     public RedBlackNode(Color color, Integer value) {
@@ -28,12 +30,12 @@ public class RedBlackNode {
 
     @Override
     public String toString() {
-        return "RedBlockNode{" +
-                "parent=" + (parent == null ? "empty parent" : parent) +
-                ", left=" + (left == null ? "empty left" : left) +
-                ", right=" + (right == null ? "empty right" : right) +
-                ", color=" + (color == null ? "empty color" : color) +
-                ", value=" + (value == null ? "empty value" : value) +
-                '}';
+        return MoreObjects.toStringHelper(this)
+                .add("parent", parent)
+                .add("left", left)
+                .add("right", right)
+                .add("color", color)
+                .add("value", value)
+                .toString();
     }
 }

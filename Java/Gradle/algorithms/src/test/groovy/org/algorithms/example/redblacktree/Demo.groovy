@@ -6,23 +6,40 @@ import org.junit.jupiter.api.Test
 @Slf4j
 class Demo {
     @Test
-    void test() {
-        RedBlackNode parent = new RedBlackNode(Color.BLACK, 5);
-        RedBlackNode left = new RedBlackNode(Color.BLACK, 4);
-        left.parent = parent;
-        RedBlackNode right = new RedBlackNode(Color.BLACK, 6);
-        right.parent = parent;
-        parent.left = left;
-        parent.right = right;
+    void rotateTest() {
+        RedBlackNode parent = new RedBlackNode(Color.BLACK, 5)
+        RedBlackNode left = new RedBlackNode(Color.BLACK, 4)
+        left.parent = parent
+        RedBlackNode right = new RedBlackNode(Color.BLACK, 6)
+        right.parent = parent
+        parent.left = left
+        parent.right = right
 
-        RedBlackNode tree = parent;
+        RedBlackNode tree = parent
 
-        tree = RedBlackUtil.leftRotate(tree, tree);
+        tree = RedBlackUtil.leftRotate(tree, tree)
 
-        tree = RedBlackUtil.rightRotate(tree, tree);
-        log.info("debug");
+        tree = RedBlackUtil.rightRotate(tree, tree)
+        log.info("debug")
 
         tree = RedBlackUtil.leftRotate(tree, tree.right);
-        log.info("debug");
+        log.info("debug")
+    }
+
+    @Test
+    void insertTest(){
+        RedBlackNode parent = new RedBlackNode(Color.BLACK, 5)
+        RedBlackNode left = new RedBlackNode(Color.BLACK, 4)
+        left.parent = parent
+        RedBlackNode right = new RedBlackNode(Color.BLACK, 6)
+        right.parent = parent
+        parent.left = left
+        parent.right = right
+
+        RedBlackNode tree = parent
+
+        RedBlackNode insertNode = new RedBlackNode(Color.BLACK, 7)
+        tree = RedBlackUtil.rbInsert(tree, insertNode)
+        log.info("debug")
     }
 }
