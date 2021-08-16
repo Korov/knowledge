@@ -41,8 +41,21 @@ repositories {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_11
-    targetCompatibility = JavaVersion.VERSION_11
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+    sourceCompatibility = "16"
+}
+
+tasks.withType<Test> {
+    systemProperty("file.encoding", "UTF-8")
+}
+
+tasks.withType<Javadoc> {
+    options.encoding = "UTF-8"
 }
 
 idea {

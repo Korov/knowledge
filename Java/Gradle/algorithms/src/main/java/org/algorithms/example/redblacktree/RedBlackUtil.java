@@ -9,6 +9,9 @@ public class RedBlackUtil {
      */
     public static RedBlackNode leftRotate(RedBlackNode tree, RedBlackNode node) {
         RedBlackNode rightNodeTemp = node.right;
+        if (rightNodeTemp == null) {
+            return tree;
+        }
         node.right = rightNodeTemp.left;
         rightNodeTemp.left = node;
         rightNodeTemp.parent = node.parent;
@@ -25,6 +28,9 @@ public class RedBlackUtil {
      */
     public static RedBlackNode rightRotate(RedBlackNode tree, RedBlackNode node) {
         RedBlackNode leftNodeTemp = node.left;
+        if (leftNodeTemp == null) {
+            return tree;
+        }
         node.left = leftNodeTemp.right;
         leftNodeTemp.right = node;
         leftNodeTemp.parent = node.parent;
