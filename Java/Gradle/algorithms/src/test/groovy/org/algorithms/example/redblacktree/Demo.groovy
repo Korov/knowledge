@@ -38,7 +38,9 @@ class Demo {
 
         RedBlackNode tree = parent
 
-        RedBlackNode insertNode = new RedBlackNode(Color.BLACK, 7)
+        RedBlackNode insertNode = new RedBlackNode(Color.BLACK, 3)
+        tree = RedBlackUtil.rbInsert(tree, insertNode)
+        insertNode = new RedBlackNode(Color.BLACK, 2)
         tree = RedBlackUtil.rbInsert(tree, insertNode)
         log.info("debug")
     }
