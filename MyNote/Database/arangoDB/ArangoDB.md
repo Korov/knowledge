@@ -415,7 +415,12 @@ collection.figures()
 ## 备份
 
 ```bash
-/opt/rizhiyi/parcels/arangodb/bin/arangodump --output-directory "/tmp/arangodump" --overwrite true --server.endpoint tcp://192.168.1.19:8529 --server.username root --server.password "rizhiyi&2014" --server.authentication true --server.database siem_db
+# 备份指定database
+arangodump --output-directory "/tmp/arangodump" --compress-output --overwrite true --server.endpoint tcp://192.168.1.19:8529 --server.username root --server.password "rizhiyi&2014" --server.authentication true --server.database siem_db --collection ThreatTraceDoc_202107 --collection threatTraceEdge_202107
+
+# 备份还原所有database
+arangodump --all-databases true --threads 4
+arangorestore --all-databases true
 ```
 
 ## 还原
