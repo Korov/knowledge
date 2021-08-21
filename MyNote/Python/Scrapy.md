@@ -22,13 +22,13 @@ The data flow in Scrapy is controlled by the execution engine, and goes like thi
 
 The engine is responsible for controlling the data flow between all components of the system, and triggering events when certain actions occur. See the [Data Flow](https://docs.scrapy.org/en/latest/topics/architecture.html#data-flow) section above for more details.
 
-
+控制整个系统组件的数据流，并且在特定动作发生时出发事务。
 
 ### Scheduler
 
 The Scheduler receives requests from the engine and enqueues them for feeding them later (also to the engine) when the engine requests them.
 
-
+用来接收引擎发过来的请求，由过滤器过滤重复url并将其压入队列中，在引擎再次请求的时候返回，可以想象成一个url的优先队列，由他来决定下一个要抓取的网址是什么
 
 ### Downloader
 
@@ -40,13 +40,13 @@ The Downloader is responsible for fetching web pages and feeding them to the eng
 
 Spiders are custom classes written by Scrapy users to parse responses and extract [items](https://docs.scrapy.org/en/latest/topics/items.html#topics-items) from them or additional requests to follow. For more information see [Spiders](https://docs.scrapy.org/en/latest/topics/spiders.html#topics-spiders).
 
-
+可以生成url，并从特定的url中提取自己需要的信息，用户也可以从中提取出链接，让Scrapy继续抓取下一个页面
 
 ### Item Pipeline
 
 The Item Pipeline is responsible for processing the items once they have been extracted (or scraped) by the spiders. Typical tasks include cleansing, validation and persistence (like storing the item in a database). For more information see [Item Pipeline](https://docs.scrapy.org/en/latest/topics/item-pipeline.html#topics-item-pipeline).
 
-
+负责处理爬虫从网页中抽取的实体，主要的功能是持久化、验证实体的有效性、清除不需要的信息，当页面被爬虫解析后，将被发送到项目管道，并经过几个特定的次序处理数据。
 
 ### Downloader middlewares
 
