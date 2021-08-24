@@ -493,3 +493,13 @@ mongoexport --uri="mongodb://admin:admin@127.0.0.1:27017/admin" --authentication
 mongoimport --uri="mongodb://admin:admin@127.0.0.1:27017/admin" --authenticationDatabase="admin" --authenticationMechanism="SCRAM-SHA-256" --collection="logriver" --type="json" --file="/logriver.json"
 ```
 
+# 权限
+
+```javascript
+show roles;
+
+show users;
+
+db.createUser({user: "spider_test",pwd: "spider_test",roles: [ { role: "dbAdmin", db: "spider_test"} ]});
+```
+
