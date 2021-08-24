@@ -63,6 +63,9 @@ use old_name;
 db.dropDatabase('old_name');
 
 db.adminCommand({renameCollection: "db.collection1", to:"db.collection2"})
+
+// 删除Collection
+db.getCollection("test").drop();
 ```
 
 ## 修改collection中的字段
@@ -466,6 +469,115 @@ db.alert.find({key:"spl_alert"}, {"value.alertName":"同一源IP针对多目标�
 }
 ```
 
+# 权限
+
+## 创建admin超级管理员
+
+```javascript
+db.createUser(  
+  { user: "admin",  
+    customData：{description:"superuser"},
+    pwd: "admin",  
+    roles: [ { role: "userAdminAnyDatabase", db: "admin" } ]  
+  }  
+) 
+```
+
+user字段，为新用户的名字；
+pwd字段，用户的密码；
+cusomData字段，为任意内容，例如可以为用户全名介绍；
+roles字段，指定用户的角色，可以用一个空数组给新用户设定空角色。在roles字段,可以指定内置角色和用户定义的角色。
+超级用户的role有两种，userAdmin或者userAdminAnyDatabase(比前一种多加了对所有数据库的访问,仅仅是访问而已)。
+db是指定数据库的名字，admin是管理数据库。
+不能用admin数据库中的用户登录其他数据库。注：当我用admin登录的时候，切换到test数据库，test数据库中有个用户test_user，此时使用 show users 才能查看到此用户。
+
+## 创建一个不受访问限制的超级用户
+
+```javascript
+db.createUser(
+    {
+        user:"root",
+        pwd:"pwd",
+        roles:["root"]
+    }
+)
+```
+
+## 创建一个业务数据库管理员用户
+
+```javascript
+db.createUser({
+    user:"user001",
+    pwd:"123456",
+    customData:{
+        name:'jim',
+        email:'jim@qq.com',
+        age:18,
+    },
+    roles:[
+        {role:"readWrite",db:"db001"},
+        {role:"readWrite",db:"db002"},
+        'read'// 对其他数据库有只读权限，对db001、db002是读写权限
+    ]
+})
+```
+
+> 1. 数据库用户角色：read、readWrite；
+> 2. 数据库管理角色：dbAdmin、dbOwner、userAdmin;
+> 3. 集群管理角色：clusterAdmin、clusterManager、4. clusterMonitor、hostManage；
+> 4. 备份恢复角色：backup、restore；
+> 5. 所有数据库角色：readAnyDatabase、readWriteAnyDatabase、userAdminAnyDatabase、dbAdminAnyDatabase
+> 6. 超级用户角色：root
+> 7. 内部角色：__system
+
+> 1. Read：允许用户读取指定数据库
+> 2. readWrite：允许用户读写指定数据库
+> 3. dbAdmin：允许用户在指定数据库中执行管理函数，如索引创建、删除，查看统计或访问system.profile
+> 4. userAdmin：允许用户向system.users集合写入，可以在指定数据库里创建、删除和管理用户
+> 5. clusterAdmin：只在admin数据库中可用，赋予用户所有分片和复制集相关函数的管理权限。
+> 6. readAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的读权限
+> 7. readWriteAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的读写权限
+> 8. userAdminAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的userAdmin权限
+> 9. dbAdminAnyDatabase：只在admin数据库中可用，赋予用户所有数据库的dbAdmin权限。
+> 10. root：只在admin数据库中可用。超级账号，超级权限
+
+## 查看创建的用户
+
+```javascript
+// 显示当前数据库中的用户
+show users 
+
+// 只能查到当前数据库中的数据
+db.runCommand({usersInfo:"userName"})
+
+// 显示所有用户
+use admin;
+db.system.users.find();
+```
+
+## 修改密码
+
+```javascript
+use admin
+db.changeUserPassword("username", "xxx")
+
+db.runCommand(
+    {
+        updateUser:"username",
+        pwd:"xxx",
+        customData:{title:"xxx"}
+    }
+)
+```
+
+## 删除用户
+
+```
+db.dropUser('user001')
+```
+
+
+
 # 备份恢复
 
 ## mongodump
@@ -491,15 +603,5 @@ mongoexport --uri="mongodb://admin:admin@127.0.0.1:27017/admin" --authentication
 
 ```bash
 mongoimport --uri="mongodb://admin:admin@127.0.0.1:27017/admin" --authenticationDatabase="admin" --authenticationMechanism="SCRAM-SHA-256" --collection="logriver" --type="json" --file="/logriver.json"
-```
-
-# 权限
-
-```javascript
-show roles;
-
-show users;
-
-db.createUser({user: "spider_test",pwd: "spider_test",roles: [ { role: "dbAdmin", db: "spider_test"} ]});
 ```
 
