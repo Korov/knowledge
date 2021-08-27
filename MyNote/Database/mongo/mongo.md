@@ -285,7 +285,7 @@ totalDocsExamined
 db.collection.createIndex(keys, options)
 # 给alert集合中的所有文档的key键建立升序索引
 db.alert.createIndex({key:1})
-# 给alert集合中的所有文档的key键建立升序索引，value键建立降序索引
+# 给alert集合中的所有文档的key键建立升序索引，value键建立降序索引(组合索引，一个索引里面两个key)
 db.alert.createIndex({key:1，value：-1})
 # 后台创建索引
 db.values.createIndex({open: 1, close: 1}, {background: true})

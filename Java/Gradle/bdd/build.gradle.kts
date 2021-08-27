@@ -24,25 +24,25 @@ repositories {
 }
 
 dependencies {
-    testImplementation("org.codehaus.groovy:groovy:3.0.7")
+    testImplementation("org.codehaus.groovy:groovy:3.0.8")
     implementation(platform("org.jetbrains.kotlin:kotlin-bom"))
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.apache.curator:curator-framework:5.1.0")
-    implementation("com.google.guava:guava:30.1-jre")
+    implementation("com.google.guava:guava:30.1.1-jre")
 
     implementation("org.apache.logging.log4j:log4j-api:2.14.1")
     implementation("org.apache.logging.log4j:log4j-core:2.14.1")
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.14.1")
 
-    testImplementation(platform("org.spockframework:spock-bom:2.0-M4-groovy-3.0"))
+    testImplementation(platform("org.spockframework:spock-bom:2.0-groovy-3.0"))
     testImplementation("org.spockframework:spock-core")
     testImplementation("org.junit.platform:junit-platform-launcher:1.8.0-M1")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:5.8.0-M1")
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit")
 
-    testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.15")
-    testImplementation("org.spekframework.spek2:spek-runner-junit5:2.0.15")
+    testImplementation("org.spekframework.spek2:spek-dsl-jvm:2.0.17")
+    testImplementation("org.spekframework.spek2:spek-runner-junit5:2.0.17")
     testImplementation("org.jetbrains.kotlin:kotlin-reflect:1.4.20")
 }
 
