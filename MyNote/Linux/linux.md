@@ -513,7 +513,7 @@ sys	0m0.094s
 ```bash
 # 只归档不压缩
 tar -cf file.tar filepath
-tar -f file.tar -C filepath
+tar -xf file.tar -C filepath
 ```
 
 ### 并发打包pigz
