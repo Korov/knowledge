@@ -510,6 +510,12 @@ sys	0m0.094s
 
 仅备份比某个时刻还要新的文件：--newer,--newer-mtime。
 
+```bash
+# 只归档不压缩
+tar -cf file.tar filepath
+tar -f file.tar -C filepath
+```
+
 ### 并发打包pigz
 
 ```bash
