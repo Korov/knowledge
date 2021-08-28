@@ -393,6 +393,14 @@ find . -name "*.c"
 #检查一个文件中是否包含pain这个词
 grep pain three_no_more_forever.txt
 grep '^pain$' three_no_more_forever.txt
+# 使用扩展正则，o表示只展示匹配到的内容
+➜  ~ docker ps -a | grep -Eo "minions-spider-biquge[0-9]{0,}"
+minions-spider-biquge5
+minions-spider-biquge4
+minions-spider-biquge3
+minions-spider-biquge2
+minions-spider-biquge1
+minions-spider-biquge
 ```
 
 | 支持的模式                         | grep命令选项               | 单独的命令 |
