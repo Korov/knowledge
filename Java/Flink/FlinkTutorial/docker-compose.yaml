@@ -21,7 +21,7 @@ services:
 
   mongo:
     container_name: mongo-flink
-    image: mongo:4.4.5
+    image: mongo:5.0.2
     expose:
       - 27017
     ports:
@@ -31,7 +31,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: "admin"
 
   jobmanager:
-    image: flink:1.13.0-scala_2.12-java11
+    image: flink:1.13.2-scala_2.12-java11
     container_name: flink-jobmanager-flink
     expose:
       - "6123"
@@ -42,7 +42,7 @@ services:
       - JOB_MANAGER_RPC_ADDRESS=jobmanager
       - TASK_MANAGER_NUMBER_OF_TASK_SLOTS=4
   taskmanager:
-    image: flink:1.13.0-scala_2.12-java11
+    image: flink:1.13.2-scala_2.12-java11
     container_name: flink-taskmanager-flink
     expose:
       - "6121"
@@ -57,7 +57,7 @@ services:
       - TASK_MANAGER_NUMBER_OF_TASK_SLOTS=4
 
   postgres:
-    image: postgres:12.4
+    image: postgres:13.4-alpine
     container_name: postgres-flink
     ports:
     - 5432:5432
