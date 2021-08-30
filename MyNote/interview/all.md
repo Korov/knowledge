@@ -190,15 +190,15 @@ get：
 
 ### HashMap为什么只允许一个key为null
 
-如果key为null，hash这个key会返回0，然后null == null为true，null的可以一直放在第一个桶里。
+如果key为null，hash这个key会返回0，然后null == null为true，此时这个值就只会放在第一个桶里，再来一个null的话还是插入第一个桶了，所以只会有一个。
 
 ## HashMap在高并发下如果没有处理线程安全会有怎样的安全隐患，具体表现是什么
 
 1.多线程put时可能会导致get无限循环，具体表现为CPU使用率100%；原因：在向HashMap  put元素时，会检查HashMap的容量是否足够，如果不足，则会新建一个比原来容量大两倍的Hash表，然后把数组从老的Hash表中迁移到新的Hash表中，迁移的过程就是一个rehash()的过程（该方法中的transfer方法会执行出现循环Entry List），多个线程同时操作就有可能会形成循环链表，所以在使用get()时，就会出现Infinite Loop的情况。
 
-这是JDK7时候迁移的时候会出现这个问题，jdk8做了修改，迁移的时候按原有的顺序迁移
+这是JDK7时候迁移的时候会出现这个问题，jdk8做了修改，rehash的时候只会往链表的末尾添加元素，不会出现无限循环的问题了
 
-2.多线程put时可能导致元素丢失
+2.多线程put时可能导致元素丢失，jdk7和jdk8都有这个问题
 
 ## 如何实现数组和 List 之间的转换
 
@@ -206,10 +206,6 @@ get：
 2. 使用Arrays.asList
 3. Collections.addAll()
 4. 使用Stream中的Collector收集器
-
-## ArrayList和Vector区别
-
-两个都实现了List接口，继承了AbstractList类。Vector是线程安全的。都使用数组实现。vector的扩充为2n，ArrayList扩充为原来的1.5n。
 
 ## Queue中的方法
 
@@ -223,7 +219,7 @@ get：
 
 PriorityQueue 保证最高或者最低优先级的的元素总是在队列头部，但是 LinkedHashMap 维持的顺序是元素插入的顺序。当遍历一个 PriorityQueue 时，没有任何顺序保证，但是 LinkedHashMap 课保证遍历顺序是元素插入的顺序。
 
-LinkedHashMap存储数据的结构继承自HashMap，但是重新实现了Entry（多了before和after），以及newNode方法，使用newNode方法时会维护一个Node的双向链表。
+LinkedHashMap存储数据的结构继承自HashMap，但是重新实现了Entry（多了before和after），以及重新实现了newNode方法，使用newNode方法时会维护一个Node的双向链表。
 
 ## Iterator有什么特点
 
@@ -240,10 +236,6 @@ LinkedHashMap存储数据的结构继承自HashMap，但是重新实现了Entry�
 3. ListIterator可以定位当前的索引位置，nextIndex()和previousIndex()可以实现。Iterator没有此功能。
 4. ListIterator可以通过set方法实现对象的修改，Iterator不可以
 
-## 我们能自己写一个容器类，然后使用 for-each 循环码？
-
-可以，你可以写一个自己的容器类。如果你想使用 Java 中增强的循环来遍历，你只需要实现 Iterable 接口。如果你实现 Collection 接口，默认就具有该属性。
-
 ## 怎么确保一个集合不能被修改
 
 ```java
@@ -251,6 +243,8 @@ Collections.unmodifiableList(List);
 Collections.unmodifiableMap(List);
 Collections.unmodifiableSet(List);
 ```
+
+或者用Guava中自带的ImutableList
 
 ## 什么是反射
 
@@ -263,7 +257,7 @@ Collections.unmodifiableSet(List);
 
 序列化方式：
 
-- 实现Serializable接口(隐式序列化)
+- 实现Serializable接口(隐式序列化，实例中所有属性都会被序列化)
 - 实现Externalizable接口。(显式序列化)：Externalizable接口继承自Serializable, 我们在实现该接口时，必须实现writeExternal()和readExternal()方法，而且只能通过手动进行序列化，并且两个方法是自动调用的，因此，这个序列化过程是可控的，可以自己选择哪些部分序列化
 - 实现Serializable接口+添加writeObject()和readObject()方法。(显+隐序列化)：如果想将方式一和方式二的优点都用到的话，可以采用方式三， 先实现Serializable接口，并且添加writeObject()和readObject()方法。注意这里是添加，不是重写或者覆盖。但是添加的这两个方法必须有相应的格式。
   - 方法必须要被private修饰  
@@ -290,6 +284,14 @@ Collections.unmodifiableSet(List);
 **CGlib动态代理**：利用ASM（开源的Java字节码编辑库，操作字节码）开源包，将代理对象类的class文件加载进来，通过修改其字节码生成子类来处理。
 
 **区别**：JDK代理只能对实现接口的类生成代理；CGlib是针对类实现代理，对指定的类生成一个子类，并覆盖其中的方法，这种通过继承类的实现方式，不能代理final修饰的类。
+
+**Spring如何选择用JDK还是CGLiB？**
+
+1、当Bean实现接口时，Spring就会用JDK的动态代理。  2、当Bean没有实现接口时，Spring使用CGlib是实现。  3、可以强制使用CGlib（在spring配置中加入<aop:aspectj-autoproxy  proxy-target-class="true"/>，或者SpringBoot中添加@EnableAspectJAutoProxy(proxyTargetClass = true)注解）。
+
+**CGlib比JDK快？**
+
+1、使用CGLib实现动态代理，CGLib底层采用ASM字节码生成框架，使用字节码技术生成代理类， 在jdk6之前比使用Java反射效率要高。唯一需要注意的是，CGLib不能对声明为final的方法进行代理，  因为CGLib原理是动态生成被代理类的子类。  2、在jdk6、jdk7、jdk8逐步对JDK动态代理优化之后，在调用次数较少的情况下，JDK代理效率高于CGLIB代理效率，只有当进行大量调用的时候，jdk6和jdk7比CGLIB代理效率低一点，但是到jdk8的时候，jdk代理效率高于CGLIB代理，总之，每一次jdk版本升级，jdk代理效率都得到提升，而CGLIB代理消息确有点跟不上步伐。
 
 ## 如何实现克隆
 
@@ -426,14 +428,6 @@ java.lang.Cloneable 是一个标示性接口，不包含任何方法，clone 方
 
 不行，你不能在没有强制类型转换的前提下将一个 double 值赋值给 long 类型的变量，因为 double 类型的范围比 long 类型更广，所以必须要进行强制转换。
 
-## 我们能在 Switch 中使用 String 吗？
-
-从 Java 7 开始，我们可以在 switch case 中使用字符串，但这仅仅是一个语法糖。内部实现在 switch 中使用字符串的 hash code。
-
-## 3\*0.1 == 0.3 将会返回什么？true 还是 false？
-
-false，因为有些浮点数不能完全精确的表示出来。
-
 ## a = a + b 与 a += b 的区别
 
 += 隐式的将加操作的结果类型强制转换为持有结果的类型。如果两这个整型相加，如 byte、short 或者 int，首先会将它们提升到 int 类型，然后在执行加法操作。如果加法操作的结果比 a 的最大值要大，则 a+b 会出现编译错误，但是 a += b 没问题，如下：
@@ -471,6 +465,8 @@ Comparable 接口用于定义对象的自然顺序，而 comparator 通常用于
 2. 使用 PreparedStatement 来避免 SQL 注入，并提高性能
 3. 使用数据库连接池
 4. 通过列名来获取结果集，不要使用列的下标来获取。
+5. 获取列的时候只获取必要的列，能distinct尽量distinct
+6. 对于数据量较大的表不可以使用关联查询，避免笛卡儿积问题
 
 ## 描述 Java 中的重载和重写
 
