@@ -32,7 +32,7 @@ import java.util.Properties;
 public class KafkaCount {
     // private static final String MONGO_HOST = "localhost";
     private static final String MONGO_HOST = "korov.myqnapcloud.cn";
-    private static final String DB_NAME = "admin";
+    private static final String DB_NAME = "kafka";
 
     public static void main(String[] args) throws Exception {
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
