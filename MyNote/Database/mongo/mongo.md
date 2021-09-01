@@ -596,7 +596,10 @@ mongodump --uri="mongodb://admin:admin@127.0.0.1:27017/admin"  --authenticationD
 
 ```bash
 # 若没有指定--nsInclude="admin.alert"，则恢复所有
-mongorestore --uri="mongodb://admin:admin@127.0.0.1:27017/admin" --authenticationDatabase="admin" --authenticationMechanism="SCRAM-SHA-256" --nsInclude="admin.alert" --gzip  --dir="/alert/admin"
+mongorestore --uri="mongodb://admin:admin@127.0.0.1:27017/admin" --authenticationDatabase="admin" --authenticationMechanism="SCRAM-SHA-256" --nsInclude="admin.alert" --gzip  --dir="/backup"
+
+将数据库app中带有user前缀的表都转移到app-dev中，功能真是太强大了
+mongorestore --nsInclude='app.user*' --nsFrom='app.*' --nsTo='app-dev.*' --gzip  --dir="/backup"
 ```
 
 ## mongoexport

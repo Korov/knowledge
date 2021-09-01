@@ -62,7 +62,7 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
         super.open(parameters);
         ServerAddress serverAddress = new ServerAddress(host, port);
         //MongoCredential.createScramSha1Credential()三个参数分别为 用户名 数据库名称 密码
-        MongoCredential mongoCredential = MongoCredential.createScramSha256Credential("admin", "admin", "zl7636012086".toCharArray());
+        MongoCredential mongoCredential = MongoCredential.createScramSha256Credential("kafka", "kafka", "kafka".toCharArray());
         MongoClientOptions options = MongoClientOptions.builder().maxConnectionIdleTime(6000).build();
         //通过连接认证获取MongoDB连接
         mongoClient = new MongoClient(ImmutableList.of(serverAddress), mongoCredential, options);
