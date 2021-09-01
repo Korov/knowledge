@@ -85,7 +85,13 @@ db.example.update({}, {$unset: {words:1}} , {multi: true});
 db.user.updateMany( {}, { $rename: { "user": "name" } } )
 ```
 
+## 创建collection
 
+```javascript
+db.getCollection("seen_urls").drop();
+db.createCollection("seen_urls", {storageEngine: {wiredTiger: {configString: "block_compressor=zstd"}}});
+db.getCollection("seen_urls").stats();
+```
 
 ## 高级更新
 
@@ -288,7 +294,7 @@ db.alert.createIndex({key:1})
 # 给alert集合中的所有文档的key键建立升序索引，value键建立降序索引(组合索引，一个索引里面两个key)
 db.alert.createIndex({key:1，value：-1})
 # 后台创建索引
-db.values.createIndex({open: 1, close: 1}, {background: true})
+db.values.createIndex({open: 1, close: 1}, {background: true, unique:true})
 ```
 
 `createIndex()`接收可选参数，可选参数列表如下：
