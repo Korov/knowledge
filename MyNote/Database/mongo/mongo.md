@@ -7,7 +7,7 @@
 ## 启动shell：
 
 ```bash
-mongo --username alice --password --authenticationDatabase admin --host mongodb0.examples.com --port 28015
+mongo --username alice --password --authenticationDatabase admin --host mongodb0.examples.com --port 27017
 ```
 
 ## 切换数据库
