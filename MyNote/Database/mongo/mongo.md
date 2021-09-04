@@ -134,6 +134,12 @@ db.stats();
 db.getCollection("kafka-key-count").stats();
 ```
 
+# 体系结构
+
+## 数据存储结构
+
+mongodb默认数据目录是`/data/db`，他负责存储所有的mongo的数据文件。在mongo内部每个数据库都包含一个`.ns`文件和一些数据库文件，而且这些数据文件会随着数据量的增加而变得越来越多。
+
 # 使用索引创建和查询
 
 ## explain
