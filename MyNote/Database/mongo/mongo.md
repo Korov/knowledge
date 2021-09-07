@@ -7,7 +7,8 @@
 ## 启动shell：
 
 ```bash
-mongo --username alice --password --authenticationDatabase admin --host mongodb0.examples.com --port 27017
+# 5版本之后推荐使用mongosh之前使用mongo
+mongosh --username alice --password --authenticationDatabase admin --host mongodb0.examples.com --port 27017
 ```
 
 ## 切换数据库
@@ -16,7 +17,7 @@ mongo --username alice --password --authenticationDatabase admin --host mongodb0
 # 数据库不需要手动创建，切换的时候会自动创建数据库
 use database
 # collection也不需要手动创建，插入的时候会自动创建
-db.user.insert({username: "korov"})
+db.user.insertOne({username: "korov"})
 # 查询user集合中的所有数据
 db.user.find()
 db.user.find().pretty()
@@ -139,6 +140,20 @@ db.getCollection("kafka-key-count").stats();
 ## 数据存储结构
 
 mongodb默认数据目录是`/data/db`，他负责存储所有的mongo的数据文件。在mongo内部每个数据库都包含一个`.ns`文件和一些数据库文件，而且这些数据文件会随着数据量的增加而变得越来越多。
+
+`WiredTiger.wt`文件是mongodb的元数据文件，存储了其他数据库表的元数据信息。
+
+## 引擎
+
+### WiredTiger Storage Engine
+
+#### Document Level Concurrency
+
+支持文档级别的并发写控制，因此，多个客户端可以同时修改不同的文档
+
+### GridFS
+
+支持超大文件（16MB），例如视频啥的。
 
 # 使用索引创建和查询
 

@@ -478,16 +478,6 @@ Comparable 接口用于定义对象的自然顺序，而 comparator 通常用于
 
 # Java并发
 
-## 在多线程环境下，SimpleDateFormat 是线程安全的吗
-
-不是，非常不幸，DateFormat 的所有实现，包括 SimpleDateFormat 都不是线程安全的，因此你不应该在多线程序中使用，除非是在对外线程安全的环境中使用，如 将 SimpleDateFormat 限制在 ThreadLocal 中。如果你不这么做，在解析或者格式化日期的时候，可能会获取到一个不正确的结果。因此，从日期、时间处理的所有实践来说，我强力推荐 joda-time 库。
-
-```java
-Date date = new Date();
-SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyy-MM-dd HH:mm:ss");
-System.out.println(simpleDateFormat.format(date));
-```
-
 ## Java实现多线程有哪几种方式
 
 - 继承Threads类
@@ -531,7 +521,7 @@ start被用来启动新线程并且在内部调用了run，run不能。start不�
 
 一种实现数据共享的轻量锁，**提供可见性保证。**
 
-volatile可以修饰对象，但是volatile指向的是对象的地址，而不是对象的内容，这样多线程访问时候无法访问到最新的对象内容。
+volatile可以修饰对象，但是volatile指向的是对象的地址，而不是对象的内容，这样多线程访问时候无法访问到最新的对象内容。通过读屏障和写屏障来实现，每次读的时候都是从主内存获取最新的数据，每次写的时候将数据写入到主内存中
 
 ### Java变量的读写
 
@@ -560,7 +550,7 @@ volatile的特殊规则就是：
 
 ### volatile如何防止指令重排
 
-volatile关键字通过`“内存屏障”`来防止指令被重排序。
+volatile关键字通过`内存屏障`来防止指令被重排序。
 
 为了实现volatile的内存语义，编译器在生成字节码时，会在指令序列中插入内存屏障来禁止特定类型的处理器重排序。然而，对于编译器来说，发现一个最优布置来最小化插入屏障的总数几乎不可能，为此，Java内存模型采取保守策略。
 

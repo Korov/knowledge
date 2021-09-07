@@ -10,6 +10,9 @@ docker build --build-arg JENKINS_VERSION=2.295 -t korov/jenkins:alpine-2.295 .
 
 ```bash
 docker run -d -p 8080:8080 -p 50000:50000 --name jenkins korov/jenkins:alpine-2.295
+# 官方镜像
+docker run -d -p 8080:8080 -p 50000:50000 --name jenkins jenkins/jenkins:2.303.1-jdk11
+
 docker exec -it --user root jenkins bash
 
 # 修改国内镜像源
@@ -40,4 +43,6 @@ docker run -d -p 9080:8080 --name jenkins -v `pwd`/jenkins-data:/var/jenkins_hom
 重新设置帐号密码：`admin/admin`
 
 # 集成GitLab
+
+
 
