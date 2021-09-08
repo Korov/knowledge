@@ -38,7 +38,7 @@ def write_excel():
     workSheet.unmerge_cells(range_string='A15:E18')
 
     currentTime = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
-    savePath = "C:\\Users\\Korov\\Desktop\\temporary\\PythonExcel\\sample{}.xlsx".format(currentTime)
+    savePath = "C:\\Users\\Korov\\Desktop\\temp\\PythonExcel\\sample{}.xlsx".format(currentTime)
     # Save the file
     workBook.save(savePath)
 
@@ -173,9 +173,9 @@ def exportToSql(originaFile, sheetName, sqlFile):
 
 
 if __name__ == "__main__":
-    originaFile = 'C:\\Users\\Korov\\Desktop\\temporary\\PythonExcel\\test.xlsx'
+    originaFile = 'C:\\Users\\Korov\\Desktop\\temp\\PythonExcel\\test.xlsx'
     currentTime = time.strftime('%Y%m%d%H%M%S', time.localtime(time.time()))
-    targetFile = "C:\\Users\\Korov\\Desktop\\temporary\\PythonExcel\\sample{}.xlsx".format(currentTime)
+    targetFile = "C:\\Users\\Korov\\Desktop\\temp\\PythonExcel\\sample{}.xlsx".format(currentTime)
     strSplit = ';'
     sheetName = "test"
     newSheetName = "newTest"
@@ -183,8 +183,8 @@ if __name__ == "__main__":
     # write_excel();
     # format_excel(originaFile, targetFile, strSplit, sheetName, newSheetName);
 
-    originaFile = 'C:\\Users\\Korov\\Desktop\\temporary\\PythonExcel\\sample.xlsx'
+    originaFile = 'C:\\Users\\Korov\\Desktop\\temp\\PythonExcel\\sample.xlsx'
     sheetName = "newTest"
-    sqlFile = 'C:\\Users\\Korov\\Desktop\\temporary\\PythonExcel\\sample.sql'
+    sqlFile = 'C:\\Users\\Korov\\Desktop\\temp\\PythonExcel\\sample.sql'
     exportToSql(originaFile, sheetName, sqlFile)
     print("写入成功")
