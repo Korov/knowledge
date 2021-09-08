@@ -3,9 +3,6 @@ import time
 
 import openpyxl
 
-# 写excel
-from util import StringUtils
-
 
 def write_excel():
     # 创建工作簿
@@ -51,11 +48,14 @@ def write_excel():
 可以跨平台
 """
 
+def remove_line_breaks(oldString):
+    return oldString.replace('\n', '').replace('\r', '')
+
 
 def checkLength(workSheet, row, cols, param):
     maxNum = 0
     for col in range(1, cols + 1):
-        cellValue = StringUtils.remove_line_breaks(str(workSheet.cell(row=row, column=col).value))
+        cellValue = remove_line_breaks(str(workSheet.cell(row=row, column=col).value))
         if cellValue.find(param) >= 0:
             cells = cellValue.split(param)
             if maxNum == 0:
@@ -69,7 +69,7 @@ def checkLength(workSheet, row, cols, param):
 def addRange(maxNum, row, cols, workSheet, param):
     workSheet.insert_rows(row + 1, maxNum - 1)
     for col in range(1, cols + 1):
-        cellValue = StringUtils.remove_line_breaks(str(workSheet.cell(row=row, column=col).value))
+        cellValue = remove_line_breaks(str(workSheet.cell(row=row, column=col).value))
         for newRow in range(row, row + maxNum):
             cellValueLength = cellValue.find(param) if cellValue.find(param) >= 0 else len(cellValue)
             cellValueTemp = cellValue[0:cellValueLength]
@@ -81,7 +81,7 @@ def sheetCopy(originalSheet, targeSheet):
     for row in range(1, originalSheet.max_row + 1):
         for col in range(1, originalSheet.max_column + 1):
             targeSheet.cell(row=row, column=col,
-                            value=StringUtils.remove_line_breaks(str(originalSheet.cell(row=row, column=col).value)))
+                            value=remove_line_breaks(str(originalSheet.cell(row=row, column=col).value)))
 
 
 def unmergeSheet(sheet):
@@ -93,7 +93,7 @@ def unmergeSheet(sheet):
         sheet.unmerge_cells(range_string=mergedCell.coord)
         for row in range(mergedCell.min_row, mergedCell.max_row + 1):
             for col in range(mergedCell.min_col, mergedCell.max_col + 1):
-                sheet.cell(row=row, column=col, value=StringUtils.remove_line_breaks(str(cell.value)))
+                sheet.cell(row=row, column=col, value=remove_line_breaks(str(cell.value)))
 
 
 def splitSheetValue(sheet, strSplit):
