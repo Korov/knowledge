@@ -610,7 +610,7 @@ db.dropUser('user001')
 ## mongodump
 
 ```bash
-mongodump --uri="mongodb://admin:admin@127.0.0.1:27017/admin"  --authenticationDatabase="admin" --authenticationMechanism="SCRAM-SHA-256" --collection="alert" --gzip --out="/backup"
+mongodump --uri="mongodb://admin:admin@127.0.0.1:27017/kafka"  --authenticationDatabase="admin" --authenticationMechanism="SCRAM-SHA-256" --db="kafka" --collection="alert" -q='{ "a": { "$gte": 3 }, "date": { "$lt": { "$date": "2016-01-01T00:00:00.000Z" } } }' --gzip --out="/backup"
 ```
 
 ## mongorestore
@@ -620,7 +620,7 @@ mongodump --uri="mongodb://admin:admin@127.0.0.1:27017/admin"  --authenticationD
 mongorestore --uri="mongodb://admin:admin@127.0.0.1:27017/admin" --authenticationDatabase="admin" --authenticationMechanism="SCRAM-SHA-256" --nsInclude="admin.alert" --gzip  --dir="/backup"
 
 将数据库app中带有user前缀的表都转移到app-dev中，功能真是太强大了
-mongorestore --nsInclude='app.user*' --nsFrom='app.*' --nsTo='app-dev.*' --gzip  --dir="/backup"
+mongorestore --uri="mongodb://admin:admin@nas.korov.org:27017/backup" --authenticationDatabase="admin" --authenticationMechanism="SCRAM-SHA-256" --nsInclude="kafka.value-record" --nsFrom='kafka.value-record' --nsTo='backup.value-record' --gzip  --dir="/backup/kafka"
 ```
 
 ## mongoexport

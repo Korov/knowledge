@@ -472,7 +472,7 @@ zip -m myfile.zip ./rpm_info.txt
 | -u              | 更新压缩文件中的内容。                                       |
 | -p              | 保留绝对路径，即允许备份数据中含有根目录                     |
 | -P              | 保留数据原来权限及属性。                                     |
-| --exclude =FILE | 压缩过程中，不要讲FILE打包                                   |
+| --exclude =FILE | 压缩过程中，不要将FILE打包                                   |
 | man tar         | 查看更多参数                                                 |
 
 压缩：tar -jvc -f filename.tar.bz2 <要被压缩的文件或目录名称>
