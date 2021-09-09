@@ -1,20 +1,25 @@
 from pymongo.mongo_client import MongoClient
 import pymysql.cursors
 import psycopg2
+import time
 
-pg_connection = psycopg2.connect(dbname="backup", user="minions", password="postgres", host="localhost", port="5432")
+pg_connection = psycopg2.connect(dbname="backup",
+                                 user="minions",
+                                 password="postgres",
+                                 host="localhost",
+                                 port="5432")
 
 mysql_connection = pymysql.connect(host='localhost',
-                             user='test',
-                             password='test',
-                             database='backup',
-                             cursorclass=pymysql.cursors.DictCursor)
+                                   user='test',
+                                   password='test',
+                                   database='backup',
+                                   cursorclass=pymysql.cursors.DictCursor)
 
 client = MongoClient('mongodb://admin:mongo@localhost:27017/admin')
 db = client['backup']
 collection = db['value-record']
 count = 0
-batch_count = 10000
+batch_count = 100000
 urls = []
 for url in collection.find({}):
     count = count + 1
@@ -45,5 +50,7 @@ for url in collection.find({}):
         # connection is not autocommit by default. So you must commit to save
         # your changes.
         pg_connection.commit()
-        print("insert ==============================================================", batch_count)
+
+        print("insert count:%s, time:%s" %
+              (batch_count, time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())))
         urls.clear()
