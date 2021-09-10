@@ -77,7 +77,7 @@ Thumbs.db
 Python/scrapy/**/dbs
 /**/report/*
 **/htmlcov
-/**/__pycache__
+/**/__pycache__/**
 /**/project.egg-info
 /**/.coverage
 MyNote/tools/docker/examples/arangodb/cluster/standalone_cluster/*/agency/*
