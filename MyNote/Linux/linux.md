@@ -1385,3 +1385,26 @@ sed 's/book/books/' file
 sed 's?\(<url>\).*\(</url>\)?\1https://updates.jenkins-zh.cn/update-center.json\2?g' /var/jenkins_home/hudson.model.UpdateCenter.xml
 ```
 
+## supervisor
+
+```bash
+# 安装
+pip install supervisor
+# 生成简单的配置文件，需要root权限
+echo_supervisord_conf > /etc/supervisord.conf
+
+# 启动
+supervisord
+# 查看后台进程
+supervisorctl
+```
+
+```bash
+echo_supervisord_conf > /etc/supervisord.conf
+
+[program:foo]
+command:/bin/cat
+```
+
+以上命令就会控制一个进程
+
