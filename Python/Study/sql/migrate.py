@@ -4,22 +4,22 @@ import psycopg2
 import time
 
 pg_connection = psycopg2.connect(dbname="backup",
-                                 user="minions",
-                                 password="postgres",
-                                 host="localhost",
+                                 user="postgres",
+                                 password="zl7636012086",
+                                 host="korov.myqnapcloud.cn",
                                  port="5432")
 
-mysql_connection = pymysql.connect(host='localhost',
-                                   user='test',
-                                   password='test',
+mysql_connection = pymysql.connect(host='korov.myqnapcloud.cn',
+                                   user='root',
+                                   password='zl7636012086',
                                    database='backup',
                                    cursorclass=pymysql.cursors.DictCursor)
 
-client = MongoClient('mongodb://admin:mongo@localhost:27017/admin')
+client = MongoClient('mongodb://admin:zl7636012086@korov.myqnapcloud.cn:27017/admin')
 db = client['backup']
 collection = db['value-record']
 count = 0
-batch_count = 100000
+batch_count = 10000
 urls = []
 for url in collection.find({}):
     count = count + 1
