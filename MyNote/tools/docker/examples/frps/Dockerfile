@@ -6,6 +6,7 @@ ENV appdir /app
 RUN mkdir -p $appdir
 WORKDIR $appdir
 COPY frps/frp_0.37.1_linux_amd64.tar.gz /app/
+COPY nginx/nginx.conf /etc/nginx.conf
 COPY supervisor/supervisord.conf /etc/supervisord.conf
 COPY docker-entrypoint.sh /usr/sbin/
 
