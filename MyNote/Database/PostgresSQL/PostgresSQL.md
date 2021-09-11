@@ -32,3 +32,23 @@ from demo where name = 'minions';
 - B-tree：最常用的索引，适合处理等值查询和范围查询
 - Hash：只能处理简单的等值查询
 - GiST：不是一种单独的索引类型，而是一种架构，可以在这种架构上实现很多不同的索引策略。GiST索引定义的特定操作符可以用于特定索引策略。
+
+# 创建用户
+
+```sql
+CREATE USER testUser WITH PASSWORD '*****';
+GRANT ALL PRIVILEGES ON DATABASE testDB TO testUser;
+GRANT ALL PRIVILEGES ON all tables in schema public TO testUser;
+
+REVOKE ALL PRIVILEGES ON DATABASE testDB FROM testUser;
+```
+
+```sql
+1、查看某用户的表权限
+select * from information_schema.table_privileges where grantee='user_name';
+2、查看usage权限表
+select * from information_schema.usage_privileges where grantee='user_name';
+3、查看存储过程函数相关权限表
+select * from information_schema.routine_privileges where grantee='user_name';
+```
+
