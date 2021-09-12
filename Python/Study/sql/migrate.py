@@ -1,19 +1,21 @@
-from pymongo.mongo_client import MongoClient
-import pymysql.cursors
-import psycopg2
-import time
 import logging
+import time
 
-logging.basicConfig(level=logging.INFO, filename="/home/korov/temp/logs/migrate.log", filemode="w", format="%(asctime)s - %(name)s - %(levelname)-9s - %(filename)-8s : %(lineno)s line - %(message)s", datefmt="%Y-%m-%d %H:%M:%S"
-                    )
+import psycopg2
+import pymysql.cursors
+from pymongo.mongo_client import MongoClient
+
+logging.basicConfig(level=logging.INFO, filename="migrate.log", filemode="w",
+                    format="%(asctime)s - %(name)s - %(levelname)-9s - %(filename)-8s : %(lineno)s line - %(message)s",
+                    datefmt="%Y-%m-%d %H:%M:%S")
 
 pg_connection = psycopg2.connect(dbname="backup",
                                  user="postgres",
                                  password="zl7636012086",
-                                 host="nas.korov.org",
+                                 host="postgres.korov-nas.org",
                                  port="5432")
 
-mysql_connection = pymysql.connect(host='nas.korov.org',
+mysql_connection = pymysql.connect(host='mysql.korov-nas.org',
                                    user='root',
                                    password='zl7636012086',
                                    database='backup',
