@@ -16,6 +16,7 @@ RUN sed -e 's|^mirrorlist=|#mirrorlist=|g' \
 	gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel tk-devel libffi-devel xz-devel; \
 	bash /root/ohmyzsh_install.sh && \
 	curl -s "https://get.sdkman.io" | zsh; zsh /root/pyenv_install.sh; \
+	echo "source /root/.zshrc" >> /etc/profile; \
 	yum clean all; rm /root/ohmyzsh_install.sh; rm /root/pyenv_install.sh;
 
 CMD [ "zsh" ]
