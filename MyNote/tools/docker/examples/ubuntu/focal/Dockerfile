@@ -21,11 +21,14 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list; \
 		apt-get install -y --no-install-recommends dirmngr; \
 	fi; \
     apt-get upgrade -y; \
-    apt-get install -y tzdata language-pack-zh-hans htop neofetch git zsh unzip zip vim iputils-ping telnet make build-essential libssl-dev \
-	zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev --fix-missing; \
+    apt-get install -y tzdata language-pack-zh-hans htop neofetch git zsh unzip zip vim iputils-ping \
+	telnet make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget \
+	curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev --fix-missing; \
 	bash /root/ohmyzsh_install.sh && \
 	curl -s "https://get.sdkman.io" | zsh; zsh /root/pyenv_install.sh; \
 	rm -rf /var/lib/apt/lists/*
+
+RUN chsh -s $(which zsh) && /bin/sh -c zsh -c "source ~/.zshrc"
 
 CMD [ "zsh" ]
    
