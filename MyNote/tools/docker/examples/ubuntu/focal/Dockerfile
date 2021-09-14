@@ -26,9 +26,8 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list; \
 	curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev --fix-missing; \
 	bash /root/ohmyzsh_install.sh && \
 	curl -s "https://get.sdkman.io" | zsh; zsh /root/pyenv_install.sh; \
-	rm -rf /var/lib/apt/lists/*
-
-RUN chsh -s $(which zsh) && /bin/sh -c zsh -c "source ~/.zshrc"
+	echo "source /root/.zshrc" >> /etc/profile; \
+	rm -rf /var/lib/apt/lists/*; rm /root/ohmyzsh_install.sh; rm /root/pyenv_install.sh;
 
 CMD [ "zsh" ]
    
