@@ -2,7 +2,7 @@
 <configuration status="error">
     <!--全局参数-->
     <Properties>
-        <Property name="logPattern">%d{yyyy-MM-dd HH:mm:ss,SSS} %highlight{%5p} %c{1}:%L - %m%n</Property>
+        <Property name="logPattern">%d{yyyy-MM-dd HH:mm:ss,SSS} %highlight{%5p} %t %c{1}:%L - %m%n</Property>
         <Property name="logDir">/logs</Property>
     </Properties>
 
@@ -25,7 +25,7 @@
         <!--这个会打印出所有的信息，每次大小超过size，则这size大小的日志会自动存入按年份-月份建立的文件夹下面并进行压缩，作为存档 -->
         <RollingFile name="RollingFile" fileName="logs/app.log"
                      filePattern="logs/${date:yyyy-MM}/%d{MM-dd-yyyy}-%i.log.gz">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %5p %c{1}:%L - %m%n"/>
+            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss,SSS} %t %5p %c{1}:%L - %m%n"/>
             <SizeBasedTriggeringPolicy size="10MB"/>
         </RollingFile>
     </appenders>
