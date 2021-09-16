@@ -1408,3 +1408,13 @@ command:/bin/cat
 
 以上命令就会控制一个进程
 
+## 压缩WSL磁盘空间
+
+```
+wsl --shutdown
+diskpart
+
+select vdisk file="C:\Users\korov\AppData\Local\Docker\wsl\data\ext4.vhdx"
+compact vdisk
+```
+
