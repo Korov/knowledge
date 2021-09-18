@@ -1025,6 +1025,18 @@ services:
 
 
 
+# Docker是怎样隔离的
+
+## Linux namespace
+
+每个进程能看到的东西
+
+linux允许创建以下namespace：mount，pid，network，ipc
+
+## Linux Control Groups(cgroups)
+
+限制每个进程所能使用的资源
+
 # 个人总结
 
 ## 切换国内镜像
