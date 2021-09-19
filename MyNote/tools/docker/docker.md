@@ -357,21 +357,27 @@ services:
     webapp:
         image: example/web
         deploy:
+            restart_policy:
+                condition: on-failure
+                delay: 5s
+                max_attempts: 3
+                window: 120s
             replicas: 2
             resources:
                 limits:
-                    cpus: "0.1"
-                    memory: 100M
-                restart_policy:
-                    condition: on-failure
+                    cpus: '0.50'
+                    memory: 50M
+                reservations:
+                    cpus: '0.25'
+                    memory: 20M
         ports:
             - "80:80"
         networks:
             - mynet
         volumes:
             - "/data"
-    networks:
-        mynet:
+networks:
+    mynet:
 ```
 
 **每个服务都必须通过image指令指定镜像或build指令（需要Dockerfile）等来自动构建生成镜像。如果使用build指令，在Dockerfile中设置的选项（例如CMD、EXPOSE）将自动被获取，无须在docker-compose.yml中再次设置**
