@@ -12,10 +12,10 @@ logging.basicConfig(level=logging.INFO, filename="migrate.log", filemode="w",
 pg_connection = psycopg2.connect(dbname="backup",
                                  user="postgres",
                                  password="zl7636012086",
-                                 host="postgres.korov-nas.org",
+                                 host="nas.korov.org",
                                  port="5432")
 
-mysql_connection = pymysql.connect(host='mysql.korov-nas.org',
+mysql_connection = pymysql.connect(host='nas.korov.org',
                                    user='root',
                                    password='zl7636012086',
                                    database='backup',
@@ -41,13 +41,13 @@ for url in collection.find({}):
     urls.append(line)
     if count % batch_count == 0:
         with mysql_connection.cursor() as cursor:
-            sql = "insert into value_record(count, value_key, message, value_name, value_time) VALUES (%s,%s,%s,%s,%s);"
+            sql = "insert into value_record_temp(count, value_key, message, value_name, value_time) VALUES (%s,%s,%s,%s,%s);"
             cursor.executemany(sql, urls)
 
         mysql_connection.commit()
 
         with pg_connection.cursor() as cursor:
-            sql = 'insert into "public"."value-record"(count, value_key, message, value_name, value_time) VALUES (%s,%s,%s,%s,%s);'
+            sql = 'insert into "public"."value_record_temp"(count, value_key, message, value_name, value_time) VALUES (%s,%s,%s,%s,%s);'
             cursor.executemany(sql, urls)
 
         pg_connection.commit()
