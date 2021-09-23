@@ -62,7 +62,7 @@ create user	if not exists 'company_read_only'@'localhost' identified with mysql_
 with max_queries_per_hour 500 max_updates_per_hour 100;
 ```
 
-创建一个company_read_only用户，仅从localhost访问，可以限制对IP范围的访问，例如`10.148.%。%`。通过给出%，用户可以从任何主机访问。密码company_pass。使用mysql_native_password身份验证。用户在一小时内执行的最大查询数为500,最大更新数为100。
+创建一个company_read_only用户，仅从localhost访问，可以限制对IP范围的访问，例如`10.148.%。%`。通过给出%，用户可以从任何主机访问。密码company_pass。使用mysql_native_password身份验证，还可以选择caching_sha2_password。用户在一小时内执行的最大查询数为500,最大更新数为100。
 
 当客户端连接到MySQL服务器时，他会经历两个访问控制阶段：
 
@@ -73,6 +73,16 @@ with max_queries_per_hour 500 max_updates_per_hour 100;
 - 请求验证
 
   > 服务器会检查用户是否有足够的权限执行每项操作
+
+身份验证方式区别
+
+|                   | mysql_native_password | caching_sha2_password |
+| ----------------- | --------------------- | --------------------- |
+| 杂凑              | SHA1                  | SHA256                |
+| 用盐              | 没有                  | 20字节                |
+| 哈希轮数          | 2                     | 5000                  |
+| 支持质询-响应认证 | 是                    | 是（快速模式）        |
+| 重新确定密码知识  | 没有                  | 是（完成模式）        |
 
 # 使用MySQL进阶
 

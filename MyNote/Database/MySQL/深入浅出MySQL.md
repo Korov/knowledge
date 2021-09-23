@@ -249,6 +249,20 @@ select * from emp where deptno in(select deptno from dept);
 grant select,insert on sakila.* to 'z1'@'localhost' identified by '123';
 由于权限变更，需要将z1 的权限变更，收回INSERT，只能对数据进行SELECT 操作：
 revoke insert on sakila.* from 'z1'@'localhost';
+
+# 权限种类有 普通数据的增删改查select，insert，update，delete
+# 创建修改删除数据表结构create，alter，drop
+# 操作外键权限references
+# 操作临时表权限create temporary
+# 操作索引权限index
+# 操作视图，查看视图源代码权限create view，show view
+# 操作存储过程，函数权限create routine，alter routine，execute
+grant all on `pear-admin-pro`.* to 'pear'@'%';
+
+# 查看自己的权限
+show grants;
+#查看其他用户权限
+show grants for dba@localhost;
 ```
 
 ## 2.3 帮助的使用
