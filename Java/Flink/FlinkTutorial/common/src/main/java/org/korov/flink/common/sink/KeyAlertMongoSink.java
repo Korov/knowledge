@@ -1,7 +1,5 @@
 package org.korov.flink.common.sink;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableList;
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientOptions;
@@ -15,11 +13,14 @@ import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.bson.Document;
 import org.korov.flink.common.enums.SinkType;
 import org.korov.flink.common.model.NameModel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel, Long>> {
+    private static final Logger log = LoggerFactory.getLogger(KeyAlertMongoSink.class);
     private final String host;
     private final int port;
     private final String dbname;
@@ -37,7 +38,10 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
 
     @Override
     public void invoke(Tuple3<String, NameModel, Long> value, Context context) {
-        if (mongoClient != null) {
+        if (mongoClient == null) {
+            return;
+        }
+        try {
             MongoDatabase db = mongoClient.getDatabase(dbname);
             MongoCollection<Document> mongoCollection = db.getCollection(collection);
             List<Document> documents = new ArrayList<>();
@@ -54,6 +58,8 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
             documents.add(document);
 
             mongoCollection.insertMany(documents);
+        } catch (Exception e) {
+            log.error("insert documents filed, collection:{}", collection, e);
         }
     }
 
