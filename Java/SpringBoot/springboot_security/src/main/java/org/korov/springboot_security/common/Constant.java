@@ -15,4 +15,5 @@ public class Constant {
     public static final String HTTP_ACT_MATCHERS="/webjars/springfox-swagger-ui/fonts/**,/swagger-resources,/swagger-resources/configuration/**,/webjars**,/swagger-ui.html,/webjars/springfox-swagger-ui/**,/v2/api-docs,/api/login,/api/captcha/create";
     public static final String UTF8 = "UTF-8";
     public static final String LOGIN_URL = "/api/login";
+    public static final String LOGOUT_URL = "/api/logout";
 }

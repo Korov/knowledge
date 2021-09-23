@@ -66,18 +66,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .loginProcessingUrl(Constant.LOGIN_URL)
                 //配置登录成功自定义处理类
-                .successHandler(secureAuthenticationSuccessHandler)
+                // .successHandler(secureAuthenticationSuccessHandler)
                 //配置登录失败自定义处理类
-                .failureHandler(secureAuthenticationFailureHandler)
+                // .failureHandler(secureAuthenticationFailureHandler)
                 .and()
                 //配置登出地址
                 .logout()
-                .logoutUrl(SecurityConstant.LOGOUT_URL)
+                .logoutUrl(Constant.LOGOUT_URL)
                 //配置用户登出自定义处理类
-                .logoutSuccessHandler(secureLogoutSuccessHandler)
+                // .logoutSuccessHandler(secureLogoutSuccessHandler)
                 .and()
                 //配置没有权限自定义处理类
-                .exceptionHandling().accessDeniedHandler(secureAuthAccessDeniedHandler)
+                .exceptionHandling()
+                // .accessDeniedHandler(secureAuthAccessDeniedHandler)
                 .and()
                 // 取消跨站请求伪造防护
                 .csrf()
@@ -90,8 +91,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         // Captcha / Token 过滤器
-        http.addFilterBefore(new SecureUserTokenSupport(), UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(new SecureCaptchaSupport(), UsernamePasswordAuthenticationFilter.class);
+        // http.addFilterBefore(new SecureUserTokenSupport(), UsernamePasswordAuthenticationFilter.class);
+        // http.addFilterBefore(new SecureCaptchaSupport(), UsernamePasswordAuthenticationFilter.class);
 
         // 禁用缓存
         http.headers().cacheControl();
