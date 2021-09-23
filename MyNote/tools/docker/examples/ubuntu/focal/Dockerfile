@@ -26,7 +26,8 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list && 
 	telnet make build-essential libssl-dev zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget \
 	curl llvm libncursesw5-dev xz-utils tk-dev libxml2-dev libxmlsec1-dev libffi-dev liblzma-dev --fix-missing && \
 	bash /root/ohmyzsh_install.sh && \
-	curl -s "https://get.sdkman.io" | zsh && zsh /root/pyenv_install.sh && zsh /root/nvm_install.sh && \
+	curl -s "https://get.sdkman.io" | zsh && \
+	zsh /root/pyenv_install.sh && zsh /root/nvm_install.sh && \
 	echo "source /root/.zshrc" >> /etc/profile && \
 	rm -rf /var/lib/apt/lists/* && rm /root/ohmyzsh_install.sh && rm /root/pyenv_install.sh && rm /root/nvm_install.sh
 
