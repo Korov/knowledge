@@ -724,3 +724,12 @@ systemProp.socks.proxyPort=1089
 ./gradlew build -x test -d -Dorg.gradle.debug=true -Dorg.gradle.daemon=false
 ```
 
+使用上面的命令启动gradle相关行为之后打开IDEA点击remote debug设置
+
+`debugger mode`:`Attach to remote JVM`
+
+`host`:`localhost`
+
+`port`:`5005`
+
+`Command line arguments for remote jvm`:`-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005`
