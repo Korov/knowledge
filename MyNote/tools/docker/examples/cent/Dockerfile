@@ -14,7 +14,7 @@ RUN sed -e 's|^mirrorlist=|#mirrorlist=|g' \
          /etc/yum.repos.d/CentOS-*.repo && \
 	yum install -y epel-release && \
     yum makecache && yum install -y htop neofetch git zsh unzip zip vim telnet \
-	gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel tk-devel libffi-devel xz-devel && \
+	gcc zlib-devel bzip2 bzip2-devel readline-devel sqlite sqlite-devel openssl-devel tk-devel libffi-devel xz-devel make && \
 	bash /root/ohmyzsh_install.sh && \
 	curl -s "https://get.sdkman.io" | zsh && zsh /root/pyenv_install.sh && zsh /root/nvm_install.sh && \
 	echo "source /root/.zshrc" >> /etc/profile && \
