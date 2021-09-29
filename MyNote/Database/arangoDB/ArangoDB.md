@@ -276,6 +276,10 @@ REMOVE "50830" IN Characters
 ```AQL
 FOR c IN Characters
     REMOVE c IN Characters
+    
+for edge in ThreatAttributeEdge_202108
+filter edge._to in ["ThreatAttributeDoc/350009473","ThreatAttributeDoc/350009474","ThreatAttributeDoc/350009475"]
+    REMOVE edge IN ThreatAttributeEdge_202108
 ```
 
 # 常用命令

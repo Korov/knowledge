@@ -11,9 +11,9 @@ import lombok.Data;
 @Data
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class SPLAlertModel {
-    @JsonProperty("alertName")
+    @JsonProperty("alert_name")
     private String alertName;
 
-    @JsonProperty("createTime")
+    @JsonProperty("create_time")
     private Long createTime;
 }
