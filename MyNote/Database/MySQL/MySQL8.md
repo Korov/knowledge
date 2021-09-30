@@ -698,3 +698,99 @@ INDEX (city);
 ## 使用资源组
 
 你可以使用资源组来限制查询仅使用一定数量的系统资源。
+
+# 表维护
+
+`ALTER TABLE`操作有可能需要复制整个表，然后删除旧表数据，这个是个极其耗时的操作，解决办法，创建一个新表，将旧表数据复制到新表中同时在旧表上创建一个触发器，这样所有的旧数据和新数据都会迁移到新表中，等整个流程完毕，删除旧表，将新表重命名，这样在迁移数据的过程中旧表仍然可以访问，对应用的影响降到最低
+
+# 自我总结
+
+## 表分区
+
+根据`emp_no`的大小进行分区，小于100000的放到p0分区，小于200000放到p1分区
+
+```mysql
+create table employee
+(
+    emp_no     int(11)     not null,
+    birth_date date        not null,
+    first_name varchar(14) not null,
+    last_name  varchar(16) not null,
+    hire_date  date        not null,
+    primary key (emp_no),
+    key `name` (first_name, last_name)
+) engine = InnoDB
+  default charset = utf8mb4
+    partition by range (emp_no)(
+        partition p0 values less than (100000) engine = InnoDB,
+        partition p1 values less than (200000) engine = InnoDB,
+        partition p2 values less than (300000) engine = InnoDB,
+        partition p3 values less than (400000) engine = InnoDB,
+        partition p4 values less than (500000) engine = InnoDB,
+        partition pmax values less than maxvalue engine = InnoDB
+        );
+
+# 删除分区
+ALTER TABLE employee REMOVE partition;
+# 添加分区
+ALTER TABLE employee ADD partition(
+  partition p5 values less than (600000) engine = InnoDB
+);
+# 重组分区，一个分区分到多个分区，以及多个分区分到一个分区
+ALTER TABLE employee REORGANIZE partition pmax INTO (
+    partition p6 values less than (700000) engine = InnoDB,
+    partition pmax values less than maxvalue engine = InnoDB
+);
+
+ALTER TABLE employee REORGANIZE partition p1,p2 INTO (
+    partition p2 values less than (200000) engine = InnoDB
+);
+# 删除指定分区
+ALTER TABLE employee DROP partition p1;
+# 清空分区数据
+ALTER TABLE employee TRUNCATE partition p1;
+
+# 通过hash创建分区，分区数量8
+create table employee
+(
+    emp_no     int(11)     not null,
+    birth_date date        not null,
+    first_name varchar(14) not null,
+    last_name  varchar(16) not null,
+    hire_date  date        not null,
+    primary key (emp_no),
+    key `name` (first_name, last_name)
+) engine = InnoDB
+  default charset = utf8mb4
+    partition by hash (year(hire_date)) partition 8;
+# 减少两个分区
+ALTER TABLE employee COALESCE PARTITION 2;
+# 增加10个分区
+ALTER TABLE employee ADD PARTITIONS 10;
+```
+
+### 分区的方法：
+
+- RANGE：根据落在给定范围内的列值，将行分配给分区
+
+- LIST：类似于RANGE分区，不同的是其分区是基于与一组离散值匹配的列来选择的
+
+- HASH：一个分区是根据用户定义的表达式返回值来选择的，该表达式对插入到表的行中的列值进行操作。HASH函数可以包含任何在MySQL中具有非负整数值的有效表达式
+
+- KEY：类似于HASH分区，只是它仅提供一个或多个列，而且MySQL服务器提供自己的哈希函数。这些列可以包含除整数值以外的其他值，因为MySQL提供的哈希函数保证不管列数据是什么类型，结果都是整数
+
+  上述每一个分区类型都有一个扩展。RANGE的扩展为RANGE COLUMNS，LIST的扩展为LIST COLUMNS，HASH的扩展为LINEAR HASH, KEY的扩展为LINEAR KEY.
+
+  对于LINEAR KEY，RANGE COLUMNS，LIST COLUMNS分区，分表表达式包含一个或多个列的列表
+
+  在RANGE,LIST,LINEAR HASH分区中，分区的列的值被传递给分区函数，该函数返回一个整数值，表示该特定记录应该被存储在第几个分区。这个函数的返回值必须为既非常数也非随机数。
+
+### 升级为分区表
+
+如果希望将一个表转换为分区的表，如果分区键不是主键的一部分，则需要删除主键，并将**分区键作为主键和所有唯一键的一部分添加进来**。
+
+### 分区修剪和指定
+
+MySQL不扫描没有匹配值的分区，这是自动的操作，称为分区修剪（partition pruning）。
+
+指定分区：`select * from employee partition (p1990) limit 10`
