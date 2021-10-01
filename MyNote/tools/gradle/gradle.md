@@ -733,3 +733,13 @@ systemProp.socks.proxyPort=1089
 `port`:`5005`
 
 `Command line arguments for remote jvm`:`-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005`
+
+## 使用自己编译的gradle
+
+```bash
+# 打包，包的位置在 subprojects/distributions-full/build/distributions/gradle-<version>-all.zip
+./gradlew :distributions-full:allDistributionZip -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1089
+# 使用自己编译的
+./gradlew wrapper --gradle-distribution-url=file:/path/to/gradle-<version>-all.zip
+```
+

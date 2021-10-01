@@ -3,10 +3,14 @@ package com.korov.gradle.knowledge;
 import com.fasterxml.uuid.Generators;
 import com.github.f4b6a3.uuid.UuidCreator;
 import org.junit.jupiter.api.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class MyTest {
+class MyTest {
+    private static final Logger log = LoggerFactory.getLogger(MyTest.class);
 
     public static String digits(long val, int digits) {
         long hi = 1L << (digits * 4);
@@ -66,12 +70,16 @@ public class MyTest {
             System.out.println(uuid.toString());
             String uid = toString(uuid);
             //System.out.println("UUID : " + uid);
-        //    uuidSet.add(uid);
+            //    uuidSet.add(uid);
         }
     }
 
     @Test
     public void test11() {
-
+        // byte[] utf8Array = new byte[]{-61, 97, 109, 111, 110, 110, 32, 77, 99, 77, 97, 110, 117, 115, 32, 60, 101, 97, 109, 111, 110, 110, 64, 109, 99, 109, 97, 110, 117, 115, 46, 110, 101, 116, 62};
+        // byte[] utf8Array = new byte[]{83, 112, 114, 105, 110, 103, 32, 66, 117, 105, 108, 100, 109, 97, 115, 116, 101, 114, 32, 60, 98, 117, 105, 108, 100, 109, 97, 115, 116, 101, 114, 64, 115, 112, 114, 105, 110, 103, 102, 114, 97, 109, 101, 119, 111, 114, 107, 46, 111, 114, 103, 62};
+        byte[] utf8Array = new byte[]{83, 112, 114, 105, 110, 103, 32, 66, 117, 105, 108, 100, 109, 97, 115, 116, 101, 114, 32, 60, 98, 117, 105, 108, 100, 109, 97, 115, 116, 101, 114, 64, 115, 112, 114, 105, 110, 103, 102, 114, 97, 109, 101, 119, 111, 114, 107, 46, 111, 114, 103, 62};
+        String result = new String(utf8Array, 0, utf8Array.length, StandardCharsets.UTF_8);
+        log.info("result:{}", result);
     }
 }
