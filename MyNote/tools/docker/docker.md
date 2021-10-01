@@ -358,6 +358,7 @@ services:
         image: example/web
         deploy:
             restart_policy:
+                # none,on-failure,any(default)
                 condition: on-failure
                 delay: 5s
                 max_attempts: 3
