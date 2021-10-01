@@ -50,8 +50,9 @@ public class KafkaCount {
                 CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
 
         EmbeddedRocksDBStateBackend rocksDbStateBackend = new EmbeddedRocksDBStateBackend(true);
-        rocksDbStateBackend.setDbStoragePath("/opt/flink/rocksdb");
+        rocksDbStateBackend.setDbStoragePath("file:////opt/flink/rocksdb");
         env.setStateBackend(rocksDbStateBackend);
+        // env.getCheckpointConfig().setCheckpointStorage("s3://flink/rocksdb");
         env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE);
 
         KafkaSource<Tuple3<String, NameModel, Long>> kafkaSource = KafkaSource.<Tuple3<String, NameModel, Long>>builder()

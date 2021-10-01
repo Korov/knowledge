@@ -1,5 +1,20 @@
 version: "3"
 services:
+    minio:
+        image: minio/minio:RELEASE.2021-09-24T00-24-24Z
+        container_name: minio
+        command: server /data --console-address ":9001"
+        ports:
+            - "9000:9000"
+            - "9001:9001"
+        environment:
+            - MINIO_ROOT_USER=minioadmin
+            - MINIO_ROOT_PASSWORD=minioadmin
+        deploy:
+            restart_policy:
+                condition: on-failure
+        volumes:
+            - ./data:/data
     jobmanager:
         image: flink:1.14.0-scala_2.12-java11
         container_name: flink-jobmanager
@@ -12,12 +27,19 @@ services:
             restart_policy:
                 condition: on-failure
         environment:
+            # 这个插件需要自己下载到容器中麻烦
+            - ENABLE_BUILT_IN_PLUGINS=flink-s3-fs-hadoop-1.14.jar
+            # savepoint保存在本地   state.savepoints.dir: file:////opt/flink/savepoints
             - |
                 FLINK_PROPERTIES=
                 jobmanager.rpc.address: jobmanager
                 parallelism.default: 2
                 rest.flamegraph.enabled: true
-                state.savepoints.dir: file:///opt/flink/savepoints
+                state.savepoints.dir: s3://flink/savepoints
+                s3.endpoint: http://minio:9000
+                s3.path.style.access: true
+                s3.access-key: minioadmin
+                s3.secret-key: minioadmin
     taskmanager:
         image: flink:1.14.0-scala_2.12-java11
         container_name: flink-taskmanager
@@ -33,11 +55,16 @@ services:
             restart_policy:
                 condition: on-failure
         environment:
+            - ENABLE_BUILT_IN_PLUGINS=flink-s3-fs-hadoop-1.14.jar
             - |
                 FLINK_PROPERTIES=
                 jobmanager.rpc.address: jobmanager
                 parallelism.default: 2
                 taskmanager.numberOfTaskSlots: 4
                 rest.flamegraph.enabled: true
-                state.savepoints.dir: file:///opt/flink/savepoints
+                state.savepoints.dir: s3://flink/savepoints
+                s3.endpoint: http://minio:9000
+                s3.path.style.access: true
+                s3.access-key: minioadmin
+                s3.secret-key: minioadmin
                 
