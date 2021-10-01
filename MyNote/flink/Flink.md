@@ -552,3 +552,48 @@ Flink针对DataSet提供了大量的已经实现的Sink
 # 疑问
 
 ## 分区的作用是什么
+
+# 自我总结
+
+## 停止启动job
+
+停止一个job并保存savepoint
+
+```bash
+# 展示所有正在运行中的job
+root@a9468e7b85ae:/opt/flink# flink list
+Waiting for response...
+------------------ Running/Restarting Jobs -------------------
+01.10.2021 17:19:32 : 81b5059971b0caa43110a2839c52f2b3 : kafka-count (RUNNING)
+--------------------------------------------------------------
+No scheduled jobs.
+
+# 方式一：停止指定job并将savepoint保存到state.savepoints.dir指定的位置
+flink stop -d -p 81b5059971b0caa43110a2839c52f2b3
+# 方式二：停止指定job并将savepoint保存到指定位置
+flink stop -d -p file:///opt/flink/savepoints 81b5059971b0caa43110a2839c52f2b3
+```
+
+```bash
+# 从指定的savepoint恢复需要指定到具体的savepoint
+flink run -d -s file:///opt/flink/savepoints/savepoint-81b505-e4febc0f9768 jar_name.jar <arguments>
+
+flink run -d -s <savepointPath> --classpath <url> --class <classname> <arguments>
+```
+
+savepoint中的信息
+
+```
+# Savepoint 目标目录
+/savepoint/
+
+# Savepoint 目录
+/savepoint/savepoint-:shortjobid-:savepointid/
+
+# Savepoint 文件包含 Checkpoint元数据
+/savepoint/savepoint-:shortjobid-:savepointid/_metadata
+
+# Savepoint 状态
+/savepoint/savepoint-:shortjobid-:savepointid/...
+```
+
