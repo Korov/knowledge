@@ -18,7 +18,6 @@ import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.korov.flink.common.deserialization.KeyAlertDeserializer;
 import org.korov.flink.common.enums.SinkType;
@@ -26,7 +25,6 @@ import org.korov.flink.common.model.NameModel;
 import org.korov.flink.common.sink.KeyAlertMongoSink;
 
 import java.time.Duration;
-import java.util.Properties;
 
 /**
  * @author zhu.lei
@@ -52,13 +50,15 @@ public class KafkaCount {
                 CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
 
         EmbeddedRocksDBStateBackend rocksDbStateBackend = new EmbeddedRocksDBStateBackend(true);
+        rocksDbStateBackend.setDbStoragePath("/opt/flink/rocksdb");
         env.setStateBackend(rocksDbStateBackend);
+        env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE);
 
         KafkaSource<Tuple3<String, NameModel, Long>> kafkaSource = KafkaSource.<Tuple3<String, NameModel, Long>>builder()
                 .setBootstrapServers("192.168.1.19:9092")
                 .setGroupId("kafka-name-count")
                 .setStartingOffsets(OffsetsInitializer.committedOffsets(OffsetResetStrategy.EARLIEST))
-                .setTopics(ImmutableList.of("flink_siem"))
+                .setTopics("flink_siem")
                 .setDeserializer(new KeyAlertDeserializer())
                 .build();
 
