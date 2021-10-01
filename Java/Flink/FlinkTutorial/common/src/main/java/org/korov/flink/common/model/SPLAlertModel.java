@@ -14,6 +14,6 @@ public class SPLAlertModel {
     @JsonProperty("alert_name")
     private String alertName;
 
-    @JsonProperty("create_time")
-    private Long createTime;
+    @JsonProperty("end_time")
+    private Long endTime;
 }

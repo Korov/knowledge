@@ -3,25 +3,35 @@ package org.korov.flink.common.deserialization;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple3;
-import org.apache.flink.streaming.connectors.kafka.KafkaDeserializationSchema;
+import org.apache.flink.connector.kafka.source.reader.deserializer.KafkaRecordDeserializationSchema;
+import org.apache.flink.util.Collector;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.korov.flink.common.model.FlinkAlertModel;
 import org.korov.flink.common.model.MapModel;
 import org.korov.flink.common.model.NameModel;
 import org.korov.flink.common.model.SPLAlertModel;
 
+import java.io.IOException;
+
 @Slf4j
-public class KeyAlertDeserializer implements KafkaDeserializationSchema<Tuple3<String, NameModel, Long>> {
+public class KeyAlertDeserializer implements KafkaRecordDeserializationSchema<Tuple3<String, NameModel, Long>> {
     @Override
-    public boolean isEndOfStream(Tuple3<String, NameModel, Long> nextElement) {
-        return false;
+    public TypeInformation<Tuple3<String, NameModel, Long>> getProducedType() {
+        return TypeInformation.of(new TypeHint<Tuple3<String, NameModel, Long>>() {
+        });
     }
 
     @Override
-    public Tuple3<String, NameModel, Long> deserialize(ConsumerRecord<byte[], byte[]> record) throws Exception {
+    public void open(DeserializationSchema.InitializationContext context) throws Exception {
+        KafkaRecordDeserializationSchema.super.open(context);
+    }
+
+    @Override
+    public void deserialize(ConsumerRecord<byte[], byte[]> record, Collector<Tuple3<String, NameModel, Long>> out) throws IOException {
         String key = new String(record.key());
         String value = new String(record.value());
 
@@ -52,13 +62,13 @@ public class KeyAlertDeserializer implements KafkaDeserializationSchema<Tuple3<S
                 } catch (JsonProcessingException e) {
                     log.error("parse key:[{}] value:[{}] failed", key, value, e);
                 }
-                if (alertModel == null || alertModel.getAlertName() == null || alertModel.getCreateTime() == null) {
+                if (alertModel == null || alertModel.getAlertName() == null || alertModel.getEndTime() == null) {
                     log.error("parse key:[{}] value:[{}] failed", key, value);
                     nameModel.setTimestamp(System.currentTimeMillis());
                     nameModel.setName("null");
                 } else {
                     nameModel.setName(alertModel.getAlertName());
-                    nameModel.setTimestamp(alertModel.getCreateTime());
+                    nameModel.setTimestamp(alertModel.getEndTime());
                 }
                 break;
             case "nmap_data":
@@ -83,12 +93,6 @@ public class KeyAlertDeserializer implements KafkaDeserializationSchema<Tuple3<S
                 nameModel.setName("null");
                 break;
         }
-        return new Tuple3<>(key, nameModel, 1L);
-    }
-
-    @Override
-    public TypeInformation<Tuple3<String, NameModel, Long>> getProducedType() {
-        return TypeInformation.of(new TypeHint<Tuple3<String, NameModel, Long>>() {
-        });
+        out.collect(new Tuple3<>(key, nameModel, 1L));
     }
 }

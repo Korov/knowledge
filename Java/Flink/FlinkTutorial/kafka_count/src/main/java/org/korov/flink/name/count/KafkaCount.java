@@ -1,6 +1,7 @@
 package org.korov.flink.name.count;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
@@ -8,6 +9,8 @@ import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.connector.kafka.source.KafkaSource;
+import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.contrib.streaming.state.EmbeddedRocksDBStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
@@ -16,6 +19,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
+import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.korov.flink.common.deserialization.KeyAlertDeserializer;
 import org.korov.flink.common.enums.SinkType;
 import org.korov.flink.common.model.NameModel;
@@ -50,17 +54,15 @@ public class KafkaCount {
         EmbeddedRocksDBStateBackend rocksDbStateBackend = new EmbeddedRocksDBStateBackend(true);
         env.setStateBackend(rocksDbStateBackend);
 
-        Properties properties = new Properties();
-        properties.setProperty("bootstrap.servers", "192.168.1.19:9092");
-        properties.setProperty("group.id", "kafka-name-count");
-        properties.setProperty("auto.offset.reset", "earliest");
-        KeyAlertDeserializer serializationSchema = new KeyAlertDeserializer();
-        FlinkKafkaConsumer<Tuple3<String, NameModel, Long>> consumer = new FlinkKafkaConsumer<Tuple3<String, NameModel, Long>>("flink_siem", serializationSchema, properties);
+        KafkaSource<Tuple3<String, NameModel, Long>> kafkaSource = KafkaSource.<Tuple3<String, NameModel, Long>>builder()
+                .setBootstrapServers("192.168.1.19:9092")
+                .setGroupId("kafka-name-count")
+                .setStartingOffsets(OffsetsInitializer.committedOffsets(OffsetResetStrategy.EARLIEST))
+                .setTopics(ImmutableList.of("flink_siem"))
+                .setDeserializer(new KeyAlertDeserializer())
+                .build();
 
-        DataStream<Tuple3<String, NameModel, Long>> stream = env.addSource(consumer, "kafka-source");
-
-        KeyAlertMongoSink mongoNameSink = new KeyAlertMongoSink(MONGO_HOST, 27017, DB_NAME, "kafka-name-count", SinkType.KEY_NAME);
-        stream.assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple3<String, NameModel, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
+        DataStream<Tuple3<String, NameModel, Long>> stream = env.fromSource(kafkaSource, WatermarkStrategy.<Tuple3<String, NameModel, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
                 .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, NameModel, Long>>() {
                     @Override
                     public long extractTimestamp(Tuple3<String, NameModel, Long> element, long recordTimestamp) {
@@ -71,17 +73,20 @@ public class KafkaCount {
                             return System.currentTimeMillis();
                         }
                     }
-                })).keyBy(new KeySelector<Tuple3<String, NameModel, Long>, Object>() {
-            @Override
-            public Object getKey(Tuple3<String, NameModel, Long> value) throws Exception {
-                try {
-                    return Joiner.on("-").join(value.f0, value.f1.getName());
-                } catch (Exception e) {
-                    log.error("get name key failed", e);
-                    return value.f0 + "null";
-                }
-            }
-        }).window(TumblingProcessingTimeWindows.of(Time.minutes(1)))
+                }), "kafka-source");
+
+        KeyAlertMongoSink mongoNameSink = new KeyAlertMongoSink(MONGO_HOST, 27017, DB_NAME, "kafka-name-count", SinkType.KEY_NAME);
+        stream.keyBy(new KeySelector<Tuple3<String, NameModel, Long>, Object>() {
+                    @Override
+                    public Object getKey(Tuple3<String, NameModel, Long> value) throws Exception {
+                        try {
+                            return Joiner.on("-").join(value.f0, value.f1.getName());
+                        } catch (Exception e) {
+                            log.error("get name key failed", e);
+                            return value.f0 + "null";
+                        }
+                    }
+                }).window(TumblingProcessingTimeWindows.of(Time.minutes(1)))
                 .reduce(new ReduceFunction<Tuple3<String, NameModel, Long>>() {
                     @Override
                     public Tuple3<String, NameModel, Long> reduce(Tuple3<String, NameModel, Long> value1, Tuple3<String, NameModel, Long> value2) throws Exception {
@@ -91,28 +96,17 @@ public class KafkaCount {
                 .addSink(mongoNameSink).name("mongo-name-sink");
 
         KeyAlertMongoSink mongoKeySink = new KeyAlertMongoSink(MONGO_HOST, 27017, DB_NAME, "kafka-key-count", SinkType.KEY);
-        stream.assignTimestampsAndWatermarks(WatermarkStrategy.<Tuple3<String, NameModel, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
-                .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, NameModel, Long>>() {
+        stream.keyBy(new KeySelector<Tuple3<String, NameModel, Long>, Object>() {
                     @Override
-                    public long extractTimestamp(Tuple3<String, NameModel, Long> element, long recordTimestamp) {
+                    public Object getKey(Tuple3<String, NameModel, Long> value) throws Exception {
                         try {
-                            return element.f1.getTimestamp();
+                            return value.f0;
                         } catch (Exception e) {
-                            log.error("get key timestamp failed", e);
-                            return System.currentTimeMillis();
+                            log.error("get key failed", e);
+                            return "null";
                         }
                     }
-                })).keyBy(new KeySelector<Tuple3<String, NameModel, Long>, Object>() {
-            @Override
-            public Object getKey(Tuple3<String, NameModel, Long> value) throws Exception {
-                try {
-                    return value.f0;
-                } catch (Exception e) {
-                    log.error("get key failed", e);
-                    return "null";
-                }
-            }
-        }).window(TumblingProcessingTimeWindows.of(Time.minutes(1)))
+                }).window(TumblingProcessingTimeWindows.of(Time.minutes(1)))
                 .reduce(new ReduceFunction<Tuple3<String, NameModel, Long>>() {
                     @Override
                     public Tuple3<String, NameModel, Long> reduce(Tuple3<String, NameModel, Long> value1, Tuple3<String, NameModel, Long> value2) throws Exception {

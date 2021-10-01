@@ -13,6 +13,7 @@ services:
                 FLINK_PROPERTIES=
                 jobmanager.rpc.address: jobmanager
                 parallelism.default: 2
+                rest.flamegraph.enabled: true
     taskmanager:
         image: flink:1.14.0-scala_2.12-java11
         container_name: flink-taskmanager
@@ -30,4 +31,5 @@ services:
                 jobmanager.rpc.address: jobmanager
                 parallelism.default: 2
                 taskmanager.numberOfTaskSlots: 4
+                rest.flamegraph.enabled: true
                 
