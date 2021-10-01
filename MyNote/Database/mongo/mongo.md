@@ -496,6 +496,102 @@ db.alert.find({key:"spl_alert"}, {"value.alertName":"同一源IP针对多目标�
 }
 ```
 
+# 分片
+
+## 介绍
+
+要对已经填充数据的集合进行分片，该集合必须具有以分片键开头的索引。分片一个空集合时，如果该集合还没有针对指定分片键的适当索引，则mongodb会创建支持索引。
+
+**chunks**：mongodb将分片数据拆分成块，每个分块都有一个基于分片键的上下范围
+
+**Bncer and Even Chunk Distribution 均衡器和均匀分配**：均衡器通过在后台迁移各个分片上的块，来实现集群的所有分片中块的均匀分布。
+
+### 分片的策略
+
+#### 哈希分片
+
+计算分片键字段的哈希值，然后根据散列的分片键值为每个块分配一个范围。使用基于哈希值的数据分发有助于更均匀的数据分发，但是对分片键的基于范围的查询需要查询所有的分片。
+
+```javascript
+sh.shardCollection(
+  "database.collection",
+    # 1表示是范围分片
+  { "fieldA" : 1, "fieldB" : 1, "fieldC" : "hashed" }
+)
+```
+
+
+
+#### 范围分片
+
+范围分片根据分片键的值将数据划分为多个范围，然后基于分片键的值分配每个块的范围。有可能导致数据分布不均匀，但是对基于范围查询友好
+
+```javascript
+sh.shardCollection( "database.collection", { <shard key> } )
+```
+
+
+
+## 分片键
+
+分片键决定了集合内的文档如何在集群的多个分片间的分布状况。分片键要么是一个索引字段，要么是一个存在于集合内所有文档中的复合索引字段。
+
+MongoDB使用分片键值范围对集合中的数据进行分区。每个范围都定义了一个分片键值的非重叠范围，并且与一个chunk(数据块，下同)相关联。MongoDB尝试在集群中的各个分片之间平均分配数据块。 分片键与数据块分配的有效性直接相关。
+
+```javascript
+# 为了将一个集合分片，你必须在sh.shardCollection（）方法中指定目标集合和分片键：
+# namespace参数由字符串<database>.<collection>组成，该字符串指定目标集合的完整命名空间
+# key参数由包含一个字段和该字段的索引遍历方向的文档组成。
+sh.shardCollection( namespace, key )
+```
+
+#### 改变一个文档的分片键的值
+
+更新分片键的值时
+
+- `必须`在`事务`中或以`可重试写入`方式在mongos上运行。 不要直接在分片上执行操作。
+- 您必须在查询过滤器的完整分片键上包含相等条件。 例如，如果一个分片集合内使用`{country：1，userid：1}`作为分片键，要想更新文档的分片键，则必须在查询过滤器中包含`country：<value>，userid：<value>`。 也可以根据需要在查询中包括其他字段。
+
+```javascript
+db.collection.replaceOne()
+db.collection.updateOne()
+	
+db.collection.findOneAndReplace()
+db.collection.findOneAndUpdate()
+db.collection.findAndModify()
+
+db.sales.updateOne(
+  { _id: 12345, location: "" },
+  { $set: { location: "New York"} }
+)
+```
+
+## 改变shard key
+
+### reshard
+
+reshard会导致collection两秒的写被锁定。确保你的存储空间有当前collection大小的1.2倍，确保IO使用率在50%以下，确保CPU使用率在80%以下
+
+```javascript
+# 使用mongosh
+db.adminCommand({
+  reshardCollection: "<database>.<collection>",
+  key: <shardkey>
+});
+```
+
+### refine
+
+```javascript
+# 原先只有一个key：customer_id，现在增加了一个key：order_id
+db.adminCommand( {
+   refineCollectionShardKey: "test.orders",
+   key: { customer_id: 1, order_id: 1 }
+} ) 
+```
+
+
+
 # 权限
 
 ## 创建admin超级管理员
