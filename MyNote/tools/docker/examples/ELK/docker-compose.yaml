@@ -2,15 +2,16 @@ version: '3.4'
 
 services: 
     elasticsearch:
-        image: elasticsearch:7.12.1
+        image: elasticsearch:7.14.1
         container_name: elasticsearch
         ports: 
             - 9200:9200
             - 9300:9300
         environment: 
             - "discovery.type=single-node"
+            - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     logstash:
-        image: logstash:7.12.1
+        image: logstash:7.14.1
         container_name: logstash
         volumes: 
             - "./logstash.conf:/usr/share/logstash/config/logstash.conf:ro"
@@ -22,7 +23,7 @@ services:
         depends_on: 
             - elasticsearch
     kibana:
-        image: kibana:7.12.1
+        image: kibana:7.14.1
         container_name: kibana
         volumes: 
             - "./kibana.yaml:/usr/share/kibana/config/kibana.yml:ro"
