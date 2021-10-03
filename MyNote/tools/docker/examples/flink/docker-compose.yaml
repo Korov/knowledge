@@ -27,7 +27,7 @@ services:
             restart_policy:
                 condition: on-failure
         environment:
-            # 这个插件需要自己下载到容器中麻烦
+            # 这个插件需要自己下载到容器中  https://repo1.maven.org/maven2/org/apache/flink/flink-s3-fs-presto/1.14.0/flink-s3-fs-presto-1.14.0.jar
             - ENABLE_BUILT_IN_PLUGINS=flink-s3-fs-hadoop-1.14.jar
             # savepoint保存在本地   state.savepoints.dir: file:////opt/flink/savepoints
             - |
