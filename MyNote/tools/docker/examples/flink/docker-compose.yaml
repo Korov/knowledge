@@ -55,7 +55,7 @@ services:
             restart_policy:
                 condition: on-failure
         environment:
-            - ENABLE_BUILT_IN_PLUGINS=flink-s3-fs-hadoop-1.14.jar
+            - ENABLE_BUILT_IN_PLUGINS=flink-s3-fs-presto-1.14.0.jar
             - |
                 FLINK_PROPERTIES=
                 jobmanager.rpc.address: jobmanager
