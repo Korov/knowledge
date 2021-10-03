@@ -1,24 +1,33 @@
-#  Filebeat
+#  Filebeat使用
 
-filebeat只是收集数据发送到ES，提取字段需要使用logstash或者ES的pipeline
-
-## 安装Filebeat
+## 安装filebeat
 
 ```bash
 curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.15.0-linux-x86_64.tar.gz
 tar -zvx -f filebeat-7.15.0-linux-x86_64.tar.gz -C ./
 ```
 
-链接Elastic Stack和Kibana
+## 日志内容和对应的pattern
+
+日志：
+
+```
+2021-09-30 17:06:54,001 DEBUG Thread-3 sql.ResultSet: {conn-10013, pstmt-27245, rs-69156} Result: [1245, e76027db1ea94a2e821d264591454a93, 612, WAF发现PHP加密WebShell上传, 1, 0, null, null, 0, 0, 1, , , 2021-07-29 16:53:24.0, 2021-07-30 14:28:33.0, ( (appname:waf) AND (json.waf_type:禁止PHP加密webshell上传) ) | fields json.waf_src_ip, json.waf_dst_ip | rename json.waf_src_ip as src_ip, json.waf_dst_ip as dst_ip, | eval threat_classif = "" | eval extend_threat_classif = "" | eval threat_stage = 0 | eval threat_state = 0 | eval threat_level = 1 | eval att_ck_stage = 0 | eval ttp_no = "" | eval ttp_desc = "" | eval __inner_alert__ = 0 | eval __inner_event__ = 1 | eval desc = src_ip + dst_ip| eval rule_name = "WAF发现PHP加密WebShell上传", null]
+```
+
+pattern
+
+```
+%{LOGTIME:log_time} %{LOGLEVEL:log_level} %{THREATNAME:thread} %{CLASSNAME:java_class}: %{GREEDYDATA:log_content}
+```
+
+## filebeat直接发送数据到ES
 
 ```bash
 cd filebeat-7.15.0-linux-x86_64
 vim filebeat.yml
 # 设置output.elasticsearch的host为elasticsearch的host和port
-# 设置setup.kibana的host为指定的地址
 ```
-
-以上数据将直接发到Elasticsearch，如果想要将数据发送到Logstash进一步处理则需要修改配置。
 
 ## 指定日志文件
 
@@ -38,28 +47,9 @@ vim nginx.yml.disabled
 
 ## 解析日志数据属性并发送到Elasticsearch
 
-```bash
-# 不知道为什么不行
-./filebeat setup --dashboards
+### 配置pipeline
 
-./filebeat -e -c filebeat.yml -d "publish"
-```
-
-## 在Kibana中可视化日志数据
-
-## 使用Pipeline提取数据
-
-定义数据提取结构
-
-日志内容：
-
-```log
-2021-09-30 17:06:54,001 DEBUG Thread-3 sql.ResultSet: {conn-10013, pstmt-27245, rs-69156} Result: [1245, e76027db1ea94a2e821d264591454a93, 612, WAF发现PHP加密WebShell上传, 1, 0, null, null, 0, 0, 1, , , 2021-07-29 16:53:24.0, 2021-07-30 14:28:33.0, ( (appname:waf) AND (json.waf_type:禁止PHP加密webshell上传) ) | fields json.waf_src_ip, json.waf_dst_ip | rename json.waf_src_ip as src_ip, json.waf_dst_ip as dst_ip, | eval threat_classif = "" | eval extend_threat_classif = "" | eval threat_stage = 0 | eval threat_state = 0 | eval threat_level = 1 | eval att_ck_stage = 0 | eval ttp_no = "" | eval ttp_desc = "" | eval __inner_alert__ = 0 | eval __inner_event__ = 1 | eval desc = src_ip + dst_ip| eval rule_name = "WAF发现PHP加密WebShell上传", null]
-```
-
-我们期望能够将这条日志中的时间`2021-09-30 17:06:54,001`、线程`Thread-3`、日志级别`DEBUG`、Java类名`sql.ResultSet`和日志正文分别提取出来方便我们日后在kibana中做筛选统计, 同时时间要以日志中打印的时间为基准而不是filebeat发送消息时的时间。为了实现这一目标，我们可以向ES发一个HTTP请求创建一个名为`xxx-log`的pipeline:
-
-```bash
+```json
 PUT /_ingest/pipeline/siem-log1 HTTP/1.1
 Host: 192.168.50.189:9200
 Content-Type: application/json
@@ -84,44 +74,9 @@ Content-Type: application/json
 }
 ```
 
-配置filebeat.yml中的input，type很重要
+### 配置filebeat
 
-```
-filebeat.inputs:
-- type: log
-  enabled: true
-  paths:
-      - /path/to/gunicorn-access.log
-  fields:
-      type: siem-log1
-```
-
-配置es的output
-
-```
-output.elasticsearch:
-  hosts: ["http://localhost:9200"]
-  indices:
-    - index: "siem-log1-%{[agent.version]}-%{+yyyy.MM.dd}"
-      when.equals:
-        fields.type: siem-log1
-  pipelines:
-    - pipeline: "siem-log1"
-      when.equals:
-        fields.type: siem-log1
-        
-output.elasticsearch:
-  hosts: ["http://localhost:9200"]
-  indices:
-    - index: "siem-log1-%{[agent.version]}-%{+yyyy.MM.dd}"
-      pipeline: siem-log1
-      when.equals:
-        fields.type: siem-log1
-```
-
-如果Kibana的Discover界面看不到索引需要到index pattern中配置索引匹配规则
-
-## filebeat.yml示例
+`filebeat.yml`文件
 
 ```yaml
 filebeat.inputs:
@@ -150,8 +105,8 @@ filebeat.inputs:
     pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}'
     # 是否开启正则匹配，true:开启，false:不开启
     negate: true
-    # 不匹配正则的行是放到匹配到正则的行的after(后面)还是before(前面)
-    match: next
+    # 不匹配正则的行是放到匹配到正则的行的after(后面)还是before(前面)，此处配置不是时间开头的就是下一行
+    match: after
     # 多行日志结束的时间，多长时间没接收到日志，如果上一个是多行日志，则认为上一个结束了
     timeout: 2s
   # 使用es的ignes node 的pipeline处理数据，这个理论上要配置到output.elasticsearch下方，但是测试的时候发现配置在output.elasticsearch下方不生效。
@@ -186,11 +141,19 @@ output.elasticsearch:
   enabled: true
 ```
 
+### 启动filebeat
 
+```bash
+./filebeat -e -c filebeat.yml -d "publish"
+```
+
+如果Kibana的Discover界面看不到索引需要到index pattern中配置索引匹配规则
 
 ## 使用logstash
 
-配置filebeat:`vim filebeat.yml`
+### 配置filebeat
+
+`filebeat.yml`文件
 
 ```bash
 filebeat.inputs:
@@ -220,7 +183,9 @@ output.logstash:
   hosts: ["192.168.50.189:5044"]
 ```
 
-配置logstash：`vim logstash-siem.conf`
+### 配置logstash
+
+### `/usr/share/logstash/pipeline/logstash.conf`
 
 ```
 input {
@@ -250,15 +215,11 @@ output {
 }
 ```
 
-启动logstash和filebeat
+### 启动logstash和filebeat
 
 本地启动logstash：`logstash -r -f /usr/share/logstash/config/logstash-siem.conf --path.data /usr/share/logstash/data_siem`
 
 docker修改logstash需要修改`/usr/share/logstash/pipeline/logstash.conf`，然后重启docker
-
-
-
-
 
 ## 自我总结
 
