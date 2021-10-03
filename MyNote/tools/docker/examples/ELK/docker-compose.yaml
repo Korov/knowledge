@@ -19,7 +19,7 @@ services:
             - "5044:5044"
             - "9600:9600"
         environment: 
-            LS_JAVA_OPTS: "-Xmx512m -Xms512m"
+            - "LS_JAVA_OPTS=-Xmx512m -Xms512m"
         depends_on: 
             - elasticsearch
     kibana:
