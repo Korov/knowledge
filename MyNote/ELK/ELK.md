@@ -15,7 +15,7 @@ tar -zvx -f filebeat-7.15.0-linux-x86_64.tar.gz -C ./
 2021-09-30 17:06:54,001 DEBUG Thread-3 sql.ResultSet: {conn-10013, pstmt-27245, rs-69156} Result: [1245, e76027db1ea94a2e821d264591454a93, 612, WAF发现PHP加密WebShell上传, 1, 0, null, null, 0, 0, 1, , , 2021-07-29 16:53:24.0, 2021-07-30 14:28:33.0, ( (appname:waf) AND (json.waf_type:禁止PHP加密webshell上传) ) | fields json.waf_src_ip, json.waf_dst_ip | rename json.waf_src_ip as src_ip, json.waf_dst_ip as dst_ip, | eval threat_classif = "" | eval extend_threat_classif = "" | eval threat_stage = 0 | eval threat_state = 0 | eval threat_level = 1 | eval att_ck_stage = 0 | eval ttp_no = "" | eval ttp_desc = "" | eval __inner_alert__ = 0 | eval __inner_event__ = 1 | eval desc = src_ip + dst_ip| eval rule_name = "WAF发现PHP加密WebShell上传", null]
 ```
 
-pattern
+pattern，测试用的网址:`http://grokdebug.herokuapp.com/`
 
 ```
 %{LOGTIME:log_time} %{LOGLEVEL:log_level} %{THREATNAME:thread} %{CLASSNAME:java_class}: %{GREEDYDATA:log_content}
