@@ -27,6 +27,7 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
     private final String collection;
     private final SinkType sinkType;
     MongoClient mongoClient = null;
+    MongoClient localMongoClient = null;
 
     public KeyAlertMongoSink(String host, int port, String dbname, String collection, SinkType sinkType) {
         this.host = host;
@@ -38,28 +39,38 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
 
     @Override
     public void invoke(Tuple3<String, NameModel, Long> value, Context context) {
+        List<Document> documents = new ArrayList<>();
+        Document document = new Document();
+        document.append("key", value.f0);
+        document.append("timestamp", value.f1.getTimestamp());
+        document.append("count", value.f2);
+        if (sinkType == SinkType.KEY_NAME) {
+            document.append("name", value.f1.getName());
+        } else if (sinkType == SinkType.KEY_NAME_VALUE) {
+            document.append("name", value.f1.getName());
+            document.append("message", value.f1.getMessage());
+        }
+        documents.add(document);
         if (mongoClient == null) {
             return;
         }
         try {
             MongoDatabase db = mongoClient.getDatabase(dbname);
             MongoCollection<Document> mongoCollection = db.getCollection(collection);
-            List<Document> documents = new ArrayList<>();
-            Document document = new Document();
-            document.append("key", value.f0);
-            document.append("timestamp", value.f1.getTimestamp());
-            document.append("count", value.f2);
-            if (sinkType == SinkType.KEY_NAME) {
-                document.append("name", value.f1.getName());
-            } else if (sinkType == SinkType.KEY_NAME_VALUE) {
-                document.append("name", value.f1.getName());
-                document.append("message", value.f1.getMessage());
-            }
-            documents.add(document);
-
             mongoCollection.insertMany(documents);
         } catch (Exception e) {
             log.error("insert documents filed, collection:{}", collection, e);
+        }
+
+        if (localMongoClient == null) {
+            return;
+        }
+        try {
+            MongoDatabase db = localMongoClient.getDatabase(dbname);
+            MongoCollection<Document> mongoCollection = db.getCollection(collection);
+            mongoCollection.insertMany(documents);
+        } catch (Exception e) {
+            log.error("insert documents filed, local collection:{}", collection, e);
         }
     }
 
@@ -72,6 +83,11 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
         MongoClientOptions options = MongoClientOptions.builder().maxConnectionIdleTime(6000).build();
         //通过连接认证获取MongoDB连接
         mongoClient = new MongoClient(ImmutableList.of(serverAddress), mongoCredential, options);
+
+        ServerAddress localServerAddress = new ServerAddress("192.168.50.189", 27017);
+        MongoClientOptions localOptions = MongoClientOptions.builder().maxConnectionIdleTime(6000).build();
+        //通过连接认证获取MongoDB连接
+        localMongoClient = new MongoClient(ImmutableList.of(localServerAddress), localOptions);
     }
 
 
@@ -79,6 +95,9 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
     public void close() {
         if (mongoClient != null) {
             mongoClient.close();
+        }
+        if (localMongoClient != null) {
+            localMongoClient.close();
         }
     }
 }
