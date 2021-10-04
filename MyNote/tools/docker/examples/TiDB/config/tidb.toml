@@ -1,16 +1,16 @@
 # TiDB Configuration.
 
 # TiDB server host.
-host = "0.0.0.0"
+host = "tidb"
 
 # TiDB server port.
 port = 4000
 
-# Registered store name, [tikv, mocktikv]
-store = "mocktikv"
+# Registered store name, [tikv, mocktikv, unistore]
+store = "tikv"
 
 # TiDB storage path.
-path = "/tmp/tidb"
+path = "pd0.korov-nas.org:2379"
 
 # The socket file to use for connection.
 socket = ""
@@ -52,7 +52,7 @@ format = "text"
 disable-timestamp = false
 
 # Stores slow query log into separated files.
-slow-query-file = ""
+slow-query-file = "/logs/tidb_slow.log"
 
 # Queries with execution time greater than this value will be logged. (Milliseconds)
 slow-threshold = 300
@@ -66,16 +66,16 @@ query-log-max-len = 2048
 # File logging.
 [log.file]
 # Log file name.
-filename = ""
+filename = "/logs/tidb.log"
 
 # Max log file size in MB (upper limit to 4096MB).
-max-size = 300
+max-size = 200
 
 # Max log file keep days. No clean up by default.
-max-days = 0
+max-days = 28
 
 # Maximum number of old log files to retain. No clean up by default.
-max-backups = 0
+max-backups = 10
 
 # Rotate log by day
 log-rotate = true
@@ -101,7 +101,7 @@ cluster-ssl-key = ""
 
 [status]
 # If enable status report HTTP service.
-report-status = true
+report-status = false
 
 # TiDB status port.
 status-port = 10080
@@ -110,7 +110,7 @@ status-port = 10080
 metrics-addr = "pushgateway:9091"
 
 # Prometheus client push interval in second, set \"0\" to disable prometheus push.
-metrics-interval = 15
+metrics-interval = 0
 
 [performance]
 # Max CPUs to use, 0 use number of CPUs in the machine.
@@ -210,6 +210,10 @@ log-spans = false
 
 #  LocalAgentHostPort instructs reporter to send spans to jaeger-agent at this address
 local-agent-host-port = ""
+
+[pd-client]
+# Max time which PD client will wait for the PD server in seconds.
+pd-server-timeout = 3
 
 [tikv-client]
 # Max gRPC connections that will be established with each tikv-server.

@@ -1,17 +1,17 @@
 # PD Configuration.
 
-name = "pd"
-data-dir = "default.pd"
+name = "pd0"
+data-dir = "/data"
 
-client-urls = "http://127.0.0.1:2379"
+client-urls = "http://0.0.0.0:2379"
 # if not set, use ${client-urls}
-advertise-client-urls = ""
+advertise-client-urls = "http://pd0.korov-nas.org:2379"
 
-peer-urls = "http://127.0.0.1:2380"
+peer-urls = "http://0.0.0.0:2380"
 # if not set, use ${peer-urls}
-advertise-peer-urls = ""
+advertise-peer-urls = "http://pd0.korov-nas.org:2380"
 
-initial-cluster = "pd=http://127.0.0.1:2380"
+initial-cluster = "pd0=http://pd0.korov-nas.org:2380"
 initial-cluster-state = "new"
 
 lease = 3
@@ -29,28 +29,28 @@ key-path = ""
 level = "error"
 
 # log format, one of json, text, console
-#format = "text"
+format = "text"
 
 # disable automatic timestamps in output
-#disable-timestamp = false
+disable-timestamp = false
 
 # file logging
 [log.file]
-#filename = ""
+filename = "/logs/pd0.log"
 # max log file size in MB
-#max-size = 300
+max-size = 200
 # max log file keep days
-#max-days = 28
+max-days = 28
 # maximum number of old log files to retain
-#max-backups = 7
+max-backups = 10
 # rotate log by day
-#log-rotate = true
+log-rotate = true
 
 [metric]
 # prometheus client push interval, set "0s" to disable prometheus.
-interval = "15s"
+interval = "0s"
 # prometheus pushgateway address, leaves it empty will disable prometheus.
-address = "pushgateway:9091"
+# address = "pushgateway:9091"
 
 [schedule]
 max-merge-region-size = 0
@@ -72,7 +72,7 @@ tolerant-size-ratio = 5.0
 
 [replication]
 # The number of replicas for each region.
-max-replicas = 3
+max-replicas = 0
 # The label keys specified the location of a store.
 # The placement priorities is implied by the order of label keys.
 # For example, ["zone", "rack"] means that we should place replicas to

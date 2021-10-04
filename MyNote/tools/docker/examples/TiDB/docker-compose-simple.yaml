@@ -2,58 +2,49 @@ version: '3'
 
 services:
   pd0:
-    image: pingcap/pd:v5.2.1
-    ports:
-      - "2379"
+    image: pingcap/pd:v5.1.1
+    container_name: pd0
+    hostname: pd0.korov-nas.org
     volumes:
-      - ./config/pd.toml:/pd.toml:ro
-      - ./data:/data
-      - ./logs:/logs
+      - ./config/pd.toml:/pd.toml
+      - ./pd0_logs:/logs
     command:
-      - --name=pd0
-      - --client-urls=http://0.0.0.0:2379
-      - --peer-urls=http://0.0.0.0:2380
-      - --advertise-client-urls=http://pd0:2379
-      - --advertise-peer-urls=http://pd0:2380
-      - --initial-cluster=pd0=http://pd0:2380
-      - --data-dir=/data/pd0
       - --config=/pd.toml
-      - --log-file=/logs/pd0.log
-    restart: on-failure
+
   tikv0:
-    image: pingcap/tikv:v5.2.1
+    image: pingcap/tikv:v5.1.1
+    container_name: tikv0
+    hostname: tikv0.korov-nas.org
     volumes:
-      - ./config/tikv.toml:/tikv.toml:ro
-      - ./data:/data
-      - ./logs:/logs
+      - ./config/tikv.toml:/tikv.toml
+      - ./kv0_logs:/logs
     command:
-      - --addr=0.0.0.0:20160
-      - --advertise-addr=tikv0:20160
-      - --data-dir=/data/tikv0
-      - --pd=pd0:2379
       - --config=/tikv.toml
-      - --log-file=/logs/tikv0.log
     depends_on:
       - "pd0"
-    restart: on-failure
+    # deploy:
+    #   restart_policy:
+    #     condition: on-failure
+    #   resources:
+    #     limits:
+    #       memory: 4G
+    #     reservations:
+    #       memory: 4G
 
   tidb:
-    image: pingcap/tidb:v5.2.1
+    image: pingcap/tidb:v5.1.1
+    container_name: tidb
+    hostname: tidb.korov-nas.org
     ports:
       - "4000:4000"
       - "10080:10080"
     volumes:
-      - ./config/tidb.toml:/tidb.toml:ro
-      - ./logs:/logs
+      - ./config/tidb.toml:/tidb.toml
+      - ./tidb_logs:/logs
     command:
-      - --store=tikv
-      - --path=pd0:2379
       - --config=/tidb.toml
-      - --log-file=/logs/tidb.log
-      - --advertise-address=tidb
     depends_on:
       - "tikv0"
-    restart: on-failure
 
   pushgateway:
     image: prom/pushgateway:v0.3.1

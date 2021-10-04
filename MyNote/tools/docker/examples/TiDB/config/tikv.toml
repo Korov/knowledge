@@ -8,7 +8,12 @@
 # log level: trace, debug, info, warn, error, off.
 log-level = "error"
 # file to store log, write to stderr if it's empty.
-# log-file = ""
+log-file = "/logs/tikv0.log"
+log-format = "text"
+log-rotation-timespan = "24h"
+log-rotation-size = "200MB"
+slow-log-file = "/logs/tikv0_slow.log"
+slow-log-threshold = "1s"
 
 [readpool.storage]
 # size of thread pool for high-priority operations
@@ -40,9 +45,9 @@ log-level = "error"
 
 [server]
 # set listening address.
-# addr = "127.0.0.1:20160"
+addr = "0.0.0.0:20160"
 # set advertise listening address for client communication, if not set, use addr instead.
-# advertise-addr = ""
+advertise-addr = "tikv0.korov-nas.org:20160"
 # notify capacity, 40960 is suitable for about 7000 regions.
 # notify-capacity = 40960
 # maximum number of messages can be processed in one tick.
@@ -82,7 +87,7 @@ log-level = "error"
 
 [storage]
 # set the path to rocksdb directory.
-# data-dir = "/tmp/tikv/store"
+data-dir = "/data"
 
 # notify capacity of scheduler's channel
 # scheduler-notify-capacity = 10240
@@ -101,13 +106,19 @@ log-level = "error"
 # the "scheduler too busy" error is displayed.
 # scheduler-pending-write-threshold = "100MB"
 
+## Reserve some space to ensure recovering the store from `no space left` must succeed.
+## `max(reserve-space, capacity * 5%)` will be reserved exactly.
+##
+## Set it to 0 will cause no space is reserved at all. It's generally used for tests.
+reserve-space = "0GB"
+
 [pd]
 # pd endpoints
-# endpoints = []
+endpoints = ["pd0.korov-nas.org:2379"]
 
 [metric]
 # the Prometheus client push interval. Setting the value to 0s stops Prometheus client from pushing.
-# interval = "15s"
+interval = "0s"
 # the Prometheus pushgateway address. Leaving it empty stops Prometheus client from pushing.
 address = "pushgateway:9091"
 # the Prometheus client push job name. Note: A node id will automatically append, e.g., "tikv_1".
