@@ -110,7 +110,7 @@ data-dir = "/data"
 ## `max(reserve-space, capacity * 5%)` will be reserved exactly.
 ##
 ## Set it to 0 will cause no space is reserved at all. It's generally used for tests.
-reserve-space = "0GB"
+reserve-space = 0
 
 [pd]
 # pd endpoints

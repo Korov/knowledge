@@ -53,16 +53,16 @@ interval = "0s"
 # address = "pushgateway:9091"
 
 [schedule]
-max-merge-region-size = 0
-split-merge-interval = "1h"
-max-snapshot-count = 3
-max-pending-peer-count = 16
-max-store-down-time = "30m"
-leader-schedule-limit = 4
-region-schedule-limit = 4
-replica-schedule-limit = 8
-merge-schedule-limit = 8
-tolerant-size-ratio = 5.0
+#max-merge-region-size = 0
+#split-merge-interval = "1h"
+#max-snapshot-count = 3
+#max-pending-peer-count = 16
+#max-store-down-time = "30m"
+#leader-schedule-limit = 4
+#region-schedule-limit = 4
+#replica-schedule-limit = 8
+#merge-schedule-limit = 8
+#tolerant-size-ratio = 5.0
 
 # customized schedulers, the format is as below
 # if empty, it will use balance-leader, balance-region, hot-region as default
@@ -72,7 +72,7 @@ tolerant-size-ratio = 5.0
 
 [replication]
 # The number of replicas for each region.
-max-replicas = 0
+max-replicas = 1
 # The label keys specified the location of a store.
 # The placement priorities is implied by the order of label keys.
 # For example, ["zone", "rack"] means that we should place replicas to
