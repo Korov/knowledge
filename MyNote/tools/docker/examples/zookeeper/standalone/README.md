@@ -1,5 +1,4 @@
 ```bash
-docker run -d -p 2181:2181 --name zookeeper zookeeper:3.5.8
+docker run -d -p 2181:2181 --name zookeeper zookeeper:3.7.0
 ```
-
 

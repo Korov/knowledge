@@ -1,3 +1,5 @@
+# 使用旧版本的kafka
+
 ```bash
 docker run -d --name zookeeper -p 2181:2181 -t wurstmeister/zookeeper;
 docker run -d --name kafka --publish 9092:9092 --link zookeeper \
@@ -32,5 +34,18 @@ cd /opt/kafka_*/bin
 ./opt/kafka_*/bin/kafka-console-producer.sh --broker-list localhost:9092 --topic test
 #创建一个消费者接受消息
 ./opt/kafka_*/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
+```
+
+# 使用bitman的kafka
+
+kafka2.8版本支持不用zookeeper
+
+```
+docker run -d --name kafka --publish 9092:9092 \
+--env KAFKA_CFG_ZOOKEEPER_CONNECT=linux.korov.org:2181 \
+--env ALLOW_PLAINTEXT_LISTENER=yes \
+--env KAFKA_CFG_LISTENERS=PLAINTEXT://:9092 \
+--env KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://linux.korov.org:9092 \
+--volume /etc/localtime:/etc/localtime bitnami/kafka:2.8.1;
 ```
 
