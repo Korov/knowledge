@@ -9,9 +9,18 @@ import com.mongodb.client.MongoDatabase;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.Document;
 import org.junit.jupiter.api.Test;
+import org.korov.flink.common.model.Biquge;
+
+import java.util.Date;
 
 @Slf4j
 public class MongoTest {
+    @Test
+    public void test(){
+        Date date = new Date("2021-08-25 17:38:56.918363");
+        log.info("debug");
+    }
+
     @Test
     public void queryBiquge() {
         ServerAddress serverAddress = new ServerAddress("nas.korov.org", 27017);
@@ -26,7 +35,7 @@ public class MongoTest {
         MongoCollection<Document> mongoCollection = db.getCollection("book_info");
         Iterable<Document> documents = mongoCollection.find().limit(10);
         for (Document document : documents) {
-            log.info("document:{}", document);
+            log.info("document:{}", new Biquge(document));
         }
     }
 }
