@@ -1451,3 +1451,25 @@ mysqlslap -u root -p password --create-schema=employee --query="select * from ta
 mysqlslap -u root -p password --create-schema=employee --query=query.sql --query=queries.sql --delimiter=";" -c 1000 -i 100
 ```
 
+## 清理binlog
+
+```mysql
+# 可以看到所有的binlog文件
+show binary logs;
+# 过期时间，0表示永不过期
+show variables like 'expire_logs_days';
+# 设置3天过期，重启之后失效
+set global expire_logs_days=3;
+```
+
+配置文件修改
+
+```
+在[mysqld]标签内增加如下内容
+# 旧版本
+expire_logs_days=3
+
+# MySQL8，三天
+binlog_expire_logs_seconds=259200
+```
+
