@@ -1,18 +1,16 @@
+import logging
 from kafka import KafkaConsumer
+from kafka.structs import TopicPartition
 from loguru import logger
 
-# 去掉所有的handler，即sys.stderr
-logger.remove(handler_id=None)
-logger.add('test.log', rotation="100 MB", format="{time:YYYY-MM-DD HH:mm:ss.SSS} - {thread.name} - {file} - {level.icon} - {name}:{function}:{line} {message}", level="INFO")
+from util.kafka_consumer import consumer_msg, consumer_seek, create_consumer, display_all_topics, display_topic_partition
 
-# def consume_message():
-#     consumer = KafkaConsumer("flink_siem", bootstrap_servers="192.168.1.19:9092", group_id="test_group2", auto_offset_reset="earliest")
-#     for msg in consumer:
-#         recv = "%s:%d:%d: key=%s value=%s" % (msg.topic, msg.partition, msg.offset, msg.key.decode('utf-8'), msg.value.decode('utf-8'))
-#         logger.info(recv)
+logging.basicConfig(level=logging.INFO, filename="test.log", filemode="a",
+                    format="%(asctime)s.%(msecs)03d - %(threadName)s - %(name)s:%(funcName)s - %(levelname)s - %(filename)s:%(lineno)s - %(message)s",
+                    datefmt="%Y-%m-%d %H:%M:%S")
 
-# consume_message()
+logger = logging.getLogger(__name__)
 
-logger.info("info message")
-logger.error("info message")
-logger.warning("info message")
+kafka_consumer = create_consumer(bootstrap_servers="192.168.1.19:9092", group_id="test_group1")
+display_topic_partition(kafka_consumer, ["flink_siem"])
+consumer_seek(kafka_consumer, "flink_siem", 4, 6443748)
