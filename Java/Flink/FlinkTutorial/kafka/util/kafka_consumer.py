@@ -47,6 +47,22 @@ def display_topic_partition(kafka_consumer=None, topics=[]):
             logger.info(
                 f"topic:{topic_partition.topic}, partition:{topic_partition.partition}, beginning offsets:{beginning_offsets[topic_partition]}, position:{position}, valid count:{position - beginning_offsets[topic_partition]}")
 
+def display_topic_consumers(kafka_consumer=None, topics=[]):
+    for topic in topics:
+        partitions = kafka_consumer.partitions_for_topic(topic)
+        logger.info(f"====topic:{topic}, partitions:====")
+        topic_partitions = []
+        for partition in partitions:
+            topic_partitions.append(TopicPartition(topic=topic, partition=partition))
+
+        kafka_consumer.assign(topic_partitions)
+        beginning_offsets = kafka_consumer.beginning_offsets(topic_partitions)
+
+        for topic_partition in topic_partitions:
+            position = kafka_consumer.position(topic_partition)
+            logger.info(
+                f"topic:{topic_partition.topic}, partition:{topic_partition.partition}, beginning offsets:{beginning_offsets[topic_partition]}, position:{position}, valid count:{position - beginning_offsets[topic_partition]}")
+
 
 def consumer_seek(kafka_consumer=None, topic=None, partition=None, offset=0):
     topic_partition = TopicPartition(topic=topic, partition=partition)

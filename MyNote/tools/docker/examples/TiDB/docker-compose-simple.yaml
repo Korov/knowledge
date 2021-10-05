@@ -4,6 +4,9 @@ services:
   pd0:
     image: pingcap/pd:v5.1.1
     container_name: pd0
+    # http://nas.korov.org:2379/dashboard
+    ports:
+      - "2379:2379"
     hostname: pd0.korov-nas.org
     volumes:
       - ./config/pd.toml:/pd.toml
