@@ -13,4 +13,4 @@ logger = logging.getLogger(__name__)
 
 kafka_consumer = create_consumer(bootstrap_servers="192.168.1.19:9092", group_id="test_group1")
 display_topic_partition(kafka_consumer, ["flink_siem"])
-consumer_seek(kafka_consumer, "flink_siem", 4, 6443748)
+# consumer_seek(kafka_consumer, "flink_siem", 4, 6443748)
