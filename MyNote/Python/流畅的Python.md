@@ -63,8 +63,39 @@ pip install pytest-cov
 
 ## 日志框架loguru
 
-```bash
-pip install loguru
+使用地方框架的日志无法获取自带的日志内容，相比自带的日志框架只能获得很小部分日志，无法获取所有的
+
+安装：`pip install loguru==0.5.3`
+
+最简单的使用就是：`from loguru import logger`，这个只会把日志打印到console，并且是彩色的
+
+配置：
+
+```
+from loguru import logger
+
+# 去掉所有的handler，即sys.stderr
+logger.remove(handler_id=None)
+logger.add('test.log', rotation="100 MB", format="{time:YYYY-MM-DD HH:mm:ss.SSS} {level} {name}:{function}:{line} {message}", level="INFO")
+```
+
+
+
+## 自带的日志框架
+
+以下配置只会把日志保存到文件中，需要同时输出到console还需要另外配置
+
+```python
+import logging
+
+logging.basicConfig(level=logging.INFO, filename="test.log", filemode="a",
+                    format="%(asctime)s.%(msecs)03d - %(threadName)s - %(name)s:%(funcName)s - %(levelname)s - %(filename)s:%(lineno)s - %(message)s",
+                    datefmt="%Y-%m-%d %H:%M:%S")
+
+logger = logging.getLogger(__name__)
+
+# 结果
+2021-10-05 18:48:09.965 - MainThread - kafka.coordinator._send_join_group_request - INFO - base.py:450 - (Re-)joining group test_group1
 ```
 
 # python版本管理工具
