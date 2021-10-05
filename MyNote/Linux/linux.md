@@ -1094,6 +1094,9 @@ localhost :: ~ » du -h ./eggs
 chmo
 #只报告目录使用的总空间
 du -s
+
+# -d表示统计的文件深度
+du -h -d 1 ./
 ```
 
 ## 网络
