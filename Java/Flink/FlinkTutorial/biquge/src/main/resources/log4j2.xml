@@ -5,7 +5,7 @@
 <Configuration status="WARN" monitorInterval="30">
     <Properties>
         <!-- 配置日志文件输出目录 ${sys:user.home} -->
-        <Property name="LOG_HOME">logs/basic</Property>
+        <Property name="LOG_HOME">logs</Property>
 
         <property name="CONSOLE_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t-%L] %highlight{%-5level} %logger{36} - %msg%n
         </property>
@@ -17,12 +17,12 @@
         <!--这个输出控制台的配置 -->
         <Console name="Console" target="SYSTEM_OUT">
             <!-- 控制台只输出level及以上级别的信息(onMatch),其他的直接拒绝(onMismatch) -->
-            <ThresholdFilter level="info"/>
+            <ThresholdFilter level="All"/>
             <PatternLayout pattern="${CONSOLE_PATTERN}"/>
         </Console>
 
-        <RollingFile name="RollingFile" fileName="${LOG_HOME}/log.log"
-                     filePattern="${LOG_HOME}/$${date:yyyy-MM}/warn-%d{yyyy-MM-dd}-%i.log">
+        <RollingFile name="RollingFile" fileName="${LOG_HOME}/biquge.log"
+                     filePattern="${LOG_HOME}/biquge-%d{yyyy-MM-dd}-%i.log">
             <ThresholdFilter level="All"/>
             <PatternLayout pattern="${FILE_PATTERN}"/>
             <Policies>

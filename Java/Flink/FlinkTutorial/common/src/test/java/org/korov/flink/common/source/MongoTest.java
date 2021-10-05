@@ -23,19 +23,19 @@ public class MongoTest {
 
     @Test
     public void queryBiquge() {
-        ServerAddress serverAddress = new ServerAddress("nas.korov.org", 27017);
+        ServerAddress serverAddress = new ServerAddress("192.168.50.189", 27017);
 
         //MongoCredential.createScramSha1Credential()三个参数分别为 用户名 数据库名称 密码
-        MongoCredential credential = MongoCredential.createScramSha256Credential("spider", "spider", "spider".toCharArray());
+        MongoCredential credential = MongoCredential.createScramSha256Credential("", "admin", "".toCharArray());
 
         MongoClientOptions options = MongoClientOptions.builder().maxConnectionIdleTime(6000).build();
         //通过连接认证获取MongoDB连接
-        MongoClient mongoClient = new MongoClient(serverAddress, credential, options);
-        MongoDatabase db = mongoClient.getDatabase("spider");
-        MongoCollection<Document> mongoCollection = db.getCollection("book_info");
+        MongoClient mongoClient = new MongoClient(serverAddress, options);
+        MongoDatabase db = mongoClient.getDatabase("kafka");
+        MongoCollection<Document> mongoCollection = db.getCollection("value-record");
         Iterable<Document> documents = mongoCollection.find().limit(10);
         for (Document document : documents) {
-            log.info("document:{}", new Biquge(document));
+            log.info("document:{}", document);
         }
     }
 }
