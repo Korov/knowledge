@@ -71,12 +71,15 @@ pip install pytest-cov
 
 配置：
 
-```
+```python
 from loguru import logger
 
 # 去掉所有的handler，即sys.stderr
 logger.remove(handler_id=None)
-logger.add('test.log', rotation="100 MB", format="{time:YYYY-MM-DD HH:mm:ss.SSS} {level} {name}:{function}:{line} {message}", level="INFO")
+logger.add('test.log', rotation="100 MB", format="{time:YYYY-MM-DD HH:mm:ss.SSS} - {thread.name} - {file} - {level.icon} - {name}:{function}:{line} {message}", level="INFO")
+
+# 示例，日志的level可以打印成图片
+2021-10-05 19:39:18.916 - MainThread - consumer.py - ❌ - __main__:<module>:17 info message
 ```
 
 
