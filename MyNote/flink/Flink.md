@@ -659,3 +659,19 @@ savepoint中的信息
 /savepoint/savepoint-:shortjobid-:savepointid/...
 ```
 
+## flink docker jfr
+
+```
+sed -i 's#http://deb.debian.org#https://mirrors.163.com#g' /etc/apt/sources.list
+
+apt update
+apt install openjdk-11-jdk-headless openjdk-11-jdk -y
+
+su flink
+
+jcmd 1 JFR.start name=jfr-dump maxage=2d maxsize=5g duration=2d filename=jfr-dump.jfr dumponexit=true
+jcmd 1 JFR.check
+
+jcmd 1 JFR.dump filename=jfr-dump-1.jfr
+```
+

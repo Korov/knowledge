@@ -2037,7 +2037,7 @@ dump文件中对象有Shallow Heap和Retained Heap，Shallow Heap表明对象自
 
 通过`jsp`找到对应程序的`PID`
 
-```
+```bash
 [rizhiyi@192-168-1-19 rizhiyi]$ jps
 351877 FrontendServer
 450339 Main
