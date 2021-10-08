@@ -49,3 +49,8 @@ docker run -d --name kafka --publish 9092:9092 \
 --volume /etc/localtime:/etc/localtime bitnami/kafka:2.8.1;
 ```
 
+```bash
+/opt/bitnami/kafka/bin/kafka-topics.sh --create --zookeeper zookeeper:2181 --topic mytopic --partitions 3 --replication-factor 3
+Created topic "mytopic".
+```
+

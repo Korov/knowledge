@@ -1,7 +1,6 @@
 package org.korov.flink.name.count;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableList;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
@@ -16,7 +15,7 @@ import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.korov.flink.common.deserialization.KeyAlertDeserializer;
@@ -63,18 +62,19 @@ public class KafkaCount {
                 .setDeserializer(new KeyAlertDeserializer())
                 .build();
 
-        DataStream<Tuple3<String, NameModel, Long>> stream = env.fromSource(kafkaSource, WatermarkStrategy.<Tuple3<String, NameModel, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
-                .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, NameModel, Long>>() {
-                    @Override
-                    public long extractTimestamp(Tuple3<String, NameModel, Long> element, long recordTimestamp) {
-                        try {
-                            return element.f1.getTimestamp();
-                        } catch (Exception e) {
-                            log.error("get name key timestamp failed", e);
-                            return System.currentTimeMillis();
-                        }
-                    }
-                }), "kafka-source");
+        DataStream<Tuple3<String, NameModel, Long>> stream = env.fromSource(kafkaSource,
+                WatermarkStrategy.<Tuple3<String, NameModel, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
+                        .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, NameModel, Long>>() {
+                            @Override
+                            public long extractTimestamp(Tuple3<String, NameModel, Long> element, long recordTimestamp) {
+                                try {
+                                    return element.f1.getTimestamp();
+                                } catch (Exception e) {
+                                    log.error("get name key timestamp failed", e);
+                                    return System.currentTimeMillis();
+                                }
+                            }
+                        }).withIdleness(Duration.ofMinutes(5)), "kafka-source");
 
         KeyAlertMongoSink mongoNameSink = new KeyAlertMongoSink(MONGO_HOST, 27017, DB_NAME, "kafka-name-count", SinkType.KEY_NAME);
         stream.keyBy(new KeySelector<Tuple3<String, NameModel, Long>, Object>() {
@@ -87,7 +87,7 @@ public class KafkaCount {
                             return value.f0 + "null";
                         }
                     }
-                }).window(TumblingProcessingTimeWindows.of(Time.minutes(1)))
+                }).window(TumblingEventTimeWindows.of(Time.minutes(1)))
                 .reduce(new ReduceFunction<Tuple3<String, NameModel, Long>>() {
                     @Override
                     public Tuple3<String, NameModel, Long> reduce(Tuple3<String, NameModel, Long> value1, Tuple3<String, NameModel, Long> value2) throws Exception {
@@ -107,7 +107,7 @@ public class KafkaCount {
                             return "null";
                         }
                     }
-                }).window(TumblingProcessingTimeWindows.of(Time.minutes(1)))
+                }).window(TumblingEventTimeWindows.of(Time.minutes(1)))
                 .reduce(new ReduceFunction<Tuple3<String, NameModel, Long>>() {
                     @Override
                     public Tuple3<String, NameModel, Long> reduce(Tuple3<String, NameModel, Long> value1, Tuple3<String, NameModel, Long> value2) throws Exception {
