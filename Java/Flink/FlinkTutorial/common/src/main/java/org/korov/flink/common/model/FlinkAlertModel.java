@@ -26,5 +26,8 @@ public class FlinkAlertModel {
     public static class MetaModel {
         @JsonProperty("timestamp")
         private Long timestamp;
+
+        @JsonProperty("uuid")
+        private String uuid;
     }
 }

@@ -49,6 +49,7 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
         } else if (sinkType == SinkType.KEY_NAME_VALUE) {
             document.append("name", value.f1.getName());
             document.append("message", value.f1.getMessage());
+            document.append("uuid", value.f1.getUuid());
         }
         documents.add(document);
         if (mongoClient == null) {

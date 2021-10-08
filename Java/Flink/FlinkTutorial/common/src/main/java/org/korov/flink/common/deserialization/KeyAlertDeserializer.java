@@ -53,6 +53,7 @@ public class KeyAlertDeserializer implements KafkaRecordDeserializationSchema<Tu
                 } else {
                     nameModel.setTimestamp(alert.getMetaModel().getTimestamp());
                     nameModel.setName(alert.getRuleName());
+                    nameModel.setUuid(alert.getMetaModel().getUuid());
                 }
                 break;
             case "spl_alert":
@@ -69,6 +70,7 @@ public class KeyAlertDeserializer implements KafkaRecordDeserializationSchema<Tu
                 } else {
                     nameModel.setName(alertModel.getAlertName());
                     nameModel.setTimestamp(alertModel.getEndTime());
+                    nameModel.setUuid(alertModel.getUuid());
                 }
                 break;
             case "nmap_data":

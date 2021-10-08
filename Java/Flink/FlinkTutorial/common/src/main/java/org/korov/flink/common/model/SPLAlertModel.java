@@ -16,4 +16,7 @@ public class SPLAlertModel {
 
     @JsonProperty("end_time")
     private Long endTime;
+
+    @JsonProperty("uuid")
+    private String uuid;
 }
