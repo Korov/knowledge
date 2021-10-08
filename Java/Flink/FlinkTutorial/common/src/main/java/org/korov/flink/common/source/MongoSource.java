@@ -10,12 +10,7 @@ import com.mongodb.client.MongoDatabase;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.state.ListState;
 import org.apache.flink.api.common.state.ListStateDescriptor;
-import org.apache.flink.api.common.state.ReducingState;
-import org.apache.flink.api.common.typeinfo.TypeHint;
-import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.common.typeutils.base.LongSerializer;
-import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.runtime.state.FunctionInitializationContext;
 import org.apache.flink.runtime.state.FunctionSnapshotContext;
@@ -23,15 +18,12 @@ import org.apache.flink.streaming.api.checkpoint.CheckpointedFunction;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 import org.bson.Document;
 
-import java.util.List;
-import java.util.Optional;
-
 /**
  * @author zhu.lei
  * @date 2021-05-05 13:26
  */
 @Slf4j
-public class MongoSource extends RichSourceFunction<Tuple3<String, String, Long>> implements CheckpointedFunction {
+public class MongoSource extends RichSourceFunction<Document> implements CheckpointedFunction {
     private final String host;
     private final int port;
     private final String dbname;
@@ -66,15 +58,15 @@ public class MongoSource extends RichSourceFunction<Tuple3<String, String, Long>
         ServerAddress serverAddress = new ServerAddress(host, port);
 
         //MongoCredential.createScramSha1Credential()三个参数分别为 用户名 数据库名称 密码
-        MongoCredential credential = MongoCredential.createScramSha256Credential("admin", "admin", "admin".toCharArray());
+        MongoCredential credential = MongoCredential.createScramSha256Credential("spider", "spider", "spider".toCharArray());
 
         MongoClientOptions options = MongoClientOptions.builder().maxConnectionIdleTime(6000).build();
         //通过连接认证获取MongoDB连接
-        mongoClient = new MongoClient(serverAddress, options);
+        mongoClient = new MongoClient(serverAddress, credential, options);
     }
 
     @Override
-    public void run(SourceContext<Tuple3<String, String, Long>> ctx) throws Exception {
+    public void run(SourceContext<Document> ctx) throws Exception {
         final Object lock = ctx.getCheckpointLock();
         while (isRunning) {
             // output and state update are atomic
@@ -86,8 +78,7 @@ public class MongoSource extends RichSourceFunction<Tuple3<String, String, Long>
                     FindIterable<Document> documents = mongoCollection.find().skip(offset.intValue());
                     for (Document document : documents) {
                         offset++;
-                        Tuple3<String, String, Long> tuple3 = Tuple3.of(document.getString("key"), document.getString("name"), document.getLong("timestamp"));
-                        ctx.collectWithTimestamp(tuple3, Optional.ofNullable(tuple3.f2).orElse(System.currentTimeMillis()));
+                        ctx.collectWithTimestamp(document, System.currentTimeMillis());
                     }
                 }
                 log.info("mongo source failed");
