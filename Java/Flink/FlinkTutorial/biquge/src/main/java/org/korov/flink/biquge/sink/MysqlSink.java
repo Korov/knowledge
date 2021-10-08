@@ -4,6 +4,7 @@ import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
+import org.korov.flink.biquge.model.BookDto;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -14,7 +15,7 @@ import java.sql.Statement;
  * @author zhu.lei
  * @date 2021-10-08 17:49
  */
-public class MysqlSink extends RichSinkFunction<String> {
+public class MysqlSink extends RichSinkFunction<BookDto> {
     private final String jdbcUrl;
     private final String username;
     private final String password;
@@ -28,14 +29,13 @@ public class MysqlSink extends RichSinkFunction<String> {
     }
 
     @Override
-    public void invoke(String sql, Context context) {
+    public void invoke(BookDto bookDto, Context context) {
         if (dataSource == null) {
             return;
         }
         try {
             Connection connection = dataSource.getConnection();
             Statement statement = connection.createStatement(ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-            ResultSet resultSet = statement.executeQuery(sql);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
