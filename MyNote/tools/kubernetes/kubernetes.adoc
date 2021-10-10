@@ -47,7 +47,7 @@ pod有两种类型，普通的pod及静态pod。静态pod并没有被存放在ku
 
 image:picture/pod-node.png[]
 
-[source:YAML]
+[source, YAML]
 ----
 # 核心api v1
 apiVersion: v1
