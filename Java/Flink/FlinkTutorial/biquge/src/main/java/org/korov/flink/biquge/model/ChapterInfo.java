@@ -11,5 +11,6 @@ public class ChapterInfo {
     private Long id;
     private Long bookId;
     private String chapterName;
+    private String chapterUrl;
     private String chapterContent;
 }
