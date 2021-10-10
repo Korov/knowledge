@@ -579,3 +579,50 @@ The following example will give you an idea of how *failover* has been implement
 
 11. The new *follower* syncs its data from the *leader* and order is restored.
 
+# 导入导出
+
+## arangodump
+
+```bash
+arangodump --server.endpoint tcp://192.168.1.19：8529 --server.username root --server.password rizhiyi&2014 --server.authentication false --server.database mydb --all-databases true --output-directory "dump" --overwrite true
+```
+
+上面的命令会用指定的用户和密码链接将对应数据库中的所有非系统的collection的结构信息和数据一起导出。
+
+To adjust this, there are the following command-line arguments:
+
+- `--dump-data <bool>`: set to *true* to include documents in the dump. Set to *false* to exclude documents. The default value is *true*.
+- `--include-system-collections <bool>`: whether or not to include system collections in the dump. The default value is *false*. **Set to \*true\* if you are using named graphs that you are interested in restoring.**
+
+如果只想导出部分collection
+
+```
+arangodump --collection myusers --collection myvalues --output-directory "dump"
+```
+
+导出的时候对数据进行压缩，多线程导出
+
+```
+arangodump --threads 4 --output-directory "dump" --compress-output
+```
+
+## arangorestore
+
+```
+arangorestore --server.endpoint tcp://192.168.1.19：8529 --server.username root --server.password rizhiyi&2014 --server.authentication false --server.database mydb --all-databases true --input-directory "dump"
+```
+
+If you want to connect to a different database or dump all databases you can additionally use the following startup options:
+
+- `--server.database <string>`: name of the database to connect to. Defaults to the `_system` database.
+- `--all-databases true`: restore multiple databases from a dump which used the same option. Introduced in v3.5.0.
+
+Since version 2.6 *arangorestore* provides the option *--create-database*. Setting this option to *true* will create the target database if it does not exist. When creating the target database, the username and passwords passed to *arangorestore* (in options *--server.username* and *--server.password*) will be used to create an initial user for the new database.
+
+The option `--force-same-database` allows restricting arangorestore operations to a database with the same name as in the source dump’s `dump.json` file. It can thus be used to prevent restoring data into a “wrong” database by accident.
+
+The following parameters are available to adjust this behavior:
+
+- `--create-collection <bool>`: set to *true* to create collections in the target database. If the target database already contains a collection with the same name, it will be dropped first and then re-created with the properties found in the input directory. Set to *false* to keep existing collections in the target database. If set to *false* and *arangorestore* encounters a collection that is present in the input directory but not in the target database, it will abort. The default value is *true*.
+- `--import-data <bool>`: set to *true* to load document data into the collections in the target database. Set to *false* to not load any document data. The default value  is *true*.
+- `--include-system-collections <bool>`: whether or not to include system collections when re-creating collections or reloading data. The default value is *false*.
