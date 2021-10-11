@@ -1044,6 +1044,71 @@ linux允许创建以下namespace：mount，pid，network，ipc
 
 限制每个进程所能使用的资源
 
+# Docker数据管理
+
+容器中的管理数据主要有两种方式：
+
+- 数据卷（Data Volumes）：容器内数据直接映射到本地主机环境
+- 数据卷容器（Data Volume Containers）：使用特定容器维护数据卷
+
+创建容器时将主机本地的任意路径挂载到容器内作为数据卷，这种形式创建的数据卷称为绑定数据卷。
+
+使用`docker run`命令的时候，可以使用`-mount`选项来使用数据卷。`-mount`选项支持三种类型的数据卷包括：
+
+- `volume`:普通数据卷，映射到主机`/var/lib/docker/volumes`路径下
+- `bind`:绑定数据卷，映射到主机指定路径下
+- `tmpfs`：临时数据卷，只存在于内存中
+
+示例（绑定数据卷到容器的`/opt/webapp`路径下）：
+
+```bash
+docker run -d -p --name web --mount type=bind,source=/webapp,destination=/opt/webapp training/webapp python app.py
+
+# 相当于
+docker run -d -p --name web -v /webapp:/opt/webapp training/webapp python app.py
+```
+
+Docker挂载数据卷的默认权限时读写（rw），用户也可以通过`ro`指定位只读
+
+```bash
+docker run -d -p --name web -v /webapp:/opt/webapp:ro training/webapp python app.py
+```
+
+## 数据卷容器
+
+数据卷容器是一个容器，他的目的是专门提供数据卷给其他容器挂载
+
+首先创建一个数据卷容器`dbdata`，并在其中创建一个数据卷挂载到`/dbdata`:
+
+```bash
+docker run -it -v /dbdata --name dbdata ubuntu
+```
+
+然后可以在其他容器中使用`--volumes-from`来挂载`dbdata`目录，三个容器任何一方在该目录下的写入，其他容器都可以看到
+
+```bash
+docker run -it --volumes-from dbdata --name db1 ubuntu
+docker run -it --volumes-from dbdata --name db2 ubuntu
+```
+
+可以多次使用`--volumes-from`参数来从多个容器挂载多个数据卷，还可以从其他已经挂载了容器卷的容器来挂载数据卷
+
+```bash
+docker run -d --name db3 --volumes-from db1 training/postgres
+```
+
+**使用`--volumes-from`参数所挂载数据卷的容器自身并不需要保持在运行状态**
+
+如果删除了挂载的容器（包括dadata、db1和db2），数据卷并不会自动倍删除。如果要删除一个数据卷，必须在删除最后一个还挂载着她的容器时显示使用`docker rm -v`命令来指定删除关联的容器。
+
+## 利用数据卷容器来迁移数据
+
+```bash
+docker run --volumes-from dbdata -v $(pwd):/backup --name worker ubuntu tar cvf /backup/backup.tar /dbdata
+```
+
+首先利用ubuntu镜像创建了一个容器worker。使用`--volumes-from dbdata`参数来让worker容器挂载dbdata容器的数据卷（即dbdata数据卷）；使用`-v $(pwd):/backup`来挂载本地的当前目录到worker容器的`/backup`目录。worker容器启动后，使用`tar cvf /backup/backup.tar /dbdata`命令将`/dbdata`下内容备份位容器内的`/backup/backup.tar`，即宿主机当前目录下的`backup.tar`。
+
 # 个人总结
 
 ## 切换国内镜像
