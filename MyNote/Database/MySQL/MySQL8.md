@@ -657,6 +657,8 @@ alter table employees add index name_desc(first_name asc, last_name desc);
 
 一条查询的成本包括：从磁盘访问数据，从内存访问数据，创建临时表，在内存中对结果进行排序，等等。MySQL会为每个操作分配一个相对值，并将每个计划的成本相加后汇总。最终会执行那个成本最低的执行计划。
 
+为了生成执行计划，优化器使用了一个成本模型，基于执行查询期间发生的各种操作来估算成本。优化器有一组预编译的默认成本常数，可用于做关于执行计划的决策。可以通过更新或插入`mysql.engine_cost`表并执行`FLUSH OPTIMIZER_COSTS`命令来调整这些常数
+
 ### 如何操作
 
 #### optimizer_search_depth
