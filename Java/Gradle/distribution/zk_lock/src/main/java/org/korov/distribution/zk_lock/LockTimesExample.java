@@ -8,6 +8,7 @@ import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.utils.CloseableUtils;
 
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * 测试锁竞争激烈的时候的情况
@@ -29,6 +30,9 @@ public class LockTimesExample {
             }
         });
 
+        AtomicLong lockCount = new AtomicLong(0L);
+        long startTime = System.currentTimeMillis();
+
         for (int i = 0; i < QTY; ++i) {
             final int index = i;
             Callable<Void> task = new Callable<Void>() {
@@ -45,9 +49,10 @@ public class LockTimesExample {
                                 throw new IllegalStateException(System.currentTimeMillis() + " " + clientName + " could not acquire the lock");
                             }
                             try {
-                                log.info(System.currentTimeMillis() + " " + clientName + " has the lock");
+                                long count = lockCount.addAndGet(1);
+                                long now = System.currentTimeMillis();
+                                log.info("{}:{} has the lock, count:{}, cost:{}", now, clientName, count, now - startTime);
                             } finally {
-                                log.info(System.currentTimeMillis() + " " + clientName + " releasing the lock");
                                 // 释放锁
                                 lock.release();
                             }
