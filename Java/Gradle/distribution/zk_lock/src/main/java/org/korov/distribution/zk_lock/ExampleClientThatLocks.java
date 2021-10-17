@@ -1,10 +1,12 @@
 package org.korov.distribution.zk_lock;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 public class ExampleClientThatLocks {
     private final InterProcessMutex lock;
     private final FakeLimitedResource resource;
@@ -21,10 +23,10 @@ public class ExampleClientThatLocks {
             throw new IllegalStateException(System.currentTimeMillis() + " " + clientName + " could not acquire the lock");
         }
         try {
-            System.out.println(System.currentTimeMillis() + " " + clientName + " has the lock");
+            log.info(System.currentTimeMillis() + " " + clientName + " has the lock");
             resource.use();
         } finally {
-            System.out.println(System.currentTimeMillis() + " " + clientName + " releasing the lock");
+            log.info(System.currentTimeMillis() + " " + clientName + " releasing the lock");
             lock.release(); // always release the lock in a finally block
         }
     }

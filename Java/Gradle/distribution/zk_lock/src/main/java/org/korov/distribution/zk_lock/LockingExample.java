@@ -28,7 +28,7 @@ public class LockingExample {
             Callable<Void> task = new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    CuratorFramework client = CuratorFrameworkFactory.newClient("linux.korov.org:2181", new ExponentialBackoffRetry(1000, 3));
+                    CuratorFramework client = CuratorFrameworkFactory.newClient("linux.korov.org:2181", new ExponentialBackoffRetry(10000, 3));
                     try {
                         client.start();
 
@@ -49,5 +49,7 @@ public class LockingExample {
             };
             service.submit(task);
         }
+        service.shutdown();
+        service.awaitTermination(10, TimeUnit.MINUTES);
     }
 }

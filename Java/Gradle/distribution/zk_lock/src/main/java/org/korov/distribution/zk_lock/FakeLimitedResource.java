@@ -1,7 +1,10 @@
 package org.korov.distribution.zk_lock;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
+@Slf4j
 public class FakeLimitedResource {
     private final AtomicBoolean inUse = new AtomicBoolean(false);
 
@@ -13,7 +16,9 @@ public class FakeLimitedResource {
         }
 
         try {
+            log.info("resource start run");
             Thread.sleep((long) (3 * Math.random()));
+            log.info("resource end");
         } finally {
             inUse.set(false);
         }
