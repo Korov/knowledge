@@ -14,6 +14,19 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
-tasks.getByName<Test>("test") {
-    useJUnitPlatform()
+
+
+allprojects {
+    tasks.withType<JavaCompile> {
+        options.encoding = "UTF-8"
+    }
+
+    tasks.withType<Test> {
+        systemProperty("file.encoding", "UTF-8")
+    }
+
+    tasks.withType<Javadoc> {
+        options.encoding = "UTF-8"
+    }
+
 }
