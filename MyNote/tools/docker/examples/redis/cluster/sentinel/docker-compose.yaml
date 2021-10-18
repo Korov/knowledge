@@ -14,7 +14,7 @@ services:
     image: redis
     container_name: redis-slave-1
     restart: always
-    command: redis-server --slaveof 192.168.0.102 6379 --port 6380  --requirepass test@dbuser2018 --masterauth test@dbuser2018  --appendonly yes
+    command: redis-server --slaveof 192.168.0.102 6379 --port 6380  --requirepass test@dbuser2018 --masterauth test@dbuser2018  --appendonly yes --replica-announce-ip 192.168.50.112 --replica-announce-port 6380
     ports:
       - 6380:6380
     volumes:
@@ -25,7 +25,7 @@ services:
     image: redis
     container_name: redis-slave-2
     restart: always
-    command: redis-server --slaveof 192.168.0.102 6379 --port 6381  --requirepass test@dbuser2018 --masterauth test@dbuser2018  --appendonly yes
+    command: redis-server --slaveof 192.168.0.102 6379 --port 6381  --requirepass test@dbuser2018 --masterauth test@dbuser2018  --appendonly yes --replica-announce-ip 192.168.50.112 --replica-announce-port 6381
     ports:
       - 6381:6381
     volumes:

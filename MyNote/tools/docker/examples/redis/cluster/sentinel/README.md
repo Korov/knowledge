@@ -18,3 +18,4 @@
 docker-compose -f docker-compose.yaml up -d
 ```
 
+要使用的话需要连接哨兵的端口
