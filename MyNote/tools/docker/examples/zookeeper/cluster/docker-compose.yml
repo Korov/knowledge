@@ -2,8 +2,7 @@ version: '3.4'
 
 services:
   zoo1:
-    image: zookeeper:3.4.13
-    restart: always
+    image: zookeeper:3.7.0
     hostname: zoo1
     container_name: zoo1
     ports:
@@ -13,14 +12,13 @@ services:
     - "./zoo1/datalog:/datalog"
     environment:
       ZOO_MY_ID: 1
-      ZOO_SERVERS: server.1=0.0.0.0:2888:3888 server.2=zoo2:2888:3888 server.3=zoo3:2888:3888
+      ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
     networks:
       net_zookeeper:
         ipv4_address: 172.21.0.11
 
   zoo2:
-    image: zookeeper:3.4.13
-    restart: always
+    image: zookeeper:3.7.0
     hostname: zoo2
     container_name: zoo2
     ports:
@@ -30,14 +28,13 @@ services:
     - "./zoo2/datalog:/datalog"
     environment:
       ZOO_MY_ID: 2
-      ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=0.0.0.0:2888:3888 server.3=zoo3:2888:3888
+      ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181
     networks:
       net_zookeeper:
         ipv4_address: 172.21.0.12
 
   zoo3:
-    image: zookeeper:3.4.13
-    restart: always
+    image: zookeeper:3.7.0
     hostname: zoo3
     container_name: zoo3
     ports:
@@ -47,12 +44,4 @@ services:
     - "./zoo3/datalog:/datalog"
     environment:
       ZOO_MY_ID: 3
-      ZOO_SERVERS: server.1=zoo1:2888:3888 server.2=zoo2:2888:3888 server.3=0.0.0.0:2888:3888
-    networks:
-      net_zookeeper:
-        ipv4_address: 172.21.0.13
-
-networks:
-  net_zookeeper:
-    external:
-      name: net_zookeeper
+      ZOO_SERVERS: server.1=zoo1:2888:3888;2181 server.2=zoo2:2888:3888;2181 server.3=zoo3:2888:3888;2181

@@ -6,7 +6,13 @@ group = "org.korov"
 version = "1.0-SNAPSHOT"
 
 repositories {
-    mavenCentral()
+    mavenLocal()
+    maven {
+        setUrl("https://maven.aliyun.com/repository/central")
+    }
+    maven {
+        setUrl("https://maven.aliyun.com/repository/gradle-plugin")
+    }
 }
 
 dependencies {
