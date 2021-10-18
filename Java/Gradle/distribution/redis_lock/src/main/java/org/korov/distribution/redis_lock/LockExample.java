@@ -35,8 +35,8 @@ public class LockExample {
         long startTime = System.currentTimeMillis();
         Config config = new Config();
         config.setTransportMode(TransportMode.NIO);
-        // config.useSingleServer().setAddress("redis://192.168.50.112:26379").setDatabase(0);
-        config.useSentinelServers().addSentinelAddress("redis://192.168.50.112:26379").setCheckSentinelsList(false).setMasterName("mymaster").setDatabase(0).setPassword("test@dbuser2018");
+        config.useSingleServer().setAddress("redis://linux.korov.org:6379").setDatabase(0);
+        // config.useSentinelServers().addSentinelAddress("redis://linux.korov.org:26379").setCheckSentinelsList(false).setMasterName("mymaster").setDatabase(0).setPassword("test@dbuser2018");
         RedissonClient redisClient = Redisson.create(config);
         RLock lock = redisClient.getLock("example_lock");
 
