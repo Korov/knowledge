@@ -17,10 +17,11 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public class LockTimesExample {
     private static final int QTY = 15;
+    private static final long LOCK_COUNT = 10000L;
 
     private static final String PATH = "/examples/locks";
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
         ExecutorService service = new ThreadPoolExecutor(5, 5, 0L,
                 TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
@@ -38,12 +39,13 @@ public class LockTimesExample {
             Callable<Void> task = new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    CuratorFramework client = CuratorFrameworkFactory.newClient("linux.korov.org:2181", new ExponentialBackoffRetry(10000, 3));
+                    CuratorFramework client = CuratorFrameworkFactory.newClient("192.168.50.112:2181", new ExponentialBackoffRetry(10000, 3));
+                    // CuratorFramework client = CuratorFrameworkFactory.newClient("192.168.50.112:2182,192.168.50.112:2183,192.168.50.112:2184", new ExponentialBackoffRetry(10000, 3));
                     try {
                         client.start();
                         InterProcessMutex lock = new InterProcessMutex(client, PATH);
                         String clientName = "Clinet " + index;
-                        while (true) {
+                        while (lockCount.get() <= LOCK_COUNT) {
                             // 等待锁10秒钟
                             if (!lock.acquire(10, TimeUnit.SECONDS)) {
                                 throw new IllegalStateException(System.currentTimeMillis() + " " + clientName + " could not acquire the lock");
@@ -69,6 +71,8 @@ public class LockTimesExample {
                 }
             };
             service.submit(task);
+            service.awaitTermination(10, TimeUnit.MINUTES);
+            log.info("finish with lock count:{}, time:{}", lockCount.get(), System.currentTimeMillis() - startTime);
         }
     }
 }
