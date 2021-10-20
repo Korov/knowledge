@@ -13,3 +13,10 @@ docker run -d -p 2181:2181 --name zookeeper zookeeper:3.7.0
 ----
 docker-compose -f zookeeper_cluster.yml
 ----
+
+启动 `redis`
+[source,bash]
+.redis.sh
+----
+docker run --name redis -p 6379:6379 -d redis:6.2.5-alpine redis-server --appendonly yes
+----
