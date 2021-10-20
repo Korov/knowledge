@@ -201,4 +201,9 @@ local 1634567582284:Clinet 4 has the lock, count:2013081, cost:27588   0.0137043
 zk standalone 1634568057042:Clinet 2 has the lock, count:122415, cost:118490    0.96763635833  70
 redis cluster 1634568648123:Clinet 0 has the lock, count:640216, cost:101315   0.15825127769377834   11
 reids standalone  1634568904952:Clinet 1 has the lock, count:383682, cost:60710  0.15822999254591041 11
+
+local 1943 2039  1991
+zookeeper 113163  114140  113651.5          57
+zookeeper cluster 204977  185368  195172.5  98
+redis 17483 17643   17563                   8
 ----

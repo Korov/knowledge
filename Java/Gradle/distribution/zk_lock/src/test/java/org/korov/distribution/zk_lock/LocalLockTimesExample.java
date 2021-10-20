@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class LocalLockTimesExample {
     private static final int QTY = 15;
 
-    private static final String PATH = "/examples/locks";
+    private static final long LOCK_COUNT = 100000L;
 
     public static void main(String[] args) {
 
@@ -43,20 +43,22 @@ public class LocalLockTimesExample {
                 public Void call() throws Exception {
                     try {
                         String clientName = "Clinet " + index;
-                        while (true) {
+                        while (lockCount.get() <= LOCK_COUNT) {
                             // 等待锁10秒钟
                             if (!lock.tryLock(10, TimeUnit.SECONDS)) {
                                 throw new IllegalStateException(System.currentTimeMillis() + " " + clientName + " could not acquire the lock");
                             }
                             try {
-                                long count = lockCount.addAndGet(1);
+                                lockCount.addAndGet(1);
                                 long now = System.currentTimeMillis();
-                                log.info("{}:{} has the lock, count:{}, cost:{}", now, clientName, count, now - startTime);
+                                log.info("{} has the lock, count:{}, cost:{}", clientName, lockCount.get(), now - startTime);
                             } finally {
                                 // 释放锁
                                 lock.unlock();
                             }
                         }
+                        long now = System.currentTimeMillis();
+                        log.info("{} has the lock, count:{}, cost:{}", clientName, lockCount.get(), now - startTime);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     } catch (Exception e) {

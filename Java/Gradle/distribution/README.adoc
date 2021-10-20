@@ -20,3 +20,10 @@ docker-compose -f zookeeper_cluster.yml
 ----
 docker run --name redis -p 6379:6379 -d redis:6.2.5-alpine redis-server --appendonly yes
 ----
+
+启动 `redis` 集群
+[source,bash]
+.redis.sh
+----
+docker-compose -f redis_cluster.yml up -d
+----

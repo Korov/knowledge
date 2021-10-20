@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public class LockTimesExample {
     private static final int QTY = 15;
-    private static final long LOCK_COUNT = 10000L;
+    private static final long LOCK_COUNT = 100000L;
 
     private static final String PATH = "/examples/locks";
 
@@ -51,14 +51,16 @@ public class LockTimesExample {
                                 throw new IllegalStateException(System.currentTimeMillis() + " " + clientName + " could not acquire the lock");
                             }
                             try {
-                                long count = lockCount.addAndGet(1);
+                                lockCount.addAndGet(1);
                                 long now = System.currentTimeMillis();
-                                log.info("{}:{} has the lock, count:{}, cost:{}", now, clientName, count, now - startTime);
+                                log.info("{} has the lock, count:{}, cost:{}", clientName, lockCount.get(), now - startTime);
                             } finally {
                                 // 释放锁
                                 lock.release();
                             }
                         }
+                        long now = System.currentTimeMillis();
+                        log.info("{} has the lock, count:{}, cost:{}", clientName, lockCount.get(), now - startTime);
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt();
                     } catch (Exception e) {

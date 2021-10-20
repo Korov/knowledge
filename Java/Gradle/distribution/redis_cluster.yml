@@ -1,0 +1,36 @@
+version: '3.7'
+services:
+  master:
+    image: redis:6.2.5-alpine
+    container_name: redis-master
+    command: redis-server --port 6379 --appendonly yes --replica-announce-ip linux.korov.org --replica-announce-port 6379
+    ports:
+      - 6379:6379
+
+  slave1:
+    image: redis:6.2.5-alpine
+    container_name: redis-slave-1
+    command: redis-server --slaveof 192.168.0.102 6379 --port 6380  --appendonly yes --replica-announce-ip linux.korov.org --replica-announce-port 6380
+    ports:
+      - 6380:6380
+
+
+  slave2:
+    image: redis:6.2.5-alpine
+    container_name: redis-slave-2
+    command: redis-server --slaveof 192.168.0.102 6379 --port 6381 --appendonly yes --replica-announce-ip linux.korov.org --replica-announce-port 6381
+    ports:
+      - 6381:6381
+
+  sentinel:
+    image: redis:6.2.5-alpine
+    container_name: redis-sentinel
+    command: redis-sentinel /usr/local/etc/redis/sentinel.conf
+    ports:
+      - 26379:26379
+    volumes:
+      - ./sentinel.conf:/usr/local/etc/redis/sentinel.conf
+    depends_on:
+      - master
+      - slave1
+      - slave2

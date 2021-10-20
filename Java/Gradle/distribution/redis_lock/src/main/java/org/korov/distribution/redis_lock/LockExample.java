@@ -19,7 +19,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class LockExample {
     private static final int QTY = 15;
 
-    private static final String PATH = "/examples/locks";
+    private static final long LOCK_COUNT = 100000L;
 
     public static void main(String[] args) {
 
@@ -35,8 +35,8 @@ public class LockExample {
         long startTime = System.currentTimeMillis();
         Config config = new Config();
         config.setTransportMode(TransportMode.NIO);
-        config.useSingleServer().setAddress("redis://linux.korov.org:6379").setDatabase(0);
-        // config.useSentinelServers().addSentinelAddress("redis://linux.korov.org:26379").setCheckSentinelsList(false).setMasterName("mymaster").setDatabase(0).setPassword("test@dbuser2018");
+        // config.useSingleServer().setAddress("redis://linux.korov.org:6379").setDatabase(0);
+        config.useSentinelServers().addSentinelAddress("redis://linux.korov.org:26379").setCheckSentinelsList(false).setMasterName("mymaster").setDatabase(0);
         RedissonClient redisClient = Redisson.create(config);
         RLock lock = redisClient.getLock("example_lock");
 
@@ -48,15 +48,15 @@ public class LockExample {
 
                     try {
                         String clientName = "Clinet " + index;
-                        while (true) {
+                        while (lockCount.get() <= LOCK_COUNT) {
                             // 尝试获取锁，10秒钟内没有获取到则放弃
                             if (!lock.tryLock(10, TimeUnit.SECONDS)) {
                                 throw new IllegalStateException(System.currentTimeMillis() + " " + clientName + " could not acquire the lock");
                             }
                             try {
-                                long count = lockCount.addAndGet(1);
+                                lockCount.addAndGet(1);
                                 long now = System.currentTimeMillis();
-                                log.info("{}:{} has the lock, count:{}, cost:{}", now, clientName, count, now - startTime);
+                                log.info("{}:{} has the lock, count:{}, cost:{}", now, clientName, lockCount.get(), now - startTime);
                             } finally {
                                 // 释放锁
                                 lock.unlock();
