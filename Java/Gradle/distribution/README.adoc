@@ -5,3 +5,11 @@
 ----
 docker run -d -p 2181:2181 --name zookeeper zookeeper:3.7.0
 ----
+
+启动 `zookeeper` 集群
+
+[source,bash]
+.zookeeper.sh
+----
+docker-compose -f zookeeper_cluster.yml
+----

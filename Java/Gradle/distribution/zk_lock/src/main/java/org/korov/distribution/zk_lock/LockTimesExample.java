@@ -39,8 +39,8 @@ public class LockTimesExample {
             Callable<Void> task = new Callable<Void>() {
                 @Override
                 public Void call() throws Exception {
-                    CuratorFramework client = CuratorFrameworkFactory.newClient("192.168.50.112:2181", new ExponentialBackoffRetry(10000, 3));
-                    // CuratorFramework client = CuratorFrameworkFactory.newClient("192.168.50.112:2182,192.168.50.112:2183,192.168.50.112:2184", new ExponentialBackoffRetry(10000, 3));
+                    // CuratorFramework client = CuratorFrameworkFactory.newClient("linux.korov.org:2181", new ExponentialBackoffRetry(10000, 3));
+                    CuratorFramework client = CuratorFrameworkFactory.newClient("linux.korov.org:2181,linux.korov.org:2182,linux.korov.org:2183", new ExponentialBackoffRetry(10000, 3));
                     try {
                         client.start();
                         InterProcessMutex lock = new InterProcessMutex(client, PATH);
