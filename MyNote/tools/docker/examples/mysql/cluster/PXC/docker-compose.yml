@@ -7,6 +7,8 @@ services:
       - "MYSQL_ROOT_PASSWORD=root123"
       - "CLUSTER_NAME=PXC"
       - "XTRABACKUP_PASSWORD=root123"
+    volumes:
+      - ./config:/etc/percona-xtradb-cluster.conf.d
     ports:
       - "3306:3306"
     hostname: pxc1
@@ -19,6 +21,9 @@ services:
       - "CLUSTER_NAME=PXC"
       - "XTRABACKUP_PASSWORD=root123"
       - "CLUSTER_JOIN=pxc1"
+    volumes:
+      - ./config:/etc/percona-xtradb-cluster.conf.d
+      - ./cert:/cert
     ports:
       - "3307:3306"
     hostname: pxc2
