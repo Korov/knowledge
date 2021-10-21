@@ -27,3 +27,25 @@ docker run --name redis -p 6379:6379 -d redis:6.2.5-alpine redis-server --append
 ----
 docker-compose -f redis_cluster.yml up -d
 ----
+
+启动 `MySQL`
+[source,bash]
+.mysql.sh
+----
+docker run --name mysql -e MYSQL_ALLOW_EMPTY_PASSWORD=true -p 3306:3306 -d mysql:8.0.26
+----
+
+执行以下SQL初始化数据库
+[source,mysql]
+.init.sql
+----
+create database if not exists test;
+use test;
+
+drop table if exists table_id;
+create table table_id (
+    id bigint auto_increment primary key,
+    mark varchar(255)
+) engine=InnoDB default charset=utf8mb4 collate utf8mb4_bin;
+----
+
