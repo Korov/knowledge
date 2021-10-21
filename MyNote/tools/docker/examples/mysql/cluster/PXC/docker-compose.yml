@@ -9,6 +9,7 @@ services:
       - "XTRABACKUP_PASSWORD=root123"
     volumes:
       - ./config:/etc/percona-xtradb-cluster.conf.d
+      - ./cert:/cert
     ports:
       - "3306:3306"
     hostname: pxc1
