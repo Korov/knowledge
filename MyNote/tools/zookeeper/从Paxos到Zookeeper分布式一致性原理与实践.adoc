@@ -218,6 +218,8 @@ Zookeeper实现全局唯一ID的生成。调用Zookeeper节点创建的API接口
 
 客户端集群会在zookeeper上创建一个临时节点，例如 `/master/service`，在这个过程中只有一个客户端能够成功创建这个节点，那么这个客户端所在的机器就成为了Master。同时其他没有在zookeeper上成功创建节点的客户端都会在节点 `/master/service` 上注册一个子节点变更的 `Watcher` ，用于监控当前的Master机器是否存活，一旦发现当前的Master挂了，那么其余的客户端将会重新进行Master选举。
 
+NOTE: LeaderLatch:根据一个路径，多台客户端在该路径下创建临时顺序节点，例如： `/leader/node_1`,`/leader/node_2`,`/leader/node_3` 节点编号最小的客户端成为leader，没抢到leader的节点都监听前一个节点的删除事件，在前一个节点删除后重新抢主。这样就会按照临时节点的顺序一次成为master。
+
 === 分布式锁
 
 ==== 排他锁
