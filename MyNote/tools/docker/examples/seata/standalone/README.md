@@ -4,6 +4,8 @@
 
 ```bash
 docker pull seataio/seata-server
+
+docker run -d --name seata -p 8091:8091 seataio/seata-server:1.5.0-SNAPSHOT
 docker run --net example_default --link nacos1:nacos --name seata-server -p 8091:8091 seataio/seata-server:latest
 #指定自定义配置文件启动
 docker run --name seata-server \
