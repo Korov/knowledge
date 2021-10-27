@@ -70,4 +70,4 @@ def consumer_seek(kafka_consumer=None, topic=None, partition=None, offset=0):
     kafka_consumer.seek(topic_partition, offset)
     for msg in kafka_consumer:
         logger.info(
-            f"{msg.topic}:{msg.partition}:{msg.offset}: key={msg.key.decode('utf-8')} value={msg.value.decode('utf-8')}")
+            f"{msg.topic}:{msg.partition}:{msg.offset}: key={msg.key} value={msg.value.decode('utf-8')}")
