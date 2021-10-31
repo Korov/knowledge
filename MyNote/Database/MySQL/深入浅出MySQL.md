@@ -1472,6 +1472,10 @@ mysqlbinlog --start-position="368315" /var/log/mysql/bin.123456 | mysql -uroot -
 
 # 自我总结
 
+## max_allowed_packet
+
+客户端和服务端都有自己的单个packet可以允许的最大值，默认是16MB。
+
 ## cardinality
 
 `show indexes from siem_threat_info_202109;`可以查看相应的值

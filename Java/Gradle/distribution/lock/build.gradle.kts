@@ -16,6 +16,7 @@ repositories {
 }
 
 dependencies {
+    implementation("io.etcd:jetcd-core:0.5.0")
     implementation("org.redisson:redisson:3.16.3")
     implementation("org.apache.curator:curator-recipes:5.2.0")
     implementation("org.apache.curator:curator-framework:5.2.0")
