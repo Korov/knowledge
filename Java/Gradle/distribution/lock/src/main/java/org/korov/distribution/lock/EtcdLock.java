@@ -19,7 +19,7 @@ import java.util.concurrent.*;
 public class EtcdLock {
     public static void main(String[] args) {
         // 创建Etcd客户端，Etcd服务端为单机模式
-        Client client = Client.builder().endpoints("http://win.korov.org:2380").build();
+        Client client = Client.builder().endpoints("http://linux.korov.org:2379").build();
 
         // 对于某共享资源制定的锁名
         String lockName = "/lock/mylock";
