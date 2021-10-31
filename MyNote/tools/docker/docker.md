@@ -1113,7 +1113,7 @@ docker run --volumes-from dbdata -v $(pwd):/backup --name worker ubuntu tar cvf 
 
 ## 切换国内镜像
 
-修改或新增/etc/docker/daemon.json
+修改或新增`/etc/docker/daemon.json`
 
 ```json
 {
