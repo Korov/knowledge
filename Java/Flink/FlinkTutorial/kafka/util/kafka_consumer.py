@@ -45,7 +45,8 @@ def display_topic_partition(kafka_consumer=None, topics=[]):
         for topic_partition in topic_partitions:
             position = kafka_consumer.position(topic_partition)
             logger.info(
-                f"topic:{topic_partition.topic}, partition:{topic_partition.partition}, beginning offsets:{beginning_offsets[topic_partition]}, position:{position}, valid count:{position - beginning_offsets[topic_partition]}")
+                f"topic:{topic_partition.topic}, partition:{topic_partition.partition}, beginning offsets:{beginning_offsets[topic_partition]}, end position:{position}, valid count:{position - beginning_offsets[topic_partition]}")
+
 
 def display_topic_consumers(kafka_consumer=None, topics=[]):
     for topic in topics:
@@ -69,5 +70,10 @@ def consumer_seek(kafka_consumer=None, topic=None, partition=None, offset=0):
     kafka_consumer.assign([topic_partition])
     kafka_consumer.seek(topic_partition, offset)
     for msg in kafka_consumer:
-        logger.info(
-            f"{msg.topic}:{msg.partition}:{msg.offset}: key={msg.key} value={msg.value.decode('utf-8')}")
+        message_key = msg.key
+        if message_key is None:
+            logger.info(
+                f"{msg.topic}:{msg.partition}:{msg.offset}: value={msg.value.decode('utf-8')}")
+        else:
+            logger.info(
+                f"{msg.topic}:{msg.partition}:{msg.offset}: key={msg.key.decode('utf-8')} value={msg.value.decode('utf-8')}")
