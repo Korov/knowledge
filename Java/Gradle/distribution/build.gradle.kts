@@ -9,7 +9,7 @@ ext {
     set("log4jVersion", "2.14.1")
     set("lombokVersion", "1.18.22")
     set("junitVersion", "5.8.1")
-    set("springBootVersion", "2.5.6")
+    set("springBootVersion", "2.4.12")
 }
 
 repositories {

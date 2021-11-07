@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
  */
 @Slf4j
 @SpringBootTest
-class DistributionTransicationTest {
+public class DistributionTransicationTest {
     @Test
     void test() {
         log.info("start success!");

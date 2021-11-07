@@ -20,6 +20,7 @@ configurations {
 }
 
 dependencies {
+    implementation("com.alibaba.boot:nacos-config-spring-boot-starter:0.2.10")
     implementation("org.springframework.boot:spring-boot-starter-web:${rootProject.ext.get("springBootVersion")}")
     implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0")
     implementation("mysql:mysql-connector-java:8.0.27")

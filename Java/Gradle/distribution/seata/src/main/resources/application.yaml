@@ -1,6 +1,9 @@
 seata:
   enabled: true
   enable-auto-data-source-proxy: true
+  registry:
+    nacos:
+      server-addr: localhost
 spring:
   application:
     name: distributation_transication
@@ -8,3 +11,7 @@ spring:
     url: jdbc:mysql://localhost:3306/test?allowMultiQueries=true&jdbcCompliantTruncation=false&useAffectedRows=true&zeroDateTimeBehavior=convertToNull
     username: root
     password: rizhiyi&2014
+
+nacos:
+  config:
+    server-addr: localhost:8848
