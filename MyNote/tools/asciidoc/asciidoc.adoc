@@ -53,6 +53,11 @@ _斜体_
 ==== 有序列表 ====
 
 . 阿拉伯数字作为序号（隐式）(4)
++
+[source,json]
+----
+{"key":"value"}
+----
 .. 小写字母作为序号（隐式）
 .. 小写字母作为序号（隐式）
 ... 小写罗马字母作为序号（隐式）
@@ -141,7 +146,7 @@ joe.bloggs@foobar.com
 
 
 `图片`
-image:images/logo.png["Company Logo",height=32,link="screen.png",scaledwidth="75%"align="left"]
+image::logo.png["Company Logo",height=32,link="screen.png",scaledwidth="75%"align="left"]
 
 [width="40%",cols="^,2m",frame="topbot",options="header,footer"]
 |======================
