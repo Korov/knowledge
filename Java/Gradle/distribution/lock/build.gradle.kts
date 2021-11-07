@@ -27,9 +27,9 @@ dependencies {
     compileOnly("org.projectlombok:lombok:1.18.22")
     annotationProcessor("org.projectlombok:lombok:1.18.22")
 
-    testCompileOnly("org.projectlombok:lombok:1.18.22")
-    testAnnotationProcessor("org.projectlombok:lombok:1.18.22")
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
+    testCompileOnly("org.projectlombok:lombok:${rootProject.ext.get("lombokVersion")}")
+    testAnnotationProcessor("org.projectlombok:lombok:${rootProject.ext.get("lombokVersion")}")
+    testImplementation("org.junit.jupiter:junit-jupiter-api:${rootProject.ext.get("junitVersion")}")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 

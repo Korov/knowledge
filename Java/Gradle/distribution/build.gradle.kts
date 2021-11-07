@@ -5,6 +5,11 @@ plugins {
 group = "org.korov"
 version = "1.0-SNAPSHOT"
 
+ext {
+    set("lombokVersion", "1.18.22")
+    set("junitVersion", "5.8.1")
+}
+
 repositories {
     mavenLocal()
     maven {
