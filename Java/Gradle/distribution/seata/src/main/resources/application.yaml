@@ -1,18 +1,18 @@
 seata:
   enabled: true
   enable-auto-data-source-proxy: true
-  config:
-    type: nacos
-    nacos:
-      server-addr: korov.linux.org:8848
-      username: nacos
-      password: nacos
-  registry:
-    type: nacos
-    nacos:
-      server-addr: korov.linux.org:8848
-      username: nacos
-      password: nacos
+#  config:
+#    type: nacos
+#    nacos:
+#      server-addr: korov.linux.org:8848
+#      username: nacos
+#      password: nacos
+#  registry:
+#    type: nacos
+#    nacos:
+#      server-addr: korov.linux.org:8848
+#      username: nacos
+#      password: nacos
 spring:
   application:
     name: distributation_transication
