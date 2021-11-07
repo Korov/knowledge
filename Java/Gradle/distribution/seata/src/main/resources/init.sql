@@ -1,3 +1,5 @@
+create schema if not exists `test`;
+use `test`;
 DROP TABLE IF EXISTS `stock_tbl`;
 CREATE TABLE `stock_tbl`
 (
