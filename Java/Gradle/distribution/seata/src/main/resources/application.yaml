@@ -1,23 +1,32 @@
 seata:
   enabled: true
   enable-auto-data-source-proxy: true
-  registry:
+  config:
+    type: nacos
     nacos:
-      server-addr: localhost
+      server-addr: korov.linux.org:8848
+      username: nacos
+      password: nacos
+  registry:
+    type: nacos
+    nacos:
+      server-addr: korov.linux.org:8848
+      username: nacos
+      password: nacos
 spring:
   application:
     name: distributation_transication
   datasource:
-    url: jdbc:mysql://localhost:3306/test?allowMultiQueries=true&jdbcCompliantTruncation=false&useAffectedRows=true&zeroDateTimeBehavior=convertToNull
+    url: jdbc:mysql://korov.linux.org:3306/test?allowMultiQueries=true&jdbcCompliantTruncation=false&useAffectedRows=true&zeroDateTimeBehavior=convertToNull
     username: root
-    password: rizhiyi&2014
+    password: root123
 
 nacos:
   config:
-    server-addr: localhost:8848
+    server-addr: korov.linux.org:8848
     username: nacos
     password: nacos
   discovery:
-    server-addr: localhost:8848
+    server-addr: korov.linux.org:8848
     username: nacos
     password: nacos

@@ -17,15 +17,21 @@ repositories {
 
 configurations {
     implementation.get().exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+    // implementation.get().exclude(group = "org.springframework.boot", module = "spring-boot-starter")
 }
 
 dependencies {
-    implementation("org.springframework.cloud:spring-cloud-dependencies:2020.0.4")
-    implementation("com.alibaba.cloud:spring-cloud-alibaba-dependencies:2021.1")
-    implementation("com.alibaba.boot:nacos-config-spring-boot-starter:0.2.10")
-    implementation("com.alibaba.boot:nacos-discovery-spring-boot-starter:0.2.10")
+    implementation("com.alibaba.boot:nacos-config-spring-boot-starter:0.2.10") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter")
+    }
+    implementation("com.alibaba.boot:nacos-discovery-spring-boot-starter:0.2.10") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter")
+    }
     implementation("org.springframework.boot:spring-boot-starter-web:${rootProject.ext.get("springBootVersion")}")
-    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0")
+    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0") {
+        exclude(group = "org.springframework.boot", module = "spring-boot-starter")
+        exclude(group = "org.mybatis.spring.boot", module = "mybatis-spring-boot-autoconfigure")
+    }
     implementation("mysql:mysql-connector-java:8.0.27")
     implementation("io.seata:seata-spring-boot-starter:1.4.2")
     implementation("org.springframework.boot:spring-boot-starter-log4j2:${rootProject.ext.get("springBootVersion")}")
