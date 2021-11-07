@@ -6,6 +6,7 @@ group = "org.korov"
 version = "1.0-SNAPSHOT"
 
 ext {
+    set("log4jVersion", "2.14.1")
     set("lombokVersion", "1.18.22")
     set("junitVersion", "5.8.1")
 }
