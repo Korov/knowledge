@@ -15,3 +15,9 @@ spring:
 nacos:
   config:
     server-addr: localhost:8848
+    username: nacos
+    password: nacos
+  discovery:
+    server-addr: localhost:8848
+    username: nacos
+    password: nacos
