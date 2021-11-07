@@ -15,18 +15,20 @@ repositories {
     }
 }
 
+configurations {
+    implementation.get().exclude(group = "org.springframework.boot", module = "spring-boot-starter-logging")
+}
+
 dependencies {
-    implementation("io.etcd:jetcd-core:0.5.0")
-    implementation("org.redisson:redisson:3.16.3")
-    implementation("org.apache.curator:curator-recipes:5.2.0")
-    implementation("org.apache.curator:curator-framework:5.2.0")
-    implementation("org.apache.curator:curator-test:5.2.0")
-    implementation("org.apache.logging.log4j:log4j-api:${rootProject.ext.get("log4jVersion")}")
-    implementation("org.apache.logging.log4j:log4j-core:${rootProject.ext.get("log4jVersion")}")
-    implementation("org.apache.logging.log4j:log4j-slf4j-impl:${rootProject.ext.get("log4jVersion")}")
+    implementation("org.springframework.boot:spring-boot-starter-web:${rootProject.ext.get("springBootVersion")}")
+    implementation("org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.0")
+    implementation("mysql:mysql-connector-java:8.0.27")
+    implementation("io.seata:seata-spring-boot-starter:1.4.2")
+    implementation("org.springframework.boot:spring-boot-starter-log4j2:${rootProject.ext.get("springBootVersion")}")
     compileOnly("org.projectlombok:lombok:${rootProject.ext.get("lombokVersion")}")
     annotationProcessor("org.projectlombok:lombok:${rootProject.ext.get("lombokVersion")}")
 
+    testImplementation("org.springframework.boot:spring-boot-starter-test:${rootProject.ext.get("springBootVersion")}")
     testCompileOnly("org.projectlombok:lombok:${rootProject.ext.get("lombokVersion")}")
     testAnnotationProcessor("org.projectlombok:lombok:${rootProject.ext.get("lombokVersion")}")
     testImplementation("org.junit.jupiter:junit-jupiter-api:${rootProject.ext.get("junitVersion")}")

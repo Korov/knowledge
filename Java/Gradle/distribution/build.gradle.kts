@@ -9,6 +9,7 @@ ext {
     set("log4jVersion", "2.14.1")
     set("lombokVersion", "1.18.22")
     set("junitVersion", "5.8.1")
+    set("springBootVersion", "2.5.6")
 }
 
 repositories {
@@ -19,11 +20,6 @@ repositories {
     maven {
         setUrl("https://maven.aliyun.com/repository/gradle-plugin")
     }
-}
-
-dependencies {
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.6.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
 

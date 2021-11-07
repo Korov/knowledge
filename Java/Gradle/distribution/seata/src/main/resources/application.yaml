@@ -1,0 +1,10 @@
+seata:
+  enabled: true
+  enable-auto-data-source-proxy: true
+spring:
+  application:
+    name: distributation_transication
+  datasource:
+    url: jdbc:mysql://localhost:3306/test?allowMultiQueries=true&jdbcCompliantTruncation=false&useAffectedRows=true&zeroDateTimeBehavior=convertToNull
+    username: root
+    password: rizhiyi&2014
