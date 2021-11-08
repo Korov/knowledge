@@ -6,27 +6,80 @@ import io.etcd.jetcd.options.GetOption;
 import io.etcd.jetcd.options.PutOption;
 import io.etcd.jetcd.watch.WatchEvent;
 import io.etcd.jetcd.watch.WatchResponse;
+import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * @author zhu.lei
  * @date 2021-10-31 09:57
  */
+@Slf4j
 public class EtcdLock {
+    private static final int QTY = 1;
+
+    private static final long LOCK_COUNT = 100000L;
+
     public static void main(String[] args) {
+
+        ExecutorService service = new ThreadPoolExecutor(5, 5, 0L,
+                TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new ThreadFactory() {
+            @Override
+            public Thread newThread(Runnable r) {
+                return new Thread(r);
+            }
+        });
+
         // 创建Etcd客户端，Etcd服务端为单机模式
         Client client = Client.builder().endpoints("http://linux.korov.org:2379").build();
 
         // 对于某共享资源制定的锁名
         String lockName = "/lock/mylock";
 
-        // 模拟分布式场景下，多个进程“抢锁”
-        for (int i = 0; i < 3; i++) {
-            new MyThread(lockName, client).start();
+        AtomicLong lockCount = new AtomicLong(0L);
+        long startTime = System.currentTimeMillis();
+        for (int i = 0; i < QTY; ++i) {
+            final int index = i;
+            Callable<Void> task = new Callable<Void>() {
+                @Override
+                public Void call() throws Exception {
+
+                    try {
+                        String clientName = "Clinet " + index;
+                        // 创建一个租约，有效期15s
+                        Lease leaseClient = client.getLeaseClient();
+                        Long leaseId = null;
+                        try {
+                            leaseId = leaseClient.grant(15).get(10, TimeUnit.SECONDS).getID();
+                        } catch (InterruptedException | ExecutionException | TimeoutException e1) {
+                            System.out.println("[error]: create lease failed:" + e1);
+                        }
+                        while (lockCount.get() <= LOCK_COUNT) {
+                            // 尝试获取锁，10秒钟内没有获取到则放弃
+                            // 1\. try to lock
+                            String realLoclName = lock(lockName, client, leaseId);
+
+                            try {
+                                lockCount.addAndGet(1);
+                                long now = System.currentTimeMillis();
+                                log.info("{}:{} has the lock, count:{}, cost:{}", now, clientName, lockCount.get(), now - startTime);
+                            } finally {
+                                // 释放锁
+                                unLock(realLoclName, client);
+                            }
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        // log or do something
+                    }
+                    return null;
+                }
+            };
+            service.submit(task);
         }
     }
 
@@ -142,51 +195,6 @@ public class EtcdLock {
             System.out.println("[unLock]: unlock successfully.[lockName]:" + realLockName);
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             System.out.println("[error]: unlock failed：" + e);
-        }
-    }
-
-    /**
-     * 自定义一个线程类，模拟分布式场景下多个进程 "抢锁"
-     */
-    public static class MyThread extends Thread {
-        private final String lockName;
-        private final Client client;
-
-        MyThread(String lockName, Client client) {
-            this.client = client;
-            this.lockName = lockName;
-        }
-
-        @Override
-        public void run() {
-            // 创建一个租约，有效期15s
-            Lease leaseClient = client.getLeaseClient();
-            Long leaseId = null;
-            try {
-                leaseId = leaseClient.grant(15).get(10, TimeUnit.SECONDS).getID();
-            } catch (InterruptedException | ExecutionException | TimeoutException e1) {
-                System.out.println("[error]: create lease failed:" + e1);
-                return;
-            }
-
-            // 创建一个定时任务作为“心跳”，保证等待锁释放期间，租约不失效；
-            // 同时，一旦客户端发生故障，心跳便会中断，锁也会应租约过期而被动释放，避免死锁
-            ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-            // 续约心跳为12s，仅作为举例
-            service.scheduleAtFixedRate(new KeepAliveTask(leaseClient, leaseId), 1, 12, TimeUnit.SECONDS);
-
-            // 1\. try to lock
-            String realLoclName = lock(lockName, client, leaseId);
-
-            // 2\. to do something
-            try {
-                Thread.sleep(6000);
-            } catch (InterruptedException e2) {
-                System.out.println("[error]:" + e2);
-            }
-            // 3\. unlock
-            service.shutdown();// 关闭续约的定时任务
-            unLock(realLoclName, client);
         }
     }
 
