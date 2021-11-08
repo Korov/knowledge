@@ -1,0 +1,10 @@
+== 生成代码
+
+将  proto 文件放在 src/main/proto 中
+
+mvn protobuf:compile
+mvn protobuf:compile-custom
+
+需要将项目的 target/generated-sources/protobuf/grpc-java 和 target/generated-sources/protobuf/java 设置为source
+
+分别启动 HelloWorldServer 和 HelloWorldClient
