@@ -2,10 +2,56 @@
 Korov9 <korov9@163.com>
 v1.0 2021-10-31
 :toc: right
-:imagesdir: assets/images
+:imagesdir: images
 :homepage: http://asciidoctor.org
 :source-highlighter: pygments
 :source-language: java
+
+== Raft协议
+
+=== Leader选举
+
+在Raft协议中，每个节点都维护了一个状态机，该状态机有三种状态：Leader、Foller和Candidate。在任意时刻，集群中的任意一个节点都处于这三个状态之一。各个状态和转换条件如图所示
+
+image::Snipaste_2021-11-10_00-00-11.png[]
+
+在多数情况下，集群中有一个Leader节点，其他节点都处于Follower状态，
+
+. Leader节点负责处理所有客户端的请求，当接受到客户端的写入请求时，Leader节点会在本地追加一条相应的日志，然后将其封装成消息发送到集群中其他的Follower节点。当Follower节点收到该消息时会对其进行响应。如果集群中多数（超过半数）节点都已经收到该请求对应的日志记录时，则Leader节点认为该条日志记录已提交（committed），可以向客户端返回响应。Leader还会处理客户端的只读请求。Leader节点另一项工作时定期向集群中的Follower节点发送心跳消息，这主要是为了防止集群中的其他Follower节点的选举计时器超时而触发新一轮选举
+. Follower节点不会发送任何请求，他们只是简单的相应来自Leader或者Candidate的请求；Follower节点也不会处理Client的请求，而是将请求重定向给集群中的Leader节点
+. Candidte节点是由Follower节点转换而来的，当Follower节点长时间没有收到Leader节点发送的心跳消息时，则该节点的选举计时器就会过期，同时将自身状态转换成Candidate，发起新一轮选举。
+
+在Raft协议中有两个时间控制Leader选举发生，其中一个是选举超时时间（election timeout），每个Follower节点在接收不到Leader节点的心跳消息之后，并不会立即发起新一轮选举，而是需要等待一段时间之后才切换成Candidate状态发起新一轮选举。这段等待时长就是这里所说的election timeout。之所以这样设计，主要是Leader节点发送的心跳消息可能因为瞬间的网络延迟或程序瞬间的卡顿而迟到（或是丢失），因此就触发新一轮选举是没有必要的。election timeout一般设置为150ms~300ms之间的一个随机数。另一个超时时间是心跳的超时时间（heartbeat timeout），也就是Leader节点向集群中其他Follower节点发送心跳消息的时间间隔。
+
+当集群初始化时，所有节点都处于Follower的状态，此时的集群中没有Leader节点。当Follower节点一段时间（选举计时器超时）内收不到Leader节点的心跳消息，则认为Leader节点出现故障导致任期（Term）过期，Follower节点会转换成Candidate状态，发起新一轮的选举。任期实际上是一个全局的、连续递增的整数，在Raft协议中每进行一次选举，任期加一，在每个节点中都会记录当前的任期值（currentTerm）。每一个任期都是从一次选举开始的，在选举时，会出现一个或多个Candidte节点尝试成为Leader节点，如果其中一个Candidate节点赢得选举，则该节点就会切换为Leader状态并成为该任期的Leader节点，直到该任期结束。
+
+假设有三个节点A、B、C。A由于长时间未收到Leader的心跳消息，就会切换成为Candidate并发起选举（A的选举计时器election timer已被重置）。在选举的过程中，节点A首先将自己的选票投给自己，并会向集群中其他节点发送选举请求（Request Vote）以获取选票，如图1所示；此时节点B和C还都是处于Term=0的任期中，且都是Follower状态，均未透出Term=1任期中的选票，所以节点B和C在接受到A的选举请求后会选票投给节点A，另外节点B和C在收到节点A的选举请求的同时会将选举定时器重置，这是为了防止一个任期中同时出现多个Candidate节点，导致选举失败，如图2所示
+
+image::Snipaste_2021-11-10_00-48-59.png[]
+
+在节点A收到节点B、C的投票之后，其收到了集群中超过半数的选票，所以在Term=1这个任期中，该集群的Leader节点就是节点A，其他节点将切换成Follower状态。集群中的节点除了记录当前任期号（currentTerm），还会记录在该任期中当前节点的投票结果（VoteFor）
+
+image::Snipaste_2021-11-10_00-55-10.png[]
+
+A成为Term=1任期的Leader节点之后，节点A会定期向集群中的其他节点发送心跳消息，这样就可以防止节点B和C中的需那句计时器（election timer）超时而触发新一轮的选举；当节点B和C收到节点A的心跳消息之后会重置选举计时器。由此可见心跳超时时间（heartbeat timeout）需要远小于选举超时时间（election timeout）
+
+image::Snipaste_2021-11-10_00-58-30.png[]
+
+如果有两个或两个以上节点的选举计时器同时过期，则这些节点会同时由Follower状态切换成Candidate状态，然后同时触发新一轮选举，在该轮选举中，每个Candidate节点获取的选票都不到半数，怎么办？假设集群中有4个节点，其中A节点和B节点的选举计时器同时到期，切换到Candidte状态并向集群中其他节点发送选举请求，假设A节点发出的选举请求先抵达C，B的选举请求先抵达D，则A和B都获得了两票。在这种情况下Term=4这个任期会以选举失败结束，随着时间的流逝，当任意节点的选举计时器到期之后，会再次发起新一轮的选举。前面提到election timeout是在一个时间区间内取的随机数，所以在配置合理的时候，像上述情况出现的概率并不大。
+
+image::Snipaste_2021-11-10_01-06-31.png[]
+
+这里假设节点A的选举计时器再次到期（此次节点B，C，D的选举计时器并未到期），它会切换成Candidate状态并发起新一轮选举（Term=5），其中节点B虽然处于Candidate状态，但是接收到Term值比自身记录Term值大的请求时，节点会切换成Follower状态并更新自身记录的Term值，所以该实例中的节点B也会将选票投给A
+
+image::Snipaste_2021-11-10_01-10-33.png[]
+
+在获取集群中半数以上的选票并成为新任期（Term=5）的Leader之后，节点A会定期向集群中其他节点发送心跳消息；当集群中其他节点收到Leader节点的心跳消息的时候，会重置选举定时器
+
+当集群中的Leader宕机之后，一段时间之后其他节点会触发Leader选举，选举成功之后Term=6，此时宕机的节点恢复之后会收到Term=6的心跳，恢复的节点的Term=5，此时恢复的节点会切换为Follower，并更新自己的任期号。
+
+Leader选举是Raft算法中对时间要求较为严格的一个点，一般要求整个集群中的时间满足如下不等式： `广播时间 << 选举超时时间 << 平均故障时间`。
+
+广播时间指的是从一个节点发送心跳消息到集群中其他节点并接收响应的平均时间；平均故障时间就是对于一个节点而言，两次故障之间的平均时间。广播时间必须比选举时间小一个数量级，这样Leader节点才能够发送稳定的心跳消息来重置其他Follower节点的选举计时器，从而防止他们切换成Candidate，触发新一轮选举。
 
 == ETCD 特性 ==
 
