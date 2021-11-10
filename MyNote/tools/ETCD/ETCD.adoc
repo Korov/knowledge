@@ -53,6 +53,46 @@ Leader选举是Raft算法中对时间要求较为严格的一个点，一般要�
 
 广播时间指的是从一个节点发送心跳消息到集群中其他节点并接收响应的平均时间；平均故障时间就是对于一个节点而言，两次故障之间的平均时间。广播时间必须比选举时间小一个数量级，这样Leader节点才能够发送稳定的心跳消息来重置其他Follower节点的选举计时器，从而防止他们切换成Candidate，触发新一轮选举。
 
+=== 日志复制
+
+Leader节点除了向Follower节点发送心跳消息，还会处理客户端的请求，并将客户端的更新操作以消息（Append Entries消息）的形式发送到集群中所有的Follower节点。当Follower节点记录收到的这些消息之后，会向Leader节点返回相应的响应消息。当Leader节点在收到半数以上的Follower节点的响应消息之后，会对客户端的请求进行应答。最后，Leader会提交客户端的更新操作，该过程会发送Append Entries消息到Follower节点，通知Follower节点该操作已经提交，同时Leader节点和Follower节点也就可以将该操作应用到自己的状态机中。
+
+假设当前集群中有三个节点（A、B、C）。其中A是Leader节点，此时有一个客户端发送了一个更新操作到集群。节点A会将该更新操作记录到本地的Log中如图所示
+
+image::Snipaste_2021-11-10_12-26-26.png[]
+
+之后节点A会向其他节点发送Append Entries消息，其中记录了Leader节点最近接受到的请求日志，集群中其他Follower节点收到该Append Entries消息之后，会将该操作记录到本地Log中，并返回响应的响应消息，如图所示
+
+image::Snipaste_2021-11-10_12-28-07.png[]
+
+当Leader节点收到半数以上的响应消息之后，会认为集群中有半数以上的节点已经记录了该更新操作，Leader节点会将该更新操作对应的日志记录设置未已提交（committed），并应用到自身的状态机中。同时Leader节点还会对客户端的请求作出响应。同时Leader节点还会向集群中其他Follower节点发送消息，通知他们该更新操作已经被提交，Follower节点收到该消息之后，才会将该更新操作应用到自己的状态机中，如图所示
+
+image::Snipaste_2021-11-10_12-31-19.png[]
+
+集群中各个节点都会维护一个本地Log用于记录更新操作，除此之外，每个节点还会维护commitIndex和lastApplied两个值，他们是本地Log的索引值，其中commitIndex表示的是当前节点已知的、最大的、已提交的日志索引值，lastApplied表示的是当前节点最后一条被应用到状态机中的日志索引值。当节点中的commitIndex值大于lastApplied值时，会将lastApplied加1，并将lastApplied对应的日志应用到状态机中。
+
+Leader节点中不仅需要知道自己的上述信息，还需要了解集群中其他Follower节点的这些信息，例如，Leader节点需要了解每个Follower节点的日志复制到哪个位置，从而决定下次发送Append Entries消息中包含那些日志记录。为此，Leader节点会维护nexIndex[]和matchIndex[]两个数组，这两个数组中记录的都是日志索引值，其中nextIndex[]数组记录了需要发送给每个Follower节点的下一条日志的索引值，matchIndex[]表示记录了已经复制给每个Follower节点的最大的日志索引值。
+
+假设集群中有三个节点，A是Leader（Term=1），而Follower节点C因为宕机导致有一段时间未与Leader节点同步日志。此时节点C的Log中并不包含全部的已提交日志，而只是节点A的Log的子集，节点C排除故障重新启动，当前集群的状态如图所示
+
+image::Snipaste_2021-11-10_12-44-33.png[]
+
+A作为Leader节点，记录了nextIndex[]和matchIndex[]，所以知道应该向节点C发送哪些日志，在本例中，Leader节点在下次发送Append Entries消息时会携带index=2的消息（这里为了描述简单，每条消息只携带单条日志，Raft协议采用批量发送的方式，这样效率更高），当节点C收到Append Entries消息后，会将日志记录到本地Log中，然后向Leader节点返回追加日志成功的响应，当Leader节点收到响应之后，会递增节点C对应的nextIndex和matchIndex，这样Leader节点就知道下次发送日志的位置了。
+
+image::Snipaste_2021-11-10_12-48-38.png[]
+
+当C故障恢复后，节点A宕机重启，并且导致节点B成为新任（Term=2）的Leader节点，则此时节点B并不知道旧Leader节点中记录的nextIndex[]和matchIndex[]信息，所以Leader节点会重置nextIndex[]和matchIndex[]，其中会将nextIndex[]全部重置为其自身Log的最后一条已提交日志的Index值，而matchIndex[]全部重置为0，
+
+image::Snipaste_2021-11-10_12-52-02.png[]
+
+随后，新任期中的Leader节点会向其他节点发送Append Entries消息，节点A已经拥有了当前Leader的全部日志记录，所以会返回追加成功的响应并等待后续的日志，而节点C并没有Index=2和Index=3两条日志，所以返回追加日志失败的响应，在收到该响应后，Leader节点会向nextIndex前移，然后Leader节点会再次尝试发送Append Entries消息，循环往复，不断减小nextIndex值，直至节点C返回追加成功的响应，之后就进入了正常追加消息记录的流程。
+
+image::Snipaste_2021-11-10_12-56-15.png[]
+
+Follower节点投票的时候还需要比肩Candidate节点的日志记录与自身的日志记录，拒绝那些没有自己新的Candidate节点发来的投票请求，确保将选票投给包含了全部已提交（committed）日志记录的Candidate节点，这也保证了已提交的日志记录不会丢失：Candidate节点为了成为Leader节点必然会在选举过程中向集群中半数以上的节点发送选举请求，因为已提交的日志记录必须存在集群中半数以上的节点中，这也就意味着每一条已提交的日志记录肯定在这些接收到节点中至少存在一份。如果Candidate节点上的日志记录与集群中大多数节点上的日志记录一样新，那么其日志一定包含所有已经提交的日志记录，也就可以获得这些节点的投票并成为Leader。
+
+Raft协议通过比较两节点日志中的最后一条日志的索引值和任期号，以决定谁的日志比较新：首先会比较最后一条日志记录的任期号，如果最后的日志记录的任期号不同，那么任期号大的日志记录比较新；如果最后一条日志记录的任期号相同，那么日志索引比较大的比较新。
+
 == ETCD 特性 ==
 
 - Lease机制：即租约机制（TTL，Time To Live），Etcd 可以为存储的 KV 对设置租约，当租约到期，KV 将失效删除；同时也支持续约，即 KeepAlive。
