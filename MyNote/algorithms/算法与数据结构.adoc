@@ -1,0 +1,13 @@
+= 算法与数据结构 =
+Korov9 <korov9@163.com>
+v1.0 2021-11-14
+:toc: right
+:imagesdir: images
+:source-highlighter: pygments
+:source-language: java
+
+== LSM Tree ==
+
+LSM树(Log-Structured-Merge-Tree)的名字往往会给初识者一个错误的印象，事实上，LSM树并不像B+树、红黑树一样是一颗严格的树状数据结构，它其实是一种存储结构，目前HBase,LevelDB,RocksDB这些NoSQL存储都是采用的LSM树。
+
+LSM树的核心特点是利用顺序写来提高写性能，但因为分层(此处分层是指的分为内存和文件两部分)的设计会稍微降低读性能，但是通过牺牲小部分读性能换来高性能写，使得LSM树成为非常流行的存储结构。
