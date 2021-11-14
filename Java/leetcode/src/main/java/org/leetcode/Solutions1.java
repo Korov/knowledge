@@ -12,19 +12,6 @@ import java.util.Map;
  * @author korov
  */
 public class Solutions1 {
-    public int[] method1(int[] nums, int target) {
-        Map<Integer, Integer> sumKey = new HashMap<>(16);
-        for (int i = 0; i < nums.length - 1; i++) {
-            sumKey.put(i, nums[i]);
-            for (int j = i + 1; j < nums.length; j++) {
-                if (nums[j] == target - nums[i]) {
-                    return new int[]{i, j};
-                }
-            }
-        }
-        return new int[]{0, 0};
-    }
-
     public int[] method2(int[] nums, int target) {
         Map<Integer, Integer> sumKey = new HashMap<>(16);
         for (int i = 0; i < nums.length; i++) {
