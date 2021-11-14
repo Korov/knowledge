@@ -1,6 +1,6 @@
 package org.leetcode;
 
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -11,22 +11,36 @@ public class Solution677 {
 }
 
 class MapSum {
-    private final LinkedHashMap<String, Integer> innerMap = new LinkedHashMap<>(64);
+    private final Map<String, Integer> innerMap = new HashMap<>(64);
+    TrieNode root = new TrieNode();
 
     public MapSum() {
     }
 
     public void insert(String key, int val) {
+        int delta = val - innerMap.getOrDefault(key, 0);
         innerMap.put(key, val);
+        TrieNode node = root;
+        for (char c : key.toCharArray()) {
+            node = node.childMap.computeIfAbsent(c, mapKey -> new TrieNode());
+            // 所有此前缀的和
+            node.sum += delta;
+        }
     }
 
     public int sum(String prefix) {
-        int sum = 0;
-        for (Map.Entry<String, Integer> entry : innerMap.entrySet()) {
-            if (entry.getKey().startsWith(prefix)) {
-                sum += entry.getValue();
+        TrieNode node = root;
+        for (char c : prefix.toCharArray()) {
+            node = node.childMap.get(c);
+            if (node == null) {
+                return 0;
             }
         }
-        return sum;
+        return node.sum;
+    }
+
+    class TrieNode {
+        int sum = 0;
+        Map<Character, TrieNode> childMap = new HashMap<>(8);
     }
 }
