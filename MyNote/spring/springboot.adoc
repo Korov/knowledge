@@ -41,3 +41,35 @@ Spring定义了5种事务的隔离级别：
 
 `@Transactional` propagation定义传播行为，isolation定义隔离级别，timeout设置事务的过期时间，readOnly指定当前事务是否是只读事务。rollbackfor（norollbackfor）指定哪个或者哪些异常可以引起（或不可以引起）事务回滚。
 
+== Spring
+
+=== Spring中涉及的设计模式
+
+==== 简单工厂模式
+
+`BeanFactory`, Spring中的 `BeanFactory` 就是简单工厂模式的体现，根据传入beanName来获得对象，先从缓存中获取，缓存中没有再创建
+
+实现原理：
+
+. bean容器的启动阶段：
+.. 读取bean的xml配置文件，将bean元素分别转换成一个BeanDefinition对象。
+.. 然后通过BeanDefinitionRegistry将这些bean注册到beanFactory中，保存在它的一个ConcurrentHashMap中。
+.. 将BeanDefinition注册到了beanFactory之后，在这里Spring为我们提供了一个扩展的切口，允许我们通过实现接口BeanFactoryPostProcessor 在此处来插入我们定义的代码。典型的例子就是：PropertyPlaceholderConfigurer，我们一般在配置数据库的dataSource时使用到的占位符的值，就是它注入进去的。
+
+==== 工厂方法
+
+
+
+==== 单例模式
+
+==== 适配器模式
+
+==== 装饰器模式
+
+==== 代理模式
+
+==== 观察者模式
+
+==== 策略模式
+
+==== 模板方法模式
