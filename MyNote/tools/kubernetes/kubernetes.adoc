@@ -283,7 +283,78 @@ NodePort的实现方式是在Kubernetes集群里的每个Node上都为需要外�
 
 === Volume
 
-存储卷是Pod中能够被多个容器访问的共享目录。Kubernetes的Volume概念、用途和目的与Docker的Volume比较类似，但两者不能等价。首先Kubernetes中的Volume被定义在Pod上，然后被一个Pod里的多个容器挂载到具体的文件目录下；其次
+存储卷是Pod中能够被多个容器访问的共享目录。Kubernetes的Volume概念、用途和目的与Docker的Volume比较类似，但两者不能等价。首先Kubernetes中的Volume被定义在Pod上，然后被一个Pod里的多个容器挂载到具体的文件目录下；其次，Kubernetes中的Volume与Pod的生命周期相同，但与容器的生命周期不相关，当容器终止或重启时，Volume中的数据也不会丢失。最后，Kubernetes支持多种类型的Volume，例如GlusterFS、Ceph等先进的分布式文件系统。
 
+Volume的使用也比较简单，在大多数情况下，我们先在Pod上声明一个Volume，然后在容器里引用该Volume并挂载（Mount）到容器里的某个目录上。举例来说，我们要给之前的Tomcat Pod增加一个名为datavol的Volume，并且挂载到容器的 `/mydata-data` 目录上，则只要对Pod的定义文件做如下修正即可
+
+[source, yaml]
+----
+template:
+  metadata:
+    labels:
+      app: app-demo
+      tier: frontend
+  spec:
+    volumes:
+    - name: datavol
+      emptyDir: {}
+    containers:
+    - name: tomcat-demo
+      image: tomcat
+      volumeMounts:
+      - mountPath: /mydata-data
+        name: datavol
+      imagePullPolicy: IfNotPresent
+----
+
+Kubernetes提供了非常丰富的Volume类型，下面逐一进行说明：
+
+. emptyDir：一个emptyDir Volume是在Pod分配到Node时创建的。从它的名称就可以看出，他的初始内容为空，并且无须指定宿主机上对应的目录文件，因为这是Kubernetes自动分配的一个目录，当Pod从Node上移除时，emptyDir中的数据也会被永久删除。emptyDir的一些用途如下：临时空间；长时间任务的中间过程CheckPoint的临时保存目录；一个容器需要从另一个容器中获取数据的目录。
+. hostPath：hostPath为在Pod上挂载宿主机上的文件或目录，它通常可以用于以下几个方面：1，容器应用程序生成的日志文件需要永久保存时，可以使用宿主机的高速文件系统进行存储；2，需要访问宿主机上Docker引擎内部数据结构的容器应用时，可以通过定义hostPath为宿主机 `/var/lib/docker` 目录，使容器内部应用可以直接访问Docker的文件系统。在使用这种类型的Volume时，需要注意以下几点：1，在不同的Node上具有相同配置的Pod，可能会因为宿主机上目录和文件不同而导致Volume上目录和文件的访问结果不一致；2，如果使用了资源配额管理，则Kubernetes无法将hostPath在宿主机上使用的资源纳入管理。
++
+[source, yaml]
+----
+volumes:
+- name: "persistent-storage"
+  hostPath:
+    path: "/data"
+----
+. gcePersistentDisk：使用这种类型的Volume表示使用谷歌公有云提供的永久磁盘（Persistent Disk，PD）存放Volume的数据，它与emptyDir不同，PD上的内容会被永久保存，当Pod被删除时，PD只是被卸载（Unmount），但不会被删除。
++
+[sourc,yaml]
+----
+volumes:
+- name: test-volume
+  gcePersistentDisk:
+    pdName: my-data-disk
+    fsType: ext4
+----
+. awsElasticBlockStore：亚马逊公有云提供的EBS Volume存储数据
++
+[sourc,yaml]
+----
+volumes:
+- name: test-volume
+  awsElasticBlockStore:
+    volumeID: aws://<availability-zone>/<volume-id>
+    fsType: ext4
+----
+. NFS：使用NFS网络文件系统提供的共享目录存储数据时，我们需要在系统中部署一个NFS Server。
++
+[sourc,yaml]
+----
+volumes:
+- name: nfs
+  nfs:
+    server: nfs-server.localhost
+    path: "/"
+----
+. 其他类型的Volume：
+.. iscis：使用iSCSI存储设备上的目录挂载到Pod中
+.. flocker：使用Flocker管理存储卷
+.. glusterfs：使用开源GlusterFS网络文件系统的目录挂载到Pod中
+.. rbd：使用Ceph块设备共享存储（Rados Block Device）挂载到Pod中
+.. gitRepo：通过挂载一个空目录，并从Git库中clone一个仓库以供Pod使用
+.. secret： 一个Secret Volume用于为Pod提供加密的信息，你可以将定义在Kubernetes中的Secret直接挂载为文件让Pod访问。Secret Volume是通过TMFS（内存文件系统）实现的，这种类型的Volume是不会被持久化的
 
 
