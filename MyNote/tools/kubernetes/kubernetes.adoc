@@ -857,8 +857,168 @@ Pod的重启策略与控制方式息息相关。每种控制器对Pod的重启�
 - Job：OnFailuer或Never，确保容器执行完成后不再重启
 - kubelet：在Pod失效时自动重启它，不论将RestartPolicy设置为什么值，也不会对Pod进行健康检查
 
+ === Pod健康检查和服务可用性检查
+ 
+Kubernetes对Pod的健康状态可以通过两类探针来检查：LivenessProbe和ReadinessProbe，kubelet定期执行这两类探针来诊断容器的健康状况
 
+LivenessProbe探针：用于判断容器是否存活（Running状态），如果LivenessProbe探针探测到容器不健康，则kubelet将杀掉该容器，并根据容器的重启策略做相应的处理。如果一个容器不包含LivenessProbe探针，那么kubelet认为该容器的LivenessProbe探针返回的值永远时Success。
 
+ReadinessProbe探针：用于判断容器服务是否可用（Ready状态），达到Reay状态的Pod才可以接收请求。对于被Service管理的Pod，Service与Pod Endpoint的关联关系也将基于Pod是否Ready进行设置。如果在运行过程中Ready状态变为False，则系统自动将其从Service的后端Endpoint列表中隔离出去，后续再把恢复到Ready状态的Pod加回后端Endpoint列表。这样就能保证客户端在访问Service时不会被转发到服务不可用的Pod实例上。
+
+LivenessProbe和ReadinessProbe均可配置以下三种实现方式：
+
+. ExecAction：在容器内执行一个命令，如果该命令的返回码为0，则表明容器健康。以下通过执行 `cat /tmp/health` 命令来判断一个容器运行是否正常。在该Pod运行后，将创建/tmp/health文件10s后删除该文件，而LivenessProbe健康检查的初始探测时间（initialDeplaySeconds）为15s，探测结果是Fail，将导致kubelet杀掉该容器并重启它
++
+[source,yaml]
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: liveness
+  name: liveness-exec
+spec:
+  containers:
+  - name: liveness
+    image: gcr.io/google_containers/busybox
+    args:
+    - /bin/sh
+    - -c
+    - echo ok > /tmp/health; sleep 10; rm -rf /tmp/health; sleep 600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/health
+      initialDeplaySeconds: 15
+      timeoutSeconds: 1
+----
+. TCPSocketAction：通过容器的IP地址和端口号执行TCP检查，如果能够建立TCP连接，则表明容器健康。如下通过与容器内的 `localhost:80` 建立TCP连接进行健康检查
++
+[source, yaml]
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-healthcheck
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+    livenessProbe:
+      tcpSocket:
+        port: 80
+      initialDeplaySeconds: 30
+      timeoutSeconds: 1
+----
+. HTTPGetAction：通过容器IP的IP地址、端口号及路径调用HTTP Get方法，如果响应的状态码大于等于200且小于400，则认为容器健康。
++
+[source, yaml]
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-healthcheck
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+    livenessProbe:
+      httpGet:
+        path: /_status/healthz
+        port: 80
+      initialDeplaySeconds: 30
+      timeoutSeconds: 1
+----
+
+NOTE: initialDeplaySeconds：启动容器后进行首次健康检查的等待时间，单位为s。timeoutSeconds：健康检查发送请求后等待响应的超时时间，单位为s。当超时发生时，kubelet会认为容器已经无法提供服务，将会重启该容器
+
+=== 玩转Pod调度
+
+严谨的说，RC的继任者其实并不是Deployment，而是ReplicaSet，因为ReplicaSet进一步增强了RC标签选择器的灵活性。之前RC的标签选择器只能选择一个标签，而ReplicaSet拥有集合式的标签选择器，可以选择多个Pod标签，如下所示
+
+[source, yaml]
+----
+selector:
+  matchLabels:
+    tier: frontend
+  matchExpressions:
+    - {key: tier, operator: In, values: [frontend]}
+----
+
+与RC不同，ReplicaSet被设计成能控制多个不同标签的Pod副本。一种常见的应用场景是，应用MyApp目前发布了v1与v2两个版本，用户希望MyApp的Pod副本数保持为3个，可以同时包含v1和贰版本的Pod，就可以用ReplicaSet来实现这种控制
+
+[source, yaml]
+----
+selector:
+  matchLabels:
+    tier: frontend
+  matchExpressions:
+    - {key: tier, operator: In, values: [v1,v2]}
+----
+
+其实，Kubernetes的滚动升级就是巧妙运用ReplicaSet的这个特性来实现的，同时，Deployment也是通过ReplicaSet来实现Pod副本自动控制功能的。我们不应该直接使用底层ReplicaSet来控制Pod副本，而应该使用管理ReplicaSet的Deployment对象来控制副本，这是来自官方的建议。
+
+当我们希望某种Pod的副本全部在指定的一个或者一些节点上运行，比如希望MySQL数据库调度到一个具有SSD磁盘的目标节点上，此时Pod模板中的NodeSelector属性就开始发挥作用了，上述MySQL定向调度案例的是实现方式可以分为以下两步：
+
+. 把具有SSD磁盘的Node都打上自己定义标签 `disk=ssd`
+. 在Pod模板中设定NodeSelector的值为 `disk:ssd`
+
+如此一来，Kubernetes在调度Pod副本的时候，就会先按照Node的标签过滤出合适的目标节点，然后选择一个最佳节点进行调度。
+
+上述逻辑看起来即简单又完美，但在真实的生产环境中可能面临以下问题：
+
+. 如果NodeSelector选择的Label不存在或者不符合条件，比如这些目标节点此时宕机或者资源不足，该怎么办
+. 如果要选择多种合适的目标节点，比如SSD磁盘的节点或者超高速硬盘的节点，该怎么办？
+
+在真实的生产环境中还存在如下所述的特殊需求
+
+. 不同Pod之间的亲和性（Affinity）。比如MySQL数据库与Redis中间件不能被调度到同一个目标节点上，或者两种不同的Pod必须被调度到同一个Node上，以实现本地文件共享或本地网络通信等特殊需求，这就是 `PodAffinity` 要解决的问题
+. 又状态集群的调度。对于Zookeeper、Elasticsearch、MongoDB、Kafka等有状态集群，虽然集群中的每个Worker节点看起来都是相同的，但每个Worker节点都必须有明确的、不变的唯一ID（主机名或IP地址），这些节点的启动和停止次序通常有严格的顺序。此外，由于集群需要持久化保存状态数据，所以集群中的Worker节点对应的Pod不管在哪个Node上恢复，都需要挂载原来的Volume，因此这些Pod还需要捆绑具体的PV。针对这种复杂的需求，Kubernetes提供了StatefulSet这种特殊的副本控制器来解决
+. 在每个Node上调度并且仅仅创建一个Pod副本。这种调度通常用在系统监控相关的Pod，比如主机上的日志采集、主机性能采集等进程需要被部署到集群中的每个节点，并且只能部署一个副本，这就是DaemonSet这种特殊Pod副本控制所解决的问题
+. 对于批处理组作业，需要创建多个Pod副本来协同工作，当这些Pod副本都完成自己的工作任务时，整个批处理作业就结束了。这种Pod运行且仅运行一次的特殊调度，有Job和CronJob
+
+Kubernetes 1.9之前，在RC等对象被删除后，他们所创建的Pod副本都不会被删除；Kubernetes 1.9以后，这些Pod副本会被一并删除。如果不希望这样做，则可以通过 `kubectl` 命令的 `--cascade=false` 参数来取消这一默认特性： `kubectl delete replicaset my-repset --cascade=false`
+
+==== NodeSelector： 定向调度
+
+有时候我们需要将Pod调度到指定的一些Node上，可以通过Node的标签（Label）和Pod的nodeSelector属性相匹配，来达到上述目的。
+
+. 首先通过 `kubectl label` 命令给目标Node打上一些标签： `kubectl label nodes <node-name> <label-key>=<label-value>`。
+. 然后，在Pod的定义中加上nodeSelector的设置，以 `redis-master-controller.yaml` 
++
+[source, yaml]
+.redis-master-controller.yaml
+----
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: redis-master
+  labels:
+    name: redis-master
+spec:
+  replicas: 1
+  selector:
+    name: redis-master
+  template:
+    metadata:
+      labels:
+        name: redis-master
+    spec:
+      containers:
+      - name: master
+        image: kubeguide/redis-master
+        ports:
+        - containerPort: 6379
+      nodeSelector:
+        zone: north
+----
+
+NOTE: 如果我们指定了Pod的nodeSelector条件，且在集群中不存在包含相应标签的Node，则即使在集群中还有其他可供使用的Node，这个Pod也无法被成功调度。
 
 
 
