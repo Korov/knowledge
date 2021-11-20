@@ -357,4 +357,151 @@ volumes:
 .. gitRepo：通过挂载一个空目录，并从Git库中clone一个仓库以供Pod使用
 .. secret： 一个Secret Volume用于为Pod提供加密的信息，你可以将定义在Kubernetes中的Secret直接挂载为文件让Pod访问。Secret Volume是通过TMFS（内存文件系统）实现的，这种类型的Volume是不会被持久化的
 
+=== Persistent Volume
+
+之前提到的Volume是被定义在Pod上的，属于计算资源的一部分，而实际上，网络存储是相对独立于计算资源而存在的一种实体资源。比如在使用虚拟机的情况下，我们通常会先定义一个网络存储，然后从中划出一个网盘并挂接到虚拟机上。Persistent Volume（PV）和与之相关联的Persistent Volume Claim（PVC）也起到了类似的作用
+
+PV可以被理解成Kubernetes集群中某个网络存储对应的一块存储，它与Volume类似，但有以下区别
+
+. PV只能是网络存储，不属于任何Node，但可以在每个Node上访问
+. PV并不是被定义在Pod上的，而是独立与Pod之外定义的
+. PV目前支持的类型包括：gcePersistentDisk、awsElasticBlockStore、AzureFile、AzureDisk、FC（Fibre Channel）、Flockers、NFS、iSCSI、RBD（Rados Block Device）、CephFS、Cinder、GlusterFS、VsphereVolume、Quobyte Volumes、VMware Photon、Portworx Volumes、ScaleIO Volumes
+
+下面给出了NFS类型的PV的一个yaml定义文件，声明了需要5Gi的存储空间
+
+----
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv003
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+  - ReadWriteOnce
+  nfs:
+    path: /somepath
+    server: 172.17.0.2
+----
+
+比较重要的是PV的 `accessModes` 属性，目前有以下类型：
+
+ . ReadWriteOnce：读写权限，并且只能被单个Node挂载
+ . ReadOnlyMany：只读权限，允许被多个Node挂载
+ . ReadWriteMany：读写权限，允许被多个Node挂载
+ 
+如果某个Pod想申请某种类型的PV，则首先需要定义一个PersistentVolumeClain对象
+
+[source,yaml]
+----
+kind: PersistentVolumeClain
+apiVersion: v1
+metadata:
+  name: myclain
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi
+----
+
+然后，在Pod的Volume定义中引用上述PVC即可
+
+[source, yaml]
+----
+volumes:
+  -name: mypd
+    persistentVolumeClain:
+      clainName: myclaim
+----
+
+最后说说PV的状态，PV是有状态的对象，它的状态有以下几种：
+
+- Available：空闲状态
+- Bound：已经绑定到某个PVC上
+- Released：对应的PVC已经被删除，但资源还没有被集群收回
+- Failed：PV自动回收失败
+
+=== Namespace
+
+Namespace（命名空间）是Kubernetes系统中的另一个非常重要的概念，Namespace在很多情况下用于实现多租户的资源隔离。Namespace通过将集群内部的资源对象分配到不同的Namespace中，形成逻辑上分组的不同项目、小组或用户组，便于不同的分组在共享使用整个集群的资源的同事还能被分别管理
+
+Kubernetes集群在启动后会创建一个 `default` 的Namespace，通过kubectl可以查看： `kubectl get namespaces`
+
+Namespace的定义很简单，如下所示的yaml定义了名为 `development` 的 Namespace
+
+[source, yaml]
+----
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: development
+----
+
+一旦创建了Namespace，我们在创建资源对象时就可以指定这个资源对象属于那个Namespace。
+
+[source, yaml]
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+  namespace: development
+spec:
+  containers:
+  - image: busybox
+    command:
+    - sleep
+    - "3600"
+  name: busybox
+----
+
+此时查看对应Namespace的Pod：`kubectl get pods --namespace=development`
+
+=== Annotation
+
+Annotation（注解）与Label类似，也使用key/value键值对的形式进行定义。不同的是Label具有严格的命名规则，它定义的是Kubernetes对象的元数据（Metadata），并且用户Label Selector。Annotation则是用户任意定义的附加信息，以便于外部工具查找。在很多时候，Kubernetes的模块自身会通过Annotation标记资源对象的一些特殊信息。
+
+通常来说，用Annotation来记录的信息如下：
+
+- build信息，release信息，Docker镜像信息，例如时间戳、release id号、PR号，镜像Hash值
+- 日志库、监控库、分析库等资源库的地址信息
+- 程序调试工具信息，例如工具名称、版本号等
+- 团队的联系信息，例如电话号码、负责人名称、网址等
+
+=== ConfigMap
+
+为了集中管理系统的配置参数，而不是管理一堆配置文件。Kubernetes把所有的配置项都当作 `key-value` 字符串，当然value可以来自某个文本文件。这些配置项可以作为Map表中的一个项，整个Map的数据可以被持久化存储在Kubernetes的Etcd数据库中，然后提供API以方便Kubernetes相关组件或客户应用CRUD操作这些数据，上述专门用来保存配置参数的Map就是Kubernetes ConfigMap资源对象。
+
+接下里Kubernetes提供了一种内建机制，将存储在etcd中的ConfigMap通过Volume映射的方式变成目标Pod内的配置文件，不管目标Pod被调度到哪台服务器上，都会完成自动映射。进一步地，如果ConfigMap中的key-value数据被修改，则映射到Pod中的配置文件也会随之更新。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
