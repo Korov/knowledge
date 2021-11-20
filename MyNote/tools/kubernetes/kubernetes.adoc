@@ -476,6 +476,387 @@ Annotation（注解）与Label类似，也使用key/value键值对的形式进�
 
 接下里Kubernetes提供了一种内建机制，将存储在etcd中的ConfigMap通过Volume映射的方式变成目标Pod内的配置文件，不管目标Pod被调度到哪台服务器上，都会完成自动映射。进一步地，如果ConfigMap中的key-value数据被修改，则映射到Pod中的配置文件也会随之更新。
 
+== Kubernetes安装配置指南
+
+=== kubectl命令行工具用法详解
+
+kubectl作为客户端CLI工具，可以让用户通过命令行对Kubernetes集群进行操作。
+
+==== kubectl用法概述
+
+kubectl命令行的语法如下：
+
+[source, bash]
+----
+kubectl [command] [TYPE] [NAME] [flags]
+----
+
+command：子命令，用于操作Kubernetes集群对象的命令，例如create、delete、describe、get、apply等
+
+Type：资源对象的类型，区分大小写，能以单数、复数或者简写形式表示。例如以下3种TYPE是等价的
+
+[source, bash]
+----
+kubectl get pod pod1
+kubectl get pods pod1
+kubectl get po pod1
+----
+
+NAME：资源对象的名称，区分大小写。如果不指定名称，系统则将返回属于TYPE的全部对象的列表
+
+flags：kubectl子命令的可选参数，例如使用-s指定API Server的URL地址而不用默认值
+
+获取多个Pod信息： `kubectl get pods pod1 pod2`
+
+获取多种对象的信息： `kubectl get pod/pod1 rc/rc1`
+
+同时应用多个yaml文件
+[source, bash]
+----
+kubectl get pod -f pod1.yaml -f pod2.yaml
+kubectl create -f pod1.yaml -f rc1.yaml
+----
+
+== 深入掌握Pod
+
+=== Pod定义详解
+
+yaml格式的Pod定义文件的完整内容如下
+
+[source, yaml]
+----
+# yaml格式的pod定义文件完整内容：
+apiVersion: v1        　　#必选，版本号，例如v1
+kind: Pod       　　　　　　#必选，Pod
+metadata:       　　　　　　#必选，元数据
+  name: string        　　#必选，Pod名称
+  namespace: string     　　#必选，Pod所属的命名空间
+  labels:       　　　　　　#自定义标签
+    - name: string      　#自定义标签名字
+  annotations:        　　#自定义注释列表
+    - name: string
+spec:         　　　　　　　#必选，Pod中容器的详细定义
+  containers:       　　　　#必选，Pod中容器列表
+  - name: string      　　#必选，容器名称
+    image: string     　　#必选，容器的镜像名称
+    imagePullPolicy: [Always | Never | IfNotPresent]  #获取镜像的策略 Alawys表示下载镜像 IfnotPresent表示优先使用本地镜像，否则下载镜像，Nerver表示仅使用本地镜像
+    command: [string]     　　#容器的启动命令列表，如不指定，使用打包时使用的启动命令
+    args: [string]      　　 #容器的启动命令参数列表
+    workingDir: string      #容器的工作目录
+    volumeMounts:     　　　　#挂载到容器内部的存储卷配置
+    - name: string      　　　#引用pod定义的共享存储卷的名称，需用volumes[]部分定义的的卷名
+      mountPath: string     #存储卷在容器内mount的绝对路径，应少于512字符
+      readOnly: boolean     #是否为只读模式
+    ports:        　　　　　　#需要暴露的端口库号列表
+    - name: string      　　　#端口号名称
+      containerPort: int    #容器需要监听的端口号
+      hostPort: int     　　 #容器所在主机需要监听的端口号，默认与Container相同
+      protocol: string      #端口协议，支持TCP和UDP，默认TCP
+    env:        　　　　　　#容器运行前需设置的环境变量列表
+    - name: string      　　#环境变量名称
+      value: string     　　#环境变量的值
+    resources:        　　#资源限制和请求的设置
+      limits:       　　　　#资源限制的设置
+        cpu: string     　　#Cpu的限制，单位为core数，将用于docker run --cpu-shares参数
+        memory: string      #内存限制，单位可以为Mib/Gib，将用于docker run --memory参数
+      requests:       　　#资源请求的设置
+        cpu: string     　　#Cpu请求，容器启动的初始可用数量
+        memory: string      #内存清楚，容器启动的初始可用数量
+    livenessProbe:      　　#对Pod内个容器健康检查的设置，当探测无响应几次后将自动重启该容器，检查方法有exec、httpGet和tcpSocket，对一个容器只需设置其中一种方法即可
+      exec:       　　　　　　#对Pod容器内检查方式设置为exec方式
+        command: [string]   #exec方式需要制定的命令或脚本
+      httpGet:        　　　　#对Pod内个容器健康检查方法设置为HttpGet，需要制定Path、port
+        path: string
+        port: number
+        host: string
+        scheme: string
+        HttpHeaders:
+        - name: string
+          value: string
+      tcpSocket:      　　　　　　#对Pod内个容器健康检查方式设置为tcpSocket方式
+         port: number
+       initialDelaySeconds: 0   #容器启动完成后首次探测的时间，单位为秒
+       timeoutSeconds: 0    　　#对容器健康检查探测等待响应的超时时间，单位秒，默认1秒
+       periodSeconds: 0     　　#对容器监控检查的定期探测时间设置，单位秒，默认10秒一次
+       successThreshold: 0
+       failureThreshold: 0
+       securityContext:
+         privileged: false
+    restartPolicy: [Always | Never | OnFailure] #Pod的重启策略，Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Nerver表示不再重启该Pod
+    nodeSelector: obeject   　　#设置NodeSelector表示将该Pod调度到包含这个label的node上，以key：value的格式指定
+    imagePullSecrets:     　　　　#Pull镜像时使用的secret名称，以key：secretkey格式指定
+    - name: string
+    hostNetwork: false      　　#是否使用主机网络模式，默认为false，如果设置为true，表示使用宿主机网络
+    volumes:        　　　　　　#在该pod上定义共享存储卷列表
+    - name: string     　　 　　#共享存储卷名称 （volumes类型有很多种）
+      emptyDir: {}      　　　　#类型为emtyDir的存储卷，与Pod同生命周期的一个临时目录。为空值
+      hostPath: string      　　#类型为hostPath的存储卷，表示挂载Pod所在宿主机的目录
+        path: string      　　#Pod所在宿主机的目录，将被用于同期中mount的目录
+      secret:       　　　　　　#类型为secret的存储卷，挂载集群与定义的secre对象到容器内部
+        scretname: string
+        items:   
+        - key: string
+          path: string
+      configMap:      　　　　#类型为configMap的存储卷，挂载预定义的configMap对象到容器内部
+        name: string
+        items:
+        - key: string
+          path: string
+----
+
+=== Pod的基本用法
+
+Kubernetes要求我们自己创建的Docker镜像并以一个前台命令作为启动命令
+
+如果两个容器为紧耦合的关系，并组合成一个整体对外提供服务时，应将这两个容器打包为一个Pod
+
+[source, yaml]
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-php
+  labels:
+    name: redis-php
+spec:
+  containers:
+  - name: frontend
+    image: jjjj
+    ports:
+    - containerPort: 80
+  -name: redis
+    image: llll
+    ports:
+    - containerPort: 6379
+----
+
+属于同一个Pod的多个容器应用之间相互访问时仅需通过localhost就可以通信，使得这一组容器被绑定在了一个环境中。
+
+=== 静态Pod
+
+静态Pod是又kubelet进行管理的仅存在与特定Node上的Pod。他们不能通过API Server进行管理，无法与ReplicationController、Deployment或者DaemonSet进行关联，并且kubelet无法对他们进行健康检查。静态Pod总是由Kubelet创建的，并且总在Kubelet所在的Node上运行。
+
+静态Pod由两种创建方式：
+
+. 配置文件方式：首先，需要设置Kubelet的启动参数 `--config`， 指定Kubelet需要监控的配置文件所在的目录，Kubelet会定期扫描该目录，并根据该目录下的 `.yaml` 或 `.json` 文件进行创建操作，删除此Pod只能到Kubelet所在机器上删除对应的配置文件即可
+. HTTP方式：通过设置Kubelet的启动参数 `--manifest-url`，Kubelet将会定期从该URL地址下载Pod的定义文件，并以 `.yaml` 或 `.json` 文件的格式进行解析，然后创建Pod
+
+=== Pod容器共享Volume
+
+同一个Pod中的多个容器能够共享Pod级别的存储卷Volume。Volume可以被定义为各种类型，多个容器各自进行挂载操作，将一个Volume挂载为容器内部需要的目录，如图所示
+
+image::Snipaste_2021-11-20_18-21-17.png[]
+
+配置文件如下：
+
+[source, yaml]
+.pod-volume-applogs.yaml
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: volume-pod
+spec:
+  containers:
+  - name: tomcat
+    image: tomcat
+    ports:
+    - containerPort: 8080
+      volumeMounts:
+      - name: app-logs
+        mountPath: /usr/local/tomcat/logs
+  - name: busybox
+    image: busybox
+    command: ["sh", "-c", "tail -f /logs/catalina*.log"]
+    volumeMounts:
+    - name: app-logs
+      mountPath: /logs
+  volumes:
+  - name: app-logs
+    emptyDir: {}
+----
+
+这里设置的Volume名为app-logs，类型为emptyDir，挂载到tomcat容器内的 `/usr/local/tomcat/logs` 目录，同时挂载在busybox容器内的 `/logs` 目录。tomcat容器在启动后会向 `/usr/local/tomcat/logs` 目录写文件，busybox容器就可以读取其中的文件了。
+
+=== Pod的配置管理
+
+==== ConfigMap概述
+
+ConfigMap供容器使用的典型用法如下：
+
+. 生成为容器内的环境变量
+. 设置容器启动命令的启动参数（需设置为环境变量）
+. 以Volume的形式挂载为容器内部的文件或目录
+
+ConfigMap以一个或多个key:value的形式保存在Kubernetes系统中供应用使用，既可以用于表示一个变量的值（例如apploglevel=info），也可以用于表示一个完整配置文件的内容（例如 `server.xml=<?xml...>...`）
+
+可以通过yaml配置文件或者直接使用 `kubectl create configmap` 命令行的方式来创建ConfigMap
+
+==== 创建ConfigMap资源对象
+
+===== 通过yaml配置文件方式创建
+
+[source, yaml]
+.cm-appvars.yaml
+----
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-appvars
+data:
+  apploglevel: info
+  appdatadir: /var/data
+  key-serverxml: |
+    <?xml ...>...
+----
+
+执行kubectl create命令创建该ConfigMap： `kubectl create -f cm-appvars.yaml`
+
+查看创建好的ConfigMap：
+[source,bash]
+----
+# 获取信息
+kubectl get configmap
+# 获取详细信息
+kubectl describe configmap cm-appvars
+----
+
+===== 通过kubectl命令行方式创建
+
+通过 `--from-file` 参数从文件中进行创建，可以指定key的名称，也可以在一个命令行中创建包含多个key的ConfigMap，语法为： `kubectl create configmap NAME --from-file=[key=]source --from-file=[key=]source`
+
+通过 `--from-file` 参数从目录中进行创建，该目录下的每个配置文件名都被设置为key，文件的内容被设置为value，语法为： `kubectl create configmap NAME --from-file=config-files-dir`
+
+使用 `--from-literal` 时会从文本中进行创建，直接将指定的 `key#=value#` 创建为ConfigMap的内容，语法为： `kubectl create configmap NAME --from-literal=key1=value1 --from-literal=key2=value2`
+
+==== 在Pod中使用ConfigMap
+
+===== 通过环境变量方式使用ConfigMap
+
+以前面创建的ConfigMap `cm-appvars` 为例
+
+[source, yaml]
+.cm-appvars.yaml
+----
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-appvars
+data:
+  apploglevel: info
+  appdatadir: /var/data
+----
+
+使用如下文件创建Pod之后会在容器内生成APPLOGLEVEL和APPDATADIR两个环境变量
+[source, yaml]
+.cm-appvars.yaml
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cm-test-pod
+spec:
+  containers:
+  - name: cm-test
+    image: busybox
+    command: ["/bin/sh", "-c", "env | grep APP"]
+    env:
+    - name: APPLOGLEVEL #定义环境变量的名称
+      valueFrom:  # key apploglevel对应的值
+        configMapKeyRef:
+          name: cm-appvars
+          key: apploglevel
+    - name: APPDATADIR
+      valueFrom:
+        configMapKeyRef:
+          name: cm-appvars
+          key: appdatadir
+----
+
+使用如下文件创建Pod将会在容器内部生成apploglevel和appdatadir两个环境变量
+[source, yaml]
+.cm-appvars.yaml
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cm-test-pod
+spec:
+  containers:
+  - name: cm-test
+    image: busybox
+    command: ["/bin/sh", "-c", "env | grep APP"]
+    envFrom:
+    - configMapRef
+      name: cm-appvars # 根据 cm-appvars中的key=value自动生成环境变量
+  restartPolicy: Never
+----
+
+IMPORTANT: 需要说明的是，环境变量的名称受POSIX命名规范（[a-zA-Z_][a-zA-Z0-9_]*）约束，不能以数字开头，如果包含非法字符，则系统将跳过该环境变量的创建，并记录一个Event来提示环境变量无法生成，但并不组织Pod的启动
+
+===== 通过volumeMount使用ConfigMap
+
+在Pod `cm-test-app` 的定义中，将ConfigMap `cm-appconfigfiles` 中的内容以文件的形式mount到容器内部 `/configfiles` 目录下。
+
+[source, yaml]
+.cm-test-app.yaml
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: cm-test-pod
+spec:
+  containers:
+  - name: cm-test-app
+    image: kubeguide/tomcat-app:v1
+    ports:
+    - containerPort: 8080
+    volumeMounts:
+    - name: serverxml  # 引用Volume的名称
+      mountPath: /configfiles # 挂载到容器内的目录
+  volumes:
+  - name: serverxml  # 定义Volume的名称
+    configMap:
+      name: cm-appconfigfiles # 使用ConfigMap cm-appconfigfiles
+      item:
+      - key: key-serverxml  # key=key-serverxml
+        path: server.xml # value将server.xml文件名进行挂载
+----
+
+如果在引用ConfigMap时不指定items，则使用volumeMount方式在容器内的目录下为每个item都生成一个文件名为key的文件。
+
+==== 使用ConfigMap的限制条件
+
+- ConfigMap必须在Pod之前创建
+- ConfigMap受Namespace限制，只有处于相同Namespace中的Pod才可以引用它
+- ConfigMap中的配额管理还未能实现
+- kubelet只支持可以被API Server管理的Pod使用ConfigMap。kubelet在本Node上通过 `--manifest-url` 或 `--config` 自动创建的静态Pod将无法引用ConfigMap。
+- 在Pod对ConfigMap进行挂载操作时，在容器内部只能挂载为 **目录** ，无法挂载为 **文件** 。在挂载到容器内部后，在目录下将包含ConfigMap定义的每个item，如果在该目录下原来还有其他文件，则容器内的该目录将被挂载的ConfigMap覆盖。
+
+=== Pod声明周期和重启策略
+
+状态：
+
+- Pending：API Server已经创建该Pod，但在Pod内部还有一个或多个容器的镜像没有创建，包括正在下载镜像的过程
+- Running：Pod内所有容器均已创建，且至少有一个容器处于运行状态、正在启动状态或正在重启状态
+- Succeeded：Pod内所有容器均成功执行后退出，且不会再重启
+- Failed：Pod内所有容器均已退出，但至少有一个容器退出为失败状态
+- Unknown：由于某种原因无法获取该Pod的状态，可能由于网络通信不畅导致
+
+Pod的重启策略（RestartPolicy）,应用于Pod内的所有容器，并且仅再Pod所处的Node上由kubelet进行判断和重启操作。
+
+- Always：当容器失效时，由kubelet自动重启该容器
+- OnFailure：当容器终止运行且退出码不为0时，由kueblet自动重启该容器
+- Never：不论容器运行状态如何，kubelet都不会重启该容器
+
+kubelet重启失效容器的时间间隔以 `sync-frequency` 乘以2n来计算，例如1、2、4、8倍等，最长延时5min，并且再成功重启后的10min后重置该时间。
+
+Pod的重启策略与控制方式息息相关。每种控制器对Pod的重启策略要求如下：
+
+- RC和DaemonSet：必须设置为Always，需要保证该容器持续运行
+- Job：OnFailuer或Never，确保容器执行完成后不再重启
+- kubelet：在Pod失效时自动重启它，不论将RestartPolicy设置为什么值，也不会对Pod进行健康检查
+
 
 
 
