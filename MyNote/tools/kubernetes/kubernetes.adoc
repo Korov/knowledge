@@ -1020,13 +1020,378 @@ spec:
 
 NOTE: 如果我们指定了Pod的nodeSelector条件，且在集群中不存在包含相应标签的Node，则即使在集群中还有其他可供使用的Node，这个Pod也无法被成功调度。
 
+==== NodeAffinity: Node亲和性调度
 
+NodeAffinity意为Node亲和性的调度策略，用于替换NodeSelector的全新调度策略，目前有两种节点亲和性表达
 
+- RequiredDuringSchedulingIgnoredDuringExecution：必须满足指定的规则才可以调度Pod到Node上
+- PreferredDuringSchedulingIgnoredDuringExecution：强调优先满足指定规则，调度器会尝试调度Pod到Node上，但并不强求，相当于软限制。多个优先级规则还可以设置权重（weight）值，以定义执行的先后顺序
 
+IgnoredDuringExecution的意思是：如果一个Pod所在的节点在Pod运行期间标签发生了变更，不再符合Pod的节点亲和性需求，则系统将忽略Node的Lebel变化
 
+下面的例子设置了NodeAffinity调度如下规则：
 
+- requiredDuringSchedulingIgnoredDuringExecution要求只运行在amd64的节点上
+- preferredDuringSchedulingIgnoredDuringExecution的要求是尽量运行在磁盘类型为ssd的节点上
 
+[source, yaml]
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: with-node-affinity
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: beta.kubernetes.io/arch
+            operator: In
+            values:
+            - amd64
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: disk-type
+            operator: In
+            values:
+            - ssd
+  containers:
+  - name: with-node-affinity
+    image: gcr.io/google_containers/pause:2.0
+----
 
+NodeAffinity语法支持的操作符包括 `In`, `NotIn`, `Exists`, `DoesNotExist`, `Gt`, `Lt`。
+
+NodeAffinity规则设置的注意事项如下：
+
+- 如果同时定义了 nodeSelector和 nodeAffinity，那么必须两个条件都得到满足，Pod才能最终运行在指定的Node上。
+- 如果nodeAffinity指定了多个nodeSelectorTerms，那么其中一个能够匹配成功即可
+- 如果在nodeSelectorTerms中有多个matchExpressions，则一个几点必须满足所有matchExpressions才能运行该Pod
+
+==== PodAffinity： Pod亲和与互斥调度策略
+
+根据在节点上正在运行的Pod的标签而不是节点的标签进行判断和调度，要求对节点和Pod两个条件进行匹配。这种规则可以描述为：如果在具有标签X的Node上运行了一个或者多个符合条件Y的Pod，那么Pod应该（如果是互斥的情况，那么就变成拒绝）运行在这个Node上
+
+这里的X指的是集群中的节点、机架区域等概念，通过Kubernetes内置节点标签中的key来进行声明。这个key的名字为 `topologyKey` （ `kubernetes.io/hostname`, `failure-domain.beta.kubernetes.io/zone`, `failure-domain.beta.kubernetes.io/region` ）
+
+与节点不同，Pod是属于某个命名空间的，所以条件Y表达的是一个或者全部命名空间中的一个Label Selector。Pod亲和与互斥条件设置也是 `requiredDuringSchedulingIgnoredDuringExecution` 和 `preferredDuringSchedulingIgnoredDuringExecution`
+
+假设现在有一个名为pod-flag的Pod，带有标签 `security=S1` 和 `app=nginx`。
+
+[source, yaml]
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-affinity
+spec:
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoreDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: security
+            operator: In
+            values:
+            - S1
+        topologyKey: kubernetes.io/hostname
+  containers:
+  - name: with-pod-affinity
+    image: gcr.io/google_containers/pause:2.0
+----
+
+互斥，要求新Pod与 `security=S1` 的Pod为同一个zone，但是不与 `app=nginx` 的Pod为同一个Node。创建Pod之后，
+
+[source, yaml]
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-affinity
+spec:
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoreDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: security
+            operator: In
+            values:
+            - S1
+        topologyKey: failure-domain.beta.kubernetes.io/zone
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoreDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app
+            operator: In
+            values:
+            - nginx
+        topologyKey: kubernetes.io/hostname
+  containers:
+  - name: with-pod-affinity
+    image: gcr.io/google_containers/pause:2.0
+----
+
+Pod亲和性的操作符也包括 `In`, `NotIn`, `Exists`, `DoesNotExist`, `Gt`, `Lt`。
+
+原则上，topologyKey可以使用任何合法的标签Key赋值，但是出于性能和安全方面的考虑，对topologyKey有如下限制：
+
+- 在Pod亲和性和RequiredDuringScheduling的Pod互斥性的定义中，不允许使用空的topologyKey
+- 如果Admission controller包含了LimitPodHardAntiAffinityTopology，那么针对Required DuringScheduling的Pod互斥性定义就被限制为 `kubernetes.io/hostname`，要使用自定义的 topologyKey，
+- 在PreferredDuringScheduling类型的Pod互斥性定义中，空的topologyKey会被解释为 `kubernetes.io/hostname`, `failure-domain.beta.kubernetes.io/zone`, `failure-domain.beta.kubernetes.io/region`的组合
+- 如果不是上述情况，就可以采用任意合法的topologyKey
+
+PodAffinity规则设置的注意事项如下：
+
+- 除了Label Selector和topologyKey，用户还可以指定Namespace列表来进行限制，Namespace和Label Selector同级，省略Namespace表示使用定义了 affinity/anti-affinity 的Pod所在的Namespace，如果Namespace被设置为空值（""），则表示所有Namespace
+- 在所有关联requiredDuringSchedulingIgnoreDuringExecution的matchExpressions全都满足之后，系统才能将Pod调度到某个Node上
+
+==== Taints和Tolerations（污点和容忍）
+
+Taint让Node拒绝Pod的运行。Taints需要和Tolerations配合使用，让Pod避开那些不合适的Node，在Node上设置一个或多个Taint之后，除非Pod明确声明能够容忍这些污点，否则无法在这些Node上运行。Tolerations是Pod的属性，让Pod能够（非必须）运行在标注了Taint的Node上。
+
+创建Taint信息命令： `kubectl taint nodes node1 key=value:NoSchedule`
+
+这个设置为node1加上了一个Taint，该Taint的键为key，值为value，Taint的效果是NoSchedule。这意为着除非Pod明确声明可以容忍这个Taint，否则就不会被调度到node1上。
+
+然后需要在Pod上声明Toleration，下面的两个Toleration都被设置为可以容忍具有该Taint的Node，使得Pod能够被调度到node1上
+
+[source,yaml]
+----
+toerations:
+- key: "key"
+  operator: "Equal"
+  value: "value"
+  effect: "NoSchedule"
+----
+
+或
+
+[source,yaml]
+----
+toerations:
+- key: "key"
+  operator: "Exists"
+  effect: "NoSchedule"
+----
+
+Pod的Toleration声明中的key和effect需要与Taint的设置保持一致，并且满足以下条件之一
+
+- operator的值是Exists（无须指定value）
+- operator的值是Equal并且value相等。如果不指定operator，则默认值为Equal
+
+另外，有如下两个特例
+
+- 空的key配合Exists操作符能够匹配所有的键和值
+- 空的effect匹配所有的effect
+
+系统允许在同一个Node上设置多个Taint，也可以在Pod上设置多个Toleration，Kubernetes调度器处理多个Taint和Toleration的逻辑顺序为：首先列出节点中所有的Taint，然后忽略Pod的Toleration能够匹配的部分，剩下的没有忽略的Taint就是对Pod的效果了。下面是几种特殊情况
+
+- 如果在剩余的Taint中存在 `effect=NoSchedule`，则调度器不会把该Pod调度到这一节点上
+- 如果在剩余的Taint中没有NoSchedule效果，但有PreferNodeSchedule效果（系统尽量避免把这个Pod调度到这一节点上，但不是强制的），则调度器会尝试不把这个Pod指派给这个节点
+- 如果在剩余的Taint中有NoExecute小果果，并且这个Pod已经在该节点上运行，则会被驱逐；如果没有在该节点上运行，则也不会再被调度到该节点上。（如果Pod没有设置tolerationSeconds赋值，则会一直留在这一节点中）
+
+==== Pod Priority Preemption: Pod优先级调度
+
+在Kubernetes 1.8版本之前，当集群的可用资源不足时，在用户提交新的Pod创建请求后，该Pod会一直处于Pending状态，即使这个Pod是一个很重要的Pod，也只能被动等待其他Pod被删除并释放资源，才能有机会被调度成功。Kubernetes 1.8版本引入了基于Pod优先级抢占的调度策略，此时Kubernetes会尝试释放目标节点上低优先级的Pod，以腾出空间安置高优先级的Pod。我们可以通过以下几个维度来定义：
+
+- Priority，优先级
+- QoS，服务质量等级
+- 系统定义的其他度量指标
+
+优先级抢占调度策略的核心行为分别是驱逐（Eviction）与抢占（Preemption），这两种行为的使用场景不同，效果相同。Eviction是kubelet进程的行为，即当一个Node发生资源不足（under resource pressure）的情况下，该节点上的kubelet进程会执行驱逐动作，此时kubelet会综合考虑Pod的优先级、资源申请量与实际使用量等信息来计算哪些Pod需要被驱逐；当同样优先级的Pod需要被驱逐时，实际使用的资源量超过申请量最大倍数的高耗能Pod会被首先驱逐。对于QoS等级为 `Best Effort` 的Pod来说，由于没有定义资源申请（CPU/Memory Request），所以他们实际使用的资源可能非常大。Preemption则是Scheduler执行的行为，当一个新的Pod因为资源无法满足而不能被调度时，Scheduler可能（有权决定）选择驱逐部分低优先级的Pod实例来满足此Pod的调度目标。
+
+NOTE: Scheduler可能会驱逐Node A上的一个Pod以满足Node B上的一个新Pod的调度任务。比如：一个低优先级的Pod A在Node A（属于机架R）上运行，此时有一个高优先级的Pod B等待调度，目标节点同属于机架R的Node B，他们中的一个或全部都定义了anti-affinity规则，不允许在同一个机架上运行，此时Scheduler只好驱逐低优先级的Pod A以满足高优先级的Pod B的调度。
+
+Pod优先级调度示例如下：
+
+首先由集群管理员创建PriorityClass，PriorityClass不属于任何命名空间
+
+[source,yaml]
+----
+apiVersion: scheduling.k8s.io/v1beta1
+kind: PriorityClass
+metadata:
+  name: high-priority
+value: 100000
+globalDefault: false
+description: "This priority class should be used for XYZ serice pods only"
+----
+
+上述yaml文件定义了一个名为high-priority的优先级类别，优先级为100000，数字越大，优先级越高，超过一亿的数字被系统保留，用于指派给系统组件。
+
+我们可以在任意Pod中引用上述Pod优先级类别：
+
+[source, yaml]
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    env: test
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  priorityClassName: high-priority
+----
+
+优先级抢占的调度方式可能会导致调度陷入死循环状态，当Kubernetes集群配置了多个调度器时，这一行为可能就会发生。使用优先级抢占的调度策略可能会导致某些Pod永远无法被成功调度。因此优先级调度不但增加了系统的复杂性，还可能带来额外不稳定的因素。因此，一旦发生资源紧张的局面，首先要考虑的是集群的扩容，如果无法扩容，则再考虑有监管的优先级调度特性，比如结合基于Namespace的资源配额限制来约束任意优先级抢占行为。
+
+=== Init Container（初始化容器）
+
+在很多应用场景中，应用在启动之前都需要进行如下初始化操作
+
+- 等待其他关联组件正确运行（例如数据库或某个后台服务）
+- 基于环境变量或配置模板生成配置文件
+- 从远程数据库获取本地所需配置，或者将自身注册到某个中央数据库中
+- 下载相关依赖包，或者对系统进行一些预配置操作
+
+`init conatiner` 用于在启动应用容器（app container）之前启动一个或多个初始化容器，完成应用容器所需的预置条件。 `init conatiner` 与应用容器在本质上是一样的，但他们是仅运行一次就结束的任务，并且必须在成功执行完成后，系统才能继续执行下一个容器。根据Pod的重启策略（RestartPolicy），当 `init conatiner` 执行失败，而且设置了 `RestartPolicy=Never` 时，Pod将会启动失败；而设置了 `RestartPolicy=Always` 时，Pod将会被系统自动重启
+
+image::Snipaste_2021-11-21_15-33-20.png[]
+
+下面以Nginx应用为例，在启动Nginx之前，通过初始化容器busybox为Nginx创建一个index.html主页文件。这里init container和Nginx设置了一个共享的Volume，以供Nginx访问init container设置的index.html文件
+
+[source,yaml]
+.nginx-init-containers.yaml
+----
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  annotations:
+spec:
+  # These containers are run during pod
+  initialization
+  initContainers:
+  - name: install
+    image: busybox
+    command:
+    - wget
+    - "-O"
+    - "/work-dir/index.html"
+    - http://kubernetes.io
+    volumeMounts:
+    - name: workdir
+      mountPath: "/work-dir"
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: workdir
+      mountPath: /usr/share/nginx/html
+  dnsPolicy: Default
+  volumes:
+  - name: workdir
+    emptyDir: {}
+----
+
+`init conatiner` 与应用容器的区别如下：
+
+. `init conatiner` 的运行方式与应用容器不同，他们必须先于应用容器执行完成，当设置了多个 `init conatiner` 时，将按顺序逐个运行，并且只有前一个 `init conatiner` 运行成功后才能运行后一个 `init conatiner`。当所有 `init conatiner` 都成功运行后，Kubernetes才会初始化Pod的各种信息，并开始创建和运行应用容器
+. 在 `init conatiner` 的定义中也可以设置资源限制、 Volume的使用和安全策略，等等。但资源限制的设置与应用容器略有不同
+.. 如果多个 `init conatiner` 都定义了资源请求/资源限制，则取最大的值作为所有 `init conatiner` 的资源请求值/资源限制值
+.. Pod的有效（effective）资源请求值/资源限制值取以下二者中的较大值：所应用容器的资源请求值/资源限制值之和； `init conatiner` 的有效资源请求值/资源限制值
+.. 调度算法将基于Pod的有效资源请求值/资源限制值进行计算，也就是说 `init conatiner` 可以初始化操作预留系统资源，即使后续应用容器无须使用这些资源
+.. Pod的有效QoS等级适用于 `init conatiner` 和应用容器
+.. 资源配额和限制将根据Pod的有效资源请求值/资源限制值计算生效
+.. Pod级别的cgroup将基于Pod的有效资源请求/限制，与调度机制一致
+. `init conatiner` 不能设置readinessProbe探针，因为必须在他们成功运行后才能继续运行在Pod中定义的普通容器。在Pod重新启动时， `init conatiner` 将会重新运行，常见的Pod重启场景如下：
+.. `init conatiner` 的镜像被更新时，`init conatiner` 将会重新运行，导致Pod重启。仅更新应用容器的镜像指挥使得应用容器被重启
+.. Pod的infrastructure容器更新时，Pod将会重启
+.. 若Pod中的所有应用容器都终止了，并且 `RestartPolicy=Always`，则Pod会重启
+
+=== Pod的升级和回滚
+
+==== Deployment的升级
+
+以Deployment nginx为例：
+[source,yaml]
+.nginx-deployment.yaml
+----
+apiVersion: v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80
+----
+
+现在Pod镜像需要被更新为 `Nginx:1.9.1`，我们可以通过 `kubectl set image` 命令为Deplyment设置新的镜像名称： `kubectl set image deployment/nginx-deployment nginx=nginx:1.9.1`
+
+另一种更新的方法是使用 `kubectl edit` 命令修改Deployment的配置，将 `spec.template.spec.containers[0].image` 从 `Nginx:1.7.9` 更改为 `Nginx:1.9.1` : `kubectl edit deployment/nginx-deployment`
+
+更新的流程，初始创建Deployment时，系统创建了一个ReplicaSet，并按照用户的需求创建了3个Pod副本，当更新Deployment时，系统创建了一个新的ReplicaSet，并将其副本数量扩展到1，然后将旧的ReplicaSet缩减为2.之后继续按照相同的更新策略对新旧两个ReplicaSet进行逐个调整。最后，新的ReplicaSet运行了3个新版本Pod副本，旧的ReplicaSet副本数量则缩减为0.如图所示
+
+image::Snipaste_2021-11-21_16-10-38.png[]
+
+在整个升级的过程中，系统会保证至少有两个Pod可用，并且最多同时运行4个Pod，这是Deployment通过复杂的算法完成的。Deployment需要确保在整个更新过程中只有一定数量的Pod可能处于不可用状态。在默认情况下，Deployment确保可用的Pod总数至少为所需的副本数量减1，也就是最多1个不可用（maxUnavailable=1）。Deployment还需要确保在整个更新过程中Pod的总数最多比所需的Pod数量多1个，也就是最多1个浪涌值（maxSurge=1）。Kubernetes 1.6版本开始，maxUnavailable和maxSurge的默认值将从1，1更新为所需副本数量的25%，25%。
+
+在Deployment的定义中可以通过 `spec.strategy` 指定Pod的更新策略，目前支持两种策略： Recreate（重建）和RollingUpdate（滚动更新），默认值为RollingUpdate。
+
+- Recreate： 设置 `spec.strategy.type=Recreate`， 表示Deployment在更新Pod时，会先杀掉所有正在运行的Pod，然后创建新的Pod
+- RollingUpdate： 设置 `spec.strategy.type=RollingUpdate`，表示Deployment会以滚动更新的方式来逐个更新Pod。同时，可以通过设置 `spec.strategy.rollingUpdate`下的两个参数（maxUnavaliable和maxSurge）来控制滚动更新的过程
+
+下面对滚动更新时两个主要参数的说明如下：
+
+- spec.strategy.rollingUpdate.maxUnavailable: 用于指定Deployment在更新过程中不可用状态的Pod数量的上限。该maxUnavailable的数值可以时绝对值或Pod期望的副本数的百分比，如果被设置为百分比，那么系统会先以向下取整的方式计算出绝对值（整数）。而当另一个参数maxSurge被设置为0时，maxUnavailable则必须设置为绝对数值大于0.
+- spec.strategy.rollingUpdate.maxSurge: 用于指定Deployment更新Pod的过程中Pod总数超过Pod期望副本数部分的最大值。该maxSurge的数值可以时绝对值或Pod期望副本数的百分比。如果设置为百分比，那么系统会先按照向上取整的方式计算出绝对数值。
+
+这里需要注意多重更新（Rollover）的情况，如果Deployment的上一次更新正在进行，此时用户再次发起Deployment的更新操作，那么Deployment会为每一次更新都创建一个ReplicaSet，而每次在新的ReplicaSet创建成功后，会逐个增加Pod副本数，同时将之前正在扩容的ReplicaSet停止扩容，并将其加入旧版本ReplicaSet列表中，然后开始缩容至0的操作。
+
+==== Deployment的回滚
+
+在默认情况下，所有Deployment的发布历史记录都被保留在系统中，以便我们随时进行回滚（可以配置历史记录数量）。
+
+为了回滚到之前稳定版本的Deployment，首先用 `kubectl rollout history` 命令检查这个Deployment部署的历史记录： 
+
+[source,bash]
+----
+kubectl rollout history deployment/nginx-deployment
+# 查看特定版本的详细信息
+kubectl rollout history deployment/nginx-deployment --revision=3
+# 回滚到上一个部署版本
+kubectl rollout undo deployment/nginx-deployment
+# 回滚到指定版本
+kubectl rollout undo deployment/nginx-deployment --to-revision=2
+----
+
+NOTE: 在创建Deployment时使用 `--record` 参数，就可以在 `CHANGE-CAUSE` 列看到每个版本使用的命令了。另外Deployment的更新操作是在Deployment进行部署（Rollout）时被触发的，这意为者当且仅当Deployment的Pod模板（即spec.template）被更改时才会创建新的修订版本，例如更新模板标签或容器镜像。其他更新操作（如扩展副本数）将不会触发Deployment的更新操作，这也意味着我们将Deployment回滚到之前的版本时，只有Deployment的Pod模板部分会被修改。
+
+==== 暂停和恢复Deployment的部署操作，以完成复杂的修改
+
+对于一次复杂的Deployment配置修改，为了避免频繁触发Deployment的更新操作，可以先暂停Deployment的更新操作，然后进行配置修改，再恢复Deployment，一次性触发完整的更新操作，就可以避免不必要的Deployment更新操作了。
+
+[source,bash]
+----
+# 暂停Deployment的更新操作
+kubectl rollout pause deployment/nginx-deployment
+# 修改Deployment的镜像信息
+kubectl set image deploy/nginx-deployment nginx=nginx:1.9.1
+# 恢复这个Deployment的部署操作
+kubectl rollout resume deploy nginx-deployment
+----
+
+==== 使用kubectl rolling-update 命令完成RC的滚动升级
 
 
 
