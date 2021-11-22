@@ -1393,8 +1393,233 @@ kubectl rollout resume deploy nginx-deployment
 
 ==== 使用kubectl rolling-update 命令完成RC的滚动升级
 
+对于RC的滚动升级，Kubernetes还提供了一个 `kubectl rolling-update`命令进行实现。该命令创建了一个新的RC，然后自动控制旧的RC中的Pod副本数量逐渐减少到0，同时新的RC中的Pod副本数量从0逐步增加到目标值，来完成Pod的升级。需要注意的是，系统要求新的RC与旧的RC都在相同的命名空间内。
+
+==== 其他管理对象的更新策略
+
+Kubernetes从1.6版本开始，对DaemonSet和StatefulSet的更新策略也引入类似与Deployment的滚动升级，通过不同的策略自动完成应用的版本升级。
+
+===== DaemonSet
+
+目前DaemonSet的升级策略包括两种： OnDelete和RollingUpdate
+
+. OnDelete： DaemonSet的默认升级策略，在创建好新的DaemonSet配置之后，新的Pod并不会被自动创建，直到用户手动删除旧版本的Pod，才触发新建操作
+. RollingUpdate： 旧版本的Pod将被自动杀掉，然后自动创建新版本的DaemonSet Pod，整个过程与普通Deployment的滚动升级一样是可控的。不过有两点不同于普通Pod的滚动升级：一是目前Kubernetes还不支持查看和管理DaemonSet的更新历史记录；二是DaemonSet的回滚（Rollback）并不能如同Deployment一样直接通过 `kubectl rollback`命令实现，必须通过再次提交旧版本的配置方式实现。
+
+===== StatefulSet的更新策略
+
+Kubernetes从1.6版本开始，针对StatefulSet的更新策略主键向Deployment和DaemonSet的更新策略看齐，也将实现RollingUpdate、Paritioned和OnDelete这几种更新策略，
+
+=== Pod的扩缩容
+
+Pod的扩缩容操作有手动和自动两种模式，手动模式通过执行 `kubectl scale` 命令或通过RESTful API对一个Deployment/RC进行Pod副本数量的设置，即可一键完成。自动模式则需要用户更具某个性能指标或者自定义业务指标，并指定Pod副本数量的范围，系统将自动在这个范围内根据性能指标的变化进行调整
+
+==== 自动扩缩容机制
+
+`Horizontal Pod AutoScaler(HPA)` 控制器，用于实现基于CPU使用率进行自动Pod扩缩容的功能。HPA控制器基于Master的 `kube-controller-manager` 服务启动参数 `--horizontal-pod-autoscaler-sync-period` 定义的探测周期（默认值为15s），周期性的监测目标Pod的资源性能指标，并与HPA资源对象中的扩缩容条件进行对比，在满足条件时对Pod副本数量进行调整。
+
+HPA的工作原理：Kubernetes中的某个Metrics Server（Heapster或自定义Metrics Server）持续采集所有Pod副本的指标数据。HPA控制器通过Metrics Server的API（Heapster的API或聚合API）获取这些数据，基于用户定义的扩缩容规则进行计算，得到目标Pod副本数量。当目标副本数量与当前副本数量不同时，HPA控制器就向Pod的副本控制器发起scale操作。
+
+**指标的类型**
+
+Master的kube-controller-manager服务持续监测目标Pod的某种性能指标，以计算是否需要调整副本数量。目前Kubernetes支持的指标类型如下：
+
+- Pod资源使用率：Pod级别的性能指标，通常是一个比率值，例如CPU使用率
+- Pod自定义指标：Pod级别的性能指标，通常是一个数值，例如接收请求数量
+- Object自定义指标或外部自定义指标：通常是一个数值，需要容器应用以某种方式提供
+
+扩缩容算法详解：Autoscaler控制器从聚合API获取到Pod性能指标数据之后，基于下面的算法计算出目标Pod副本数量，与当前运行的Pod副本数量进行对比，决定是否需要进行扩缩容操作： `desiredReplicas = ceil[currentPeplicas * ( currentMetricValue / desiredMetricValue)]`
+
+即当前副本数*（当前指标值/期望的指标值），将结果向上取整。
+
+此外，存在几种Pod异常的情况，如下所述：
+
+- Pod正在被删除（设置了删除时间戳）：将不会计入目标Pod副本数量
+- Pod的当前指标值无法获得：本次探测不会将这个Pod纳入目标Pod副本数量，后续的探测会被重新纳入计算范围
+- 如果指标类型是CPU使用率，则对于正在启动但是还未达到Ready状态的Pod，也暂时不会纳入目标副本数量范围。可以通过 kubectl-controller-manager 服务的启动参数 `--horizontal-pod-autoscaler-initial-readiness-delay` 设置首次探测Pod是否Ready的延时时间，默认值为30s。另一个启动参数 `--horizontal-pod-autoscaler-cpuinitialization-period` 设置首次采集Pod的CPU使用率的延时时间
+
+=== 使用StatefulSet搭建MongoDB集群
+
+本节以MongoDB为例，使用StatefulSet完成MongoDB集群的创建，为每个MongoDB实例在共享存储中（这里采用GlusterFS）都申请一片存储空间，以实现一个无单点故障、高可用、可动态扩展的MongoDB集群。
+
+image::Snipaste_2021-11-22_16-40-19.png[]
+
+==== 前提条件
+
+在创建StatefulSet之前，需要确保在Kubernetes集群中管理员已经创建好共享存储，并能够与StorageClass对接，以实现动态存储供应的模式。
+
+==== 创建StatefulSet
+
+为了完成MongoDB集群的搭建，需要创建如下三个资源对象
+
+- 一个StorageClass，用于StatefulSet自动为各个应用Pod申请PVC
+- 一个Headless Service，用于维护MongoDB集群的状态
+- 一个StatefulSet
+
+首先创建一个StorageClass对象
+
+[source,yaml]
+.storageclass-fast.yaml
+----
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast
+provisioner: kubernetes.io/glusterfs
+parameters:
+  resturl: "http://<heketi-rest-url>"
+----
+
+执行 `kubectl create` 命令创建该StorageClass： `kubectl create -f storageclass-fast.yaml`
+
+接下来，创建对应的Headless Service。
+
+`mongo-sidecar` 作为MongoDB集群的管理者，将使用此Headless Service来维护各个MongoDB实例之间的集群关系，以及集群规模变化时自动更新。
+
+[source,yaml]
+.mongo-headless-service.yaml
+----
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  labels:
+    name: mongo
+spec:
+  ports:
+  - port: 27017
+    targetPort: 27017
+  clusterIp: None
+  selector:
+    role: mongo
+----
+
+使用 `kubectl create` 命令创建该Service： `kubectl create -f mongo-headless-service.yaml`
+
+最后，创建MongDB StatefulSet
+
+[source, yaml]
+.statefulset-mongo.yaml
+----
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo
+spec:
+  serviceName: "mongo"
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        role: mongo
+        environment: test
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: mongo
+        image: mongo
+        command:
+        - mongod
+        - "--replSet"
+        - rs0
+        - "--smallfiles"
+        - "--noprealloc"
+        ports:
+        -containerPort: 27017
+        volumeMounts:
+        - name: mongo-persistent-storage
+          mountPath: /data/db
+      - name: mongo-sidecar
+        image: cvallance/mongo-k8s-sidecar
+        env:
+        - name: MONGO_SIDECAR_POD_LABELS
+          value: "role=mongo,environment=test"
+        - name: KUBERNETES_MONGO_SERVICE_NAME
+          value: "mongo"
+    volumeClainTemplates:
+    - metadata:
+        name: mongo-persistent-storage
+        annotations:
+          volume.beta.kubernetes.io/storage-class: "fast"
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 100Gi
+----
+
+其中的主要配置说明如下：
+
+. 在该StatefulSet的定义中包括两个容器： mongo和mongo-sidecar。mongo时主服务程序，mongo-sidecar是将多个mongo实例进行集群设置的工具。mongo-sidecar中的环境变量如下：
+.. MONGO_SIDECAR_POD_LABELS：设置为mongo容器的标签，用于sidecar查询它所需要管理的MongoDB集群实例
+.. KUBERNETES_MONGO_SERVICE_NAME： 它的值为mongo，表示sidecar将使用mongo这个服务名来完成MongoDB集群的设置。
+. replicas=3表示这个MongoDB集群由3个mongo实例组成
+. volumeClainTemplates是StatefulSet最重要的存储设置。 `annotations` 设置为 `volume.beta.kubernetes.io/storage-class: "fast"` 表示使用名为fast的StorageClass自动为每个mongo Pod实例分配后端存储。 `resources.requests.storage=100Gi` 表示为每个mongo实例都分配100GiB的磁盘空间。
+
+使用 `kubectl create` 命令创建这个StatefulSet： `kubectl create -f statefulset-mongo.yaml`
+
+== 深入掌握Service
+
+=== Service定义详解
+
+[source,yaml]
+----
+apiVersion: v1   // Required
+kind: Service    // Required
+metadata:
+  name: String   // Required
+  namespace: String  // Required
+  labels:
+    - name: string
+  annotations:
+    - name: string
+spec:            // Required
+  selector: []   // Required
+  type: string   // Required
+  clusterIP: string
+  sessionAffinity: string
+  ports:
+  - name: string
+    protocol: string
+    port: int
+    targetPort: int
+    nodePort: int
+  status:
+    loadBalancer:
+      ingress:
+        ip: string
+        hostname: string
+----
 
 
+.属性说明
+[width="100%",options="header,footer"]
+|====================
+|属性名称  |取值类型  |是否必选  |取值说明  
+|version  |string  |Required  | v1  
+|kind  |string  |Required  | Service  
+|metadata  |object  |Required  |元数据  
+|metadata.name  |string  |Required  |Service名称，需符合RFC 1035规范  
+|metadata.namespace  |string  |Required  |命名空间，不指定系统时间将使用default的命名空间  
+|metadata.labels[]  |list  |  |自定义标签属性列表  
+|metadata.annotation[]  |list  |  |自定义注解属性列表  
+|spec  |object  |Required  |详细描述  
+|spec.selector[]  |list  |Required  |Label Selector配置，将选择具有指定Label标签的Pod作为管理范围  
+|spec.type  |string  |Required  |Service的类型，指定Service的访问方式，默认值为ClusterIP。  
+|spec.clusterIP  |string  |  |虚拟服务IP地址，当type=ClusterIP时，如果不指定，则系统进行自动分配，也可以手工指定；当type=LoadBalancer时，则需要指定  
+|spec.sessionAffinity  |string  |  |是否支持Session，可选值为ClientIP，默认值为空。ClientIP：表示将同一个客户端（根据客户端的IP地址决定）的访问请求都转发到同一个后端Pod
+|spec.ports[]  |list  |  |Service需要暴露的宽口列表  
+|spec.ports[].name  |string  |  |端口名称  
+|spec.ports[].protocol  |string  |  |端口协议，支持TCP和UDP，默认值为TCP
+|spec.ports[].port  |int  |  |服务监听的端口号  
+|spec.ports[].targetPort  |int  |  |需要转发到后端Pod的端口号  
+|spec.ports[].nodePort  |int  |  |当spec.type=NodePort时，指定映射到物理机的端口号  
+|Status  |object  |  |当spec.type=LoadBalancer时，设置外部负载均衡器的地址，用于公有云环境  
+|status.loadBalancer  |object  |  |外部负载均衡器  
+|status.loadBalancer.ingress  |object  |  |外部负载均衡器  
+|status.loadBalancer.ingress.ip  |string  |  |外部负载均衡器的IP地址  
+|status.loadBalancer.ingress.hostname  |string  |  |外部负载均衡器的主机名  
+|====================
 
 
 
