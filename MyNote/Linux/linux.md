@@ -475,7 +475,7 @@ zip -m myfile.zip ./rpm_info.txt
 | --exclude =FILE | 压缩过程中，不要将FILE打包                                   |
 | man tar         | 查看更多参数                                                 |
 
-压缩：tar -jvc -f filename.tar.bz2 <要被压缩的文件或目录名称>
+压缩：tar -jvc -f filename.tar.bz2 <要被压缩的文件或目录名称，多个文件用空格分隔>
 
 查询：tar -jtv -f filename.tar.bz2
 

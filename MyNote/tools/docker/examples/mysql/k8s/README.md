@@ -17,3 +17,11 @@ kubectl delete pv mysql-pv-volume
 ```
 
 需要访问外部的30306端口才能链接到数据库
+
+
+
+```bash
+kubectl apply -f mysql-service.yaml
+```
+
+这个是一个只有临时存储文件的MySQL服务
