@@ -1621,7 +1621,9 @@ spec:            // Required
 |status.loadBalancer.ingress.hostname  |string  |  |外部负载均衡器的主机名  
 |====================
 
+== 自我整理
 
+=== 
 
 
 
