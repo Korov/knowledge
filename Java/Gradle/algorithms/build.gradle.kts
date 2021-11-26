@@ -42,13 +42,13 @@ repositories {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_16
+    targetCompatibility = JavaVersion.VERSION_16
 }
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-    sourceCompatibility = "17"
+    sourceCompatibility = "16"
 }
 
 tasks.withType<Test> {

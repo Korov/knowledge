@@ -26,7 +26,7 @@ class LRUTest {
             return value
         }
 
-        add(String key, String value) {
+        void add(String key, String value) {
             if (map.containsKey(key)) {
                 map.remove(key)
                 map.put(key, value)

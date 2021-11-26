@@ -1,7 +1,6 @@
 package org.algorithms.example.redblacktree;
 
 import com.google.common.base.MoreObjects;
-import lombok.ToString;
 
 /**
  * @author korov
