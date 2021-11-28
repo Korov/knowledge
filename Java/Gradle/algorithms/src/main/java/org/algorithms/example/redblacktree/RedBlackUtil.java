@@ -8,16 +8,16 @@ public class RedBlackUtil {
      * 对node进行左旋
      */
     public static RedBlackNode leftRotate(RedBlackNode tree, RedBlackNode node) {
-        RedBlackNode rightNodeTemp = node.right;
-        if (rightNodeTemp == null) {
+        RedBlackNode leftNodeTemp = node.left;
+        if (leftNodeTemp == null) {
             return tree;
         }
-        node.right = rightNodeTemp.left;
-        rightNodeTemp.left = node;
-        rightNodeTemp.parent = node.parent;
-        node.parent = rightNodeTemp;
-        if (rightNodeTemp.parent == null) {
-            return rightNodeTemp;
+        node.right = leftNodeTemp.left;
+        leftNodeTemp.left = node;
+        leftNodeTemp.parent = node.parent;
+        node.parent = leftNodeTemp;
+        if (leftNodeTemp.parent == null) {
+            return leftNodeTemp;
         } else {
             return tree;
         }
