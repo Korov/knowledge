@@ -428,7 +428,7 @@ kafka-console-consumer脚本常见的参数：
 - --from-beginning：是否指定从头消费，与Java API中的auto.offset.reset=earliest效果一致
 
 ```sh
-bin/kafka-console-consumer.sh --bootstrap-servers localhost:9092 --topic test --from-beginning
+bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
 ```
 
 ### 5.2.3 consumer主要参数
