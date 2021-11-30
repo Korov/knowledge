@@ -2111,7 +2111,14 @@ yum install alsa-lib-devel -y
 
 # build jdk
 make images
+# 校验
+./build/*/images/jdk/bin/java -version
 ```
 
+远程编译
 
+```
+yum install openssh-server -y
+
+```
 
