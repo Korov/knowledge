@@ -2125,4 +2125,4 @@ passwd root
 systemctl start sshd
 ```
 
-然后通过vscode的remote方案就可以远程开发
+然后通过vscode的remote方案就可以远程开发（必须使用rsa密钥方式才能实现远程开发）
