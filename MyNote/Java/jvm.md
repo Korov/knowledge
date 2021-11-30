@@ -2091,7 +2091,7 @@ jcmd 317553 JFR.stop name=jfr-dump
 ## building the JDK with docker
 
 ```bash
-docker run -d -it --name cent korov/cent:1.8 zsh
+docker run -d -it --privileged -p 10022:22 --name cent korov/cent:1.8 /usr/sbin/init
 docker exec -it --user root cent zsh
 cd ~
 # 国内源 git clone https://gitee.com/mirrors/openjdk.git
@@ -2117,8 +2117,12 @@ make images
 
 远程编译
 
+```bash
+yum install passwd openssh-server -y
+# 设置密码
+passwd root
+# 启动ssh
+systemctl start sshd
 ```
-yum install openssh-server -y
 
-```
-
+然后通过vscode的remote方案就可以远程开发
