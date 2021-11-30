@@ -2087,3 +2087,31 @@ jcmd 317553 JFR.stop name=jfr-dump
 ```
 
 然后使用JMC或者其他工具连接，端口是上面的30000
+
+## building the JDK with docker
+
+```bash
+docker run -d -it --name cent korov/cent:1.8 zsh
+docker exec -it --user root cent zsh
+cd ~
+# 国内源 git clone https://gitee.com/mirrors/openjdk.git
+git clone https://git.openjdk.java.net/jdk
+cd openjdk
+# 校验环境
+bash configure
+
+# 安装前置依赖
+yum install autoconf -y
+# 安装boot jdk
+sdk install java 17-open
+yum groupinstall "Development Tools" -y
+yum install libXtst-devel libXt-devel libXrender-devel libXrandr-devel libXi-devel -y
+yum install cups-devel -y
+yum install alsa-lib-devel -y
+
+# build jdk
+make images
+```
+
+
+
