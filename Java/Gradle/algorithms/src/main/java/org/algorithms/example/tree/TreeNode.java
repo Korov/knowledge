@@ -48,16 +48,13 @@ public class TreeNode<K extends Comparable<K>> {
     }
 
     public TreeNode<K> treeSearch(TreeNode<K> node, K key) {
-        if (node == null || node.getValue() == null || key == null) {
-            return null;
+        while (node != null && key != null && key.compareTo(node.getValue()) != 0) {
+            if (key.compareTo(node.getValue()) < 0) {
+                node = node.left;
+            } else {
+                node = node.right;
+            }
         }
-        if (node.getValue().equals(key)) {
-            return node;
-        }
-        if (node.getValue().compareTo(key) > 0) {
-            return treeSearch(node.left, key);
-        } else {
-            return treeSearch(node.right, key);
-        }
+        return node;
     }
 }

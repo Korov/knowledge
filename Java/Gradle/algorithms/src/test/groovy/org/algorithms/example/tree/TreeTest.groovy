@@ -85,5 +85,8 @@ class TreeTest {
 
         TreeNode<String> result = root.treeSearch(root, "C")
         log.info("value:{}", result == null ? "null" : result.getValue().toString())
+
+        result = root.treeSearch(root, "CD")
+        log.info("value:{}", result == null ? "null" : result.getValue().toString())
     }
 }
