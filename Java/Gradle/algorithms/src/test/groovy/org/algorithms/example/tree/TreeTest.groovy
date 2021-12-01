@@ -8,10 +8,10 @@ class TreeTest {
     @Test
     void printTree() {
         /**
-         *      A
-         *    B    C
-         *  D     E F
-         * G H
+         *        A
+         *    B       C
+         *  D       E    F
+         * G H        I
          */
         TreeNode<String> root = null
         TreeNode<String> top = new TreeNode<>("D")
