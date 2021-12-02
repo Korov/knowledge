@@ -63,4 +63,13 @@ class TreeTest {
         insertRoot = temp.insert(insertRoot, new TreeNode<String>("A"))
         TreeUtil.preorderTraversal(insertRoot)
     }
+
+    @Test
+    void successorAndPredecessorNodeTest() {
+        TreeNode<String> node = root.treeSearch(root, "D")
+        TreeNode<String> successorNode = node.successor(node)
+        log.info("node:{}, successor:{}", node.getValue(), successorNode.getValue())
+        TreeNode<String> predecessorNode = node.predecessor(node)
+        log.info("node:{}, predecessor:{}", node.getValue(), predecessorNode.getValue())
+    }
 }

@@ -66,6 +66,42 @@ public class TreeNode<K extends Comparable<K>> {
         return result;
     }
 
+    /**
+     * 按照中序遍历查找他的后继
+     *
+     * @param node
+     * @return
+     */
+    public TreeNode<K> successor(TreeNode<K> node) {
+        if (node.right != null) {
+            return min(node.right);
+        }
+        TreeNode<K> parent = node.getParent();
+        while (parent != null && node == parent.right) {
+            node = parent;
+            parent = parent.getParent();
+        }
+        return parent;
+    }
+
+    /**
+     * 按照中序遍历查找他的前驱
+     *
+     * @param node
+     * @return
+     */
+    public TreeNode<K> predecessor(TreeNode<K> node) {
+        if (node.left != null) {
+            return max(node.left);
+        }
+        TreeNode<K> parent = node.getParent();
+        while (parent != null && node == parent.left) {
+            node = parent;
+            parent = parent.getParent();
+        }
+        return parent;
+    }
+
     public TreeNode<K> max(TreeNode<K> root) {
         TreeNode<K> result = root;
         while (result.right != null) {
