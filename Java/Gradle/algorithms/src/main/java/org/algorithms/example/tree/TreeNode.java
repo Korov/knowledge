@@ -57,4 +57,20 @@ public class TreeNode<K extends Comparable<K>> {
         }
         return node;
     }
+
+    public TreeNode<K> min(TreeNode<K> root) {
+        TreeNode<K> result = root;
+        while (result.left != null) {
+            result = result.left;
+        }
+        return result;
+    }
+
+    public TreeNode<K> max(TreeNode<K> root) {
+        TreeNode<K> result = root;
+        while (result.right != null) {
+            result = result.right;
+        }
+        return result;
+    }
 }
