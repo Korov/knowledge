@@ -80,7 +80,7 @@ public class TreeNode<K extends Comparable<K>> {
             return root;
         }
         TreeNode<K> insertIndex = root;
-        TreeNode<K> parentInsertIndex = insertIndex;
+        TreeNode<K> parentInsertIndex = null;
         while (insertIndex != null) {
             parentInsertIndex = insertIndex;
             if (insertIndex.getValue().compareTo(node.getValue()) < 0) {
