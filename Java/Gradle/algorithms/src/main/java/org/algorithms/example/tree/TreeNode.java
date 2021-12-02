@@ -73,4 +73,27 @@ public class TreeNode<K extends Comparable<K>> {
         }
         return result;
     }
+
+    public TreeNode<K> insert(TreeNode<K> root, TreeNode<K> node) {
+        if (root == null) {
+            root = node;
+            return root;
+        }
+        TreeNode<K> insertIndex = root;
+        TreeNode<K> parentInsertIndex = insertIndex;
+        while (insertIndex != null) {
+            parentInsertIndex = insertIndex;
+            if (insertIndex.getValue().compareTo(node.getValue()) < 0) {
+                insertIndex = insertIndex.right;
+            } else {
+                insertIndex = insertIndex.left;
+            }
+        }
+        if (parentInsertIndex.getValue().compareTo(node.getValue()) < 0) {
+            parentInsertIndex.setRight(node);
+        } else {
+            parentInsertIndex.setLeft(node);
+        }
+        return root;
+    }
 }

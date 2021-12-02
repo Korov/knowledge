@@ -69,4 +69,12 @@ class TreeTest {
         log.info("max:{}", root.max(root).getValue())
         log.info("min:{}", root.min(root).getValue())
     }
+
+    @Test
+    void insertTest() {
+        TreeNode<String> temp = new TreeNode<>()
+        TreeNode<String> insertRoot
+        insertRoot = temp.insert(insertRoot, new TreeNode<String>("A"))
+        TreeUtil.preorderTraversal(insertRoot)
+    }
 }
