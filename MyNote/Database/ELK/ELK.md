@@ -18,7 +18,9 @@ tar -zvx -f filebeat-7.15.0-linux-x86_64.tar.gz -C ./
 pattern，测试用的网址:`http://grokdebug.herokuapp.com/`
 
 ```
-%{LOGTIME:log_time} %{LOGLEVEL:log_level} %{THREATNAME:thread} %{CLASSNAME:java_class}: %{GREEDYDATA:log_content}
+# THREADNAME [a-zA-Z][[a-zA-Z]-_]+[0-9]   自定义的pattern
+# CLASSNAME (?<=([0-9] ))[a-z][a-zA-Z\.]+(?=:)   自定义的pattern
+%{TIMESTAMP_ISO8601:log_time} %{LOGLEVEL:log_level} %{THREADNAME:thread} %{CLASSNAME:java_class}: %{GREEDYDATA:log_content}
 ```
 
 ## filebeat直接发送数据到ES
@@ -170,7 +172,7 @@ filebeat.inputs:
   multiline:
     pattern: '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}'
     negate: true
-    match: next
+    match: after
 
 processors:
   - fingerprint:
@@ -180,7 +182,7 @@ processors:
       method: "sha256"
 
 output.logstash:
-  hosts: ["192.168.50.189:5044"]
+  hosts: ["192.168.50.100:5044"]
 ```
 
 ### 配置logstash
@@ -196,9 +198,9 @@ input {
 
 filter {
     grok {
-        # 自己定义正则匹配格式，在这里路径下创建文件siem，然后输入内容  POSTFIX_QUEUEID [0-9A-F]{10,11}， 使用的时候就可以类似 %{POSTFIX_QUEUEID:queue_id}
+        # 自己定义正则匹配格式，在这里路径下创建文件siem，然后输入内容  THREADNAME [a-zA-Z][[a-zA-Z]-_]+[0-9]，CLASSNAME (?<=([0-9] ))[a-z][a-zA-Z\.]+(?=:)
         patterns_dir => ["/usr/share/logstash/patterns"]
-        match => { "message" => "%{LOGTIME:log_time} %{LOGLEVEL:log_level} %{THREATNAME:thread} %{CLASSNAME:java_class}: %{GREEDYDATA:log_content}" }
+        match => { "message" => "%{TIMESTAMP_ISO8601:log_time} %{LOGLEVEL:log_level} %{THREADNAME:thread} %{CLASSNAME:java_class}: %{GREEDYDATA:log_content}" }
         overwrite => ["message"]
     }
     date {
@@ -209,7 +211,7 @@ filter {
 
 output {
   elasticsearch {
-    hosts => ["http://192.168.50.189:9200"]
+    hosts => ["elasticsearch:9200"]
     index => "siem-log2-%{+YYYY.MM.dd}"
   }
 }
