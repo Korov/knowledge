@@ -2,7 +2,7 @@ version: '3.4'
 
 services: 
     elasticsearch:
-        image: elasticsearch:7.14.1
+        image: elastic/elasticsearch:7.15.2
         container_name: elasticsearch
         ports: 
             - 9200:9200
@@ -11,10 +11,11 @@ services:
             - "discovery.type=single-node"
             - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     logstash:
-        image: logstash:7.14.1
+        image: elastic/logstash:7.15.2
         container_name: logstash
         volumes: 
-            - "./logstash.conf:/usr/share/logstash/config/logstash.conf:ro"
+            - "./siem_pattern:/usr/share/logstash/patterns/siem_pattern:ro"
+            - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
         ports: 
             - "5044:5044"
             - "9600:9600"
@@ -23,7 +24,7 @@ services:
         depends_on: 
             - elasticsearch
     kibana:
-        image: kibana:7.14.1
+        image: elastic/kibana:7.15.2
         container_name: kibana
         volumes: 
             - "./kibana.yaml:/usr/share/kibana/config/kibana.yml:ro"
