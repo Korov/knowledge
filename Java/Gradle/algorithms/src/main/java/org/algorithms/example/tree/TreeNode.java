@@ -132,4 +132,15 @@ public class TreeNode<K extends Comparable<K>> {
         }
         return root;
     }
+
+    /**
+     * 在二叉树root中，用placeNode子树替换placedNode子树
+     *
+     * @param root       树
+     * @param placedNode 被替换的子树
+     * @param placeNode  替换的子树
+     */
+    public void transplant(TreeNode<K> root, TreeNode<K> placedNode, TreeNode<K> placeNode) {
+
+    }
 }
