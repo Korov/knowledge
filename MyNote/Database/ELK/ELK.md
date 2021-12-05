@@ -3,8 +3,8 @@
 ## 安装filebeat
 
 ```bash
-curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.15.0-linux-x86_64.tar.gz
-tar -zvx -f filebeat-7.15.0-linux-x86_64.tar.gz -C ./
+curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-7.15.2-linux-x86_64.tar.gz
+tar -zvx -f filebeat-7.15.2-linux-x86_64.tar.gz -C ./
 ```
 
 ## 日志内容和对应的pattern
