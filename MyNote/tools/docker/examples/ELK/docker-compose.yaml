@@ -10,12 +10,15 @@ services:
         environment: 
             - "discovery.type=single-node"
             - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+        volumes:
+          # chmod 777 data
+          - "./data:/usr/share/elasticsearch/data:rw"
     logstash:
         image: elastic/logstash:7.15.2
         container_name: logstash
         volumes: 
-            - "./siem_pattern:/usr/share/logstash/patterns/siem_pattern:ro"
-            - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro"
+            - "./siem_pattern:/usr/share/logstash/patterns/siem_pattern:rw"
+            - "./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:rw"
         ports: 
             - "5044:5044"
             - "9600:9600"
@@ -27,7 +30,7 @@ services:
         image: elastic/kibana:7.15.2
         container_name: kibana
         volumes: 
-            - "./kibana.yaml:/usr/share/kibana/config/kibana.yml:ro"
+            - "./kibana.yaml:/usr/share/kibana/config/kibana.yml:rw"
         ports: 
             - 5601:5601
         depends_on: 
