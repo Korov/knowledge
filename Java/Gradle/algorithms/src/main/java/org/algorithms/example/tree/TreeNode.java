@@ -141,6 +141,33 @@ public class TreeNode<K extends Comparable<K>> {
      * @param placeNode  替换的子树
      */
     public void transplant(TreeNode<K> root, TreeNode<K> placedNode, TreeNode<K> placeNode) {
+        if (placedNode.getParent() == null) {
+            root = placeNode;
+        } else if (placedNode == placedNode.getParent().getLeft()) {
+            placedNode.getParent().setLeft(placeNode);
+        } else {
+            placedNode.getParent().setRight(placeNode);
+        }
+        if (placeNode != null) {
+            placeNode.setParent(placedNode.getParent());
+        }
+    }
 
+    public void delete(TreeNode<K> root, TreeNode<K> deleteNode) {
+        if (deleteNode.getLeft() == null) {
+            transplant(root, deleteNode, deleteNode.getRight());
+        } else if (deleteNode.getRight() == null) {
+            transplant(root, deleteNode, deleteNode.getLeft());
+        } else {
+            TreeNode<K> successorNode = min(deleteNode.getRight());
+            if (successorNode.getParent() != deleteNode) {
+                transplant(root, successorNode, successorNode.getRight());
+                successorNode.setRight(deleteNode.getRight());
+                successorNode.getRight().setParent(successorNode);
+            }
+            transplant(root, deleteNode, successorNode);
+            successorNode.setLeft(deleteNode.getLeft());
+            successorNode.getLeft().setParent(successorNode);
+        }
     }
 }
