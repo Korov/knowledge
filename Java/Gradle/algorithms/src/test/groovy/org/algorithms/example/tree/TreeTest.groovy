@@ -97,8 +97,9 @@ class TreeTest {
         helpNode.insert(root, new TreeNode<String>("A"))
         helpNode.insert(root, new TreeNode<String>("C"))
 
+        TreeNode<String> deleteNode
         log.info("delete C ====================")
-        TreeNode<String> deleteNode = helpNode.treeSearch(root, "C")
+        deleteNode = helpNode.treeSearch(root, "C")
         TreeUtil.inorderTraversal(root)
         root = helpNode.delete(root, deleteNode)
         log.info("after========================")
@@ -112,9 +113,33 @@ class TreeTest {
         log.info("after========================")
         TreeUtil.inorderTraversal(root)
 
+
         log.info("delete A ====================")
         helpNode.insert(root, new TreeNode<String>("B"))
         deleteNode = helpNode.treeSearch(root, "A")
+        TreeUtil.inorderTraversal(root)
+        root = helpNode.delete(root, deleteNode)
+        log.info("after========================")
+        TreeUtil.inorderTraversal(root)
+    }
+
+    @Test
+    void deleteDTest() {
+        TreeNode<String> helpNode = new TreeNode<>()
+        TreeNode<String> root = new TreeNode<>("E")
+        helpNode.insert(root, new TreeNode<String>("C"))
+        helpNode.insert(root, new TreeNode<String>("D"))
+        helpNode.insert(root, new TreeNode<String>("A"))
+        helpNode.insert(root, new TreeNode<String>("B"))
+        helpNode.insert(root, new TreeNode<String>("H"))
+        helpNode.insert(root, new TreeNode<String>("F"))
+        helpNode.insert(root, new TreeNode<String>("G"))
+        helpNode.insert(root, new TreeNode<String>("K"))
+        helpNode.insert(root, new TreeNode<String>("I"))
+        helpNode.insert(root, new TreeNode<String>("J"))
+        helpNode.insert(root, new TreeNode<String>("L"))
+
+        TreeNode<String> deleteNode = helpNode.treeSearch(root, "H")
         TreeUtil.inorderTraversal(root)
         root = helpNode.delete(root, deleteNode)
         log.info("after========================")
