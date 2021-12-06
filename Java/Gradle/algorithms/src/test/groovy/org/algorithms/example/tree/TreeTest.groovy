@@ -7,36 +7,39 @@ import org.junit.jupiter.api.Test
 @Slf4j
 class TreeTest {
     /**
-     *        A
-     *    B       C
-     *  D       E    F
-     * G H        I
+     *        E
+     *    D       G
+     *  B       F    I
+     * A C         H
      */
     public static TreeNode<String> root = null
 
     @BeforeAll
     static void buildTree() {
-        TreeNode<String> temp = new TreeNode<>("D")
+        TreeNode<String> temp = new TreeNode<>()
         root = new TreeNode<>("E")
 
-        root = temp.insert(root, new TreeNode<String>("A"))
+        root = temp.insert(root, new TreeNode<String>("D"))
         root = temp.insert(root, new TreeNode<String>("B"))
         root = temp.insert(root, new TreeNode<String>("C"))
-        root = temp.insert(root, new TreeNode<String>("D"))
-        root = temp.insert(root, new TreeNode<String>("F"))
+        root = temp.insert(root, new TreeNode<String>("A"))
         root = temp.insert(root, new TreeNode<String>("G"))
-        root = temp.insert(root, new TreeNode<String>("H"))
+        root = temp.insert(root, new TreeNode<String>("F"))
         root = temp.insert(root, new TreeNode<String>("I"))
+        root = temp.insert(root, new TreeNode<String>("H"))
     }
 
     @Test
     void printTree() {
+        // EDBACGFIH
         log.info("pre========================")
         TreeUtil.preorderTraversal(root)
 
+        // ACBDFHIGE
         log.info("post=======================")
         TreeUtil.postorderTraversal(root)
 
+        // ABCDEFGHI
         log.info("middle=====================")
         TreeUtil.inorderTraversal(root)
     }
@@ -71,5 +74,50 @@ class TreeTest {
         log.info("node:{}, successor:{}", node.getValue(), successorNode.getValue())
         TreeNode<String> predecessorNode = node.predecessor(node)
         log.info("node:{}, predecessor:{}", node.getValue(), predecessorNode.getValue())
+    }
+
+    @Test
+    void transplantTest() {
+        TreeNode<String> helpNode = new TreeNode<>()
+        TreeNode<String> root = new TreeNode<>("B")
+        helpNode.insert(root, new TreeNode<String>("A"))
+        helpNode.insert(root, new TreeNode<String>("C"))
+        TreeNode<String> placedNode = root
+        TreeNode<String> placeNode = new TreeNode<>("G")
+        TreeUtil.inorderTraversal(root)
+        root = helpNode.transplant(root, placedNode, placeNode)
+        log.info("after========================")
+        TreeUtil.inorderTraversal(root)
+    }
+
+    @Test
+    void deleteTest() {
+        TreeNode<String> helpNode = new TreeNode<>()
+        TreeNode<String> root = new TreeNode<>("B")
+        helpNode.insert(root, new TreeNode<String>("A"))
+        helpNode.insert(root, new TreeNode<String>("C"))
+
+        log.info("delete C ====================")
+        TreeNode<String> deleteNode = helpNode.treeSearch(root, "C")
+        TreeUtil.inorderTraversal(root)
+        root = helpNode.delete(root, deleteNode)
+        log.info("after========================")
+        TreeUtil.inorderTraversal(root)
+
+        log.info("delete B ====================")
+        helpNode.insert(root, new TreeNode<String>("C"))
+        deleteNode = helpNode.treeSearch(root, "B")
+        TreeUtil.inorderTraversal(root)
+        root = helpNode.delete(root, deleteNode)
+        log.info("after========================")
+        TreeUtil.inorderTraversal(root)
+
+        log.info("delete A ====================")
+        helpNode.insert(root, new TreeNode<String>("B"))
+        deleteNode = helpNode.treeSearch(root, "A")
+        TreeUtil.inorderTraversal(root)
+        root = helpNode.delete(root, deleteNode)
+        log.info("after========================")
+        TreeUtil.inorderTraversal(root)
     }
 }

@@ -23,7 +23,9 @@ public class TreeNode<K extends Comparable<K>> {
 
     public void setLeft(TreeNode<K> left) {
         this.left = left;
-        left.setParent(this);
+        if (left != null) {
+            left.setParent(this);
+        }
     }
 
     public TreeNode<K> getRight() {
@@ -32,7 +34,9 @@ public class TreeNode<K extends Comparable<K>> {
 
     public void setRight(TreeNode<K> right) {
         this.right = right;
-        right.setParent(this);
+        if (right != null) {
+            right.setParent(this);
+        }
     }
 
     public TreeNode<K> getParent() {
@@ -140,34 +144,44 @@ public class TreeNode<K extends Comparable<K>> {
      * @param placedNode 被替换的子树
      * @param placeNode  替换的子树
      */
-    public void transplant(TreeNode<K> root, TreeNode<K> placedNode, TreeNode<K> placeNode) {
+    public TreeNode<K> transplant(TreeNode<K> root, TreeNode<K> placedNode, TreeNode<K> placeNode) {
+        // 先把 placeNode 和父母分开
+        if (placeNode != null && placeNode.getParent() != null) {
+            if (placeNode == placeNode.getParent().getLeft()) {
+                placeNode.getParent().setLeft(null);
+            } else {
+                placeNode.getParent().setRight(null);
+            }
+            placeNode.setParent(null);
+        }
         if (placedNode.getParent() == null) {
+            // placedNode 是根节点，直接替换掉
             root = placeNode;
         } else if (placedNode == placedNode.getParent().getLeft()) {
             placedNode.getParent().setLeft(placeNode);
         } else {
             placedNode.getParent().setRight(placeNode);
         }
-        if (placeNode != null) {
-            placeNode.setParent(placedNode.getParent());
-        }
+        placedNode.setParent(null);
+        return root;
     }
 
-    public void delete(TreeNode<K> root, TreeNode<K> deleteNode) {
+    public TreeNode<K> delete(TreeNode<K> root, TreeNode<K> deleteNode) {
         if (deleteNode.getLeft() == null) {
-            transplant(root, deleteNode, deleteNode.getRight());
+            root = transplant(root, deleteNode, deleteNode.getRight());
         } else if (deleteNode.getRight() == null) {
-            transplant(root, deleteNode, deleteNode.getLeft());
+            root = transplant(root, deleteNode, deleteNode.getLeft());
         } else {
             TreeNode<K> successorNode = min(deleteNode.getRight());
             if (successorNode.getParent() != deleteNode) {
-                transplant(root, successorNode, successorNode.getRight());
+                root = transplant(root, successorNode, successorNode.getRight());
                 successorNode.setRight(deleteNode.getRight());
                 successorNode.getRight().setParent(successorNode);
             }
-            transplant(root, deleteNode, successorNode);
+            root = transplant(root, deleteNode, successorNode);
             successorNode.setLeft(deleteNode.getLeft());
             successorNode.getLeft().setParent(successorNode);
         }
+        return root;
     }
 }
