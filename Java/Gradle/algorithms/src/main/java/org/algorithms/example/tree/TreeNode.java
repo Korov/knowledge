@@ -174,13 +174,13 @@ public class TreeNode<K extends Comparable<K>> {
         } else {
             TreeNode<K> successorNode = min(deleteNode.getRight());
             if (successorNode.getParent() != deleteNode) {
+                // 此处实际是把后继节点删除，但是保留后继节点的引用
                 root = transplant(root, successorNode, successorNode.getRight());
                 successorNode.setRight(deleteNode.getRight());
-                successorNode.getRight().setParent(successorNode);
             }
+            // 用后继节点的子树替换删除节点的子树达到删除的目的
             root = transplant(root, deleteNode, successorNode);
             successorNode.setLeft(deleteNode.getLeft());
-            successorNode.getLeft().setParent(successorNode);
         }
         return root;
     }
