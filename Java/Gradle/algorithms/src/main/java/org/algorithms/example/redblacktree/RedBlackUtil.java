@@ -1,8 +1,12 @@
 package org.algorithms.example.redblacktree;
 
+import lombok.extern.slf4j.Slf4j;
+import org.algorithms.example.tree.TreeNode;
+
 /**
  * @author korov
  */
+@Slf4j
 public class RedBlackUtil {
     /**
      * 对node进行左旋
@@ -103,5 +107,19 @@ public class RedBlackUtil {
             }
         }
         return tree;
+    }
+
+    /**
+     * 中序遍历
+     *
+     * @param tree
+     */
+    public static void inorderTraversal(RedBlackNode tree) {
+        if (tree == null) {
+            return;
+        }
+        inorderTraversal(tree.left);
+        log.info(String.valueOf(tree.value));
+        inorderTraversal(tree.right);
     }
 }
