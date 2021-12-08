@@ -27,15 +27,4 @@ public class RedBlackNode {
         this.color = color;
         this.value = value;
     }
-
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("parent", parent)
-                .add("left", left)
-                .add("right", right)
-                .add("color", color)
-                .add("value", value)
-                .toString();
-    }
 }

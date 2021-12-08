@@ -53,7 +53,7 @@ public class RedBlackUtil {
         } else {
             node.parent.right = leftNode;
         }
-        leftNode.left = node;
+        leftNode.right = node;
         node.parent = leftNode;
         return root;
     }
@@ -99,30 +99,33 @@ public class RedBlackUtil {
                     insertNode.parent.color = Color.BLACK;
                     uncleNode.color = Color.BLACK;
                     insertNode.parent.parent.color = Color.RED;
-                    uncleNode = insertNode.parent.parent;
+                    insertNode = insertNode.parent.parent;
                 } else if (insertNode == insertNode.parent.right) {
                     insertNode = insertNode.parent;
                     root = leftRotate(root, insertNode);
+                } else {
+                    insertNode.parent.color = Color.BLACK;
+                    insertNode.parent.parent.color = Color.RED;
+                    root = rightRotate(root, insertNode.parent.parent);
                 }
-                insertNode.parent.color = Color.BLACK;
-                insertNode.parent.parent.color = Color.RED;
-                root = rightRotate(root, insertNode);
             } else {
                 RedBlackNode uncleNode = insertNode.parent.parent.left;
                 if (uncleNode.color == Color.RED) {
                     insertNode.parent.color = Color.BLACK;
                     uncleNode.color = Color.BLACK;
                     insertNode.parent.parent.color = Color.RED;
-                    uncleNode = insertNode.parent.parent;
+                    insertNode = insertNode.parent.parent;
                 } else if (insertNode == insertNode.parent.left) {
                     insertNode = insertNode.parent;
                     root = rightRotate(root, insertNode);
+                } else {
+                    insertNode.parent.color = Color.BLACK;
+                    insertNode.parent.parent.color = Color.RED;
+                    root = leftRotate(root, insertNode.parent.parent);
                 }
-                insertNode.parent.color = Color.BLACK;
-                insertNode.parent.parent.color = Color.RED;
-                root = leftRotate(root, insertNode);
             }
         }
+        root.color = Color.BLACK;
         return root;
     }
 
@@ -132,7 +135,7 @@ public class RedBlackUtil {
      * @param tree
      */
     public static void inorderTraversal(RedBlackNode tree) {
-        if (tree == null) {
+        if (tree == NULL_NODE) {
             return;
         }
         inorderTraversal(tree.left);
