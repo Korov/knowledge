@@ -13,10 +13,11 @@ public class RedBlackNode {
     public Integer value;
 
     public RedBlackNode() {
+        this(RedBlackUtil.NULL_NODE, RedBlackUtil.NULL_NODE, RedBlackUtil.NULL_NODE, null, null);
     }
 
     public RedBlackNode(Color color, Integer value) {
-        this(null, null, null, color, value);
+        this(RedBlackUtil.NULL_NODE, RedBlackUtil.NULL_NODE, RedBlackUtil.NULL_NODE, color, value);
     }
 
     public RedBlackNode(RedBlackNode parent, RedBlackNode left, RedBlackNode right, Color color, Integer value) {
