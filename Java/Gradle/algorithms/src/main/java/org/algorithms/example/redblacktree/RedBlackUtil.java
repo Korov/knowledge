@@ -11,38 +11,44 @@ public class RedBlackUtil {
     /**
      * 对node进行左旋
      */
-    public static RedBlackNode leftRotate(RedBlackNode tree, RedBlackNode node) {
-        RedBlackNode leftNodeTemp = node.left;
-        if (leftNodeTemp == null) {
-            return tree;
+    public static RedBlackNode leftRotate(RedBlackNode root, RedBlackNode node) {
+        RedBlackNode rightNode = node.right;
+        if (rightNode == null) {
+            return root;
         }
-        node.right = leftNodeTemp.left;
-        leftNodeTemp.left = node;
-        leftNodeTemp.parent = node.parent;
-        node.parent = leftNodeTemp;
-        if (leftNodeTemp.parent == null) {
-            return leftNodeTemp;
+        node.right = rightNode.left;
+        if (rightNode.left != null) {
+            rightNode.left.parent = node;
+        }
+        rightNode.left = node;
+        rightNode.parent = node.parent;
+        node.parent = rightNode;
+        if (rightNode.parent == null) {
+            return rightNode;
         } else {
-            return tree;
+            return root;
         }
     }
 
     /**
      * 对node进行右旋
      */
-    public static RedBlackNode rightRotate(RedBlackNode tree, RedBlackNode node) {
-        RedBlackNode leftNodeTemp = node.left;
-        if (leftNodeTemp == null) {
-            return tree;
+    public static RedBlackNode rightRotate(RedBlackNode root, RedBlackNode node) {
+        RedBlackNode leftNode = node.left;
+        if (leftNode == null) {
+            return root;
         }
-        node.left = leftNodeTemp.right;
-        leftNodeTemp.right = node;
-        leftNodeTemp.parent = node.parent;
-        node.parent = leftNodeTemp;
-        if (leftNodeTemp.parent == null) {
-            return leftNodeTemp;
+        node.left = leftNode.right;
+        if (leftNode.right != null) {
+            leftNode.right.parent = node;
+        }
+        leftNode.right = node;
+        leftNode.parent = node.parent;
+        node.parent = leftNode;
+        if (leftNode.parent == null) {
+            return leftNode;
         } else {
-            return tree;
+            return root;
         }
     }
 
