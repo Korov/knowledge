@@ -37,7 +37,7 @@ public class RedBlackUtil {
      */
     public static RedBlackNode rightRotate(RedBlackNode root, RedBlackNode node) {
         RedBlackNode leftNode = node.left;
-        if (leftNode == null) {
+        if (leftNode == NULL_NODE) {
             return root;
         }
         node.left = leftNode.right;
