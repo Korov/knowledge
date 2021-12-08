@@ -3,33 +3,36 @@ package org.algorithms.example.redblacktree;
 import lombok.extern.slf4j.Slf4j;
 import org.algorithms.example.tree.TreeNode;
 
+import javax.print.attribute.standard.NumberUp;
+
 /**
  * @author korov
  */
 @Slf4j
 public class RedBlackUtil {
-    public static final RedBlackNode NULL_NODE = new RedBlackNode();
+    public static final RedBlackNode NULL_NODE = new RedBlackNode(null, null, null, Color.BLACK, null);
 
     /**
      * 对node进行左旋
      */
     public static RedBlackNode leftRotate(RedBlackNode root, RedBlackNode node) {
         RedBlackNode rightNode = node.right;
-        if (rightNode == null) {
-            return root;
-        }
         node.right = rightNode.left;
         if (rightNode.left != NULL_NODE) {
             rightNode.left.parent = node;
         }
-        rightNode.left = node;
+
         rightNode.parent = node.parent;
-        node.parent = rightNode;
-        if (rightNode.parent == NULL_NODE) {
-            return rightNode;
+        if (node.parent == NULL_NODE) {
+            root = rightNode;
+        } else if (node == node.parent.left) {
+            node.parent.left = rightNode;
         } else {
-            return root;
+            node.parent.right = rightNode;
         }
+        rightNode.left = node;
+        node.parent = rightNode;
+        return root;
     }
 
     /**
@@ -37,32 +40,29 @@ public class RedBlackUtil {
      */
     public static RedBlackNode rightRotate(RedBlackNode root, RedBlackNode node) {
         RedBlackNode leftNode = node.left;
-        if (leftNode == NULL_NODE) {
-            return root;
-        }
         node.left = leftNode.right;
         if (leftNode.right != NULL_NODE) {
             leftNode.right.parent = node;
         }
-        leftNode.right = node;
+
         leftNode.parent = node.parent;
-        node.parent = leftNode;
-        if (leftNode.parent == NULL_NODE) {
-            return leftNode;
+        if (node.parent == NULL_NODE) {
+            root = leftNode;
+        } else if (node == node.parent.left) {
+            node.parent.left = leftNode;
         } else {
-            return root;
+            node.parent.right = leftNode;
         }
+        leftNode.left = node;
+        node.parent = leftNode;
+        return root;
     }
 
     /**
      * 找到合适的位置将节点插入树中
      */
     public static RedBlackNode rbInsert(RedBlackNode root, RedBlackNode insertNode) {
-        if (root == null) {
-            root = insertNode;
-            insertNode.color = Color.BLACK;
-            return root;
-        }
+
         RedBlackNode insertIndex = root;
         RedBlackNode parentInsertIndex = insertIndex.parent;
         // 找到插入点
@@ -75,12 +75,16 @@ public class RedBlackUtil {
             }
         }
         insertNode.parent = parentInsertIndex;
-        if (insertNode.value.compareTo(parentInsertIndex.value) > 0) {
+        if (parentInsertIndex == NULL_NODE) {
+            root = insertIndex;
+        } else if (insertNode.value.compareTo(parentInsertIndex.value) > 0) {
             parentInsertIndex.right = insertNode;
         } else {
             parentInsertIndex.left = insertNode;
         }
         insertNode.color = Color.RED;
+        insertNode.left = NULL_NODE;
+        insertNode.right = NULL_NODE;
         return rbInsertFixup(root, insertNode);
     }
 

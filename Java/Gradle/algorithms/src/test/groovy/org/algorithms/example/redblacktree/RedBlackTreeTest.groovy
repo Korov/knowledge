@@ -19,14 +19,14 @@ class RedBlackTreeTest {
     static void buildTree() {
         root = new RedBlackNode(Color.BLACK, 5)
 
-        root = RedBlackUtil.rbInsert(root, new RedBlackNode(Color.BLACK, 3))
-        root = RedBlackUtil.rbInsert(root, new RedBlackNode(Color.BLACK, 1))
-        root = RedBlackUtil.rbInsert(root, new RedBlackNode(Color.BLACK, 4))
-        root = RedBlackUtil.rbInsert(root, new RedBlackNode(Color.BLACK, 2))
-        root = RedBlackUtil.rbInsert(root, new RedBlackNode(Color.BLACK, 8))
-        root = RedBlackUtil.rbInsert(root, new RedBlackNode(Color.BLACK, 6))
-        root = RedBlackUtil.rbInsert(root, new RedBlackNode(Color.BLACK, 9))
-        root = RedBlackUtil.rbInsert(root, new RedBlackNode(Color.BLACK, 7))
+        root = RedBlackUtil.rbInsert(root, new RedBlackNode(null, 3))
+        root = RedBlackUtil.rbInsert(root, new RedBlackNode(null, 1))
+        root = RedBlackUtil.rbInsert(root, new RedBlackNode(null, 4))
+        root = RedBlackUtil.rbInsert(root, new RedBlackNode(null, 2))
+        root = RedBlackUtil.rbInsert(root, new RedBlackNode(null, 8))
+        root = RedBlackUtil.rbInsert(root, new RedBlackNode(null, 6))
+        root = RedBlackUtil.rbInsert(root, new RedBlackNode(null, 9))
+        root = RedBlackUtil.rbInsert(root, new RedBlackNode(null, 7))
     }
 
     @Test
