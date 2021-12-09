@@ -5,22 +5,22 @@ import com.google.common.base.MoreObjects;
 /**
  * @author korov
  */
-public class RedBlackNode {
-    public RedBlackNode parent;
-    public RedBlackNode left;
-    public RedBlackNode right;
+public class RedBlackNode<K extends Comparable<K>> {
+    public RedBlackNode<K> parent;
+    public RedBlackNode<K> left;
+    public RedBlackNode<K> right;
     public Color color;
-    public Integer value;
+    public K value;
 
     public RedBlackNode() {
         this(RedBlackUtil.NULL_NODE, RedBlackUtil.NULL_NODE, RedBlackUtil.NULL_NODE, null, null);
     }
 
-    public RedBlackNode(Color color, Integer value) {
+    public RedBlackNode(Color color, K value) {
         this(RedBlackUtil.NULL_NODE, RedBlackUtil.NULL_NODE, RedBlackUtil.NULL_NODE, color, value);
     }
 
-    public RedBlackNode(RedBlackNode parent, RedBlackNode left, RedBlackNode right, Color color, Integer value) {
+    public RedBlackNode(RedBlackNode<K> parent, RedBlackNode<K> left, RedBlackNode<K> right, Color color, K value) {
         this.parent = parent;
         this.left = left;
         this.right = right;

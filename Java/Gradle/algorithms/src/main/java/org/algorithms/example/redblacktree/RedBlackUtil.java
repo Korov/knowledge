@@ -12,8 +12,8 @@ public class RedBlackUtil {
     /**
      * 对node进行左旋
      */
-    public static RedBlackNode leftRotate(RedBlackNode root, RedBlackNode node) {
-        RedBlackNode rightNode = node.right;
+    public static <K extends Comparable<K>> RedBlackNode<K> leftRotate(RedBlackNode<K> root, RedBlackNode<K> node) {
+        RedBlackNode<K> rightNode = node.right;
         node.right = rightNode.left;
         if (rightNode.left != NULL_NODE) {
             rightNode.left.parent = node;
@@ -35,8 +35,8 @@ public class RedBlackUtil {
     /**
      * 对node进行右旋
      */
-    public static RedBlackNode rightRotate(RedBlackNode root, RedBlackNode node) {
-        RedBlackNode leftNode = node.left;
+    public static <K extends Comparable<K>> RedBlackNode<K> rightRotate(RedBlackNode<K> root, RedBlackNode<K> node) {
+        RedBlackNode<K> leftNode = node.left;
         node.left = leftNode.right;
         if (leftNode.right != NULL_NODE) {
             leftNode.right.parent = node;
@@ -58,10 +58,10 @@ public class RedBlackUtil {
     /**
      * 找到合适的位置将节点插入树中
      */
-    public static RedBlackNode rbInsert(RedBlackNode root, RedBlackNode insertNode) {
+    public static <K extends Comparable<K>> RedBlackNode<K> rbInsert(RedBlackNode<K> root, RedBlackNode<K> insertNode) {
 
-        RedBlackNode insertIndex = root;
-        RedBlackNode parentInsertIndex = insertIndex.parent;
+        RedBlackNode<K> insertIndex = root;
+        RedBlackNode<K> parentInsertIndex = insertIndex.parent;
         // 找到插入点
         while (insertIndex != NULL_NODE) {
             parentInsertIndex = insertIndex;
@@ -88,10 +88,10 @@ public class RedBlackUtil {
     /**
      * 保持树的红黑性
      */
-    private static RedBlackNode rbInsertFixup(RedBlackNode root, RedBlackNode insertNode) {
+    private static <K extends Comparable<K>> RedBlackNode<K> rbInsertFixup(RedBlackNode<K> root, RedBlackNode<K> insertNode) {
         while (insertNode.parent.color == Color.RED) {
             if (insertNode.parent == insertNode.parent.parent.left) {
-                RedBlackNode uncleNode = insertNode.parent.parent.right;
+                RedBlackNode<K> uncleNode = insertNode.parent.parent.right;
                 if (uncleNode.color == Color.RED) {
                     insertNode.parent.color = Color.BLACK;
                     uncleNode.color = Color.BLACK;
@@ -106,7 +106,7 @@ public class RedBlackUtil {
                     root = rightRotate(root, insertNode.parent.parent);
                 }
             } else {
-                RedBlackNode uncleNode = insertNode.parent.parent.left;
+                RedBlackNode<K> uncleNode = insertNode.parent.parent.left;
                 if (uncleNode.color == Color.RED) {
                     insertNode.parent.color = Color.BLACK;
                     uncleNode.color = Color.BLACK;
@@ -126,7 +126,7 @@ public class RedBlackUtil {
         return root;
     }
 
-    public static RedBlackNode rbTransplant(RedBlackNode root, RedBlackNode placedNode, RedBlackNode placeNode) {
+    public static <K extends Comparable<K>> RedBlackNode<K> rbTransplant(RedBlackNode<K> root, RedBlackNode<K> placedNode, RedBlackNode<K> placeNode) {
         if (placedNode.parent == NULL_NODE) {
             root = placeNode;
         } else if (placedNode == placedNode.parent.left) {
@@ -138,10 +138,10 @@ public class RedBlackUtil {
         return root;
     }
 
-    public static RedBlackNode rbDeleteFixup(RedBlackNode root, RedBlackNode deleteNode) {
+    public static <K extends Comparable<K>> RedBlackNode<K> rbDeleteFixup(RedBlackNode<K> root, RedBlackNode<K> deleteNode) {
         while (deleteNode != root && deleteNode.color == Color.BLACK) {
             if (deleteNode == deleteNode.parent.left) {
-                RedBlackNode brotherNode = deleteNode.parent.right;
+                RedBlackNode<K> brotherNode = deleteNode.parent.right;
                 if (brotherNode.color == Color.RED) {
                     brotherNode.color = Color.BLACK;
                     deleteNode.parent.color = Color.RED;
@@ -165,7 +165,7 @@ public class RedBlackUtil {
                     deleteNode = root;
                 }
             } else {
-                RedBlackNode brotherNode = deleteNode.parent.left;
+                RedBlackNode<K> brotherNode = deleteNode.parent.left;
                 if (brotherNode.color == Color.RED) {
                     brotherNode.color = Color.BLACK;
                     deleteNode.parent.color = Color.RED;
@@ -195,9 +195,9 @@ public class RedBlackUtil {
         return root;
     }
 
-    public static RedBlackNode rbDelete(RedBlackNode root, RedBlackNode deleteNode) {
-        RedBlackNode childNode;
-        RedBlackNode originalNode = deleteNode;
+    public static <K extends Comparable<K>> RedBlackNode<K> rbDelete(RedBlackNode<K> root, RedBlackNode<K> deleteNode) {
+        RedBlackNode<K> childNode;
+        RedBlackNode<K> originalNode = deleteNode;
         Color originalColor = originalNode.color;
         if (deleteNode.left == NULL_NODE) {
             childNode = deleteNode.right;
@@ -232,7 +232,7 @@ public class RedBlackUtil {
      *
      * @param tree
      */
-    public static void inorderTraversal(RedBlackNode tree) {
+    public static <K extends Comparable<K>> void inorderTraversal(RedBlackNode<K> tree) {
         if (tree == NULL_NODE) {
             return;
         }
@@ -241,26 +241,26 @@ public class RedBlackUtil {
         inorderTraversal(tree.right);
     }
 
-    public static RedBlackNode minimum(RedBlackNode node) {
+    public static <K extends Comparable<K>> RedBlackNode<K> minimum(RedBlackNode<K> node) {
         while (node.left != NULL_NODE) {
             node = node.left;
         }
         return node;
     }
 
-    public static RedBlackNode maximum(RedBlackNode node) {
+    public static <K extends Comparable<K>> RedBlackNode<K> maximum(RedBlackNode<K> node) {
         while (node.right != NULL_NODE) {
             node = node.right;
         }
         return node;
     }
 
-    public static RedBlackNode successor(RedBlackNode node) {
+    public static <K extends Comparable<K>> RedBlackNode<K> successor(RedBlackNode<K> node) {
         if (node.right != NULL_NODE) {
             return minimum(node.right);
         }
 
-        RedBlackNode parent = node.parent;
+        RedBlackNode<K> parent = node.parent;
         while (parent != NULL_NODE && node == parent.right) {
             node = parent;
             parent = parent.parent;
@@ -268,12 +268,12 @@ public class RedBlackUtil {
         return parent;
     }
 
-    public static RedBlackNode predecessor(RedBlackNode node) {
+    public static <K extends Comparable<K>> RedBlackNode<K> predecessor(RedBlackNode<K> node) {
         if (node.left != NULL_NODE) {
             return maximum(node.left);
         }
 
-        RedBlackNode parent = node.parent;
+        RedBlackNode<K> parent = node.parent;
         while (parent != NULL_NODE && node == parent.left) {
             node = parent;
             parent = parent.parent;
@@ -282,7 +282,7 @@ public class RedBlackUtil {
         return parent;
     }
 
-    public static RedBlackNode treeSearch(RedBlackNode node, Integer key) {
+    public static <K extends Comparable<K>> RedBlackNode<K> treeSearch(RedBlackNode<K> node, K key) {
         if (node == NULL_NODE || key.compareTo(node.value) == 0) {
             return node;
         }
