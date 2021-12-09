@@ -2,6 +2,7 @@ package org.algorithms.example.redblacktree;
 
 import lombok.extern.slf4j.Slf4j;
 import org.algorithms.example.tree.TreeNode;
+import org.checkerframework.checker.units.qual.C;
 
 import javax.print.attribute.standard.NumberUp;
 
@@ -127,6 +128,91 @@ public class RedBlackUtil {
         }
         root.color = Color.BLACK;
         return root;
+    }
+
+    public static RedBlackNode rbTransplant(RedBlackNode root, RedBlackNode placedNode, RedBlackNode placeNode) {
+        if (placedNode.parent == NULL_NODE) {
+            root = placeNode;
+        } else if (placedNode == placedNode.parent.left) {
+            placedNode.parent.left = placeNode;
+        } else {
+            placedNode.parent.right = placeNode;
+        }
+        placeNode.parent = placedNode.parent;
+        return root;
+    }
+
+    public static RedBlackNode rbDeleteFixup(RedBlackNode root, RedBlackNode deleteNode) {
+        while (deleteNode != root && deleteNode.color == Color.BLACK) {
+            if (deleteNode == deleteNode.parent.left) {
+                RedBlackNode brotherNode = deleteNode.parent.right;
+                if (brotherNode.color == Color.RED) {
+                    brotherNode.color = Color.BLACK;
+                    deleteNode.parent.color = Color.RED;
+                    root = leftRotate(root, deleteNode.parent);
+                    brotherNode = deleteNode.parent.right;
+                }
+                if (brotherNode.left.color == Color.BLACK && brotherNode.right.color == Color.BLACK) {
+                    brotherNode.color = Color.RED;
+                    deleteNode = deleteNode.parent;
+                } else {
+                    if (brotherNode.right.color == Color.BLACK) {
+                        brotherNode.left.color = Color.BLACK;
+                        brotherNode.color = Color.RED;
+                        root = rightRotate(root, brotherNode);
+                        brotherNode = deleteNode.parent.right;
+                    }
+                    brotherNode.color = deleteNode.parent.color;
+                    deleteNode.parent.color = Color.BLACK;
+                    brotherNode.right.color = Color.BLACK;
+                    root = leftRotate(root, deleteNode.parent);
+                    deleteNode = root;
+                }
+            } else {
+                RedBlackNode brotherNode = deleteNode.parent.left;
+                if (brotherNode.color == Color.RED) {
+                    brotherNode.color = Color.BLACK;
+                    deleteNode.parent.color = Color.RED;
+                    root = rightRotate(root, deleteNode.parent);
+                    brotherNode = deleteNode.parent.left;
+                }
+
+                if (brotherNode.left.color == Color.BLACK && brotherNode.right.color == Color.BLACK) {
+                    brotherNode.color = Color.RED;
+                    deleteNode = deleteNode.parent;
+                } else {
+                    if (brotherNode.left.color == Color.BLACK) {
+                        brotherNode.right.color = Color.BLACK;
+                        brotherNode.color = Color.RED;
+                        root = leftRotate(root, brotherNode);
+                        brotherNode = deleteNode.parent.left;
+                    }
+                    brotherNode.color = deleteNode.parent.color;
+                    deleteNode.parent.color = Color.BLACK;
+                    brotherNode.left.color = Color.BLACK;
+                    root = rightRotate(root, deleteNode.parent);
+                    deleteNode = root;
+                }
+            }
+        }
+        deleteNode.color = Color.BLACK;
+        return root;
+    }
+
+    private static RedBlackNode rbDelete(RedBlackNode root, RedBlackNode deleteNode) {
+        RedBlackNode childNode;
+        RedBlackNode originalNode = deleteNode;
+        Color originalColor = originalNode.color;
+        if (deleteNode.left == NULL_NODE) {
+            childNode = deleteNode.right;
+            root = rbTransplant(root, deleteNode, deleteNode.right);
+        } else if (deleteNode.right == NULL_NODE) {
+            childNode = deleteNode.left;
+            root = rbTransplant(root, deleteNode, deleteNode.left);
+        } else {
+            originalNode =
+        }
+        return null;
     }
 
     /**
