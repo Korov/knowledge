@@ -35,6 +35,17 @@ class RedBlackTreeTest {
     }
 
     @Test
+    void deleteTreeTest() {
+        RedBlackNode deleteNode = RedBlackUtil.treeSearch(root, 3);
+        log.info("delete node value:{}", deleteNode.value)
+        log.info("before================================")
+        RedBlackUtil.inorderTraversal(root)
+        root = RedBlackUtil.rbDelete(root, deleteNode)
+        log.info("after=================================")
+        RedBlackUtil.inorderTraversal(root)
+    }
+
+    @Test
     void rotateTest() {
         RedBlackNode parent = new RedBlackNode(Color.BLACK, 5)
         RedBlackNode left = new RedBlackNode(Color.BLACK, 4)

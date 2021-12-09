@@ -199,7 +199,7 @@ public class RedBlackUtil {
         return root;
     }
 
-    private static RedBlackNode rbDelete(RedBlackNode root, RedBlackNode deleteNode) {
+    public static RedBlackNode rbDelete(RedBlackNode root, RedBlackNode deleteNode) {
         RedBlackNode childNode;
         RedBlackNode originalNode = deleteNode;
         Color originalColor = originalNode.color;
@@ -210,9 +210,25 @@ public class RedBlackUtil {
             childNode = deleteNode.left;
             root = rbTransplant(root, deleteNode, deleteNode.left);
         } else {
-            originalNode =
+            originalNode = minimum(deleteNode.right);
+            originalColor = originalNode.color;
+            childNode = originalNode.right;
+            if (originalNode.parent == deleteNode) {
+                childNode.parent = originalNode;
+            } else {
+                root = rbTransplant(root, originalNode, originalNode.right);
+                originalNode.right = deleteNode.right;
+                originalNode.right.parent = originalNode;
+            }
+            root = rbTransplant(root, deleteNode, originalNode);
+            originalNode.left = deleteNode.left;
+            originalNode.left.parent = originalNode;
+            originalNode.color = deleteNode.color;
         }
-        return null;
+        if (originalColor == Color.BLACK) {
+            root = rbDeleteFixup(root, childNode);
+        }
+        return root;
     }
 
     /**
@@ -227,5 +243,57 @@ public class RedBlackUtil {
         inorderTraversal(tree.left);
         log.info(String.valueOf(tree.value));
         inorderTraversal(tree.right);
+    }
+
+    public static RedBlackNode minimum(RedBlackNode node) {
+        while (node.left != NULL_NODE) {
+            node = node.left;
+        }
+        return node;
+    }
+
+    public static RedBlackNode maximum(RedBlackNode node) {
+        while (node.right != NULL_NODE) {
+            node = node.right;
+        }
+        return node;
+    }
+
+    public static RedBlackNode successor(RedBlackNode x) {
+        if (x.right != NULL_NODE) {
+            return minimum(x.right);
+        }
+
+        RedBlackNode y = x.parent;
+        while (y != NULL_NODE && x == y.right) {
+            x = y;
+            y = y.parent;
+        }
+        return y;
+    }
+
+    public static RedBlackNode predecessor(RedBlackNode x) {
+        if (x.left != NULL_NODE) {
+            return maximum(x.left);
+        }
+
+        RedBlackNode y = x.parent;
+        while (y != NULL_NODE && x == y.left) {
+            x = y;
+            y = y.parent;
+        }
+
+        return y;
+    }
+
+    public static RedBlackNode treeSearch(RedBlackNode node, Integer key) {
+        if (node == NULL_NODE || key.compareTo(node.value) == 0) {
+            return node;
+        }
+
+        if (key.compareTo(node.value) < 0) {
+            return treeSearch(node.left, key);
+        }
+        return treeSearch(node.right, key);
     }
 }
