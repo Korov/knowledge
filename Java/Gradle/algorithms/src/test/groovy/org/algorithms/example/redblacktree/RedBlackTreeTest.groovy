@@ -61,9 +61,6 @@ class RedBlackTreeTest {
 
         tree = RedBlackUtil.rightRotate(tree, tree)
         log.info("debug")
-
-        tree = RedBlackUtil.leftRotate(tree, tree.right)
-        log.info("debug")
     }
 
     @Test

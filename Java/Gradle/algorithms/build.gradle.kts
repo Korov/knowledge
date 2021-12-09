@@ -15,17 +15,17 @@ group = "org.algorithms"
 version = "1.0-SNAPSHOT"
 
 dependencies {
-    testImplementation("org.codehaus.groovy:groovy:3.0.7")
+    testImplementation("org.codehaus.groovy:groovy:3.0.9")
     implementation("org.apache.logging.log4j:log4j-api:2.14.1")
     implementation("org.apache.logging.log4j:log4j-core:2.14.1")
     implementation("org.apache.logging.log4j:log4j-slf4j-impl:2.14.1")
-    implementation("com.google.guava:guava:30.1.1-jre")
-    testImplementation(platform("org.junit:junit-bom:5.7.2"))
+    implementation("com.google.guava:guava:31.0.1-jre")
+    testImplementation(platform("org.junit:junit-bom:5.8.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
-    testImplementation(platform("org.spockframework:spock-bom:2.0-M4-groovy-3.0"))
+    testImplementation(platform("org.spockframework:spock-bom:2.1-M2-groovy-3.0"))
     testImplementation("org.spockframework:spock-core")
-    compileOnly("org.projectlombok:lombok:1.18.20")
-    annotationProcessor("org.projectlombok:lombok:1.18.20")
+    compileOnly("org.projectlombok:lombok:1.18.22")
+    annotationProcessor("org.projectlombok:lombok:1.18.22")
 
     testCompileOnly("org.projectlombok:lombok:1.18.20")
     testAnnotationProcessor("org.projectlombok:lombok:1.18.20")
