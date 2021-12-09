@@ -1,10 +1,6 @@
 package org.algorithms.example.redblacktree;
 
 import lombok.extern.slf4j.Slf4j;
-import org.algorithms.example.tree.TreeNode;
-import org.checkerframework.checker.units.qual.C;
-
-import javax.print.attribute.standard.NumberUp;
 
 /**
  * @author korov
@@ -259,31 +255,31 @@ public class RedBlackUtil {
         return node;
     }
 
-    public static RedBlackNode successor(RedBlackNode x) {
-        if (x.right != NULL_NODE) {
-            return minimum(x.right);
+    public static RedBlackNode successor(RedBlackNode node) {
+        if (node.right != NULL_NODE) {
+            return minimum(node.right);
         }
 
-        RedBlackNode y = x.parent;
-        while (y != NULL_NODE && x == y.right) {
-            x = y;
-            y = y.parent;
+        RedBlackNode parent = node.parent;
+        while (parent != NULL_NODE && node == parent.right) {
+            node = parent;
+            parent = parent.parent;
         }
-        return y;
+        return parent;
     }
 
-    public static RedBlackNode predecessor(RedBlackNode x) {
-        if (x.left != NULL_NODE) {
-            return maximum(x.left);
+    public static RedBlackNode predecessor(RedBlackNode node) {
+        if (node.left != NULL_NODE) {
+            return maximum(node.left);
         }
 
-        RedBlackNode y = x.parent;
-        while (y != NULL_NODE && x == y.left) {
-            x = y;
-            y = y.parent;
+        RedBlackNode parent = node.parent;
+        while (parent != NULL_NODE && node == parent.left) {
+            node = parent;
+            parent = parent.parent;
         }
 
-        return y;
+        return parent;
     }
 
     public static RedBlackNode treeSearch(RedBlackNode node, Integer key) {

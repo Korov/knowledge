@@ -13,7 +13,7 @@ public class TreeUtil {
      *
      * @param tree
      */
-    public static void inorderTraversal(TreeNode tree) {
+    public static <E extends Comparable<E>> void inorderTraversal(TreeNode<E> tree) {
         if (tree == null) {
             return;
         }
@@ -27,7 +27,7 @@ public class TreeUtil {
      *
      * @param tree
      */
-    public static void preorderTraversal(TreeNode tree) {
+    public static <E extends Comparable<E>> void preorderTraversal(TreeNode<E> tree) {
         if (tree == null) {
             return;
         }
@@ -41,7 +41,7 @@ public class TreeUtil {
      *
      * @param tree
      */
-    public static void postorderTraversal(TreeNode tree) {
+    public static <E extends Comparable<E>> void postorderTraversal(TreeNode<E> tree) {
         if (tree == null) {
             return;
         }
