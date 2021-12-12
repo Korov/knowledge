@@ -1,0 +1,26 @@
+version: '3'
+
+services: 
+    gitea:
+        image: gitea/gitea:1.15.7
+        container_name: gitea
+        ports: 
+          - "10022:22"
+          - "3000:3000"
+        volumes:
+          - /share/docker/gitea/data:/data
+        deploy:
+            resources:
+                limits:
+                    memory: 512M
+                reservations:
+                    memory: 256M
+        hostname: gitea.korov-nas.org
+        networks:
+          net_korov:
+            ipv4_address: 172.19.0.7
+
+networks:
+   net_korov:
+    external:
+      name: korov-nas

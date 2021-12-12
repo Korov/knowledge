@@ -1,0 +1,57 @@
+version: '3'
+
+services:
+  pd0:
+    image: pingcap/pd:v5.1.3
+    container_name: pd0
+    ports:
+      - "2379:2379"
+    hostname: pd0.korov-nas.org
+    volumes:
+      - /share/docker/tidb/config/pd.toml:/pd.toml
+      - /share/docker/tidb/pd0_logs:/logs
+      - /share/docker/tidb/pd0_data:/data
+    command:
+      - --config=/pd.toml
+    networks:
+      net_korov:
+        ipv4_address: 172.19.0.11
+
+  tikv0:
+    image: pingcap/tikv:v5.1.3
+    container_name: tikv0
+    hostname: tikv0.korov-nas.org
+    volumes:
+      - /share/docker/tidb/config/tikv.toml:/tikv.toml
+      - /share/docker/tidb/kv0_logs:/logs
+      - /share/docker/tidb/kv0_data:/data
+    command:
+      - --config=/tikv.toml
+    depends_on:
+      - "pd0"
+    networks:
+      net_korov:
+        ipv4_address: 172.19.0.10
+
+  tidb:
+    image: pingcap/tidb:v5.1.3
+    container_name: tidb
+    hostname: tidb.korov-nas.org
+    ports:
+      - "4000:4000"
+      - "10080:10080"
+    volumes:
+      - /share/docker/tidb/config/tidb.toml:/tidb.toml
+      - /share/docker/tidb/tidb_logs:/logs
+    command:
+      - --config=/tidb.toml
+    depends_on:
+      - "tikv0"
+    networks:
+      net_korov:
+        ipv4_address: 172.19.0.9
+
+networks:
+   net_korov:
+    external:
+      name: korov-nas
