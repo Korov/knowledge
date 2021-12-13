@@ -1,4 +1,4 @@
- 安装
+#  安装
 
 ```bash
 docker run -d --restart=always --name=gitea -p 10022:22 -p 13000:3000 -v `pwd`/gitea:/data gitea/gitea:1.14.2
@@ -29,4 +29,3 @@ docker restart gitea
 访问界面：`localhost:13000`
 
 帐号密码：`korov/korov`
-
