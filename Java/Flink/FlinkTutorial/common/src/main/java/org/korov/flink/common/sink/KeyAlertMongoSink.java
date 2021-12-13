@@ -16,6 +16,7 @@ import org.korov.flink.common.model.NameModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.ZoneId;
 import java.util.*;
 
 public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel, Long>> {
@@ -41,10 +42,11 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
         List<Document> documents = new ArrayList<>();
         Long timestamp = value.f1.getTimestamp();
         Date date = new Date(timestamp);
-        Calendar calendar = Calendar.getInstance(Locale.ROOT);
+        Calendar calendar = Calendar.getInstance(Locale.SIMPLIFIED_CHINESE);
+        calendar.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Asia/Shanghai")));
         calendar.setTime(date);
         int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
+        int month = calendar.get(Calendar.MONTH) + 1;
         int day = calendar.get(Calendar.DAY_OF_MONTH);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
