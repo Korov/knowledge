@@ -12,6 +12,7 @@ services:
             - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
         volumes:
           # chown -R 1000 /share/docker/elk
+          - "/share/docker/elk/elasticsearch/conf/elasticsearch.yml::/usr/share/elasticsearch/config/elasticsearch.yml:rw"
           - "/share/docker/elk/elasticsearch/data:/usr/share/elasticsearch/data:rw"
         hostname: elasticsearch.korov-nas.org
         networks:

@@ -146,7 +146,6 @@
                 <artifactId>flink-runtime-web_2.12</artifactId>
                 <version>1.14.0</version>
             </dependency>
-
         </dependencies>
     </dependencyManagement>
 

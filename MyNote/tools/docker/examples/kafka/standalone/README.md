@@ -4,8 +4,12 @@
 docker run -d --name zookeeper -p 2181:2181 -t wurstmeister/zookeeper;
 docker run -d --name kafka --publish 9092:9092 --link zookeeper \
 --env KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 \
---env KAFKA_ADVERTISED_HOST_NAME=localhost \
+--env KAFKA_CREATE_TOPICS="flink_siem:6:1,flink_siem_original_event:6:1" \
+--env KAFKA_ADVERTISED_LISTENERS="OUTSIDE://192.168.50.114:9092" \
 --env KAFKA_ADVERTISED_PORT=9092 \
+--env KAFKA_LISTENERS="OUTSIDE://:9092" \
+--env KAFKA_LISTENER_SECURITY_PROTOCOL_MAP="OUTSIDE:PLAINTEXT" \
+--env KAFKA_INTER_BROKER_LISTENER_NAME="OUTSIDE" \
 --volume /etc/localtime:/etc/localtime wurstmeister/kafka:2.12-2.4.1;
 ```
 

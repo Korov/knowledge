@@ -17,7 +17,7 @@ services:
                     memory: 512M
                 reservations:
                     memory: 256M
-        hostname: mattermost.korov-nas.org
+        hostname: mongo.korov-nas.org
         networks:
           net_korov:
             ipv4_address: 172.19.0.6
