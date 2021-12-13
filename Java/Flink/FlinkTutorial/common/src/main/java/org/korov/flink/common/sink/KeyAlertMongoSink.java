@@ -66,7 +66,7 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
             document.append("uuid", value.f1.getUuid());
         }
         documents.add(document);
-        if (mongoClient == null) {
+        /*if (mongoClient == null) {
             return;
         }
         try {
@@ -75,7 +75,7 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
             mongoCollection.insertMany(documents);
         } catch (Exception e) {
             log.error("insert documents filed, collection:{}", collection, e);
-        }
+        }*/
 
         if (localMongoClient == null) {
             return;
@@ -97,7 +97,7 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
         MongoCredential mongoCredential = MongoCredential.createScramSha256Credential("kafka", "kafka", "kafka".toCharArray());
         MongoClientOptions options = MongoClientOptions.builder().maxConnectionIdleTime(6000).build();
         //通过连接认证获取MongoDB连接
-        mongoClient = new MongoClient(ImmutableList.of(serverAddress), mongoCredential, options);
+        // mongoClient = new MongoClient(ImmutableList.of(serverAddress), mongoCredential, options);
 
         ServerAddress localServerAddress = new ServerAddress("192.168.50.100", 27017);
         MongoClientOptions localOptions = MongoClientOptions.builder().maxConnectionIdleTime(6000).build();
@@ -108,9 +108,9 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
 
     @Override
     public void close() {
-        if (mongoClient != null) {
+        /*if (mongoClient != null) {
             mongoClient.close();
-        }
+        }*/
         if (localMongoClient != null) {
             localMongoClient.close();
         }
