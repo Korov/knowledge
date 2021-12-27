@@ -76,7 +76,7 @@ public class KafkaCount {
                             }
                         }).withIdleness(Duration.ofMinutes(5)), "kafka-source");
 
-        KeyAlertMongoSink mongoNameSink = new KeyAlertMongoSink(MONGO_HOST, 27017, DB_NAME, "kafka-name-count", SinkType.KEY_NAME);
+        /*KeyAlertMongoSink mongoNameSink = new KeyAlertMongoSink(MONGO_HOST, 27017, DB_NAME, "kafka-name-count", SinkType.KEY_NAME);
         stream.keyBy(new KeySelector<Tuple3<String, NameModel, Long>, Object>() {
                     @Override
                     public Object getKey(Tuple3<String, NameModel, Long> value) throws Exception {
@@ -114,7 +114,7 @@ public class KafkaCount {
                         return new Tuple3<>(value1.f0, value1.f1, value1.f2 + value2.f2);
                     }
                 })
-                .addSink(mongoKeySink).name("mongo-key-sink");
+                .addSink(mongoKeySink).name("mongo-key-sink");*/
 
         KeyAlertMongoSink mongoValueSink = new KeyAlertMongoSink(MONGO_HOST, 27017, DB_NAME, "value-record", SinkType.KEY_NAME_VALUE);
         stream.addSink(mongoValueSink).name("mongo-value-sink");
