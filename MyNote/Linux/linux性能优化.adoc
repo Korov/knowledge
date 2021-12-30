@@ -4,3 +4,358 @@ v1.0 2021-12-21
 :toc: right
 :imagesdir: images
 :source-highlighter: pygments
+
+== 性能工具：系统CPU
+
+目标：
+
+. 理解系统级性能的基本指标，包括CPU的使用情况
+. 明白哪些工具可以检索这些系统级性能指标
+
+=== CPU性能统计信息
+
+==== 运行队列统计
+
+在Linux中，一个进程要么是可运行的，要么是阻塞的（正在等待一个事件的完成）。阻塞进程可能在等待的是从I/O设备来的数据，或者是系统调用的结果。如果进程是可运行的，那就意为着它要和其他也是可运行的进程竞争CPU事件。一个可运行的进程不一定会使用CPU，但是当Linux调度器决定下一个要运行的进程时，它会从可运行进程队列中挑选。如果进程时可运行的，同时又在等待使用处理器，这些进程就构成了运行队列。运行队列越长，处于等待状态的进程就越多。
+
+性能工具通常会给出可运行的进程个数和等待I/O的阻塞进程个数。另一种常见的系统统计时平均负载。系统的负载是指正在运行和可运行的进程总数。平均负载是给定事件内的负载量。一般情况下取负载的时间为1分钟、5分钟和15分钟。
+
+==== 上下文切换
+
+大部分现代处理器一次只能运行一个进程或线程。虽然有些处理器（比如超线程处理器）实际上可以同时运行多个进程，但是Linux会把他们看作多个单线程处理器。如果要制造出单处理器同时运行多个任务的假象，Linux内核就要不断的在不同的进程间切换。这种不同进程间的切换称为上下文切换，因为当其发生时，CPU要保存旧进程的所有上下文西悉尼，并取出新进程的所有上下文信息。上下文中包含了Linux跟踪新进程的大量信息，其中包括：进程正在执行的指令，分配给进程的内存，进程打开的文件等。这些上下文切换涉及大量信息的移动，因此，上下文切换的开销可以是相当大的。尽量减少上下文切换的次数是个好主意。
+
+上下文切换可以是内核调度的结果，为了保证公平的给每个进程分配处理器的时间，内核周期性地中断正在运行的进程，在适当的情况下，内核调度器会决定开始另一个进程，而不是让当前进程继续执行。每次这种周期性中断或定时发生时，你的系统都可能进行上下文切换。每秒定时中断的次数与架构和内核版本有关。一个检查中断频率的简单方法是用 `/proc/interrupts` 文件，它可以确定已知时长内发生中断的次数 。
+
+[source, bash]
+----
+⚡ root@centos  ~  cat /proc/interrupts | grep timer ; sleep 10 ; cat /proc/interrupts | grep timer
+  0:         36          0          0          0   IO-APIC-edge      timer
+LOC: 3729334602  137377066  321248051 4152133473   Local timer interrupts
+  0:         36          0          0          0   IO-APIC-edge      timer
+LOC: 3729338521  137382922  321251994 4152138164   Local timer interrupts
+----
+
+如上所示，我们要求内核给出定时器启动的次数，等待10秒，再次请求。
+
+==== 中断
+
+处理器还周期性的从硬件设备接收中断。当设备有事件需要内核处理时，它通常会触发这些中断。例如磁盘控制器刚刚完成从驱动器取数据块的操作，并准备好提供给内核，那么磁盘控制器就会触发一个中断。对内核收到的每个中断，如果已经有相应的已注册的中断处理程序，就运行该程序，否则将忽略这个中断。这些中断处理程序在系统中有很高的运行优先级，并且通常执行速度也很快。有时，中断处理程序有工作要做，但是又不需要高优先级，因此可以启动“下半部”（bottom half），也就是所谓的软中断处理程序。如果又很多中断，内核会花大量的事件服务这些中断。
+
+==== CPU使用率
+
+在任何给定的时间，CPU可以执行一下七件事情中的一个：
+
+. CPU可以是空闲的，处理器实际上没有做任何工作，并且等待有任务可以执行
+. CPU可以运行用户代码，即指定的“用户”时间
+. CPU可以执行Linux内核中的应用程序代码，这就是“系统”时间
+. CPU可以执行“比较友好”的或者优先级被设置为低于一般进程的用户代码
+. CPU可以处于 `iowait` 状态，即系统正在等待 `I/O` （如磁盘或网络）完成
+. CPU可以处于 `irq` 状态，即它正在用高优先级代码处理硬件中断
+. CPU可以处于 `softirq` 模式，即系统正在执行同样由中断触发的内核代码，只不过其运行于较低的优先级（下半部代码）
+
+大多数性能工具将这些数值表示为占CPU总时间的百分比。这些时间的范围从 0% 到 100%，但全部三项加起来等于100%。一个具有高“系统”百分比的系统表明其大部分时间都消耗在了内核上。像 `oprofile` 一样的工具可以帮助确定时间都消耗在了哪里。具有“用户”时间的系统则将其大部分时间都用来运行应用程序。
+
+=== Linux性能工具：CPU
+
+下面介绍哪些工具能够提取之前描述的信息
+
+==== vmstat(虚拟内存统计)
+
+此工具可以获取整个系统性能的粗略信息，包括：
+
+- 正在运行的进程个数
+- CPU的使用情况
+- CPU接收的中断个数
+- 调度器执行的上下文切换次数
+
+它是用于获取系统性能大致信息的极好工具
+
+[source, bash]
+----
+# delay表示延迟采集间隔，count表示采集次数
+⚡ root@centos  ~  vmstat --help
+
+Usage:
+ vmstat [options] [delay [count]]
+
+Options:
+ -a, --active           active/inactive memory
+ -f, --forks            number of forks since boot
+ -m, --slabs            slabinfo
+ -n, --one-header       do not redisplay header
+ -s, --stats            event counter statistics
+ -d, --disk             disk statistics
+ -D, --disk-sum         summarize disk statistics
+ -p, --partition <dev>  partition specific statistics
+ -S, --unit <char>      define display unit
+ -w, --wide             wide output
+ -t, --timestamp        show timestamp
+ 
+ -h, --help     display this help and exit
+ -V, --version  output version information and exit
+----
+
+`vmstat` 运行于两种模式：采样魔术和平均模式。如果不指定参数，运行于平均模式，显示从系统启动以来所有统计数据的均值。但是，如果指定了延迟，那么第一个采样任然是系统启动以来的均值，但之后按延迟描述采样系统并显示统计数据
+
+[source,bash]
+----
+ ⚡ root@centos  ~  vmstat 2 2
+procs -----------memory---------- ---swap-- -----io---- -system-- ------cpu-----
+ r  b   swpd   free   buff  cache   si   so    bi    bo   in   cs us sy id wa st
+ 2  0 2547596 6191196 135836 5032292    1    1    26   455    0    1  4  1 95  1  0
+ 0  0 2547596 6190684 135836 5032308    0    0     0    82 1957 2182  3  0 97  0  0
+----
+
+输出内容详解：
+
+. procs
+.. r:运行和等待cpu时间片的进程数，如果长期大于1，说明cpu不足，需要增加cpu
+.. b:等待资源的进程数，比如正在等待I/O、或者内存交换等
+. memory
+.. swpd:切换到内存交换区的内存数量（k表示）。如果swpd值不为0，或者比较大，只要si、so的值长期为0，系统性能还是正常的
+.. free:当前的空闲页面列表中内存数量（k表示）
+.. buff:作为buffer cache的内存数量，一般对块设备的读写才需要缓冲
+.. cache:作为page cache的内存数量，一般作为文件系统的cache，如果cache较大，说明用到cache的文件较多，如果此时IO中bi比较小，说明文件系统效率比较好
+. swap
+.. si:由内存进入内存交换区数量
+.. so:由内存交换区进入内存数量
+. io
+.. bi:从块设备读入数据的总量（读磁盘）（每秒kb）
+.. bo:块设备写入数据的总量（写磁盘）（每秒kb）
+. system
+.. in:某一时间间隔中观测到的每秒设备中断数
+.. cs:每秒产生的上下文切换次数，如当cs比磁盘io和网络信息包速率高的多，都应进行进一步调查
+. cpu
+.. us:用户方式下所花费cpu时间的百分比。us的值比较高时，说明用户进程消耗的cpu时间多，如果长期大于50%，需要考虑优化用户的程序
+.. sy:内核进程所花费的cpu时间百分比。这里us+sy的参考值为80%，如果大于80%说明可能存在cpu不足
+.. wa:显示了IO等待所占用的cpu时间的百分比。者的wa参考值为30%，如果wa超过30%，说明IO等待严重，这可能时磁盘大量随机访问造成的，也可能磁盘或者磁盘访问控制器的带宽瓶颈造成的（主要时块操作）
+.. id:空闲时间
+.. st:虚拟机使用cpu时间
+
+[source,bash]
+----
+{23:46}~/docker/mysql/backup ➭ vmstat -s
+     16388904 K total memory
+      2892312 K used memory
+       919108 K active memory
+      3479760 K inactive memory
+     11625864 K free memory
+       593784 K buffer memory
+      1276944 K swap cache
+     33554432 K total swap
+       106704 K used swap
+     33447728 K free swap
+       168994 non-nice user cpu ticks
+           10 nice user cpu ticks
+       126367 system cpu ticks
+    145437222 idle cpu ticks
+         4656 IO-wait cpu ticks
+            0 IRQ cpu ticks
+         8194 softirq cpu ticks
+            0 stolen cpu ticks
+      6040079 pages paged in
+     53674764 pages paged out
+         5516 pages swapped in
+        31080 pages swapped out
+     35658495 interrupts
+    179173403 CPU context switches
+   1640690672 boot time
+        18934 forks
+----
+
+vmstat输出的另外一种展示方式， `ticks` 是一种时间单位。新参数 `forks` 它大体上表示的是从系统启动开始，已经创建的新进程的数量。
+
+==== top
+
+top善于将相当多的系统整体性能信息放在一个屏幕上。显示内容还能以交互的方式进行改变，因此，在系统运行时，如果一个特定的问题不断突显，你可以修改top显示的信息。
+
+默认情况下，top表现为一个将占用cpu最多的进行按降序排序
+
+命令:
+
+[source, bash]
+----
+top [-d delay] [-n iter] [-i] [-b]
+
+-d delay:统计信息更新的时间间隔
+-n iterations: 退出前迭代的次数。top更新统计信息的次数为iterations次
+-i: 是否显示空闲进程
+-b: 以批处理模式运行。通常，top只显示单屏信息，超出该屏幕的进程不显示。该选项显示全部进程，如果你要将top的输出保存为文件或将输出流水给另一个命令进行处理，那么该项是很有用的。
+----
+
+==== procinfo(从/proc文件系统显示信息)
+
+procinfo也为系统整体信息提供总览，尽管它提供的有些信息于vmstat相同，但它还会给cpu从每个设备接收的中断数量。其输出格式的易读性比vmstat稍微强一点，但却会占用更多的屏幕空间。
+
+[source,bash]
+----
+➜  ~ procinfo -h
+procinfo version 2.0 $Rev: 304 $
+usage: procinfo [-sidDSbhHv] [-nN]
+
+        -nN     pause N second between updates (implies -f)
+        -d      show differences rather than totals (implies -f)
+        -D      show current memory/swap usage, differences on rest
+        -S      with -nN and -d/-D, always show values per second
+        -b      show number of bytes instead of requests for disk statistics
+        -H      show memory stats in KiB/MiB/GiB
+        -r      show memory usage -/+ buffers/cache
+        -s      Don't skip netdevs in /etc/procinfo/skipIfaces
+        -h      print this help
+        -v      print version info
+----
+
+输出主要参数解释：
+
+. context: The total number of context switches since bootup.
+. irq:中断请求次数
+. Load average:The average number of jobs running, followed by the number of runnable processes and the total number of processes, followed by the PID of the last process run. The pid of the last running process will probably always be procinfo's PID.
+
+procinfo表明系统空闲时间比其运行时间（uptime）还要多。这是因为系统实际上有4个cpu，因此对于一天的墙钟时间而言，cpu时间已经过去了四天。
+
+==== mpstat(多处理器统计)
+
+展示随着时间变化的cpu行为。mpstat最大的优点是在统计信息的旁边显示时间，由此你可以找出cpu使用率与时间的关系。此外mastat可以监控单个处理器是否做了大部分的工作。
+
+[source,bash]
+----
+mpstat [-P {cpu | ALL}] [delay [count]]
+
+-P {cpu | ALL}: 监控哪个cpu，cpu取值范围0~（cpu总数-1），ALL监控所有
+----
+
+[source,bash]
+----
+ ⚡ root@centos  /proc  mpstat -P ALL 2 4
+Linux 3.10.0-693.el7.x86_64 (centos)    2021年12月30日  _x86_64_        (4 CPU)
+
+11时02分35秒  CPU    %usr   %nice    %sys %iowait    %irq   %soft  %steal  %guest  %gnice   %idle
+11时02分37秒  all    1.26    0.00    0.25    0.00    0.00    0.13    0.00    0.00    0.00   98.36
+11时02分37秒    0    0.51    0.00    0.51    0.00    0.00    0.00    0.00    0.00    0.00   98.99
+11时02分37秒    1    2.51    0.00    0.50    0.00    0.00    0.00    0.00    0.00    0.00   96.98
+11时02分37秒    2    0.50    0.00    0.50    0.00    0.00    0.00    0.00    0.00    0.00   98.99
+11时02分37秒    3    1.01    0.00    0.00    0.00    0.00    0.50    0.00    0.00    0.00   98.49
+----
+
+输出详解：
+
+. %steal: 显示当虚拟机管理程序为另一个虚拟处理器提供服务时，一个或多个虚拟 CPU 花费在非自愿等待上的时间百分比。
+. %guest: 虚拟程序划分的cpu时间
+
+==== sar(系统活动报告)
+
+sar命令可以用于记录性能信息，回放之前的记录信息，以及显示当前系统实时信息。sar命令的输出可以进行格式化，使之易于导入数据库，或是输送给其他linxu命令进行处理
+
+[source,bash]
+----
+sar [options] [delay [count]]
+
+-c:报告每秒创建的进程数量
+-I {irq | SUM | ALL | XALL}:报告系统已发生中断的速率
+-P {cpu | ALL}:指定从哪个cpu收集信息。如不指定，则报告系统整体情况
+-q:报告机器的运行队列长度和平均负载
+-u:报告系统的cpu使用情况
+-w:报告系统中已发生的上下文切换次数
+-o filename:指定保存性能统计信息的二进制输出文件名
+-f filename:指定性能统计信息的文件名
+----
+
+==== oprofile
+
+oprofile是性能工具包，它利用几乎所有现代处理器都有的性能计数器来跟踪系统整体以及单个进程中cpu时间的消耗情况。除了测量cpu周期消耗在哪里之外，oprofile还可以测量关于cpu执行的非常底层的信息。根据由底层处理器支持的事件，它可以测量的内容包括：cache缺失、分支预测错误和内存引用，以及浮点操作。
+
+采样非常强大，但使用时要小心一些不明显的陷阱。首先采样可能会显示你由90%的事件花在了一个特定的例程上，但它不会显示原因。一个特定历程消耗了大量周期有两种可能的原因。其一，该例程可能时瓶颈，其执行需要很多事件。但是，也可能例程的执行时间是合理的，而其被调用的次数非常高。通常有两种途径可以发现究竟是哪一种情况：通过查看采样找出特别热门的行，或是通过编写代码来计算例程被调用次数。
+
+采样的第二个问题是你永远无法十分确定一个函数是从哪里被调用的。即使你已经搞明白它被调用了很多次，并且已经跟踪到了所有调用他的函数，但也不一定清楚其中哪一个函数完成了大多数的调用。
+
+===== CPU性能相关的选项
+
+oprofile实际上是一组协同工作的组件，用于收集CPU性能统计信息。oprofile主要有三个部分：
+
+- oprofile核心模块控制处理器并允许和禁止采样
+- oprofile后台模块收集采样，并将他们保存到磁盘
+- oprofile报告工具获取收集的采样，并向用户展示他们与在系统上运行的应用程序的关系。
+
+
+== 性能工具：系统内存
+
+=== 内存性能统计信息
+
+==== 内存子系统和性能
+
+在现代处理器中，与CPU执行代码或处理信息相比，向内存子系统保存信息或从中读取信息一般花费的时间更长。
+
+==== 内存子系统（虚拟存储器）
+
+任何给定的linxu系统都有一定容量的RAM或物理内存。在这个物理内存中寻址时，Linux将其分成块或内存页。当对内存进行分配或传送时，Linux操作的单位是页，而不是单个字节。在报告一些内存统计数据时，Linux内核报告的是每秒页面的数量。
+
+Linux默认页面大小为4KB，极少数情况下，这些页面的大小会导致极高的跟踪开销，所以内核用更大的块来操作内存，这些块被称为 `HugePage`。他们的容量为2048KB，这大大降低了管理庞大内存的开销。某些应用，如Oracle，用这些大页面加载内存中的大量数据，以达到最小化Linux内核的管理开销。但是HugePage如果不能被完全填满，就会浪费相当多的内存。
+
+===== 交换
+
+所有系统RAM芯片的物理内存容量都是固定的。即使应用程序需要的内存容量大于可用的物理内存，Linux内核仍然允许这些程序运行。Linux内核使用硬盘作为临时存储器，这个硬盘空间被称为交换分区（swap space）。交换分区相比正常的程序速度可以慢到一千倍。
+
+===== 缓冲区（buffer）和缓存（cache）（物理内存太多）
+
+如果你的物理系统内存容量超过了应用程序的需求，Linux就会在物理内存中缓存近期使用过的文件，这样后续访问这些文件时就不用取访问硬盘了。
+
+除了高速缓存，Linux还使用了额外的存储作为缓冲区。为了进一步优化应用程序，Linux为需要被写回硬盘的数据预留了存储空间。这些预留空间被称为缓冲区。如果应用程序要将数据写回硬盘，通常需要花费较长的时间，Linux让应用程序立刻继续执行，但将文件数据保存到内存缓冲区。在之后的某个时刻，缓冲区被刷新到硬盘，而应用程序可以立即继续。
+
+===== 活跃与非活跃内存
+
+活跃内存是指当前被进程使用的内存，不活跃内存是指已经被分配了，但暂时还未使用的内存。这两种类型的内存没有本质上的区别。需要时，Linux找出进程最近最少使用的内存页面，并将他们从活跃列表移动到不活跃列表。当要选择把哪个内存页交换到硬盘时，内核就从不活跃内存列表中进行选择。
+
+===== 内核的内存使用情况（分片）
+
+除了应用程序需要分配内存外，Linux内核也会位了记账的目的消耗一定量的内存。记账包括，比如跟踪从网络或磁盘IO来的数据，以及跟踪哪些进程正在运行，哪些正在休眠。为了管理记账，内核有一系列缓存，包含了一个或多个内存分片。每个分片为一组对象，个数可以是一个或多个。内核消耗的内存分片数量取决于使用的是Linux内核的哪些部分，而且还可以随着机器负载类型的变化而变化
+
+=== Linux性能工具：CPU与内存
+
+==== vmstat
+
+[source,bash]
+----
+vmstat [-a] [-s] [-m]
+
+-a:该项改变内存统计信息的默认输出以表示活跃/非活跃内存量，而不是缓冲区和高速缓存使用情况的统计信息
+-m:输出内核分片信息。信息详细展示了内核是如何分配的，并有助于确定哪部分内核消耗内存最多
+----
+
+`vmstat -m`：显示每一个分片（Cache），展示使用了多少元素（Num），分配了多少（Total），每个元素的大小（Size），整个分片使用了多少内存也（Pages）。
+
+==== top
+
+top提供了不同运行进程大量的内存信息。你可以使用这些信息来确定应用程序究竟是如何分配和使用内存的。
+
+==== free
+
+显示内存的统计信息
+
+==== slabtop
+
+显示内核是如何分配其各种缓存的，以及这些缓存的被占用情况。在内部，内核有一系列的缓存，他们由一个或多个分片（slab）构成。每个分片包括一组对象，对象个数为一个或多个。这些对象可以是活跃的（使用的）或非活跃的（未使用的）。slaptop向你展示的是不同分片的状况。它显示了这些分片的被占用情况，以及他们使用了多少内存。
+
+[source]
+----
+OBJS — The total number of objects (memory blocks), including those in use (allocated), and some spares not in use.
+ACTIVE — The number of objects (memory blocks) that are in use (allocated).
+USE — Percentage of total objects that are active. ((ACTIVE/OBJS)(100))
+OBJ SIZE — The size of the objects.
+SLABS — The total number of slabs.
+OBJ/SLAB — The number of objects that fit into a slab.
+CACHE SIZE — The cache size of the slab.
+NAME — The name of the slab.
+----
+
+
+
+
+
+
+
+
+
+
+
+
+
