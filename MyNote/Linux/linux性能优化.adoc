@@ -566,6 +566,128 @@ x:显示作为共享内存段地创建者和拥有者地用户
 
 ==== vmstat
 
+可以提供系统整体上的I/O性能情况
+
+[source,bash]
+----
+vmstat [-D] [-d] [-p partition] [interval [count]]
+
+-D:显示Linux I/O子系统总的统计数据。它可以让你很好的了解你的I/O子系统是如何被使用的，但它不会给出单个磁盘的统计数据。显示的统计数据是从系统启动开始的总信息，而不是两次采样之间的发生量
+-d:按每interval一个样本的速率显示单个磁盘的统计数据。这些统计信息是从系统启动开始的总信息，而不是两次采样之间的发生量
+-p partition:按照每interval一个采样的速率显示给定分区的性能统计数据。这些统计信息总是从系统启动开始的总信息，而不是两次采样之间的发生量
+----
+
+[source,bash]
+----
+{12:57}~ ➭ vmstat -D
+           28 disks
+            0 partitions
+       127630 total reads
+        22596 merged reads
+     15488182 read sectors
+        41447 milli reading
+       709197 writes
+      1100696 merged writes
+    133206328 written sectors
+      2445229 milli writing
+            0 inprogress IO
+         1633 milli spent IO
+         
+disks:系统中磁盘总数
+partitions：系统中分区总数
+total reads：读请求总数
+merged reads：为了提升性能而被合并的不同读请求数量，这些读请求访问的是磁盘上的相邻位置
+read sectors：从磁盘读取的扇区总数（一个扇区通常为512）
+milli reading：磁盘读所花费的时间（以毫秒为单位）
+writes：写请求的总数
+merged writes：为了提升性能而被合并的不同写请求数量，这些写请求访问的是磁盘上的相邻位置
+written sectors：向磁盘写入的扇区总数（一个扇区通常为512字节）
+milli writing：磁盘写所花费的时间（以毫秒为单位）
+inprogress IO：当前正在处理的I/O总数
+milli spent IO：等待I/O完成所花费的毫秒数
+----
+
+==== iostat
+
+专门用于显示磁盘I/O子系统统计信息的工具。iostat提供的信息细化到每个设备和每个分区从特定磁盘读写了多少个块。此外，iostat还可以提供大量的信息来显示磁盘是如何被利用的，以及Linux花费了多长时间来等待将请求提交到磁盘。
+
+[source,bash]
+----
+iostat [-d] [-k] [-x] [device] [interval [count]]
+
+-d:只显示磁盘IO的统计信息
+-k：按KB显示统计数据，而不是按块显示
+
+
+{16:33}~ ➭ iostat -d
+Linux 5.10.60.1-microsoft-standard-WSL2 (korov-win)     12/31/2021      _x86_64_        (16 CPU)
+
+Device             tps    kB_read/s    kB_wrtn/s    kB_dscd/s    kB_read    kB_wrtn    kB_dscd
+loop0             0.01         0.49         0.00         0.00     110352          0          0
+loop1             0.01         0.85         0.00         0.00     191162          0          0
+sda               0.06         0.10        19.13         0.00      23305    4321560          0
+sdb               0.00         0.18         0.00         0.00      39678        276         24
+sdc               3.63        14.75       225.08        69.60    3332937   50846652   15723896
+sdd               0.30        17.91        50.80        37.74    4046721   11475636    8526624
+
+tps：每秒传输次数。每秒对设备/分区读写请求的次数
+kB_read/s：每秒读取磁盘的速率
+kB_wrtn/s：每秒写入磁盘的速率
+kB_dscd/s：每秒丢弃数据
+kB_read：在时间间隔内读取的总数量
+kB_wrtn：在时间间隔内写入的总数量
+kB_dscd：丢弃数据总量
+----
+
+==== lsof（列出打开文件）
+
+lsof提供了一种方法来去顶哪些进程打开了一个特定的文件。除了跟踪单个文件的用户外，lsof还可以显示使用了特定目录下文件的进程。同时，它还可以递归搜索整个目录树，并列出使用该目录树内文件的进程。
+
+[source,bash]
+----
+lsof [-r delay] [+D directory] [+d directory] [file]
+
+-r delay:每间隔delay秒输出一次统计数据
++D directory：递归搜索给定目录下的所有文件，并报告哪些进程正在使用他们
++d directory：报告哪些进程正在使用给定目录下的文件
+
+{17:29}~ ➭ lsof +D ./
+COMMAND   PID USER   FD   TYPE DEVICE SIZE/OFF  NODE NAME
+zsh       766 root  cwd    DIR   8,48     4096 40961 .
+lsof    23192 root  cwd    DIR   8,48     4096 40961 .
+lsof    23193 root  cwd    DIR   8,48     4096 40961 .
+
+FD：该文件的描述符。txt表示可执行文件，mem表示内存映射文件
+TYPE：文件类型，REG表示常规文件
+DEVICE：用主设备号和次设备号表示的设备编号
+NODE：文件的索引节点
+----
+
+== 性能工具：网络
+
+目标：
+
+- 确定系统内以太网设备的速度和双工设置（mii-tool,ethtool）
+- 去顶流经每个以太网接口的网络流量（ifconfig,sar,gkrellm,iptraf,netstat,etherape）
+- 去顶流入和流出系统的IP流量的类型（gkrellm,iptraf,netstat,etherape）
+- 去顶流入和流出系统的每种类型的IP流量（gkrellm，iptraf，etherape）
+- 确定是哪个应用程序产生了IP流量（netstat）
+
+=== 网络IO介绍
+
+Linux和其他主流操作系统中的网络流量被抽象为一系列的硬件和软件层次。链路层，也就是最低一层，包含网络硬件，如以太网设备。再传送网络流量的时候，这一层并不区分流量类型，而仅仅以尽可能快的速度发送和接收数据（或帧）。
+
+链路层的上面是网络层。这一层使用互联网协议（IP）和网际控制报文协议（ICMP）在机器间寻址并路由数据包。IP/ICMP尽其最大努力尝试在机器之间传递数据包，但是他们不能保证数据包是否能正真达到其目的地。
+
+网络层上面是传输层，它定义了传输控制协议（TCP）和用户数据报协议（UDP）。TCP是一个可靠协议，它可以保证消息通过网络送达，如果消息无法送达它就会产生一个错误。UDP是一个不可靠协议，它无法保证消息能够送达（为了获得最高的数据传输速率）。UDP和TCP为IP增加了“服务”的概念。UDP和TCP接收有编号“端口”的消息。按照惯例，每个类型的网络服务都被分配了不同的编号。在Linux系统中，文件 `/etc/services` 定义了全部的端口以及他们提供的服务类型
+
+最上一层为应用层。这一层包含了各种应用程序，他们使用下面各层在网络上传输数据包。
+
+在Linux内核实现或控制的是最低三层（链路层、网络层和传输层）。内核可以提供每层的性能统计信息，包括数据流经每一层时的带宽使用情况信息和错误计数信息。
+
+
+
+
 
 
 
