@@ -639,6 +639,29 @@ kB_wrtn：在时间间隔内写入的总数量
 kB_dscd：丢弃数据总量
 ----
 
+==== pidstat
+
+此工具监测每个进程的IO信息
+
+[source,bash]
+----
+pidstat [-p PID] [-d] [-t] [ <interval> [ <count> ] ]
+
+-p:对应的pid
+-d：表明监测对象是磁盘IO
+-t：表示监测相关线程的IO信息
+----
+
+[source,bash]
+----
+{15:49}~ ➭ pidstat -p 766 -d -t
+Linux 5.10.60.1-microsoft-standard-WSL2 (korov-win)     01/01/2022      _x86_64_        (16 CPU)
+
+03:49:39 PM   UID      TGID       TID   kB_rd/s   kB_wr/s kB_ccwr/s iodelay  Command
+03:49:39 PM     0       766         -      0.99      1.14      0.12       2  zsh
+03:49:39 PM     0         -       766      0.01      0.00      0.00       2  |__zsh
+----
+
 ==== lsof（列出打开文件）
 
 lsof提供了一种方法来去顶哪些进程打开了一个特定的文件。除了跟踪单个文件的用户外，lsof还可以显示使用了特定目录下文件的进程。同时，它还可以递归搜索整个目录树，并列出使用该目录树内文件的进程。

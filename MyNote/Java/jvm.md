@@ -812,7 +812,7 @@ jstat -gc 2764 250 20
 
 选项option代表着用户希望查询的虚拟机信息，主要分为三类：类装载、垃圾收集、运行期编译状况
 
-#### 类加载统计：
+#### 类加载统计(-class)：
 
 　![img](picture\1139681-20171030173947871-420843554.png)
 
@@ -822,7 +822,7 @@ jstat -gc 2764 250 20
 - **Bytes:**未加载占用空间
 - **Time：**时间
 
-####  编译统计
+####  编译统计(-compiler)
 
 　![img](picture\1139681-20171030174025668-1000221849.png)
 
@@ -981,6 +981,12 @@ jstat -gc 2764 250 20
 
 命令格式：`jinfo [option] pid`
 
+其中option可以为以下信息：
+
+- `-flag <nam>`:打印指定Java虚拟机的参数值
+- `-flag [+|-] <name>`:设置指定Java虚拟机参数的布尔值
+- `-flag <name>=<value>`:设置指定Java虚拟参数的值
+
 ```bash
 #执行 样 例： 查询 CMSInitiatingOccupancyFraction 参数 值。
 jinfo -flag CMSInitiatingOccupancyFraction 1444
@@ -1002,6 +1008,7 @@ option选项：
 - **F：** 当-dump没有响应时，使用-dump或者-histo参数. 在这个模式下,live子参数无效.
 - **help：**打印帮助信息
 - **J：**指定传递给运行jmap的JVM的参数
+- **clstats**: print class loader statistics
 
 ```bash
 jmap -dump:live,format=b,file=`pwd`/dump.hprof 10566
@@ -1010,6 +1017,14 @@ jmap -dump:live,format=b,file=`pwd`/dump.hprof 10566
 ### 4.1.5 jhat
 
 与jmap搭配使用，用来分析生成的dump文件
+
+例如：
+
+```bash
+jhat `pwd`/dump.hprof
+```
+
+分析完成之后在浏览器中访问： `http://127.0.0.1:7000` 回展示相应的信息。
 
 ### 4.1.6 jstack：Java堆栈跟踪工具
 
@@ -1021,7 +1036,11 @@ jmap -dump:live,format=b,file=`pwd`/dump.hprof 10566
 - -l：除堆栈外，显示关于锁的附加信息
 - -m：如果调用到本地方法的话，可以显示C/C++的堆栈
 
+### 4.1.7 jcmd：多功能命令行
 
+可以用它来导出堆，查看java进程，导出线程信息，执行GC等
+
+首先通过 `jcmd -l`列出所有的jvm，然后根据jvm的pid执行`jcmd <PID> help`查看jvm支持的命令
 
 ### 4.1.3 HSDIS：JIT生成代码反编汇
 
