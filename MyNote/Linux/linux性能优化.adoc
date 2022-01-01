@@ -693,13 +693,203 @@ Linux和其他主流操作系统中的网络流量被抽象为一系列的硬件
 
 === 网络性能工具
 
-==== mii-tool（媒体无关接口工具）
+==== ethtool
 
-mii-tool是以太网专用硬件工具，主要用于设置以太网设备，但它也可以提供有关当前设置的信息。这个信息，诸如链接速度和双工设置，对于追踪性能不佳设备的成因是非常有用的。
+命令： `ethtool [device]`
+
+ethtool输出给定的以太网设备的配置信息。如果没有特别指定设备，ethtool就会输出系统所有以太网设备的统计信息。
+
+[source,bash]
+----
+[rizhiyi@siem_20-20 ~]$ sudo ethtool em1
+Settings for em1:
+        Supported ports: [ TP ]
+        Supported link modes:   1000baseT/Full
+                                10000baseT/Full
+        Supported pause frame use: Symmetric Receive-only
+        Supports auto-negotiation: Yes
+        Supported FEC modes: Not reported
+        Advertised link modes:  1000baseT/Full
+                                10000baseT/Full
+        Advertised pause frame use: No
+        Advertised auto-negotiation: Yes
+        Advertised FEC modes: Not reported
+        Speed: 1000Mb/s
+        Duplex: Full
+        Port: Twisted Pair
+        PHYAD: 13
+        Transceiver: internal
+        Auto-negotiation: on
+        MDI-X: Unknown
+        Supports Wake-on: g
+        Wake-on: g
+        Current message level: 0x00000000 (0)
+
+        Link detected: yes
+----
+
+==== ifconfig(接口配置)
+
+ifconfig的主要工作就是在Linux机器上安装和配置网络接口。它还提供了系统中所有网络设备的基本性能统计信息。
+
+命令： `ifconfig [device]`
+
+输出的统计信息：
+
+- RX packets：设备已接收的数据包数
+- TX packets：设备已发送的数据包数
+- errors:发送或接收时的错误数据
+- dropped:发送或接收时丢弃的数据包数
+- overruns：网络设备没有足够缓冲区来发送或接收一个数据包的次数
+- frame：底层以太网帧错误的数量
+- carrier:由于链路介质故障（如故障电缆）而丢弃的数据包数量
+
+==== ip
+
+命令： `ip -s [-s] link`
+
+如果你用上述选项调用IP，它就会输出系统中所有网络设备的统计信息，包括环回（lo）设备和简单互联网转换（sit0）设备。设备sit0允许将IPv6的数据包封装到IPv4的数据包中，并保持下来，这样可以缓解IPv4和IPv6之间的转换。如果ip中还有一个-s，它将回提供底层以太网更加详细的统计信息。
+
+[source,bash]
+----
+{13:23}~ ➭ ip -s -s link
+6: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+    link/ether 00:15:5d:8c:8b:dc brd ff:ff:ff:ff:ff:ff
+    RX:  bytes packets errors dropped  missed   mcast
+    3130718532 2179062      0       0       0   25518
+    RX errors:  length    crc   frame    fifo overrun
+                     0      0       0       0       0
+    TX:  bytes packets errors dropped carrier collsns
+      59712894  641601      0       0       0       0
+    TX errors: aborted   fifo  window heartbt transns
+                     0      0       0       0      85
+                     
+bytes:发送或接收的字节数
+packets：发送或接收的数据包数
+errors：发送或接收时发生的错误数
+dropped：由于网卡缺少资源，导致未发送或接收的数据包数
+overruns：网络没有足够的缓冲区空间来发送或接收更多数据包的次数
+missed：
+mcast：已接收的多播数据包的数量
+carrier：由于链路介质故障而丢弃的数据包数量
+collsns：传送时设备发生的冲突次数。当多个设备是同同时使用网络时就会发生冲突
+----
+
+ip提供的时自系统启动开始的总的系统统计数据。如果使用watch，你就可以监控这些数值是如何随着时间发生变化的。
+
+==== sar
+
+提供了与ip和ifconfig相似的数据，但是还提供了一些关于传输层打开的套接字数量的基本信息。
+
+[source,bash]
+----
+sar [-n DEV | EDEV | SOCK | FULL] [DEVICE] [interval] [count]
+
+-n DEV:显示每个设备发送和接收的数据包数和字节数信息
+-n EDEV：显示每个设备的发送和接收错误信息
+-n SOCK：显示使用套接字（TCP、UDP和RAW）的总数信息
+-n FULL：显示所有的网络统计信息
+interval：采样间隔时长
+count：采样总数
+----
 
 
+[source,bash]
+----
+{13:38}~ ➭ sar -n DEV 1 2
+Linux 5.10.60.1-microsoft-standard-WSL2 (korov-win)     01/01/2022      _x86_64_        (16 CPU)
+
+01:38:43 PM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
+01:38:44 PM        lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+01:38:44 PM     bond0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+01:38:44 PM    dummy0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+01:38:44 PM     tunl0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+01:38:44 PM      sit0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+01:38:44 PM      eth0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+
+01:38:44 PM     IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
+01:38:45 PM        lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+01:38:45 PM     bond0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+01:38:45 PM    dummy0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+01:38:45 PM     tunl0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+01:38:45 PM      sit0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+01:38:45 PM      eth0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+
+Average:        IFACE   rxpck/s   txpck/s    rxkB/s    txkB/s   rxcmp/s   txcmp/s  rxmcst/s   %ifutil
+Average:           lo      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+Average:        bond0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+Average:       dummy0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+Average:        tunl0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+Average:         sit0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+Average:         eth0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
 
 
+{13:24}~ ➭ sar -n SOCK 1 2
+Linux 5.10.60.1-microsoft-standard-WSL2 (korov-win)     01/01/2022      _x86_64_        (16 CPU)
+
+01:38:32 PM    totsck    tcpsck    udpsck    rawsck   ip-frag    tcp-tw
+01:38:33 PM       144         1         0         0         0         0
+01:38:34 PM       144         1         0         0         0         0
+Average:          144         1         0         0         0         0
+----
+
+输出详解：
+
+- rxpck/s：数据包接收速率
+- txpck/s：数据包发送数据
+- rxkB/s：kB接收速率
+- txkB/s：kB发送速率
+- rxcmp/s：压缩包接收速率
+- txcmp/s：压缩包发送速率
+- rxmcst/s：多播包接收速率
+- rxerr/s：接收错误率
+- txerr/s：发送错误率
+- coll/s：发送时的以太网冲突率
+- rxdrop/s：由于Linux内核缓冲不足而导致的接收帧丢弃率
+- txdrop/s：由于Linux内核缓冲区不足而导致的发帧丢弃率
+- txcarr/s：由于载波错误而导致的发送帧丢弃率
+- rxfram/s：由于帧对齐错误而导致的接收帧丢弃率
+- rxfifo/s：由于FIFO错误而导致的接收帧丢弃率
+- txfifo/s：由于FIFO错误而导致的发送帧丢弃率
+- totsck：当前正在被使用的套接字总数
+- tcpsck：当前正在被使用的TCP套接字总数
+- updsck：当前正在被使用的UDP套接字总数
+- rawsck：当前正在被使用的RAW套接字总数
+- ip-frag：IP分片的总数
+
+==== netstat
+
+用它可以抽取的信息包括：当前正在使用的网络套接字的数量和类型，以及有关流入和流出当前系统的UDP和TCP数据包数量的特定接口统计数据。它还能将一个套接字回溯到其特定进程或PID，这在试图确定哪个应用程序要对网络流量负责时是很有用的。
+
+[source,bash]
+----
+netstat [-p] [-c] [-interfaces=<name>] [-s] [-t] [-u] [-w]
+
+-p:给出打开每个被显示套接字的PID/程序名
+-c：每秒持续更新显示信息
+-interfaces=<name>：显示指定接口的网络统计信息
+--statistics | -s：IP/UDP/ICMP/TCP统计信息
+--tcp|-t：仅显示TCP套接字相关信息
+--udp|-u:仅显示UDP套接字相关信息
+--raw|-w:仅显示RAW套接字相关信息（IP和ICMP）
+----
+
+[source,bash]
+----
+[rizhiyi@siem_20-20 ~]$ netstat -t -c
+Active Internet connections (w/o servers)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State
+tcp        0      0 rizhiyi:35694           rizhiyi:XmlIpcRegSvc    ESTABLISHED
+tcp        0      0 rizhiyi:27017           rizhiyi:43238           ESTABLISHED
+tcp        0      0 localhost:49606         localhost:19001         TIME_WAIT
+tcp        0      0 rizhiyi:mysql           rizhiyi:47238           TIME_WAIT
+tcp        0      0 rizhiyi:mysql           rizhiyi:33150           ESTABLISHED
+
+[rizhiyi@siem_20-20 ~]$ netstat --interfaces=em1
+Kernel Interface table
+Iface             MTU    RX-OK RX-ERR RX-DRP RX-OVR    TX-OK TX-ERR TX-DRP TX-OVR Flg
+em1              1500 130053444946      0 10861739 0      287642470009      0      0      0 BMRU
+----
 
 
 
