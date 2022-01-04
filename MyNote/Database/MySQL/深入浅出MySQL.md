@@ -1189,7 +1189,7 @@ possible_keys: NULL
 
 ## 18.2 索引问题
 
-MySQL 中索引的存储类型目前只有两种（BTREE 和HASH），具体和表的存储引擎相关：MyISAM 和InnoDB 存储引擎都只支持BTREE 索引；MEMORY/HEAP 存储引擎可以支持HASH和BTREE 索引。
+MySQL 中索引的存储类型目前只有两种（BTREE 和HASH），具体和表的存储引擎相关：`MyISAM` 和`InnoDB`存储引擎都只支持BTREE 索引；MEMORY/HEAP 存储引擎可以支持HASH和BTREE 索引。
 
 **存在索引但不是用索引**
 
