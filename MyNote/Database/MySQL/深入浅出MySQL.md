@@ -1143,6 +1143,8 @@ Slow_queries：慢查询的次数。
 
 通过以上步骤查询到效率低的SQL 语句后，可以通过EXPLAIN 或者DESC 命令获取MySQL如何执行SELECT 语句的信息，包括在SELECT 语句执行过程中表如何连接和连接的顺序
 
+`mysql 8.0`之后支持`explain analyze`返回的是执行完成之后的分析结果。
+
 ```sql
 mysql> explain select * from test \G;
 *************************** 1. row ***************************
