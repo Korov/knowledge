@@ -15,5 +15,7 @@ docker run -d --name influxdb -p 8086:8086 \
   influxdb:2.1.1
   
 docker run -d --name influxdb -e DOCKER_INFLUXDB_INIT_USERNAME=root -e DOCKER_INFLUXDB_INIT_PASSWORD=root1234 -p 8086:8086 influxdb:2.1.1
+
+docker run -d --name influxdb -e DOCKER_INFLUXDB_INIT_USERNAME=root -e DOCKER_INFLUXDB_INIT_PASSWORD=root1234 -p 8086:8086 influxdb:1
 ```
 
