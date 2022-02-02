@@ -18,7 +18,7 @@ services:
       - /share/docker/influxdb/config.yml:/etc/influxdb2/config.yml
     networks:
       net_korov:
-        ipv4_address: 172.19.0.9
+        ipv4_address: 172.19.0.15
 
 networks:
    net_korov:
