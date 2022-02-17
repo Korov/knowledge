@@ -131,7 +131,7 @@ ConcurrentHashMap默认将hash表分为16个桶，诸如get、put、remove等常
 
 ### 红黑树与平衡二叉树区别
 
-红黑树：节点时红色或黑色；根节点时黑色；每个叶子节点都是黑色的空节点；每个红色节点的两个子节点都是黑色；从任一节点到其每个叶子的所有路径都包含相同数据的黑色节点。
+红黑树：节点是红色或黑色；根节点是黑色；每个叶子节点都是黑色的空节点；每个红色节点的两个子节点都是黑色；从任一节点到其每个叶子的所有路径都包含相同数据的黑色节点。
 
 这些约束保证了根节点的路径中最长路径与最短路径之间相差不超过两倍。而平衡二叉树要求左右两个子树的高度差不超过1.但是插入和删除会牺牲掉logN左右的时间。而红黑树最多只需要3次就能达到平衡。但是两者的时间复杂度相差不大。
 
@@ -2483,8 +2483,8 @@ spring boot 核心的两个配置文件：
 
 ## SpringBoot自动配置原理：
 
-1、@EnableAutoConfiguration这个注解会"猜"你将如何配置spring，前提是你已经添加了jar依赖项，如果spring-boot-starter-web已经添加Tomcat和SpringMVC，这个注释就会自动假设您在开发一个web应用程序并添加相应的spring配置，会自动去maven中读取每个starter中的spring.factories文件，该文件里配置了所有需要被创建spring容器中bean
-2、在main方法中加上@SpringBootApplication和@EnableAutoConfiguration
+1、`@EnableAutoConfiguration`这个注解会"猜"你将如何配置spring，前提是你已经添加了jar依赖项，如果spring-boot-starter-web已经添加Tomcat和`SpringMVC`，这个注释就会自动假设您在开发一个web应用程序并添加相应的spring配置，会自动去maven中读取每个starter中的`spring.factories`文件，该文件里配置了所有需要被创建spring容器中bean
+2、在main方法中加上`@SpringBootApplication`和`@EnableAutoConfiguration`
 
 ## SpringBoot starter工作原理：
 
@@ -2494,7 +2494,7 @@ spring boot 核心的两个配置文件：
 
 ##  spring boot 配置文件有哪几种类型？它们有什么区别？
 
-配置文件有.properties格式和.yml格式，它们主要的区别是书法风格不同。. yml 格式不支持 @PropertySource 注解导入
+配置文件有`.properties`格式和`.yml`格式，它们主要的区别是书法风格不同。`. yml` 格式不支持 `@PropertySource` 注解导入
 
 ## spring boot 有哪些方式可以实现热部署
 
@@ -2539,8 +2539,8 @@ rest、feign（均使用httpclient技术），负载均衡ribbon
 ## spring cloud 的核心组件有哪些
 
 Eureka：服务注册于发现
-Feign：基于动态代理机制，根据注解和选择的机器，拼接请求 url 地址，发起请求
-Ribbon：实现负载均衡，从一个服务的多台机器中选择一台
+Feign：基于动态代理机制，根据注解和选择的机器，拼接请求 url 地址，发起请求。Feign则是在Ribbon的基础上进行了一次改进，采用接口的方式，将需要调用的其他服务的方法定义成抽象方法即可，
+Ribbon：实现负载均衡，从一个服务的多台机器中选择一台，Ribbon需要自己构建http请求，模拟http请求然后使用RestTemplate发送给其他服务，步骤相当繁琐。
 Hystrix：提供线程池，不同的服务走不同的线程池，实现了不同服务调用的隔离，避免了服务雪崩的问题
 Zuul：网关管理，由 Zuul 网关转发请求给对应的服务
 

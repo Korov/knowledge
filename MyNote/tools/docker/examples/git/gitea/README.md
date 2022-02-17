@@ -7,6 +7,8 @@ docker run -d --name=gitea -p 10022:22 -p 13000:3000 gitea/gitea:1.14.2
 
 # 支持asciidoc
 docker exec -it --user root gitea bash
+# 更换国内镜像
+sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
 # 进入容器之后安装渲染asciidoc渲染器
 apk --no-cache add asciidoctor
 # 在 /data/gitea/conf/app.ini 中添加如下内容
