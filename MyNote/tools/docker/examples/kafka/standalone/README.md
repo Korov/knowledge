@@ -50,7 +50,8 @@ docker run -d --name kafka --publish 9092:9092 \
 --env ALLOW_PLAINTEXT_LISTENER=yes \
 --env KAFKA_CFG_LISTENERS=PLAINTEXT://:9092 \
 --env KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://linux.korov.org:9092 \
---volume /etc/localtime:/etc/localtime bitnami/kafka:2.8.1;
+--env KAFKA_CFG_AUTO_CREATE_TOPICS_ENABLE=true \
+--volume /etc/localtime:/etc/localtime bitnami/kafka:3.1.0;
 ```
 
 ```bash
