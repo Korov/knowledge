@@ -66,7 +66,7 @@ def display_topic_consumers(kafka_consumer=None, topics=[]):
 
 
 def consumer_seek(kafka_consumer=None, topic=None, partition=None, offset=0):
-    topic_partition = TopicPartition(topic=topic, partition=partition)
+    topic_partition = TopicPartition(topic=topic, partition=partition, )
     kafka_consumer.assign([topic_partition])
     kafka_consumer.seek(topic_partition, offset)
     for msg in kafka_consumer:
