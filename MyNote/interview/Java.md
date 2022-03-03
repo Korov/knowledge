@@ -131,7 +131,7 @@ ConcurrentHashMap默认将hash表分为16个桶，诸如get、put、remove等常
 
 HashMap是基于拉链法实现的一个散列表，内部由数组、链表和红黑树实现。
 
- ![img](C:/Users/korov/Desktop/gitrepo/knowledge/MyNote/interview/picture/1216080-20180412104426360-1425516709.png)
+ ![img](http://korov.myqnapcloud.cn:19000/images/1216080-20180412104426360-1425516709.png)
 
 HashMap的工作原理：
 

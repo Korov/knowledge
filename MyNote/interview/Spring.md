@@ -6,7 +6,7 @@
 
 ## SpringMVC，其处理流程
 
-![image-20191116183355508](C:/Users/korov/Desktop/gitrepo/knowledge/MyNote/interview/picture/image-20191116183355508.png)
+![image-20191116183355508](http://korov.myqnapcloud.cn:19000/images/image-20191116183355508.png)
 
 1. 发起请求到前端控制器（DispatcherServlet）
 2. 前端控制器请求HandlerMapping查找Handler（可以根据XML配置、注解进行查找）

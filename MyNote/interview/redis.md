@@ -187,7 +187,7 @@ RESP是redis客户端和服务端之间使用的一种通讯协议，其特点�
 
 **集群（proxy型）**：
 
-![image-20191220181254044](C:/Users/korov/Desktop/gitrepo/knowledge/MyNote/interview/picture/image-20191220181254044.png)
+![image-20191220181254044](http://korov.myqnapcloud.cn:19000/images/image-20191220181254044.png)
 
 Twemproxy 是一个 Twitter 开源的一个 redis 和 memcache 快速/轻量级代理服务器； Twemproxy 是一个快速的单线程代理程序，支持 Memcached ASCII 协议和 redis 协议。
 
@@ -201,7 +201,7 @@ Twemproxy 是一个 Twitter 开源的一个 redis 和 memcache 快速/轻量级�
 
 **集群（直连型）**：
 
-![image-20191220181640533](C:/Users/korov/Desktop/gitrepo/knowledge/MyNote/interview/picture/image-20191220181640533.png)
+![image-20191220181640533](http://korov.myqnapcloud.cn:19000/images/image-20191220181640533.png)
 
 Redis3.0之后版本支持redis-cluster集群，采用无中心结构，每个节点保存数据和整个集群状态，每个节点都和其他所有结点连接。
 
@@ -323,7 +323,7 @@ Map<String, String> map = new LinkedHashMap<String, String>(20, 0.7F, true);
 
 ## redis如何存储一个string的
 
-![img](C:/Users/korov/Desktop/gitrepo/knowledge/MyNote/interview/picture/5064562-d0c0bdaadf49f7be.png)
+![img](http://korov.myqnapcloud.cn:19000/images/5064562-d0c0bdaadf49f7be.png)
 
 Redis 内部使用一个 redisObject 对象来表示所有的 key 和 value
 

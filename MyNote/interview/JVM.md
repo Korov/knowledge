@@ -100,7 +100,7 @@ CMS过程：
 5. 并发清理：清理垃圾对象，这个阶段收集器线程和应用程序线程并发执行。
 6. 并发重置：这个阶段，重置CMS收集器的数据结构，等待下一次垃圾回收。
 
-![img](C:/Users/korov/Desktop/gitrepo/knowledge/MyNote/interview/picture/2b525609-ce63-3a42-bf19-b2fbcd42f26c.png)
+![img](http://korov.myqnapcloud.cn:19000/images/2b525609-ce63-3a42-bf19-b2fbcd42f26c.png)
 
 ## G1垃圾收集器
 
@@ -113,7 +113,7 @@ G1垃圾收集器是一种服务器端垃圾收集器，针对大内存的多处
 
 G1计划作为并行标记扫描收集器（CMS）的长期替代品。将G1与CMS进行比较，G1是更好的解决方案。第一个区别是G1是压缩型收集器。G1的压缩功能，足以完全避免使用细粒度的空闲内存进行分配，而是依赖于regions。这大大简化了收集器，并且消除了大部分的潜在碎片问题。此外，G1比CMS收集器提供更可预测的垃圾回收暂停时间，并允许用户指定所需的目标暂停时间。
 
-![img](C:/Users/korov/Desktop/gitrepo/knowledge/MyNote/interview/picture/Slide9.png)
+![img](http://korov.myqnapcloud.cn:19000/images/Slide9.png)
 
 堆被分成一组大小相等的区域，每个是连续范围的虚拟内存。某些Regions被分配给和常规收集器一样的角色（eden区，survivor区，老年代)，但他们没有固定的大小。这提供了更大的内存使用灵活性。
 
