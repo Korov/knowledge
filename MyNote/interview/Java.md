@@ -67,6 +67,7 @@ AIO：Asynchronous IO异步非阻塞IO。线程发起IO请求，立即返回；�
 
 Collection和Map两个
 
+```
 |Collection
  |　　├List
  |　　│-├LinkedList
@@ -82,6 +83,7 @@ Collection和Map两个
  　├Hashtable
  　├HashMap
  　└WeakHashMap
+```
 
 **同步容器**：Vector，Stack，HashTable，Collections.synchronized方法生成
 
@@ -294,6 +296,7 @@ Collections.unmodifiableSet(List);
 
 首先我们了解一下自定义注解的标准示例，注解类使用 @interface 关键字修饰，且在注解类上方声明注解相关信息，包含以下四种信息
 
+```
 @Documented – 注解是否将包含在JavaDoc中
 
 @Retention – 什么时候使用该注解
@@ -301,6 +304,7 @@ Collections.unmodifiableSet(List);
 @Target – 注解用于什么地方
 
 @Inherited – 是否允许子类继承该注解
+```
 
  
 
@@ -680,6 +684,8 @@ Lock接口有三个实现类，一个是ReentrantLock,另两个是ReentrantReadW
 --如果你不能获得所有需要的锁，那么使用可轮询的获取方式使你能够重新拿到控制权，它会释放你已经获得的这些锁，然后再重新尝试。
 可轮询的锁获取模式，由tryLock()方法实现。此方法仅在调用时锁为空闲状态才获取该锁。如果锁可用，则获取锁，并立即返回值true。
 如果锁不可用，则此方法将立即返回值false。此方法的典型使用语句如下：
+
+```java
 Lock lock = ...;   
 if (lock.tryLock()) {   
 try {   
@@ -690,6 +696,7 @@ lock.unlock();
 } else {   
 // perform alternative actions   
 }
+```
 
 #### 实现可定时的锁请求
 
