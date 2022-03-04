@@ -1,0 +1,75 @@
+= SpringBoot =
+Korov9 <korov9@163.com>
+v1.0 2021-10-27
+:toc: right
+:imagesdir: assets/images
+:homepage: http://asciidoctor.org
+:source-highlighter: pygments
+:source-language: java
+
+== springboot ==
+
+=== Spring Boot 事务支持 ===
+
+==== Spring 事务 ====
+
+Spring并不直接管理事务，而是提供了许多内置事务管理实现，常用的有 `DataSourceTransactionManager`, `JdoTransactionManager`, `JpaTransactionManager` 以及 `HibernateTransactionManager` 等。
+
+===== Spring 声明式事务 =====
+
+Spring配置文件中关于事务配置总是由三部分组成，分别是 `DataSource`, `TransactionManager` 和代理机制。无论哪种配置方式，一般变化的只是代理机制部分，`DataSource`, `TransactionManager` 这两部分只会根据数据访问方式有所变化，比如使用 `Hibernate` 进行数据访问时， `DataSource` 实现为 `SessionFactory`， `TransactionManager`的实现为 `HibernateTransactionManager`。
+
+===== Spring 注解事务行为 =====
+
+当事务方法被另一个事务方法调用时，必须指定事务应该如何传播。例如，方法可能继续在现有的事务中运行，也可能开启一个新事务，并在自己的事务中运行。事务的传播行为可以在 `@Transactional` 中的属性指定，Spring定义了7种传播行为，
+
+. PROPAGATION_REQUIRED：如果当前没有事务，就新建一个事务；如果已经存在一个事务，就加入这个事务
+. PROPAGATION_SUPPORTS：支持当前事务，如果当前没有事务，就以非事务方式执行
+. PROPAGATION_MANDATORY：使用当前的事务，如果当前没有事务就抛出异常
+. PROPAGATION_REQUIRES_NEW：新建事务，如果当前存在事务，就把当前事务挂起
+. PROPAGATION_NOT_SUPPORTED：以非事务方式执行操作，如果当前存在事务，就把当前事务挂起
+. PROPAGATION_NEVER：以非事务方式执行，如果当前存在事务，就抛出异常
+. PROPAGATION_NESTED：如果当前存在事务，就在嵌套事务内执行；如果当前没有事务，就执行PROPAGATION_REQUIRED类似的操作
+
+Spring定义了5种事务的隔离级别：
+
+. ISOLATION_DEFAULT：使用数据库默认的事务隔离级别，另外4个与JDBC的隔离级别相对应
+. ISOLATION_READ_UNCOMMITTED：事务最低的隔离级别，允许另一个事务可以看到这个事务未提交的数据，这种隔离级别会产生脏读、不可重复读和幻读
+. ISOLATION_READ_COMMITTED：
+. ISOLATION_REPEATABLE_READ：
+. ISOLATION_SERIALIZABLE：
+
+`@Transactional` propagation定义传播行为，isolation定义隔离级别，timeout设置事务的过期时间，readOnly指定当前事务是否是只读事务。rollbackfor（norollbackfor）指定哪个或者哪些异常可以引起（或不可以引起）事务回滚。
+
+== Spring
+
+=== Spring中涉及的设计模式
+
+==== 简单工厂模式
+
+`BeanFactory`, Spring中的 `BeanFactory` 就是简单工厂模式的体现，根据传入beanName来获得对象，先从缓存中获取，缓存中没有再创建
+
+实现原理：
+
+. bean容器的启动阶段：
+.. 读取bean的xml配置文件，将bean元素分别转换成一个BeanDefinition对象。
+.. 然后通过BeanDefinitionRegistry将这些bean注册到beanFactory中，保存在它的一个ConcurrentHashMap中。
+.. 将BeanDefinition注册到了beanFactory之后，在这里Spring为我们提供了一个扩展的切口，允许我们通过实现接口BeanFactoryPostProcessor 在此处来插入我们定义的代码。典型的例子就是：PropertyPlaceholderConfigurer，我们一般在配置数据库的dataSource时使用到的占位符的值，就是它注入进去的。
+
+==== 工厂方法
+
+
+
+==== 单例模式
+
+==== 适配器模式
+
+==== 装饰器模式
+
+==== 代理模式
+
+==== 观察者模式
+
+==== 策略模式
+
+==== 模板方法模式

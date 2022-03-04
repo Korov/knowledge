@@ -1,0 +1,83 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: siem
+spec:
+  type: NodePort
+  ports:
+  - port: 3306
+    nodePort: 30306
+    name: mysql
+  - port: 2181
+    nodePort: 30181
+    name: zookeeper
+  - port: 9092
+    nodePort: 30092
+    name: kafka
+  - port: 8529
+    nodePort: 30529
+    name: arangodb
+  selector:
+    app: siem
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: siem
+spec:
+  selector:
+    matchLabels:
+      app: siem
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: siem
+    spec:
+      containers:
+      - image: mysql:8.0.26
+        name: mysql
+        env:
+        - name: MYSQL_ROOT_PASSWORD
+          value: rizhiyi&2014
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+      - image: zookeeper:3.7.0
+        name: zookeeper
+        ports:
+        - containerPort: 2181
+          name: zookeeper
+      - image: wurstmeister/kafka:2.13-2.7.1
+        name: kafka
+        ports:
+        - containerPort: 9092
+          name: kafka
+        env:
+        - name: KAFKA_ADVERTISED_LISTENERS
+          value: "OUTSIDE://192.168.205.135:30092"
+        - name: KAFKA_LISTENERS
+          value: "OUTSIDE://0.0.0.0:9092"
+        - name: KAFKA_LISTENER_SECURITY_PROTOCOL_MAP
+          value: "OUTSIDE:PLAINTEXT"
+        - name: KAFKA_INTER_BROKER_LISTENER_NAME
+          value: "OUTSIDE"
+        - name: KAFKA_CREATE_TOPICS
+          value: "flink_siem:6:1,flink_siem_original_event:6:1"
+        - name: KAFKA_ZOOKEEPER_CONNECT
+          value: "siem:2181"
+      - image: arangodb/arangodb:3.7.12
+        name: arangodb
+        ports:
+        - containerPort: 8529
+          name: arangodb
+        env:
+        - name: ARANGO_ROOT_PASSWORD
+          value: 353b76d2062990b0b50a5e5f4cf24558
+      volumes:
+      - name: mysql-storage
+        emptyDir: {}

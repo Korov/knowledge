@@ -1,0 +1,293 @@
+= 使用 https://docs.asciidoctor.org/asciidoc/latest/[AsciiDoc] 编写文档 =
+Korov9 <korov9@163.com>
+v1.0 2020-12-20
+// 声明在右侧生成目录
+:toc: right
+:imagesdir: assets/images
+:homepage: http://asciidoctor.org
+:source-highlighter: pygments
+:source-language: java
+
+
+== 段落标题 (1级) ==
+=== 段落标题 (2级) ===
+==== 段落标题 (3级) ====
+===== 段落标题 (4级) =====
+====== Section Level 5
+
+
+**粗体**
+
+_斜体_
+
+[underline]#下划线#
+
+[big]#大号字体#
+
+[red]#有色字体#
+
+只给定脚注内容footnote:[脚注示例1]。
+
+给定脚注内容和脚注IDfootnoteref:[ft_ex, 含ID的脚注示例,ft_ex为ID]。
+
+对给定ID的脚注的引用footnoteref:[ft_ex]。
+
+== 常用标记 ==
+
+=== 列表 ===
+
+==== 无序列表 ====
+
+- 社会主义好
+- 自由软件好
+
+==== 无序列表的多级嵌套 ====
+
+- 第一级 (1)
+* 第二级 (2)
+** 第三级
+*** 第四级
+**** 第五级
+***** 第六级 (3)
+
+==== 有序列表 ====
+
+. 阿拉伯数字作为序号（隐式）(4)
++
+[source,json]
+----
+{"key":"value"}
+----
+.. 小写字母作为序号（隐式）
+.. 小写字母作为序号（隐式）
+... 小写罗马字母作为序号（隐式）
+.... 大写字母作为序号（隐式）
+..... 大写罗马字母作为序号（隐式）
+
+////
+CommentBlock（注释块）不输出到目标文件
+////
+
+++++
+PassthroughBlock，不转换内部的特殊字符
+++++
+
+[source,ruby]
+.app.rb
+----
+require 'sinatra'
+
+get '/hi' do
+  "Hello World!"
+end
+----
+
+----
+line of code  // <1>
+line of code  # <2>
+line of code  ;; <3>
+----
+<1> A callout behind a line comment for C-style languages.
+<2> A callout behind a line comment for Ruby, Python, Perl, etc.
+<3> A callout behind a line comment for Clojure.
+
+....
+LiteralBlock（文字块）
+就像普通文字段落，保留了空格，使用[listing]块标题可以在内部引用其他块样式。
+....
+
+****
+SidebarBlock（侧边栏）
+有边框和背景
+****
+
+____
+QuoteBlock（引用块）
+____
+
+====
+ExampleBlock（例子块）
+会使用数字编号的例子标题[caption="例1: "]
+可以使用NOTE, TIP, IMPORTANT, WARNING, CAUTION标题[NOTE]表示提示块
+====
+
+--
+OpenBlock（开放块）
+--
+
+
+[qanda]
+问题1::
+        答案1.
+问题2::
+        答案2.
+
+
+[glossary]
+术语1::
+    解释1.
+术语2::
+    解释2.
+
+
+http://www.methods.co.nz/asciidoc/[The AsciiDoc home page]
+
+http://www.methods.co.nz/asciidoc/
+
+mailto:joe.bloggs@foobar.com[email Joe Bloggs]
+
+joe.bloggs@foobar.com
+
+
+锚点：[[A88]]
+
+
+跳转到锚点A88：<<A88,chapter titles>>
+
+
+`图片`
+image::logo.png["Company Logo",height=32,link="screen.png",scaledwidth="75%"align="left"]
+
+[width="40%",cols="^,2m",frame="topbot",options="header,footer"]
+|======================
+|Column 1 |Column 2
+|1        |Item 1
+|2        |Item 2
+|3        |Item 3
+|6        |Three items
+|======================
+
+----
+表格参数
+frame(边框):topbot(上和下)，all(全部边，默认), none(无边框)， sides (左和右)。
+align(对齐):left，right和center。
+options(选项):header（有标题）footer（有底部）
+width(宽度):1-99%
+
+行参数
+[<multiplier>*][<align>][<width>][<style>]
+左缩进，对齐，宽度，样式
+
+单元格参数
+[<span>*|+][<align>][<style>]
+*缩进，+合并
+span语法[水平][.垂直]参数中<，^和>分别表示水平左中右和垂直上中下。
+----
+
+== 段落 ==
+
+**正常：**
+
+Paragraphs don't require any special markup in AsciiDoc.
+A paragraph is just one or more lines of consecutive text.
+
+To begin a new paragraph, separate it by at least one blank line.
+
+**换行：**
+
+Rubies are red, +
+Topazes are blue.
+
+[%hardbreaks]
+Ruby is red.
+Java is black.
+
+**文字：**
+
+A normal paragraph.
+
+ A sequence of lines that begin with at least one space is a literal paragraph.
+ Literal paragraphs are treated as preformatted text.
+ The text is shown in a fixed-width font
+ and endlines are preserved.
+
+Another normal paragraph.
+
+**警告：**
+
+NOTE: An admonition paragraph draws the reader's attention to
+auxiliary information.
+Its purpose is determined by the label
+at the beginning of the paragraph.
+
+Here are the other built-in admonition types:
+
+TIP: Pro tip...
+
+IMPORTANT: Don't forget...
+
+WARNING: Watch out for...
+
+CAUTION: Ensure that...
+
+**警示块：**
+[NOTE]
+.注意事项
+====
+An admonition block may contain complex content.
+
+.A list
+- one
+- two
+- three
+
+Another paragraph.
+
+====
+
+**概要段落：**
+[.lead]
+This text will be styled as a lead paragraph (i.e., larger font).
+
+NOTE: 默认的 Asciidoctor 样式会自动将序文的第一段作为摘要段落。 
+
+
+== 格式化文本 ==
+
+**加粗、斜体和等宽字体：**
+
+_italic phrase_
+
+__i__talic le__tt__ers
+
+*bold phrase*
+
+**b**old le**tt**ers
+
+*_bold italic phrase_*
+
+**__b__**old italic le**__tt__**ers
+
+`monospace phrase` and le``tt``ers
+
+`_monospace italic phrase_` and le``__tt__``ers
+
+`*monospace bold phrase*` and le``**tt**``ers
+
+`*_monospace bold italic phrase_*` and le``**__tt__**``ers
+
+**自定义样式：**
+
+Werewolves are #allergic to cinnamon#.
+
+Do werewolves believe in [small]#small print#?
+
+[big]##O##nce upon an infinite loop.
+
+**上角标 和 脚注：**
+
+^super^script phrase
+
+~sub~script phrase
+
+**引号：**
+
+'`single curved quotes`'
+
+"`double curved quotes`"
+
+Olaf's desk was a mess.
+
+All of the werewolves`' desks were a mess.
+
+Olaf had been with the company since the `'60s.

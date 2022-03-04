@@ -1,0 +1,28 @@
+version: '3'
+
+services: 
+    mongo:
+        image: mongo:4.4.10
+        container_name: mongo
+        ports: 
+          - "27017:27017"
+        environment: 
+          - MONGO_INITDB_ROOT_USERNAME=admin
+          - MONGO_INITDB_ROOT_PASSWORD=zl7636012086
+        volumes:
+          - /share/docker/mongo/data:/data/db
+        deploy:
+            resources:
+                limits:
+                    memory: 512M
+                reservations:
+                    memory: 256M
+        hostname: mongo.korov-nas.org
+        networks:
+          net_korov:
+            ipv4_address: 172.19.0.6
+
+networks:
+   net_korov:
+    external:
+      name: korov-nas

@@ -1,0 +1,32 @@
+version: "3"
+services:
+  pxc1:
+    container_name: pxc1
+    image: percona/percona-xtradb-cluster:8.0.23
+    environment:
+      - "MYSQL_ROOT_PASSWORD=root123"
+      - "CLUSTER_NAME=PXC"
+      - "XTRABACKUP_PASSWORD=root123"
+    volumes:
+      - ./config:/etc/percona-xtradb-cluster.conf.d
+      - ./cert:/cert
+    ports:
+      - "3306:3306"
+    hostname: pxc1
+
+  pxc2:
+    container_name: pxc2
+    image: percona/percona-xtradb-cluster:8.0.23
+    environment:
+      - "MYSQL_ROOT_PASSWORD=root123"
+      - "CLUSTER_NAME=PXC"
+      - "XTRABACKUP_PASSWORD=root123"
+      - "CLUSTER_JOIN=pxc1"
+    volumes:
+      - ./config:/etc/percona-xtradb-cluster.conf.d
+      - ./cert:/cert
+    ports:
+      - "3307:3306"
+    hostname: pxc2
+    depends_on:
+      - pxc1
