@@ -1254,7 +1254,7 @@ public class RenderPageTask implements Callable<String> {
 
 线程池的理想大小取决于被提交任务的类型以及所部署系统的特性。在代码中通常不会固定线程池的大小，而应该通过某种配置机制来提供，或根据Runtime.availableProcessors来动态计算。
 
-![image-20191109154236619](picture\image-20191109154236619.png)
+![image-20191109154236619](http://korov.myqnapcloud.cn:19000/images/image-20191109154236619.png)
 
 ## 8.3 配置ThreadPoolExecutor
 

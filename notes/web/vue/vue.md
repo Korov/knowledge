@@ -150,11 +150,11 @@ vue create hello-world
 
 你会被提示选取一个 preset。你可以选默认的包含了基本的 Babel + ESLint 设置的 preset，也可以选“手动选择特性”来选取需要的特性。
 
-![CLI 预览](picture/cli-new-project.png)
+![CLI 预览](http://korov.myqnapcloud.cn:19000/images/cli-new-project.png)
 
 这个默认的设置非常适合快速创建一个新项目的原型，而手动设置则提供了更多的选项，它们是面向生产的项目更加需要的。
 
-![CLI 预览](picture/cli-select-features.png)
+![CLI 预览](http://korov.myqnapcloud.cn:19000/images/cli-select-features.png)
 
 如果你决定手动选择特性，在操作提示的最后你可以选择将已选项保存为一个将来可复用的 preset。我们会在下一个章节讨论 preset 和插件。
 
@@ -203,7 +203,7 @@ vue ui
 
 上述命令会打开一个浏览器窗口，并以图形化界面将你引导至项目创建的流程。
 
-![图形化界面预览](picture/ui-new-project.png)
+![图形化界面预览](http://korov.myqnapcloud.cn:19000/images/ui-new-project.png)
 
 ## [#](https://cli.vuejs.org/zh/guide/creating-a-project.html#拉取-2-x-模板-旧版本) 拉取 2.x 模板 (旧版本)
 

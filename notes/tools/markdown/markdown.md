@@ -122,9 +122,9 @@ $(document).ready(function () {
 ![alt 属性文本](图片地址 "可选标题")
 ```
 
-![RUNOOB 图标](picture\runoob-logo.png)
+![RUNOOB 图标](http://korov.myqnapcloud.cn:19000/images/runoob-logo.png)
 
-![RUNOOB 图标](picture\runoob-logo.png "RUNOOB")
+![RUNOOB 图标](http://korov.myqnapcloud.cn:19000/images/runoob-logo.png "RUNOOB")
 
 # Markdown 表格
 

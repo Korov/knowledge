@@ -1,0 +1,3024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.8.dev">
+<meta name="author" content="Korov9">
+<title>Kubernetes权威指南</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<style>
+/* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
+/* Uncomment @import statement to use as custom stylesheet */
+/*@import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700";*/
+article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section{display:block}
+audio,video{display:inline-block}
+audio:not([controls]){display:none;height:0}
+html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
+a{background:none}
+a:focus{outline:thin dotted}
+a:active,a:hover{outline:0}
+h1{font-size:2em;margin:.67em 0}
+abbr[title]{border-bottom:1px dotted}
+b,strong{font-weight:bold}
+dfn{font-style:italic}
+hr{-moz-box-sizing:content-box;box-sizing:content-box;height:0}
+mark{background:#ff0;color:#000}
+code,kbd,pre,samp{font-family:monospace;font-size:1em}
+pre{white-space:pre-wrap}
+q{quotes:"\201C" "\201D" "\2018" "\2019"}
+small{font-size:80%}
+sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}
+sup{top:-.5em}
+sub{bottom:-.25em}
+img{border:0}
+svg:not(:root){overflow:hidden}
+figure{margin:0}
+fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}
+legend{border:0;padding:0}
+button,input,select,textarea{font-family:inherit;font-size:100%;margin:0}
+button,input{line-height:normal}
+button,select{text-transform:none}
+button,html input[type="button"],input[type="reset"],input[type="submit"]{-webkit-appearance:button;cursor:pointer}
+button[disabled],html input[disabled]{cursor:default}
+input[type="checkbox"],input[type="radio"]{box-sizing:border-box;padding:0}
+button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}
+textarea{overflow:auto;vertical-align:top}
+table{border-collapse:collapse;border-spacing:0}
+*,*::before,*::after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
+html,body{font-size:100%}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
+a:hover{cursor:pointer}
+img,object,embed{max-width:100%;height:auto}
+object,embed{height:100%}
+img{-ms-interpolation-mode:bicubic}
+.left{float:left!important}
+.right{float:right!important}
+.text-left{text-align:left!important}
+.text-right{text-align:right!important}
+.text-center{text-align:center!important}
+.text-justify{text-align:justify!important}
+.hide{display:none}
+img,object,svg{display:inline-block;vertical-align:middle}
+textarea{height:auto;min-height:50px}
+select{width:100%}
+.center{margin-left:auto;margin-right:auto}
+.stretch{width:100%}
+.subheader,.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{line-height:1.45;color:#7a2518;font-weight:400;margin-top:0;margin-bottom:.25em}
+div,dl,dt,dd,ul,ol,li,h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6,pre,form,p,blockquote,th,td{margin:0;padding:0;direction:ltr}
+a{color:#2156a5;text-decoration:underline;line-height:inherit}
+a:hover,a:focus{color:#1d4b8f}
+a img{border:0}
+p{font-family:inherit;font-weight:400;font-size:1em;line-height:1.6;margin-bottom:1.25em;text-rendering:optimizeLegibility}
+p aside{font-size:.875em;line-height:1.35;font-style:italic}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:300;font-style:normal;color:#ba3925;text-rendering:optimizeLegibility;margin-top:1em;margin-bottom:.5em;line-height:1.0125em}
+h1 small,h2 small,h3 small,#toctitle small,.sidebarblock>.content>.title small,h4 small,h5 small,h6 small{font-size:60%;color:#e99b8f;line-height:0}
+h1{font-size:2.125em}
+h2{font-size:1.6875em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.375em}
+h4,h5{font-size:1.125em}
+h6{font-size:1em}
+hr{border:solid #dddddf;border-width:1px 0 0;clear:both;margin:1.25em 0 1.1875em;height:0}
+em,i{font-style:italic;line-height:inherit}
+strong,b{font-weight:bold;line-height:inherit}
+small{font-size:60%;line-height:inherit}
+code{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;color:rgba(0,0,0,.9)}
+ul,ol,dl{font-size:1em;line-height:1.6;margin-bottom:1.25em;list-style-position:outside;font-family:inherit}
+ul,ol{margin-left:1.5em}
+ul li ul,ul li ol{margin-left:1.25em;margin-bottom:0;font-size:1em}
+ul.square li ul,ul.circle li ul,ul.disc li ul{list-style:inherit}
+ul.square{list-style-type:square}
+ul.circle{list-style-type:circle}
+ul.disc{list-style-type:disc}
+ol li ul,ol li ol{margin-left:1.25em;margin-bottom:0}
+dl dt{margin-bottom:.3125em;font-weight:bold}
+dl dd{margin-bottom:1.25em}
+abbr,acronym{text-transform:uppercase;font-size:90%;color:rgba(0,0,0,.8);border-bottom:1px dotted #ddd;cursor:help}
+abbr{text-transform:none}
+blockquote{margin:0 0 1.25em;padding:.5625em 1.25em 0 1.1875em;border-left:1px solid #ddd}
+blockquote cite{display:block;font-size:.9375em;color:rgba(0,0,0,.6)}
+blockquote cite::before{content:"\2014 \0020"}
+blockquote cite a,blockquote cite a:visited{color:rgba(0,0,0,.6)}
+blockquote,blockquote p{line-height:1.6;color:rgba(0,0,0,.85)}
+@media screen and (min-width:768px){h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2}
+h1{font-size:2.75em}
+h2{font-size:2.3125em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.6875em}
+h4{font-size:1.4375em}}
+table{background:#fff;margin-bottom:1.25em;border:solid 1px #dedede}
+table thead,table tfoot{background:#f7f8f7}
+table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:.5em .625em .625em;font-size:inherit;color:rgba(0,0,0,.8);text-align:left}
+table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
+table tr.even,table tr.alt{background:#f8f8f7}
+table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
+h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
+.clearfix::before,.clearfix::after,.float-group::before,.float-group::after{content:" ";display:table}
+.clearfix::after,.float-group::after{clear:both}
+:not(pre):not([class^=L])>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+:not(pre)>code.nobreak{word-wrap:normal}
+:not(pre)>code.nowrap{white-space:nowrap}
+pre{color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;line-height:1.45;text-rendering:optimizeSpeed}
+pre code,pre pre{color:inherit;font-size:inherit;line-height:inherit}
+pre>code{display:block}
+pre.nowrap,pre.nowrap pre{white-space:pre;word-wrap:normal}
+em em{font-style:normal}
+strong strong{font-weight:400}
+.keyseq{color:rgba(51,51,51,.8)}
+kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
+.keyseq kbd:first-child{margin-left:0}
+.keyseq kbd:last-child{margin-right:0}
+.menuseq,.menuref{color:#000}
+.menuseq b:not(.caret),.menuref{font-weight:inherit}
+.menuseq{word-spacing:-.02em}
+.menuseq b.caret{font-size:1.25em;line-height:.8}
+.menuseq i.caret{font-weight:bold;text-align:center;width:.45em}
+b.button::before,b.button::after{position:relative;top:-1px;font-weight:400}
+b.button::before{content:"[";padding:0 3px 0 2px}
+b.button::after{content:"]";padding:0 2px 0 3px}
+p a>code:hover{color:rgba(0,0,0,.9)}
+#header,#content,#footnotes,#footer{width:100%;margin-left:auto;margin-right:auto;margin-top:0;margin-bottom:0;max-width:62.5em;*zoom:1;position:relative;padding-left:.9375em;padding-right:.9375em}
+#header::before,#header::after,#content::before,#content::after,#footnotes::before,#footnotes::after,#footer::before,#footer::after{content:" ";display:table}
+#header::after,#content::after,#footnotes::after,#footer::after{clear:both}
+#content{margin-top:1.25em}
+#content::before{content:none}
+#header>h1:first-child{color:rgba(0,0,0,.85);margin-top:2.25rem;margin-bottom:0}
+#header>h1:first-child+#toc{margin-top:8px;border-top:1px solid #dddddf}
+#header>h1:only-child,body.toc2 #header>h1:nth-last-child(2){border-bottom:1px solid #dddddf;padding-bottom:8px}
+#header .details{border-bottom:1px solid #dddddf;line-height:1.45;padding-top:.25em;padding-bottom:.25em;padding-left:.25em;color:rgba(0,0,0,.6);display:-ms-flexbox;display:-webkit-flex;display:flex;-ms-flex-flow:row wrap;-webkit-flex-flow:row wrap;flex-flow:row wrap}
+#header .details span:first-child{margin-left:-.125em}
+#header .details span.email a{color:rgba(0,0,0,.85)}
+#header .details br{display:none}
+#header .details br+span::before{content:"\00a0\2013\00a0"}
+#header .details br+span.author::before{content:"\00a0\22c5\00a0";color:rgba(0,0,0,.85)}
+#header .details br+span#revremark::before{content:"\00a0|\00a0"}
+#header #revnumber{text-transform:capitalize}
+#header #revnumber::after{content:"\00a0"}
+#content>h1:first-child:not([class]){color:rgba(0,0,0,.85);border-bottom:1px solid #dddddf;padding-bottom:8px;margin-top:0;padding-top:1rem;margin-bottom:1.25rem}
+#toc{border-bottom:1px solid #e7e7e9;padding-bottom:.5em}
+#toc>ul{margin-left:.125em}
+#toc ul.sectlevel0>li>a{font-style:italic}
+#toc ul.sectlevel0 ul.sectlevel1{margin:.5em 0}
+#toc ul{font-family:"Open Sans","DejaVu Sans",sans-serif;list-style-type:none}
+#toc li{line-height:1.3334;margin-top:.3334em}
+#toc a{text-decoration:none}
+#toc a:active{text-decoration:underline}
+#toctitle{color:#7a2518;font-size:1.2em}
+@media screen and (min-width:768px){#toctitle{font-size:1.375em}
+body.toc2{padding-left:15em;padding-right:0}
+#toc.toc2{margin-top:0!important;background:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #e7e7e9;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto}
+#toc.toc2 #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+#toc.toc2>ul{font-size:.9em;margin-bottom:0}
+#toc.toc2 ul ul{margin-left:0;padding-left:1em}
+#toc.toc2 ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+body.toc2.toc-right{padding-left:0;padding-right:15em}
+body.toc2.toc-right #toc.toc2{border-right-width:0;border-left:1px solid #e7e7e9;left:auto;right:0}}
+@media screen and (min-width:1280px){body.toc2{padding-left:20em;padding-right:0}
+#toc.toc2{width:20em}
+#toc.toc2 #toctitle{font-size:1.375em}
+#toc.toc2>ul{font-size:.95em}
+#toc.toc2 ul ul{padding-left:1.25em}
+body.toc2.toc-right{padding-left:0;padding-right:20em}}
+#content #toc{border-style:solid;border-width:1px;border-color:#e0e0dc;margin-bottom:1.25em;padding:1.25em;background:#f8f8f7;-webkit-border-radius:4px;border-radius:4px}
+#content #toc>:first-child{margin-top:0}
+#content #toc>:last-child{margin-bottom:0}
+#footer{max-width:100%;background:rgba(0,0,0,.8);padding:1.25em}
+#footer-text{color:rgba(255,255,255,.8);line-height:1.44}
+#content{margin-bottom:.625em}
+.sect1{padding-bottom:.625em}
+@media screen and (min-width:768px){#content{margin-bottom:1.25em}
+.sect1{padding-bottom:1.25em}}
+.sect1:last-child{padding-bottom:0}
+.sect1+.sect1{border-top:1px solid #e7e7e9}
+#content h1>a.anchor,h2>a.anchor,h3>a.anchor,#toctitle>a.anchor,.sidebarblock>.content>.title>a.anchor,h4>a.anchor,h5>a.anchor,h6>a.anchor{position:absolute;z-index:1001;width:1.5ex;margin-left:-1.5ex;display:block;text-decoration:none!important;visibility:hidden;text-align:center;font-weight:400}
+#content h1>a.anchor::before,h2>a.anchor::before,h3>a.anchor::before,#toctitle>a.anchor::before,.sidebarblock>.content>.title>a.anchor::before,h4>a.anchor::before,h5>a.anchor::before,h6>a.anchor::before{content:"\00A7";font-size:.85em;display:block;padding-top:.1em}
+#content h1:hover>a.anchor,#content h1>a.anchor:hover,h2:hover>a.anchor,h2>a.anchor:hover,h3:hover>a.anchor,#toctitle:hover>a.anchor,.sidebarblock>.content>.title:hover>a.anchor,h3>a.anchor:hover,#toctitle>a.anchor:hover,.sidebarblock>.content>.title>a.anchor:hover,h4:hover>a.anchor,h4>a.anchor:hover,h5:hover>a.anchor,h5>a.anchor:hover,h6:hover>a.anchor,h6>a.anchor:hover{visibility:visible}
+#content h1>a.link,h2>a.link,h3>a.link,#toctitle>a.link,.sidebarblock>.content>.title>a.link,h4>a.link,h5>a.link,h6>a.link{color:#ba3925;text-decoration:none}
+#content h1>a.link:hover,h2>a.link:hover,h3>a.link:hover,#toctitle>a.link:hover,.sidebarblock>.content>.title>a.link:hover,h4>a.link:hover,h5>a.link:hover,h6>a.link:hover{color:#a53221}
+details,.audioblock,.imageblock,.literalblock,.listingblock,.stemblock,.videoblock{margin-bottom:1.25em}
+details>summary:first-of-type{cursor:pointer;display:list-item;outline:none;margin-bottom:.75em}
+.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{text-rendering:optimizeLegibility;text-align:left;font-family:"Noto Serif","DejaVu Serif",serif;font-size:1rem;font-style:italic}
+table.tableblock.fit-content>caption.title{white-space:nowrap;width:0}
+.paragraph.lead>p,#preamble>.sectionbody>[class="paragraph"]:first-of-type p{font-size:1.21875em;line-height:1.6;color:rgba(0,0,0,.85)}
+table.tableblock #preamble>.sectionbody>[class="paragraph"]:first-of-type p{font-size:inherit}
+.admonitionblock>table{border-collapse:separate;border:0;background:none;width:100%}
+.admonitionblock>table td.icon{text-align:center;width:80px}
+.admonitionblock>table td.icon img{max-width:none}
+.admonitionblock>table td.icon .title{font-weight:bold;font-family:"Open Sans","DejaVu Sans",sans-serif;text-transform:uppercase}
+.admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6)}
+.admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
+.exampleblock>.content{border-style:solid;border-width:1px;border-color:#e6e6e6;margin-bottom:1.25em;padding:1.25em;background:#fff;-webkit-border-radius:4px;border-radius:4px}
+.exampleblock>.content>:first-child{margin-top:0}
+.exampleblock>.content>:last-child{margin-bottom:0}
+.sidebarblock{border-style:solid;border-width:1px;border-color:#dbdbd6;margin-bottom:1.25em;padding:1.25em;background:#f3f3f2;-webkit-border-radius:4px;border-radius:4px}
+.sidebarblock>:first-child{margin-top:0}
+.sidebarblock>:last-child{margin-bottom:0}
+.sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
+.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
+.literalblock pre,.listingblock>.content>pre{-webkit-border-radius:4px;border-radius:4px;word-wrap:break-word;overflow-x:auto;padding:1em;font-size:.8125em}
+@media screen and (min-width:768px){.literalblock pre,.listingblock>.content>pre{font-size:.90625em}}
+@media screen and (min-width:1280px){.literalblock pre,.listingblock>.content>pre{font-size:1em}}
+.literalblock pre,.listingblock>.content>pre:not(.highlight),.listingblock>.content>pre[class="highlight"],.listingblock>.content>pre[class^="highlight "]{background:#f7f7f8}
+.literalblock.output pre{color:#f7f7f8;background:rgba(0,0,0,.9)}
+.listingblock>.content{position:relative}
+.listingblock code[data-lang]::before{display:none;content:attr(data-lang);position:absolute;font-size:.75em;top:.425rem;right:.5rem;line-height:1;text-transform:uppercase;color:inherit;opacity:.5}
+.listingblock:hover code[data-lang]::before{display:block}
+.listingblock.terminal pre .command::before{content:attr(data-prompt);padding-right:.5em;color:inherit;opacity:.5}
+.listingblock.terminal pre .command:not([data-prompt])::before{content:"$"}
+.listingblock pre.highlightjs{padding:0}
+.listingblock pre.highlightjs>code{padding:1em;-webkit-border-radius:4px;border-radius:4px}
+.listingblock pre.prettyprint{border-width:0}
+.prettyprint{background:#f7f7f8}
+pre.prettyprint .linenums{line-height:1.45;margin-left:2em}
+pre.prettyprint li{background:none;list-style-type:inherit;padding-left:0}
+pre.prettyprint li code[data-lang]::before{opacity:1}
+pre.prettyprint li:not(:first-child) code[data-lang]::before{display:none}
+table.linenotable{border-collapse:separate;border:0;margin-bottom:0;background:none}
+table.linenotable td[class]{color:inherit;vertical-align:top;padding:0;line-height:inherit;white-space:normal}
+table.linenotable td.code{padding-left:.75em}
+table.linenotable td.linenos{border-right:1px solid currentColor;opacity:.35;padding-right:.5em}
+pre.pygments .lineno{border-right:1px solid currentColor;opacity:.35;display:inline-block;margin-right:.75em}
+pre.pygments .lineno::before{content:"";margin-right:-.125em}
+.quoteblock{margin:0 1em 1.25em 1.5em;display:table}
+.quoteblock>.title{margin-left:-1.5em;margin-bottom:.75em}
+.quoteblock blockquote,.quoteblock p{color:rgba(0,0,0,.85);font-size:1.15rem;line-height:1.75;word-spacing:.1em;letter-spacing:0;font-style:italic;text-align:justify}
+.quoteblock blockquote{margin:0;padding:0;border:0}
+.quoteblock blockquote::before{content:"\201c";float:left;font-size:2.75em;font-weight:bold;line-height:.6em;margin-left:-.6em;color:#7a2518;text-shadow:0 1px 2px rgba(0,0,0,.1)}
+.quoteblock blockquote>.paragraph:last-child p{margin-bottom:0}
+.quoteblock .attribution{margin-top:.75em;margin-right:.5ex;text-align:right}
+.verseblock{margin:0 1em 1.25em}
+.verseblock pre{font-family:"Open Sans","DejaVu Sans",sans;font-size:1.15rem;color:rgba(0,0,0,.85);font-weight:300;text-rendering:optimizeLegibility}
+.verseblock pre strong{font-weight:400}
+.verseblock .attribution{margin-top:1.25rem;margin-left:.5ex}
+.quoteblock .attribution,.verseblock .attribution{font-size:.9375em;line-height:1.45;font-style:italic}
+.quoteblock .attribution br,.verseblock .attribution br{display:none}
+.quoteblock .attribution cite,.verseblock .attribution cite{display:block;letter-spacing:-.025em;color:rgba(0,0,0,.6)}
+.quoteblock.abstract blockquote::before,.quoteblock.excerpt blockquote::before,.quoteblock .quoteblock blockquote::before{display:none}
+.quoteblock.abstract blockquote,.quoteblock.abstract p,.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{line-height:1.6;word-spacing:0}
+.quoteblock.abstract{margin:0 1em 1.25em;display:block}
+.quoteblock.abstract>.title{margin:0 0 .375em;font-size:1.15em;text-align:center}
+.quoteblock.excerpt,.quoteblock .quoteblock{margin:0 0 1.25em;padding:0 0 .25em 1em;border-left:.25em solid #dddddf}
+.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{color:inherit;font-size:1.0625rem}
+.quoteblock.excerpt .attribution,.quoteblock .quoteblock .attribution{color:inherit;text-align:left;margin-right:0}
+table.tableblock{max-width:100%;border-collapse:separate}
+p.tableblock:last-child{margin-bottom:0}
+td.tableblock>.content>:last-child{margin-bottom:-1.25em}
+td.tableblock>.content>:last-child.sidebarblock{margin-bottom:0}
+table.tableblock,th.tableblock,td.tableblock{border:0 solid #dedede}
+table.grid-all>thead>tr>.tableblock,table.grid-all>tbody>tr>.tableblock{border-width:0 1px 1px 0}
+table.grid-all>tfoot>tr>.tableblock{border-width:1px 1px 0 0}
+table.grid-cols>*>tr>.tableblock{border-width:0 1px 0 0}
+table.grid-rows>thead>tr>.tableblock,table.grid-rows>tbody>tr>.tableblock{border-width:0 0 1px}
+table.grid-rows>tfoot>tr>.tableblock{border-width:1px 0 0}
+table.grid-all>*>tr>.tableblock:last-child,table.grid-cols>*>tr>.tableblock:last-child{border-right-width:0}
+table.grid-all>tbody>tr:last-child>.tableblock,table.grid-all>thead:last-child>tr>.tableblock,table.grid-rows>tbody>tr:last-child>.tableblock,table.grid-rows>thead:last-child>tr>.tableblock{border-bottom-width:0}
+table.frame-all{border-width:1px}
+table.frame-sides{border-width:0 1px}
+table.frame-topbot,table.frame-ends{border-width:1px 0}
+table.stripes-all tr,table.stripes-odd tr:nth-of-type(odd),table.stripes-even tr:nth-of-type(even),table.stripes-hover tr:hover{background:#f8f8f7}
+th.halign-left,td.halign-left{text-align:left}
+th.halign-right,td.halign-right{text-align:right}
+th.halign-center,td.halign-center{text-align:center}
+th.valign-top,td.valign-top{vertical-align:top}
+th.valign-bottom,td.valign-bottom{vertical-align:bottom}
+th.valign-middle,td.valign-middle{vertical-align:middle}
+table thead th,table tfoot th{font-weight:bold}
+tbody tr th{display:table-cell;line-height:1.6;background:#f7f8f7}
+tbody tr th,tbody tr th p,tfoot tr th,tfoot tr th p{color:rgba(0,0,0,.8);font-weight:bold}
+p.tableblock>code:only-child{background:none;padding:0}
+p.tableblock{font-size:1em}
+ol{margin-left:1.75em}
+ul li ol{margin-left:1.5em}
+dl dd{margin-left:1.125em}
+dl dd:last-child,dl dd:last-child>:last-child{margin-bottom:0}
+ol>li p,ul>li p,ul dd,ol dd,.olist .olist,.ulist .ulist,.ulist .olist,.olist .ulist{margin-bottom:.625em}
+ul.checklist,ul.none,ol.none,ul.no-bullet,ol.no-bullet,ol.unnumbered,ul.unstyled,ol.unstyled{list-style-type:none}
+ul.no-bullet,ol.no-bullet,ol.unnumbered{margin-left:.625em}
+ul.unstyled,ol.unstyled{margin-left:0}
+ul.checklist{margin-left:.625em}
+ul.checklist li>p:first-child>.fa-square-o:first-child,ul.checklist li>p:first-child>.fa-check-square-o:first-child{width:1.25em;font-size:.8em;position:relative;bottom:.125em}
+ul.checklist li>p:first-child>input[type="checkbox"]:first-child{margin-right:.25em}
+ul.inline{display:-ms-flexbox;display:-webkit-box;display:flex;-ms-flex-flow:row wrap;-webkit-flex-flow:row wrap;flex-flow:row wrap;list-style:none;margin:0 0 .625em -1.25em}
+ul.inline>li{margin-left:1.25em}
+.unstyled dl dt{font-weight:400;font-style:normal}
+ol.arabic{list-style-type:decimal}
+ol.decimal{list-style-type:decimal-leading-zero}
+ol.loweralpha{list-style-type:lower-alpha}
+ol.upperalpha{list-style-type:upper-alpha}
+ol.lowerroman{list-style-type:lower-roman}
+ol.upperroman{list-style-type:upper-roman}
+ol.lowergreek{list-style-type:lower-greek}
+.hdlist>table,.colist>table{border:0;background:none}
+.hdlist>table>tbody>tr,.colist>table>tbody>tr{background:none}
+td.hdlist1,td.hdlist2{vertical-align:top;padding:0 .625em}
+td.hdlist1{font-weight:bold;padding-bottom:1.25em}
+.literalblock+.colist,.listingblock+.colist{margin-top:-.5em}
+.colist td:not([class]):first-child{padding:.4em .75em 0;line-height:1;vertical-align:top}
+.colist td:not([class]):first-child img{max-width:none}
+.colist td:not([class]):last-child{padding:.25em 0}
+.thumb,.th{line-height:0;display:inline-block;border:solid 4px #fff;-webkit-box-shadow:0 0 0 1px #ddd;box-shadow:0 0 0 1px #ddd}
+.imageblock.left{margin:.25em .625em 1.25em 0}
+.imageblock.right{margin:.25em 0 1.25em .625em}
+.imageblock>.title{margin-bottom:0}
+.imageblock.thumb,.imageblock.th{border-width:6px}
+.imageblock.thumb>.title,.imageblock.th>.title{padding:0 .125em}
+.image.left,.image.right{margin-top:.25em;margin-bottom:.25em;display:inline-block;line-height:0}
+.image.left{margin-right:.625em}
+.image.right{margin-left:.625em}
+a.image{text-decoration:none;display:inline-block}
+a.image object{pointer-events:none}
+sup.footnote,sup.footnoteref{font-size:.875em;position:static;vertical-align:super}
+sup.footnote a,sup.footnoteref a{text-decoration:none}
+sup.footnote a:active,sup.footnoteref a:active{text-decoration:underline}
+#footnotes{padding-top:.75em;padding-bottom:.75em;margin-bottom:.625em}
+#footnotes hr{width:20%;min-width:6.25em;margin:-.25em 0 .75em;border-width:1px 0 0}
+#footnotes .footnote{padding:0 .375em 0 .225em;line-height:1.3334;font-size:.875em;margin-left:1.2em;margin-bottom:.2em}
+#footnotes .footnote a:first-of-type{font-weight:bold;text-decoration:none;margin-left:-1.05em}
+#footnotes .footnote:last-of-type{margin-bottom:0}
+#content #footnotes{margin-top:-.625em;margin-bottom:0;padding:.75em 0}
+.gist .file-data>table{border:0;background:#fff;width:100%;margin-bottom:0}
+.gist .file-data>table td.line-data{width:99%}
+div.unbreakable{page-break-inside:avoid}
+.big{font-size:larger}
+.small{font-size:smaller}
+.underline{text-decoration:underline}
+.overline{text-decoration:overline}
+.line-through{text-decoration:line-through}
+.aqua{color:#00bfbf}
+.aqua-background{background:#00fafa}
+.black{color:#000}
+.black-background{background:#000}
+.blue{color:#0000bf}
+.blue-background{background:#0000fa}
+.fuchsia{color:#bf00bf}
+.fuchsia-background{background:#fa00fa}
+.gray{color:#606060}
+.gray-background{background:#7d7d7d}
+.green{color:#006000}
+.green-background{background:#007d00}
+.lime{color:#00bf00}
+.lime-background{background:#00fa00}
+.maroon{color:#600000}
+.maroon-background{background:#7d0000}
+.navy{color:#000060}
+.navy-background{background:#00007d}
+.olive{color:#606000}
+.olive-background{background:#7d7d00}
+.purple{color:#600060}
+.purple-background{background:#7d007d}
+.red{color:#bf0000}
+.red-background{background:#fa0000}
+.silver{color:#909090}
+.silver-background{background:#bcbcbc}
+.teal{color:#006060}
+.teal-background{background:#007d7d}
+.white{color:#bfbfbf}
+.white-background{background:#fafafa}
+.yellow{color:#bfbf00}
+.yellow-background{background:#fafa00}
+span.icon>.fa{cursor:default}
+a span.icon>.fa{cursor:inherit}
+.admonitionblock td.icon [class^="fa icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
+.admonitionblock td.icon .icon-note::before{content:"\f05a";color:#19407c}
+.admonitionblock td.icon .icon-tip::before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#111}
+.admonitionblock td.icon .icon-warning::before{content:"\f071";color:#bf6900}
+.admonitionblock td.icon .icon-caution::before{content:"\f06d";color:#bf3400}
+.admonitionblock td.icon .icon-important::before{content:"\f06a";color:#bf0000}
+.conum[data-value]{display:inline-block;color:#fff!important;background:rgba(0,0,0,.8);-webkit-border-radius:100px;border-radius:100px;text-align:center;font-size:.75em;width:1.67em;height:1.67em;line-height:1.67em;font-family:"Open Sans","DejaVu Sans",sans-serif;font-style:normal;font-weight:bold}
+.conum[data-value] *{color:#fff!important}
+.conum[data-value]+b{display:none}
+.conum[data-value]::after{content:attr(data-value)}
+pre .conum[data-value]{position:relative;top:-.125em}
+b.conum *{color:inherit!important}
+.conum:not([data-value]):empty{display:none}
+dt,th.tableblock,td.content,div.footnote{text-rendering:optimizeLegibility}
+h1,h2,p,td.content,span.alt{letter-spacing:-.01em}
+p strong,td.content strong,div.footnote strong{letter-spacing:-.005em}
+p,blockquote,dt,td.content,span.alt{font-size:1.0625rem}
+p{margin-bottom:1.25rem}
+.sidebarblock p,.sidebarblock dt,.sidebarblock td.content,p.tableblock{font-size:1em}
+.exampleblock>.content{background:#fffef7;border-color:#e0e0dc;-webkit-box-shadow:0 1px 4px #e0e0dc;box-shadow:0 1px 4px #e0e0dc}
+.print-only{display:none!important}
+@page{margin:1.25cm .75cm}
+@media print{*{-webkit-box-shadow:none!important;box-shadow:none!important;text-shadow:none!important}
+html{font-size:80%}
+a{color:inherit!important;text-decoration:underline!important}
+a.bare,a[href^="#"],a[href^="mailto:"]{text-decoration:none!important}
+a[href^="http:"]:not(.bare)::after,a[href^="https:"]:not(.bare)::after{content:"(" attr(href) ")";display:inline-block;font-size:.875em;padding-left:.25em}
+abbr[title]::after{content:" (" attr(title) ")"}
+pre,blockquote,tr,img,object,svg{page-break-inside:avoid}
+thead{display:table-header-group}
+svg{max-width:100%}
+p,blockquote,dt,td.content{font-size:1em;orphans:3;widows:3}
+h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
+#toc,.sidebarblock,.exampleblock>.content{background:none!important}
+#toc{border-bottom:1px solid #dddddf!important;padding-bottom:0!important}
+body.book #header{text-align:center}
+body.book #header>h1:first-child{border:0!important;margin:2.5em 0 1em}
+body.book #header .details{border:0!important;display:block;padding:0!important}
+body.book #header .details span:first-child{margin-left:0!important}
+body.book #header .details br{display:block}
+body.book #header .details br+span::before{content:none!important}
+body.book #toc{border:0!important;text-align:left!important;padding:0!important;margin:0!important}
+body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
+.listingblock code[data-lang]::before{display:block}
+#footer{padding:0 .9375em}
+.hide-on-print{display:none!important}
+.print-only{display:block!important}
+.hide-for-print{display:none!important}
+.show-for-print{display:inherit!important}}
+@media print,amzn-kf8{#header>h1:first-child{margin-top:1.25rem}
+.sect1{padding:0!important}
+.sect1+.sect1{border:0}
+#footer{background:none}
+#footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
+@media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article toc2 toc-right">
+<div id="header">
+<h1>Kubernetes权威指南</h1>
+<div class="details">
+<span id="author" class="author">Korov9</span><br>
+<span id="email" class="email"><a href="mailto:korov9@163.com">korov9@163.com</a></span><br>
+<span id="revnumber">version 1.0 2021-02-24</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#truekubernetes的基本概念和术语">Kubernetes的基本概念和术语</a>
+<ul class="sectlevel2">
+<li><a href="#truemaster">Master</a></li>
+<li><a href="#truenode">Node</a></li>
+<li><a href="#truepod">Pod</a></li>
+<li><a href="#trueevent">Event</a></li>
+<li><a href="#truelabel">Label</a></li>
+<li><a href="#truerplication-controller">rplication controller</a></li>
+<li><a href="#truedeployment">Deployment</a></li>
+<li><a href="#truehorizontal-pod-autoscaler">Horizontal Pod Autoscaler</a></li>
+<li><a href="#truestatefulset">StatefulSet</a></li>
+<li><a href="#trueservice">Service</a></li>
+<li><a href="#truejob">Job</a></li>
+<li><a href="#truevolume">Volume</a></li>
+<li><a href="#truepersistent-volume">Persistent Volume</a></li>
+<li><a href="#truenamespace">Namespace</a></li>
+<li><a href="#trueannotation">Annotation</a></li>
+<li><a href="#trueconfigmap">ConfigMap</a></li>
+</ul>
+</li>
+<li><a href="#truekubernetes安装配置指南">Kubernetes安装配置指南</a>
+<ul class="sectlevel2">
+<li><a href="#truekubectl命令行工具用法详解">kubectl命令行工具用法详解</a></li>
+</ul>
+</li>
+<li><a href="#true深入掌握pod">深入掌握Pod</a>
+<ul class="sectlevel2">
+<li><a href="#truepod定义详解">Pod定义详解</a></li>
+<li><a href="#truepod的基本用法">Pod的基本用法</a></li>
+<li><a href="#true静态pod">静态Pod</a></li>
+<li><a href="#truepod容器共享volume">Pod容器共享Volume</a></li>
+<li><a href="#truepod的配置管理">Pod的配置管理</a></li>
+<li><a href="#truepod声明周期和重启策略">Pod声明周期和重启策略</a></li>
+<li><a href="#true玩转pod调度">玩转Pod调度</a></li>
+<li><a href="#trueinit-container初始化容器">Init Container（初始化容器）</a></li>
+<li><a href="#truepod的升级和回滚">Pod的升级和回滚</a></li>
+<li><a href="#truepod的扩缩容">Pod的扩缩容</a></li>
+<li><a href="#true使用statefulset搭建mongodb集群">使用StatefulSet搭建MongoDB集群</a></li>
+</ul>
+</li>
+<li><a href="#true深入掌握service">深入掌握Service</a>
+<ul class="sectlevel2">
+<li><a href="#trueservice定义详解">Service定义详解</a></li>
+</ul>
+</li>
+<li><a href="#true自我整理">自我整理</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="truekubernetes的基本概念和术语"><a class="anchor" href="#truekubernetes的基本概念和术语"></a>Kubernetes的基本概念和术语</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Kubernetes中的大部分概念如Node,Pod,Replication Controller,Service等都可以被看作一种资源对象，几乎所有资源对象都可以通过Kubernetes提供的kubectl工具执行增删改查等操作并将其保存在etcd中持久化存储。从这个角度来看，Kubernetes其实是一个高度自动化的资源控制系统，他通过跟踪对比etcd库里保存的“资源期望状态”与当前环境中的“实际资源状态”的差异来实现自动控制和自动纠错的高级功能。</p>
+</div>
+<div class="paragraph">
+<p>Kubernetes平台采用了<strong>核心+外围扩展</strong>的设计思路，在保持平台核心稳定的同时具备持续演进升级的优势。Kubernetes大部分常见的核心资源对象都归属于 <code>v1</code> 这个核心 <code>API</code> ，比如 <code>Node,Pod,Service,Endpoints,Namespace,RC,PersistenVolumn</code> 等。在 <code>1.9</code> 版本之后引入了 <code>apps/v1</code> 这个正式的扩展 <code>API</code> 组。</p>
+</div>
+<div class="sect2">
+<h3 id="truemaster"><a class="anchor" href="#truemaster"></a>Master</h3>
+<div class="paragraph">
+<p>Kubernetes里的Master指的是集群控制节点，在每个Kubernetes集群里都需要有一个Master来负责整个集群的管理和控制，基本上Kubernetes的所有控制命令都发给它，它负责具体的执行过程。Master通常会占据一个独立的服务器（高可用部署建议用3台服务器）。</p>
+</div>
+<div class="paragraph">
+<p>在Master上运行这以下关键进程：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>Kubernetes API Server(kube-apiserver)</code>:提供了HTTP Rest接口的关键服务进程，是Kubernetes里所有资源的增删改查等操作的唯一入口，也是集群控制的入口进程。</p>
+</li>
+<li>
+<p><code>Kubernetes Controller Manager(kube-controller-manager)</code>:Kubernetes里所有资源对象的自动化控制中心，可以将其理解为资源对象的大总管</p>
+</li>
+<li>
+<p><code>Kubernetes Scheduler(kube-scheduler)</code>:负责资源调度（Pod调度）的进程</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>另外，在Master上通常还需要部署etcd服务，因为Kubernetes里的所有资源对象的数据都被保存在etcd中。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truenode"><a class="anchor" href="#truenode"></a>Node</h3>
+<div class="paragraph">
+<p>除了Master，Kubernetes集群中的其他机器被称为Node。Node可以是一台物理机，也可以是一台虚拟机。Node是Kubernetes集群中的工作负载节点，每个Node都会被Master分配一些工作负载（Docker容器），当某个Node宕机时，其上的工作负载会被Master自动转移到其他节点上。</p>
+</div>
+<div class="paragraph">
+<p>每个Node上都运行着以下关键程序</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>kubelet:负责Pod对应的容器的创建、启停等任务，同时与Master密切协作，实现集群管理的基本功能</p>
+</li>
+<li>
+<p>kube-proxy:实现Kubernetes Service的通信与负载均衡机制的重要组件</p>
+</li>
+<li>
+<p>Docker Engine(docker):Docker引擎，负责本机的容器的创建和管理工作。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Node可已在运行期间动态增加到Kubernetes集群中，前提是这个节点上已经正确安装，配置和启动了上述关键进程，在默认情况下kublet会向Master注册自己，这也是Kubernetes推荐的Node管理方式。一旦Node被纳入集群管理范围，kubelet进程就会定时向Master回报自身的情报，例如操作系统，docker版本，机器的cpu和内存情况，以及当前有哪些pod在运行等，这样Master就可以获知每个node的资源使用情况，并实现高效均衡的资源调度策略。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truepod"><a class="anchor" href="#truepod"></a>Pod</h3>
+<div class="paragraph">
+<p><span class="image"><img src="http://korov.myqnapcloud.cn:19000/images/pod.png" alt="pod"></span></p>
+</div>
+<div class="paragraph">
+<p>每个pod都有一个特殊的被称为根容器的<strong>Pause</strong>容器。<strong>Pause</strong>容器对应的镜像属于kubernetes平台的一部分，除了pause容器，每个pod还包含一个或多个紧密相关的用户业务容器。</p>
+</div>
+<div class="paragraph">
+<p>pause容器作为pod的根容器，它的状态代表整个容器组的状态，pod中的多个业务容器共享pause容器的ip，共享pause容器挂接的volume，可以简化密切关联的业务容器之间的通信问题，也很好的解决了他们之间的文件共享问题。</p>
+</div>
+<div class="paragraph">
+<p>kubernetes为每个pod都分配了唯一的ip地址（pod ip），一个pod中的多个容器共享pod ip，一个pod里的容器可以与另外主机上的pod容器直接通信。</p>
+</div>
+<div class="paragraph">
+<p>pod有两种类型，普通的pod及静态pod。静态pod并没有被存放在kubernetes的etcd存储里，而是被存放在某个具体的node上的一个具体的文件中，并且只在此node上启动，运行。普通的pod一旦被创建，就会被放入etcd中存储，随后会被kubernetes master调度到某个具体的node上并进行绑定，随后该pod被对应的node上的kubelet进程实例化成一组相关的docker容器并启动。默认情况下，pod中的某个容器停止时，kubernetes会自动检测到这个问题并且重新启动这个pod，如果pod所在的node宕机，就会将这个node上的所有pod重新调度到其他节点上。</p>
+</div>
+<div class="paragraph">
+<p><span class="image"><img src="http://korov.myqnapcloud.cn:19000/images/pod-node.png" alt="pod node"></span></p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="YAML" class="language-YAML hljs"># 核心api v1
+apiVersion: v1
+# 这是一个pod的定义
+kind: Pod
+metadata:
+  name: myweb
+  labels:
+    name: myweb
+# pod里所包含的容器组的定义在spec中声明
+spec:
+  containers:
+  - name: myweb
+    image: kubeguide/tomcat-app:v1
+    # 资源配额限定
+    resources:
+      requests:
+        memory: "64Mi"
+        cpu: "250m"
+      limits:
+        memory: "64Mi"
+        cpu: "250m"
+    ports:
+    - containerPort: 8080
+    env:
+    - name: MYSQL_SERVICE_HOST
+      value: 'mysql'
+    - name: MYSQL_SERVICE_PORT
+      value: '3306'</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+requests表示该资源的最小申请量，系统必须满足要求，limits表示该资源最大允许使用的量，不能被突破，当容器试图使用超过这个量的资源时，可能会被kubernetes杀掉重启。cpu是相对值，通常一个容器的cpu配额被定义成100-300m，即0.1-0.3个cpu。memory就是内存的字节数。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="trueevent"><a class="anchor" href="#trueevent"></a>Event</h3>
+<div class="paragraph">
+<p>Event是一个事件的记录，记录了事件的最早产生时间，最后重现时间，重复次数，发起者，类型，以及导致此事件的原因等众多信息。Event通常会被关联到某个具体的资源对象上，是排故障的重要参考信息， <code>kubectl describe pod &#8230;&#8203;</code> 来查看具体pod的event信息</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truelabel"><a class="anchor" href="#truelabel"></a>Label</h3>
+<div class="paragraph">
+<p>一个label是一个key=value的键值对，key和value都由用户自己指定。label可以被附加到各种资源对象上，例如node，pod，service，rc等，一个资源对象可以定义任意数量的label，同一个label可以被添加到任意数量的资源对象上，label通常在资源对象定义时确定，也可以在对象创建后动态添加删除。</p>
+</div>
+<div class="paragraph">
+<p>我们可以通过label selector（标签选择器）查询和筛选拥有某些label的资源对象。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truerplication-controller"><a class="anchor" href="#truerplication-controller"></a>rplication controller</h3>
+<div class="paragraph">
+<p>简称RC，它定义了一个期望的场景，即声明某种pod的副本数量在任意时刻都符合某个预期值，其定义包括如下几个部分：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>pod期待的副本数量</p>
+</li>
+<li>
+<p>用于筛选目标pod的lable selector</p>
+</li>
+<li>
+<p>当pod的副本数量小于预期数量的时候，用于创建新pod的pod模板</p>
+</li>
+</ol>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="YAML" class="language-YAML hljs">aptVersion: v1
+kind: ReplicationController
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    tier: frontend
+  template:
+    metadata:
+      labels:
+        app: app-demo
+        tier: frontend
+    spec:
+      containers:
+      - name: tomcat-demo
+        image: tomcat
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: GET_HOSTS_FROM
+          value: dns
+        ports:
+        - containerPort: 80</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>当我们定义了一个RC并将其提交到kubernetes集群中后，master上的controller manager组件就得到通知，定期巡检系统中当前存活的目标pod，并确保目标pod实例的数量刚好等于rc的期望值，如果有过多的pod副本在运行，系统就会停掉一些pod，否则系统会再自动创建一些pod。</p>
+</div>
+<div class="paragraph">
+<p>kubernetes 1.2中将rplication controller更新为replica set，RS支持集合的label selector。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truedeployment"><a class="anchor" href="#truedeployment"></a>Deployment</h3>
+<div class="paragraph">
+<p>Deployment内部使用Replica Set来实现目的，无论从Deployment的作用与目的，YAML定义，还是从它的具体命令操作来看，我们都可以把它看作RC的一次升级。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="YAML" class="language-YAML hljs">aptVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      tier: frontend
+    matchExpressions:
+      - {key: tier, operator: In, vlaues:[frontend]}
+  template:
+    metadata:
+      labels:
+        app: app-demo
+        tier: frontend
+    spec:
+      containers:
+      - name: tomcat-demo
+        image: tomcat
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 80</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truehorizontal-pod-autoscaler"><a class="anchor" href="#truehorizontal-pod-autoscaler"></a>Horizontal Pod Autoscaler</h3>
+<div class="paragraph">
+<p>HPA与之前的RC、Deployment一样，也属于Kubernetes资源对象。通过追踪分析指定RC控制的所有目标Pod的负载变化情况，来确定是否需要有针对性的调整目标Pod的副本数量，当前HPA有以下两种方式作为Pod负载的度量指标：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>CPUUtilizationPercentage</p>
+</li>
+<li>
+<p>应用程序自定义的度量指标，比如服务在每秒内的相应请求数（TPS或QPS）</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>CPUUtilizationPercentage是一个算数平均值，即目标Pod所有副本自身的CPU利用率的平均值。一个Pod自身的CPU利用率是该Pod当前CPU的使用量除以它的Pod Request的值，比如定义一个Pod的Pod Request为0.4，而当前Pod的CPU使用量为0.2，则他的CPU使用率为50%。如果某一时刻CPUUtilizationPercentage的值超过了80%，则意味着当前Pod副本数量很可能不足以支撑接下来更多的请求，需要进行动态扩容，而在请求高分时段过去后，Pod的CPU利用率又会降下来，此时对应的Pod副本数量应该自动减少到一个合理的水平。如果目标Pod没有定义Pod Request的值，则无法使用CPUUtilizationPercentage实现Pod横向自动扩容。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truestatefulset"><a class="anchor" href="#truestatefulset"></a>StatefulSet</h3>
+<div class="paragraph">
+<p>Pod的管理对象RC、Deployment、DaemonSet和Job都面向无状态的服务。但现实中有很多服务是有状态的，特别是一些复杂的中间件集群，例如MySQL集群，这些应用集群有4个共同点：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>每个节点都有固定的身份ID，通过这个ID，集群中的成员可以相互发现并通信</p>
+</li>
+<li>
+<p>集群的规模比较固定，集群规模不能随意变动</p>
+</li>
+<li>
+<p>集群中每个节点都是有状态的，通常会持久化数据到永久存储中</p>
+</li>
+<li>
+<p>如果磁盘损坏，则集群里的某个节点无法正常运行，集群功能受损</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>StatefulSet有如下特性：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>StatefulSet里的每个Pod都有稳定、唯一的网络标识，可以用来发现集群内的其他成员。假设StatefulSet的名称为kafka，那么第一个Pod叫kafka-0，第2个叫kafka-1</p>
+</li>
+<li>
+<p>StatefulSet控制的Pod副本的起停顺序是受控制的，操作第n个Pod时，前n-1个Pod已经是运行且准备好的状态</p>
+</li>
+<li>
+<p>StatefulSet里的Pod采用稳定的持久化存储卷，通过PV或PVC来实现，删除Pod时默认不会删除与StatefulSet相关的存储卷</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>StatefulSet除了要与PV卷捆绑使用以存储Pod的数据状态，还要与Headless Service配合使用，即在每个StatefulSet定义中都要声明它属于那个Headless Service，Headless Service没有Cluster IP，如果解析Headless Service的DNS域名，则返回的是该Service对应的全局Pod的Endpoint列表。StatefulSet在Headless Service的基础上又为StatefulSet控制的每个Pod实例都创建了一个DNS域名，这个域名的格式为： <code>$(podname).$(headless service name)</code>。比如一个3节点的Kafka的StatefulSet集群对应的Headless Service的名称为kafka，StatefulSet的名称为kafka，则StatefulSet里的3个Pod的DNS名称分别为kafka-0.kafka、kafka-1.kafka、kafka-2.kafka，这些DNS名称可以直接在集群的配置文件中固定下来</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="trueservice"><a class="anchor" href="#trueservice"></a>Service</h3>
+<div class="paragraph">
+<p>kubernetes里的每个Service其实就是我们经常提起的微服务架构中的一个微服务。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-20_11-29-18.png" alt="Snipaste 2021 11 20 11 29 18">
+</div>
+</div>
+<div class="paragraph">
+<p>Service定义了一个微服务的访问入口地址，前端的应用Pod通过这个入口地址访问其背后的一组由Pod副本组成的集群实例，Service与其后端Pod副本集群之间则是通过Label Selector来实现无缝对接的。RC的作用实际上是保证Service的服务能力和服务质量始终符合预期标准。</p>
+</div>
+<div class="paragraph">
+<p>每个Node上会有一个kube-proxy进程，本质是一个智能的软件负载均衡器，负责把对Service的请求转发到后端的某个Pod实例上，并在内部实现服务的负载均衡与会话保持机制。但是Kubernetes发明了一种很巧妙的设计：Service没有共用一个负载均衡器的IP地址，每个Service都被分配了一个全局唯一的虚拟IP地址，这个虚拟IP被成为Cluster IP，这样一来，每个服务就变成了具备唯一IP地址的通信节点，服务调用就变成了最基础的TCP网络通信问题。</p>
+</div>
+<div class="paragraph">
+<p>当一个Pod销毁和重新创建的时候Pod的IP地址与之前旧Pod不同，而Service一旦被创建，Kubernetes就会自动为它分配一个可用的Cluster IP，而且在Service的整个生命周期内，它的Cluster IP不会发生改变，但是Kubernetes用Service的Name与Service的Cluster IP地址做了一个DNS域名映射，解决了IP地址变更的问题。</p>
+</div>
+<div class="listingblock">
+<div class="title">tomcat-server.yaml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-service
+spec:
+  ports:
+  - port: 8080
+  selector:
+    tier: frontend</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上述内容定义了一个名为tomcat-service的Service，它的服务端口为8080，拥有 <code>tier: frontend</code> 的所有Pod实例都属于它，运行以下命令进行创建： <code>kubectl create -f tomcat-server.yaml</code></p>
+</div>
+<div class="paragraph">
+<p>很多服务都存在多个端口的问题，通常一个端口提供业务服务，另外一个端口提供管理服务，Service支持多个Endpoint，在存在多个Endpoint的情况下，要求每个Endpoint都定义一个名称来区分。例如</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-service
+spec:
+  ports:
+  - port:8080
+    name: service-port
+  -port: 8005
+    name: shutdown-port
+  selector:
+    tier: frontend</code></pre>
+</div>
+</div>
+<div class="sect3">
+<h4 id="true外部系统访问service的问题"><a class="anchor" href="#true外部系统访问service的问题"></a>外部系统访问Service的问题</h4>
+<div class="paragraph">
+<p>为了更深入的理解和掌握Kubernetes，我们需要弄明白Kubernetes里的3种IP：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Node IP：Node的IP地址</p>
+</li>
+<li>
+<p>Pod IP：Pod的IP地址</p>
+</li>
+<li>
+<p>Cluster IP：Service的IP地址</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>首先，Node IP是Kubernetes集群种每个节点的物理网卡的IP地址，是一个真实存在的物理网络，所有属于这个网络的服务器都能通过这个网络直接通信，不管其中是否有部分节点不属于这个kubernetes集群。这也表明在kubernetes集群之外的节点访问kubernetes集群之内的某个节点或者TCP/IP服务时，都必须通过Node IP通信。</p>
+</div>
+<div class="paragraph">
+<p>Pod IP是每个Pod的IP地址，他是Docker Engine根据docker0网桥的IP地址段进行分配的，通常是一个虚拟的二层网络，kubernetes里一个Pod的容器访问另外一个Pod里的容器时，就是通过Pod IP所在的虚拟二层网络进行通信的，而真实的TCP/IP流量时通过Node IP所在的物理网卡流出的</p>
+</div>
+<div class="paragraph">
+<p>Cluster IP是一种虚拟的IP，但更像一个伪造的IP网络，因为：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Cluster IP仅仅作用于kubernetes Service这个对象，并由kubernetes管理和分配</p>
+</li>
+<li>
+<p>Cluster IP无法被Ping，因为没有一个实体网络对象来响应</p>
+</li>
+<li>
+<p>Cluster IP只能结合Service Port组成一个具体的通信端口，单独的Cluster IP不具备TCP/IP通信的基础，并且他们属于kubernetes集群这样一个封闭的空间，集群外的节点如果要访问这个通信端口，则需要做一些额外的工作</p>
+</li>
+<li>
+<p>kubernetes集群内，Node IP网络，Pod IP网络与Cluster IP网络之间的通信，采用的是kubernetes自己设计的一种编程方式的特殊路由规则，与我们熟知的IP路由有很大的不同</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>那要如何实现外部应用访问集群内部的服务模块，可以使用NodePort</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Service
+metadata:
+  name: tomcat-service
+spec:
+  type: NodePort
+  ports:
+  - port:8080
+    nodePort: 31002
+  selector:
+    tier: frontend</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>其中，nodePort:31002这个属性表明手动指定tomcat-service的NodePort为31002，否则Kubernetes会自动分配一个可用的端口。</p>
+</div>
+<div class="paragraph">
+<p>NodePort的实现方式是在Kubernetes集群里的每个Node上都为需要外部访问的Service开启一个对应的TCP监听端口，外部系统只要用任意一个Node的IP地址+具体的NodePort端口号即可以访问此服务，在任意Node上运行netstat命令，就可以看到有NodePort端口被监听。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truejob"><a class="anchor" href="#truejob"></a>Job</h3>
+<div class="paragraph">
+<p>批处理任务通常并行（或者串行）启动多个计算进程去处理一批工作项（work item），在处理完成后，整个批处理任务结束。Job也是一组Pod容器，但是Job控制Pod副本与RC等控制器的工作机制有以下重要差别</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Job所控制的Pod副本是短暂运行的，可以将其视为一组Docker容器，其中的每个Docker容器都仅仅运行一次。当Job控制的所有Pod副本都运行结束时，对应的Job也就结束了。Job在实现方式上与RC等副本控制器不同，Job生成Pod副本时不能自动重启的，对应Pod副本的RestartPoliy都被设置为Never。CronJob提供了类似crontab的定时任务，解决了某些批处理任务需要定时反复执行的问题</p>
+</li>
+<li>
+<p>Job所控制的Pod副本的工作模式能够多实例并行计算，以TensorFlow框架为例，可以将一个机器学习的计算任务分不到10台机器上，在每台机器上都运行一个worker执行计算任务，这很适合通过Job生成10个Pod副本同事启动运算。</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truevolume"><a class="anchor" href="#truevolume"></a>Volume</h3>
+<div class="paragraph">
+<p>存储卷是Pod中能够被多个容器访问的共享目录。Kubernetes的Volume概念、用途和目的与Docker的Volume比较类似，但两者不能等价。首先Kubernetes中的Volume被定义在Pod上，然后被一个Pod里的多个容器挂载到具体的文件目录下；其次，Kubernetes中的Volume与Pod的生命周期相同，但与容器的生命周期不相关，当容器终止或重启时，Volume中的数据也不会丢失。最后，Kubernetes支持多种类型的Volume，例如GlusterFS、Ceph等先进的分布式文件系统。</p>
+</div>
+<div class="paragraph">
+<p>Volume的使用也比较简单，在大多数情况下，我们先在Pod上声明一个Volume，然后在容器里引用该Volume并挂载（Mount）到容器里的某个目录上。举例来说，我们要给之前的Tomcat Pod增加一个名为datavol的Volume，并且挂载到容器的 <code>/mydata-data</code> 目录上，则只要对Pod的定义文件做如下修正即可</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">template:
+  metadata:
+    labels:
+      app: app-demo
+      tier: frontend
+  spec:
+    volumes:
+    - name: datavol
+      emptyDir: {}
+    containers:
+    - name: tomcat-demo
+      image: tomcat
+      volumeMounts:
+      - mountPath: /mydata-data
+        name: datavol
+      imagePullPolicy: IfNotPresent</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Kubernetes提供了非常丰富的Volume类型，下面逐一进行说明：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>emptyDir：一个emptyDir Volume是在Pod分配到Node时创建的。从它的名称就可以看出，他的初始内容为空，并且无须指定宿主机上对应的目录文件，因为这是Kubernetes自动分配的一个目录，当Pod从Node上移除时，emptyDir中的数据也会被永久删除。emptyDir的一些用途如下：临时空间；长时间任务的中间过程CheckPoint的临时保存目录；一个容器需要从另一个容器中获取数据的目录。</p>
+</li>
+<li>
+<p>hostPath：hostPath为在Pod上挂载宿主机上的文件或目录，它通常可以用于以下几个方面：1，容器应用程序生成的日志文件需要永久保存时，可以使用宿主机的高速文件系统进行存储；2，需要访问宿主机上Docker引擎内部数据结构的容器应用时，可以通过定义hostPath为宿主机 <code>/var/lib/docker</code> 目录，使容器内部应用可以直接访问Docker的文件系统。在使用这种类型的Volume时，需要注意以下几点：1，在不同的Node上具有相同配置的Pod，可能会因为宿主机上目录和文件不同而导致Volume上目录和文件的访问结果不一致；2，如果使用了资源配额管理，则Kubernetes无法将hostPath在宿主机上使用的资源纳入管理。</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">volumes:
+- name: "persistent-storage"
+  hostPath:
+    path: "/data"</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>gcePersistentDisk：使用这种类型的Volume表示使用谷歌公有云提供的永久磁盘（Persistent Disk，PD）存放Volume的数据，它与emptyDir不同，PD上的内容会被永久保存，当Pod被删除时，PD只是被卸载（Unmount），但不会被删除。</p>
+<div class="listingblock">
+<div class="content">
+<pre>volumes:
+- name: test-volume
+  gcePersistentDisk:
+    pdName: my-data-disk
+    fsType: ext4</pre>
+</div>
+</div>
+</li>
+<li>
+<p>awsElasticBlockStore：亚马逊公有云提供的EBS Volume存储数据</p>
+<div class="listingblock">
+<div class="content">
+<pre>volumes:
+- name: test-volume
+  awsElasticBlockStore:
+    volumeID: aws://&lt;availability-zone&gt;/&lt;volume-id&gt;
+    fsType: ext4</pre>
+</div>
+</div>
+</li>
+<li>
+<p>NFS：使用NFS网络文件系统提供的共享目录存储数据时，我们需要在系统中部署一个NFS Server。</p>
+<div class="listingblock">
+<div class="content">
+<pre>volumes:
+- name: nfs
+  nfs:
+    server: nfs-server.localhost
+    path: "/"</pre>
+</div>
+</div>
+</li>
+<li>
+<p>其他类型的Volume：</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>iscis：使用iSCSI存储设备上的目录挂载到Pod中</p>
+</li>
+<li>
+<p>flocker：使用Flocker管理存储卷</p>
+</li>
+<li>
+<p>glusterfs：使用开源GlusterFS网络文件系统的目录挂载到Pod中</p>
+</li>
+<li>
+<p>rbd：使用Ceph块设备共享存储（Rados Block Device）挂载到Pod中</p>
+</li>
+<li>
+<p>gitRepo：通过挂载一个空目录，并从Git库中clone一个仓库以供Pod使用</p>
+</li>
+<li>
+<p>secret： 一个Secret Volume用于为Pod提供加密的信息，你可以将定义在Kubernetes中的Secret直接挂载为文件让Pod访问。Secret Volume是通过TMFS（内存文件系统）实现的，这种类型的Volume是不会被持久化的</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truepersistent-volume"><a class="anchor" href="#truepersistent-volume"></a>Persistent Volume</h3>
+<div class="paragraph">
+<p>之前提到的Volume是被定义在Pod上的，属于计算资源的一部分，而实际上，网络存储是相对独立于计算资源而存在的一种实体资源。比如在使用虚拟机的情况下，我们通常会先定义一个网络存储，然后从中划出一个网盘并挂接到虚拟机上。Persistent Volume（PV）和与之相关联的Persistent Volume Claim（PVC）也起到了类似的作用</p>
+</div>
+<div class="paragraph">
+<p>PV可以被理解成Kubernetes集群中某个网络存储对应的一块存储，它与Volume类似，但有以下区别</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>PV只能是网络存储，不属于任何Node，但可以在每个Node上访问</p>
+</li>
+<li>
+<p>PV并不是被定义在Pod上的，而是独立与Pod之外定义的</p>
+</li>
+<li>
+<p>PV目前支持的类型包括：gcePersistentDisk、awsElasticBlockStore、AzureFile、AzureDisk、FC（Fibre Channel）、Flockers、NFS、iSCSI、RBD（Rados Block Device）、CephFS、Cinder、GlusterFS、VsphereVolume、Quobyte Volumes、VMware Photon、Portworx Volumes、ScaleIO Volumes</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>下面给出了NFS类型的PV的一个yaml定义文件，声明了需要5Gi的存储空间</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pv003
+spec:
+  capacity:
+    storage: 5Gi
+  accessModes:
+  - ReadWriteOnce
+  nfs:
+    path: /somepath
+    server: 172.17.0.2</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>比较重要的是PV的 <code>accessModes</code> 属性，目前有以下类型：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>ReadWriteOnce：读写权限，并且只能被单个Node挂载</p>
+</li>
+<li>
+<p>ReadOnlyMany：只读权限，允许被多个Node挂载</p>
+</li>
+<li>
+<p>ReadWriteMany：读写权限，允许被多个Node挂载</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>如果某个Pod想申请某种类型的PV，则首先需要定义一个PersistentVolumeClain对象</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">kind: PersistentVolumeClain
+apiVersion: v1
+metadata:
+  name: myclain
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 8Gi</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>然后，在Pod的Volume定义中引用上述PVC即可</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">volumes:
+  -name: mypd
+    persistentVolumeClain:
+      clainName: myclaim</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>最后说说PV的状态，PV是有状态的对象，它的状态有以下几种：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Available：空闲状态</p>
+</li>
+<li>
+<p>Bound：已经绑定到某个PVC上</p>
+</li>
+<li>
+<p>Released：对应的PVC已经被删除，但资源还没有被集群收回</p>
+</li>
+<li>
+<p>Failed：PV自动回收失败</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truenamespace"><a class="anchor" href="#truenamespace"></a>Namespace</h3>
+<div class="paragraph">
+<p>Namespace（命名空间）是Kubernetes系统中的另一个非常重要的概念，Namespace在很多情况下用于实现多租户的资源隔离。Namespace通过将集群内部的资源对象分配到不同的Namespace中，形成逻辑上分组的不同项目、小组或用户组，便于不同的分组在共享使用整个集群的资源的同事还能被分别管理</p>
+</div>
+<div class="paragraph">
+<p>Kubernetes集群在启动后会创建一个 <code>default</code> 的Namespace，通过kubectl可以查看： <code>kubectl get namespaces</code></p>
+</div>
+<div class="paragraph">
+<p>Namespace的定义很简单，如下所示的yaml定义了名为 <code>development</code> 的 Namespace</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Namespace
+metadata:
+  name: development</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>一旦创建了Namespace，我们在创建资源对象时就可以指定这个资源对象属于那个Namespace。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox
+  namespace: development
+spec:
+  containers:
+  - image: busybox
+    command:
+    - sleep
+    - "3600"
+  name: busybox</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>此时查看对应Namespace的Pod：<code>kubectl get pods --namespace=development</code></p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="trueannotation"><a class="anchor" href="#trueannotation"></a>Annotation</h3>
+<div class="paragraph">
+<p>Annotation（注解）与Label类似，也使用key/value键值对的形式进行定义。不同的是Label具有严格的命名规则，它定义的是Kubernetes对象的元数据（Metadata），并且用户Label Selector。Annotation则是用户任意定义的附加信息，以便于外部工具查找。在很多时候，Kubernetes的模块自身会通过Annotation标记资源对象的一些特殊信息。</p>
+</div>
+<div class="paragraph">
+<p>通常来说，用Annotation来记录的信息如下：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>build信息，release信息，Docker镜像信息，例如时间戳、release id号、PR号，镜像Hash值</p>
+</li>
+<li>
+<p>日志库、监控库、分析库等资源库的地址信息</p>
+</li>
+<li>
+<p>程序调试工具信息，例如工具名称、版本号等</p>
+</li>
+<li>
+<p>团队的联系信息，例如电话号码、负责人名称、网址等</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect2">
+<h3 id="trueconfigmap"><a class="anchor" href="#trueconfigmap"></a>ConfigMap</h3>
+<div class="paragraph">
+<p>为了集中管理系统的配置参数，而不是管理一堆配置文件。Kubernetes把所有的配置项都当作 <code>key-value</code> 字符串，当然value可以来自某个文本文件。这些配置项可以作为Map表中的一个项，整个Map的数据可以被持久化存储在Kubernetes的Etcd数据库中，然后提供API以方便Kubernetes相关组件或客户应用CRUD操作这些数据，上述专门用来保存配置参数的Map就是Kubernetes ConfigMap资源对象。</p>
+</div>
+<div class="paragraph">
+<p>接下里Kubernetes提供了一种内建机制，将存储在etcd中的ConfigMap通过Volume映射的方式变成目标Pod内的配置文件，不管目标Pod被调度到哪台服务器上，都会完成自动映射。进一步地，如果ConfigMap中的key-value数据被修改，则映射到Pod中的配置文件也会随之更新。</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="truekubernetes安装配置指南"><a class="anchor" href="#truekubernetes安装配置指南"></a>Kubernetes安装配置指南</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="truekubectl命令行工具用法详解"><a class="anchor" href="#truekubectl命令行工具用法详解"></a>kubectl命令行工具用法详解</h3>
+<div class="paragraph">
+<p>kubectl作为客户端CLI工具，可以让用户通过命令行对Kubernetes集群进行操作。</p>
+</div>
+<div class="sect3">
+<h4 id="truekubectl用法概述"><a class="anchor" href="#truekubectl用法概述"></a>kubectl用法概述</h4>
+<div class="paragraph">
+<p>kubectl命令行的语法如下：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">kubectl [command] [TYPE] [NAME] [flags]</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>command：子命令，用于操作Kubernetes集群对象的命令，例如create、delete、describe、get、apply等</p>
+</div>
+<div class="paragraph">
+<p>Type：资源对象的类型，区分大小写，能以单数、复数或者简写形式表示。例如以下3种TYPE是等价的</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">kubectl get pod pod1
+kubectl get pods pod1
+kubectl get po pod1</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NAME：资源对象的名称，区分大小写。如果不指定名称，系统则将返回属于TYPE的全部对象的列表</p>
+</div>
+<div class="paragraph">
+<p>flags：kubectl子命令的可选参数，例如使用-s指定API Server的URL地址而不用默认值</p>
+</div>
+<div class="paragraph">
+<p>获取多个Pod信息： <code>kubectl get pods pod1 pod2</code></p>
+</div>
+<div class="paragraph">
+<p>获取多种对象的信息： <code>kubectl get pod/pod1 rc/rc1</code></p>
+</div>
+<div class="paragraph">
+<p>同时应用多个yaml文件</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">kubectl get pod -f pod1.yaml -f pod2.yaml
+kubectl create -f pod1.yaml -f rc1.yaml</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="true深入掌握pod"><a class="anchor" href="#true深入掌握pod"></a>深入掌握Pod</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="truepod定义详解"><a class="anchor" href="#truepod定义详解"></a>Pod定义详解</h3>
+<div class="paragraph">
+<p>yaml格式的Pod定义文件的完整内容如下</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs"># yaml格式的pod定义文件完整内容：
+apiVersion: v1        　　#必选，版本号，例如v1
+kind: Pod       　　　　　　#必选，Pod
+metadata:       　　　　　　#必选，元数据
+  name: string        　　#必选，Pod名称
+  namespace: string     　　#必选，Pod所属的命名空间
+  labels:       　　　　　　#自定义标签
+    - name: string      　#自定义标签名字
+  annotations:        　　#自定义注释列表
+    - name: string
+spec:         　　　　　　　#必选，Pod中容器的详细定义
+  containers:       　　　　#必选，Pod中容器列表
+  - name: string      　　#必选，容器名称
+    image: string     　　#必选，容器的镜像名称
+    imagePullPolicy: [Always | Never | IfNotPresent]  #获取镜像的策略 Alawys表示下载镜像 IfnotPresent表示优先使用本地镜像，否则下载镜像，Nerver表示仅使用本地镜像
+    command: [string]     　　#容器的启动命令列表，如不指定，使用打包时使用的启动命令
+    args: [string]      　　 #容器的启动命令参数列表
+    workingDir: string      #容器的工作目录
+    volumeMounts:     　　　　#挂载到容器内部的存储卷配置
+    - name: string      　　　#引用pod定义的共享存储卷的名称，需用volumes[]部分定义的的卷名
+      mountPath: string     #存储卷在容器内mount的绝对路径，应少于512字符
+      readOnly: boolean     #是否为只读模式
+    ports:        　　　　　　#需要暴露的端口库号列表
+    - name: string      　　　#端口号名称
+      containerPort: int    #容器需要监听的端口号
+      hostPort: int     　　 #容器所在主机需要监听的端口号，默认与Container相同
+      protocol: string      #端口协议，支持TCP和UDP，默认TCP
+    env:        　　　　　　#容器运行前需设置的环境变量列表
+    - name: string      　　#环境变量名称
+      value: string     　　#环境变量的值
+    resources:        　　#资源限制和请求的设置
+      limits:       　　　　#资源限制的设置
+        cpu: string     　　#Cpu的限制，单位为core数，将用于docker run --cpu-shares参数
+        memory: string      #内存限制，单位可以为Mib/Gib，将用于docker run --memory参数
+      requests:       　　#资源请求的设置
+        cpu: string     　　#Cpu请求，容器启动的初始可用数量
+        memory: string      #内存清楚，容器启动的初始可用数量
+    livenessProbe:      　　#对Pod内个容器健康检查的设置，当探测无响应几次后将自动重启该容器，检查方法有exec、httpGet和tcpSocket，对一个容器只需设置其中一种方法即可
+      exec:       　　　　　　#对Pod容器内检查方式设置为exec方式
+        command: [string]   #exec方式需要制定的命令或脚本
+      httpGet:        　　　　#对Pod内个容器健康检查方法设置为HttpGet，需要制定Path、port
+        path: string
+        port: number
+        host: string
+        scheme: string
+        HttpHeaders:
+        - name: string
+          value: string
+      tcpSocket:      　　　　　　#对Pod内个容器健康检查方式设置为tcpSocket方式
+         port: number
+       initialDelaySeconds: 0   #容器启动完成后首次探测的时间，单位为秒
+       timeoutSeconds: 0    　　#对容器健康检查探测等待响应的超时时间，单位秒，默认1秒
+       periodSeconds: 0     　　#对容器监控检查的定期探测时间设置，单位秒，默认10秒一次
+       successThreshold: 0
+       failureThreshold: 0
+       securityContext:
+         privileged: false
+    restartPolicy: [Always | Never | OnFailure] #Pod的重启策略，Always表示一旦不管以何种方式终止运行，kubelet都将重启，OnFailure表示只有Pod以非0退出码退出才重启，Nerver表示不再重启该Pod
+    nodeSelector: obeject   　　#设置NodeSelector表示将该Pod调度到包含这个label的node上，以key：value的格式指定
+    imagePullSecrets:     　　　　#Pull镜像时使用的secret名称，以key：secretkey格式指定
+    - name: string
+    hostNetwork: false      　　#是否使用主机网络模式，默认为false，如果设置为true，表示使用宿主机网络
+    volumes:        　　　　　　#在该pod上定义共享存储卷列表
+    - name: string     　　 　　#共享存储卷名称 （volumes类型有很多种）
+      emptyDir: {}      　　　　#类型为emtyDir的存储卷，与Pod同生命周期的一个临时目录。为空值
+      hostPath: string      　　#类型为hostPath的存储卷，表示挂载Pod所在宿主机的目录
+        path: string      　　#Pod所在宿主机的目录，将被用于同期中mount的目录
+      secret:       　　　　　　#类型为secret的存储卷，挂载集群与定义的secre对象到容器内部
+        scretname: string
+        items:
+        - key: string
+          path: string
+      configMap:      　　　　#类型为configMap的存储卷，挂载预定义的configMap对象到容器内部
+        name: string
+        items:
+        - key: string
+          path: string</code></pre>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truepod的基本用法"><a class="anchor" href="#truepod的基本用法"></a>Pod的基本用法</h3>
+<div class="paragraph">
+<p>Kubernetes要求我们自己创建的Docker镜像并以一个前台命令作为启动命令</p>
+</div>
+<div class="paragraph">
+<p>如果两个容器为紧耦合的关系，并组合成一个整体对外提供服务时，应将这两个容器打包为一个Pod</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Pod
+metadata:
+  name: redis-php
+  labels:
+    name: redis-php
+spec:
+  containers:
+  - name: frontend
+    image: jjjj
+    ports:
+    - containerPort: 80
+  -name: redis
+    image: llll
+    ports:
+    - containerPort: 6379</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>属于同一个Pod的多个容器应用之间相互访问时仅需通过localhost就可以通信，使得这一组容器被绑定在了一个环境中。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="true静态pod"><a class="anchor" href="#true静态pod"></a>静态Pod</h3>
+<div class="paragraph">
+<p>静态Pod是又kubelet进行管理的仅存在与特定Node上的Pod。他们不能通过API Server进行管理，无法与ReplicationController、Deployment或者DaemonSet进行关联，并且kubelet无法对他们进行健康检查。静态Pod总是由Kubelet创建的，并且总在Kubelet所在的Node上运行。</p>
+</div>
+<div class="paragraph">
+<p>静态Pod由两种创建方式：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>配置文件方式：首先，需要设置Kubelet的启动参数 <code>--config</code>， 指定Kubelet需要监控的配置文件所在的目录，Kubelet会定期扫描该目录，并根据该目录下的 <code>.yaml</code> 或 <code>.json</code> 文件进行创建操作，删除此Pod只能到Kubelet所在机器上删除对应的配置文件即可</p>
+</li>
+<li>
+<p>HTTP方式：通过设置Kubelet的启动参数 <code>--manifest-url</code>，Kubelet将会定期从该URL地址下载Pod的定义文件，并以 <code>.yaml</code> 或 <code>.json</code> 文件的格式进行解析，然后创建Pod</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truepod容器共享volume"><a class="anchor" href="#truepod容器共享volume"></a>Pod容器共享Volume</h3>
+<div class="paragraph">
+<p>同一个Pod中的多个容器能够共享Pod级别的存储卷Volume。Volume可以被定义为各种类型，多个容器各自进行挂载操作，将一个Volume挂载为容器内部需要的目录，如图所示</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-20_18-21-17.png" alt="Snipaste 2021 11 20 18 21 17">
+</div>
+</div>
+<div class="paragraph">
+<p>配置文件如下：</p>
+</div>
+<div class="listingblock">
+<div class="title">pod-volume-applogs.yaml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Pod
+metadata:
+  name: volume-pod
+spec:
+  containers:
+  - name: tomcat
+    image: tomcat
+    ports:
+    - containerPort: 8080
+      volumeMounts:
+      - name: app-logs
+        mountPath: /usr/local/tomcat/logs
+  - name: busybox
+    image: busybox
+    command: ["sh", "-c", "tail -f /logs/catalina*.log"]
+    volumeMounts:
+    - name: app-logs
+      mountPath: /logs
+  volumes:
+  - name: app-logs
+    emptyDir: {}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>这里设置的Volume名为app-logs，类型为emptyDir，挂载到tomcat容器内的 <code>/usr/local/tomcat/logs</code> 目录，同时挂载在busybox容器内的 <code>/logs</code> 目录。tomcat容器在启动后会向 <code>/usr/local/tomcat/logs</code> 目录写文件，busybox容器就可以读取其中的文件了。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truepod的配置管理"><a class="anchor" href="#truepod的配置管理"></a>Pod的配置管理</h3>
+<div class="sect3">
+<h4 id="trueconfigmap概述"><a class="anchor" href="#trueconfigmap概述"></a>ConfigMap概述</h4>
+<div class="paragraph">
+<p>ConfigMap供容器使用的典型用法如下：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>生成为容器内的环境变量</p>
+</li>
+<li>
+<p>设置容器启动命令的启动参数（需设置为环境变量）</p>
+</li>
+<li>
+<p>以Volume的形式挂载为容器内部的文件或目录</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>ConfigMap以一个或多个key:value的形式保存在Kubernetes系统中供应用使用，既可以用于表示一个变量的值（例如apploglevel=info），也可以用于表示一个完整配置文件的内容（例如 <code>server.xml=&lt;?xml&#8230;&#8203;&gt;&#8230;&#8203;</code>）</p>
+</div>
+<div class="paragraph">
+<p>可以通过yaml配置文件或者直接使用 <code>kubectl create configmap</code> 命令行的方式来创建ConfigMap</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="true创建configmap资源对象"><a class="anchor" href="#true创建configmap资源对象"></a>创建ConfigMap资源对象</h4>
+<div class="sect4">
+<h5 id="true通过yaml配置文件方式创建"><a class="anchor" href="#true通过yaml配置文件方式创建"></a>通过yaml配置文件方式创建</h5>
+<div class="listingblock">
+<div class="title">cm-appvars.yaml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-appvars
+data:
+  apploglevel: info
+  appdatadir: /var/data
+  key-serverxml: |
+    &lt;?xml ...&gt;...</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>执行kubectl create命令创建该ConfigMap： <code>kubectl create -f cm-appvars.yaml</code></p>
+</div>
+<div class="paragraph">
+<p>查看创建好的ConfigMap：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs"># 获取信息
+kubectl get configmap
+# 获取详细信息
+kubectl describe configmap cm-appvars</code></pre>
+</div>
+</div>
+</div>
+<div class="sect4">
+<h5 id="true通过kubectl命令行方式创建"><a class="anchor" href="#true通过kubectl命令行方式创建"></a>通过kubectl命令行方式创建</h5>
+<div class="paragraph">
+<p>通过 <code>--from-file</code> 参数从文件中进行创建，可以指定key的名称，也可以在一个命令行中创建包含多个key的ConfigMap，语法为： <code>kubectl create configmap NAME --from-file=[key=]source --from-file=[key=]source</code></p>
+</div>
+<div class="paragraph">
+<p>通过 <code>--from-file</code> 参数从目录中进行创建，该目录下的每个配置文件名都被设置为key，文件的内容被设置为value，语法为： <code>kubectl create configmap NAME --from-file=config-files-dir</code></p>
+</div>
+<div class="paragraph">
+<p>使用 <code>--from-literal</code> 时会从文本中进行创建，直接将指定的 <code>key#=value#</code> 创建为ConfigMap的内容，语法为： <code>kubectl create configmap NAME --from-literal=key1=value1 --from-literal=key2=value2</code></p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="true在pod中使用configmap"><a class="anchor" href="#true在pod中使用configmap"></a>在Pod中使用ConfigMap</h4>
+<div class="sect4">
+<h5 id="true通过环境变量方式使用configmap"><a class="anchor" href="#true通过环境变量方式使用configmap"></a>通过环境变量方式使用ConfigMap</h5>
+<div class="paragraph">
+<p>以前面创建的ConfigMap <code>cm-appvars</code> 为例</p>
+</div>
+<div class="listingblock">
+<div class="title">cm-appvars.yaml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cm-appvars
+data:
+  apploglevel: info
+  appdatadir: /var/data</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>使用如下文件创建Pod之后会在容器内生成APPLOGLEVEL和APPDATADIR两个环境变量</p>
+</div>
+<div class="listingblock">
+<div class="title">cm-appvars.yaml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Pod
+metadata:
+  name: cm-test-pod
+spec:
+  containers:
+  - name: cm-test
+    image: busybox
+    command: ["/bin/sh", "-c", "env | grep APP"]
+    env:
+    - name: APPLOGLEVEL #定义环境变量的名称
+      valueFrom:  # key apploglevel对应的值
+        configMapKeyRef:
+          name: cm-appvars
+          key: apploglevel
+    - name: APPDATADIR
+      valueFrom:
+        configMapKeyRef:
+          name: cm-appvars
+          key: appdatadir</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>使用如下文件创建Pod将会在容器内部生成apploglevel和appdatadir两个环境变量</p>
+</div>
+<div class="listingblock">
+<div class="title">cm-appvars.yaml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Pod
+metadata:
+  name: cm-test-pod
+spec:
+  containers:
+  - name: cm-test
+    image: busybox
+    command: ["/bin/sh", "-c", "env | grep APP"]
+    envFrom:
+    - configMapRef
+      name: cm-appvars # 根据 cm-appvars中的key=value自动生成环境变量
+  restartPolicy: Never</code></pre>
+</div>
+</div>
+<div class="admonitionblock important">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-important" title="Important"></i>
+</td>
+<td class="content">
+需要说明的是，环境变量的名称受POSIX命名规范（[a-zA-Z_][a-zA-Z0-9_]*）约束，不能以数字开头，如果包含非法字符，则系统将跳过该环境变量的创建，并记录一个Event来提示环境变量无法生成，但并不组织Pod的启动
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect4">
+<h5 id="true通过volumemount使用configmap"><a class="anchor" href="#true通过volumemount使用configmap"></a>通过volumeMount使用ConfigMap</h5>
+<div class="paragraph">
+<p>在Pod <code>cm-test-app</code> 的定义中，将ConfigMap <code>cm-appconfigfiles</code> 中的内容以文件的形式mount到容器内部 <code>/configfiles</code> 目录下。</p>
+</div>
+<div class="listingblock">
+<div class="title">cm-test-app.yaml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Pod
+metadata:
+  name: cm-test-pod
+spec:
+  containers:
+  - name: cm-test-app
+    image: kubeguide/tomcat-app:v1
+    ports:
+    - containerPort: 8080
+    volumeMounts:
+    - name: serverxml  # 引用Volume的名称
+      mountPath: /configfiles # 挂载到容器内的目录
+  volumes:
+  - name: serverxml  # 定义Volume的名称
+    configMap:
+      name: cm-appconfigfiles # 使用ConfigMap cm-appconfigfiles
+      item:
+      - key: key-serverxml  # key=key-serverxml
+        path: server.xml # value将server.xml文件名进行挂载</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>如果在引用ConfigMap时不指定items，则使用volumeMount方式在容器内的目录下为每个item都生成一个文件名为key的文件。</p>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="true使用configmap的限制条件"><a class="anchor" href="#true使用configmap的限制条件"></a>使用ConfigMap的限制条件</h4>
+<div class="ulist">
+<ul>
+<li>
+<p>ConfigMap必须在Pod之前创建</p>
+</li>
+<li>
+<p>ConfigMap受Namespace限制，只有处于相同Namespace中的Pod才可以引用它</p>
+</li>
+<li>
+<p>ConfigMap中的配额管理还未能实现</p>
+</li>
+<li>
+<p>kubelet只支持可以被API Server管理的Pod使用ConfigMap。kubelet在本Node上通过 <code>--manifest-url</code> 或 <code>--config</code> 自动创建的静态Pod将无法引用ConfigMap。</p>
+</li>
+<li>
+<p>在Pod对ConfigMap进行挂载操作时，在容器内部只能挂载为 <strong>目录</strong> ，无法挂载为 <strong>文件</strong> 。在挂载到容器内部后，在目录下将包含ConfigMap定义的每个item，如果在该目录下原来还有其他文件，则容器内的该目录将被挂载的ConfigMap覆盖。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truepod声明周期和重启策略"><a class="anchor" href="#truepod声明周期和重启策略"></a>Pod声明周期和重启策略</h3>
+<div class="paragraph">
+<p>状态：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Pending：API Server已经创建该Pod，但在Pod内部还有一个或多个容器的镜像没有创建，包括正在下载镜像的过程</p>
+</li>
+<li>
+<p>Running：Pod内所有容器均已创建，且至少有一个容器处于运行状态、正在启动状态或正在重启状态</p>
+</li>
+<li>
+<p>Succeeded：Pod内所有容器均成功执行后退出，且不会再重启</p>
+</li>
+<li>
+<p>Failed：Pod内所有容器均已退出，但至少有一个容器退出为失败状态</p>
+</li>
+<li>
+<p>Unknown：由于某种原因无法获取该Pod的状态，可能由于网络通信不畅导致</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Pod的重启策略（RestartPolicy）,应用于Pod内的所有容器，并且仅再Pod所处的Node上由kubelet进行判断和重启操作。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Always：当容器失效时，由kubelet自动重启该容器</p>
+</li>
+<li>
+<p>OnFailure：当容器终止运行且退出码不为0时，由kueblet自动重启该容器</p>
+</li>
+<li>
+<p>Never：不论容器运行状态如何，kubelet都不会重启该容器</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>kubelet重启失效容器的时间间隔以 <code>sync-frequency</code> 乘以2n来计算，例如1、2、4、8倍等，最长延时5min，并且再成功重启后的10min后重置该时间。</p>
+</div>
+<div class="paragraph">
+<p>Pod的重启策略与控制方式息息相关。每种控制器对Pod的重启策略要求如下：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>RC和DaemonSet：必须设置为Always，需要保证该容器持续运行</p>
+</li>
+<li>
+<p>Job：OnFailuer或Never，确保容器执行完成后不再重启</p>
+</li>
+<li>
+<p>kubelet：在Pod失效时自动重启它，不论将RestartPolicy设置为什么值，也不会对Pod进行健康检查</p>
+<div class="literalblock">
+<div class="content">
+<pre>=== Pod健康检查和服务可用性检查</pre>
+</div>
+</div>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>Kubernetes对Pod的健康状态可以通过两类探针来检查：LivenessProbe和ReadinessProbe，kubelet定期执行这两类探针来诊断容器的健康状况</p>
+</div>
+<div class="paragraph">
+<p>LivenessProbe探针：用于判断容器是否存活（Running状态），如果LivenessProbe探针探测到容器不健康，则kubelet将杀掉该容器，并根据容器的重启策略做相应的处理。如果一个容器不包含LivenessProbe探针，那么kubelet认为该容器的LivenessProbe探针返回的值永远时Success。</p>
+</div>
+<div class="paragraph">
+<p>ReadinessProbe探针：用于判断容器服务是否可用（Ready状态），达到Reay状态的Pod才可以接收请求。对于被Service管理的Pod，Service与Pod Endpoint的关联关系也将基于Pod是否Ready进行设置。如果在运行过程中Ready状态变为False，则系统自动将其从Service的后端Endpoint列表中隔离出去，后续再把恢复到Ready状态的Pod加回后端Endpoint列表。这样就能保证客户端在访问Service时不会被转发到服务不可用的Pod实例上。</p>
+</div>
+<div class="paragraph">
+<p>LivenessProbe和ReadinessProbe均可配置以下三种实现方式：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>ExecAction：在容器内执行一个命令，如果该命令的返回码为0，则表明容器健康。以下通过执行 <code>cat /tmp/health</code> 命令来判断一个容器运行是否正常。在该Pod运行后，将创建/tmp/health文件10s后删除该文件，而LivenessProbe健康检查的初始探测时间（initialDeplaySeconds）为15s，探测结果是Fail，将导致kubelet杀掉该容器并重启它</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    test: liveness
+  name: liveness-exec
+spec:
+  containers:
+  - name: liveness
+    image: gcr.io/google_containers/busybox
+    args:
+    - /bin/sh
+    - -c
+    - echo ok &gt; /tmp/health; sleep 10; rm -rf /tmp/health; sleep 600
+    livenessProbe:
+      exec:
+        command:
+        - cat
+        - /tmp/health
+      initialDeplaySeconds: 15
+      timeoutSeconds: 1</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>TCPSocketAction：通过容器的IP地址和端口号执行TCP检查，如果能够建立TCP连接，则表明容器健康。如下通过与容器内的 <code>localhost:80</code> 建立TCP连接进行健康检查</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-healthcheck
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+    livenessProbe:
+      tcpSocket:
+        port: 80
+      initialDeplaySeconds: 30
+      timeoutSeconds: 1</code></pre>
+</div>
+</div>
+</li>
+<li>
+<p>HTTPGetAction：通过容器IP的IP地址、端口号及路径调用HTTP Get方法，如果响应的状态码大于等于200且小于400，则认为容器健康。</p>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-with-healthcheck
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+    livenessProbe:
+      httpGet:
+        path: /_status/healthz
+        port: 80
+      initialDeplaySeconds: 30
+      timeoutSeconds: 1</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+initialDeplaySeconds：启动容器后进行首次健康检查的等待时间，单位为s。timeoutSeconds：健康检查发送请求后等待响应的超时时间，单位为s。当超时发生时，kubelet会认为容器已经无法提供服务，将会重启该容器
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="true玩转pod调度"><a class="anchor" href="#true玩转pod调度"></a>玩转Pod调度</h3>
+<div class="paragraph">
+<p>严谨的说，RC的继任者其实并不是Deployment，而是ReplicaSet，因为ReplicaSet进一步增强了RC标签选择器的灵活性。之前RC的标签选择器只能选择一个标签，而ReplicaSet拥有集合式的标签选择器，可以选择多个Pod标签，如下所示</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">selector:
+  matchLabels:
+    tier: frontend
+  matchExpressions:
+    - {key: tier, operator: In, values: [frontend]}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>与RC不同，ReplicaSet被设计成能控制多个不同标签的Pod副本。一种常见的应用场景是，应用MyApp目前发布了v1与v2两个版本，用户希望MyApp的Pod副本数保持为3个，可以同时包含v1和贰版本的Pod，就可以用ReplicaSet来实现这种控制</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">selector:
+  matchLabels:
+    tier: frontend
+  matchExpressions:
+    - {key: tier, operator: In, values: [v1,v2]}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>其实，Kubernetes的滚动升级就是巧妙运用ReplicaSet的这个特性来实现的，同时，Deployment也是通过ReplicaSet来实现Pod副本自动控制功能的。我们不应该直接使用底层ReplicaSet来控制Pod副本，而应该使用管理ReplicaSet的Deployment对象来控制副本，这是来自官方的建议。</p>
+</div>
+<div class="paragraph">
+<p>当我们希望某种Pod的副本全部在指定的一个或者一些节点上运行，比如希望MySQL数据库调度到一个具有SSD磁盘的目标节点上，此时Pod模板中的NodeSelector属性就开始发挥作用了，上述MySQL定向调度案例的是实现方式可以分为以下两步：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>把具有SSD磁盘的Node都打上自己定义标签 <code>disk=ssd</code></p>
+</li>
+<li>
+<p>在Pod模板中设定NodeSelector的值为 <code>disk:ssd</code></p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>如此一来，Kubernetes在调度Pod副本的时候，就会先按照Node的标签过滤出合适的目标节点，然后选择一个最佳节点进行调度。</p>
+</div>
+<div class="paragraph">
+<p>上述逻辑看起来即简单又完美，但在真实的生产环境中可能面临以下问题：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>如果NodeSelector选择的Label不存在或者不符合条件，比如这些目标节点此时宕机或者资源不足，该怎么办</p>
+</li>
+<li>
+<p>如果要选择多种合适的目标节点，比如SSD磁盘的节点或者超高速硬盘的节点，该怎么办？</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>在真实的生产环境中还存在如下所述的特殊需求</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>不同Pod之间的亲和性（Affinity）。比如MySQL数据库与Redis中间件不能被调度到同一个目标节点上，或者两种不同的Pod必须被调度到同一个Node上，以实现本地文件共享或本地网络通信等特殊需求，这就是 <code>PodAffinity</code> 要解决的问题</p>
+</li>
+<li>
+<p>又状态集群的调度。对于Zookeeper、Elasticsearch、MongoDB、Kafka等有状态集群，虽然集群中的每个Worker节点看起来都是相同的，但每个Worker节点都必须有明确的、不变的唯一ID（主机名或IP地址），这些节点的启动和停止次序通常有严格的顺序。此外，由于集群需要持久化保存状态数据，所以集群中的Worker节点对应的Pod不管在哪个Node上恢复，都需要挂载原来的Volume，因此这些Pod还需要捆绑具体的PV。针对这种复杂的需求，Kubernetes提供了StatefulSet这种特殊的副本控制器来解决</p>
+</li>
+<li>
+<p>在每个Node上调度并且仅仅创建一个Pod副本。这种调度通常用在系统监控相关的Pod，比如主机上的日志采集、主机性能采集等进程需要被部署到集群中的每个节点，并且只能部署一个副本，这就是DaemonSet这种特殊Pod副本控制所解决的问题</p>
+</li>
+<li>
+<p>对于批处理组作业，需要创建多个Pod副本来协同工作，当这些Pod副本都完成自己的工作任务时，整个批处理作业就结束了。这种Pod运行且仅运行一次的特殊调度，有Job和CronJob</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>Kubernetes 1.9之前，在RC等对象被删除后，他们所创建的Pod副本都不会被删除；Kubernetes 1.9以后，这些Pod副本会被一并删除。如果不希望这样做，则可以通过 <code>kubectl</code> 命令的 <code>--cascade=false</code> 参数来取消这一默认特性： <code>kubectl delete replicaset my-repset --cascade=false</code></p>
+</div>
+<div class="sect3">
+<h4 id="truenodeselector-定向调度"><a class="anchor" href="#truenodeselector-定向调度"></a>NodeSelector： 定向调度</h4>
+<div class="paragraph">
+<p>有时候我们需要将Pod调度到指定的一些Node上，可以通过Node的标签（Label）和Pod的nodeSelector属性相匹配，来达到上述目的。</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>首先通过 <code>kubectl label</code> 命令给目标Node打上一些标签： <code>kubectl label nodes &lt;node-name&gt; &lt;label-key&gt;=&lt;label-value&gt;</code>。</p>
+</li>
+<li>
+<p>然后，在Pod的定义中加上nodeSelector的设置，以 <code>redis-master-controller.yaml</code></p>
+<div class="listingblock">
+<div class="title">redis-master-controller.yaml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: redis-master
+  labels:
+    name: redis-master
+spec:
+  replicas: 1
+  selector:
+    name: redis-master
+  template:
+    metadata:
+      labels:
+        name: redis-master
+    spec:
+      containers:
+      - name: master
+        image: kubeguide/redis-master
+        ports:
+        - containerPort: 6379
+      nodeSelector:
+        zone: north</code></pre>
+</div>
+</div>
+</li>
+</ol>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+如果我们指定了Pod的nodeSelector条件，且在集群中不存在包含相应标签的Node，则即使在集群中还有其他可供使用的Node，这个Pod也无法被成功调度。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="truenodeaffinity-node亲和性调度"><a class="anchor" href="#truenodeaffinity-node亲和性调度"></a>NodeAffinity: Node亲和性调度</h4>
+<div class="paragraph">
+<p>NodeAffinity意为Node亲和性的调度策略，用于替换NodeSelector的全新调度策略，目前有两种节点亲和性表达</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>RequiredDuringSchedulingIgnoredDuringExecution：必须满足指定的规则才可以调度Pod到Node上</p>
+</li>
+<li>
+<p>PreferredDuringSchedulingIgnoredDuringExecution：强调优先满足指定规则，调度器会尝试调度Pod到Node上，但并不强求，相当于软限制。多个优先级规则还可以设置权重（weight）值，以定义执行的先后顺序</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>IgnoredDuringExecution的意思是：如果一个Pod所在的节点在Pod运行期间标签发生了变更，不再符合Pod的节点亲和性需求，则系统将忽略Node的Lebel变化</p>
+</div>
+<div class="paragraph">
+<p>下面的例子设置了NodeAffinity调度如下规则：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>requiredDuringSchedulingIgnoredDuringExecution要求只运行在amd64的节点上</p>
+</li>
+<li>
+<p>preferredDuringSchedulingIgnoredDuringExecution的要求是尽量运行在磁盘类型为ssd的节点上</p>
+</li>
+</ul>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Pod
+metadata:
+  name: with-node-affinity
+spec:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: beta.kubernetes.io/arch
+            operator: In
+            values:
+            - amd64
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 1
+        preference:
+          matchExpressions:
+          - key: disk-type
+            operator: In
+            values:
+            - ssd
+  containers:
+  - name: with-node-affinity
+    image: gcr.io/google_containers/pause:2.0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>NodeAffinity语法支持的操作符包括 <code>In</code>, <code>NotIn</code>, <code>Exists</code>, <code>DoesNotExist</code>, <code>Gt</code>, <code>Lt</code>。</p>
+</div>
+<div class="paragraph">
+<p>NodeAffinity规则设置的注意事项如下：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>如果同时定义了 nodeSelector和 nodeAffinity，那么必须两个条件都得到满足，Pod才能最终运行在指定的Node上。</p>
+</li>
+<li>
+<p>如果nodeAffinity指定了多个nodeSelectorTerms，那么其中一个能够匹配成功即可</p>
+</li>
+<li>
+<p>如果在nodeSelectorTerms中有多个matchExpressions，则一个几点必须满足所有matchExpressions才能运行该Pod</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="truepodaffinity-pod亲和与互斥调度策略"><a class="anchor" href="#truepodaffinity-pod亲和与互斥调度策略"></a>PodAffinity： Pod亲和与互斥调度策略</h4>
+<div class="paragraph">
+<p>根据在节点上正在运行的Pod的标签而不是节点的标签进行判断和调度，要求对节点和Pod两个条件进行匹配。这种规则可以描述为：如果在具有标签X的Node上运行了一个或者多个符合条件Y的Pod，那么Pod应该（如果是互斥的情况，那么就变成拒绝）运行在这个Node上</p>
+</div>
+<div class="paragraph">
+<p>这里的X指的是集群中的节点、机架区域等概念，通过Kubernetes内置节点标签中的key来进行声明。这个key的名字为 <code>topologyKey</code> （ <code>kubernetes.io/hostname</code>, <code>failure-domain.beta.kubernetes.io/zone</code>, <code>failure-domain.beta.kubernetes.io/region</code> ）</p>
+</div>
+<div class="paragraph">
+<p>与节点不同，Pod是属于某个命名空间的，所以条件Y表达的是一个或者全部命名空间中的一个Label Selector。Pod亲和与互斥条件设置也是 <code>requiredDuringSchedulingIgnoredDuringExecution</code> 和 <code>preferredDuringSchedulingIgnoredDuringExecution</code></p>
+</div>
+<div class="paragraph">
+<p>假设现在有一个名为pod-flag的Pod，带有标签 <code>security=S1</code> 和 <code>app=nginx</code>。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-affinity
+spec:
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoreDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: security
+            operator: In
+            values:
+            - S1
+        topologyKey: kubernetes.io/hostname
+  containers:
+  - name: with-pod-affinity
+    image: gcr.io/google_containers/pause:2.0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>互斥，要求新Pod与 <code>security=S1</code> 的Pod为同一个zone，但是不与 <code>app=nginx</code> 的Pod为同一个Node。创建Pod之后，</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Pod
+metadata:
+  name: pod-affinity
+spec:
+  affinity:
+    podAffinity:
+      requiredDuringSchedulingIgnoreDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: security
+            operator: In
+            values:
+            - S1
+        topologyKey: failure-domain.beta.kubernetes.io/zone
+    podAntiAffinity:
+      requiredDuringSchedulingIgnoreDuringExecution:
+      - labelSelector:
+          matchExpressions:
+          - key: app
+            operator: In
+            values:
+            - nginx
+        topologyKey: kubernetes.io/hostname
+  containers:
+  - name: with-pod-affinity
+    image: gcr.io/google_containers/pause:2.0</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Pod亲和性的操作符也包括 <code>In</code>, <code>NotIn</code>, <code>Exists</code>, <code>DoesNotExist</code>, <code>Gt</code>, <code>Lt</code>。</p>
+</div>
+<div class="paragraph">
+<p>原则上，topologyKey可以使用任何合法的标签Key赋值，但是出于性能和安全方面的考虑，对topologyKey有如下限制：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>在Pod亲和性和RequiredDuringScheduling的Pod互斥性的定义中，不允许使用空的topologyKey</p>
+</li>
+<li>
+<p>如果Admission controller包含了LimitPodHardAntiAffinityTopology，那么针对Required DuringScheduling的Pod互斥性定义就被限制为 <code>kubernetes.io/hostname</code>，要使用自定义的 topologyKey，</p>
+</li>
+<li>
+<p>在PreferredDuringScheduling类型的Pod互斥性定义中，空的topologyKey会被解释为 <code>kubernetes.io/hostname</code>, <code>failure-domain.beta.kubernetes.io/zone</code>, `failure-domain.beta.kubernetes.io/region`的组合</p>
+</li>
+<li>
+<p>如果不是上述情况，就可以采用任意合法的topologyKey</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>PodAffinity规则设置的注意事项如下：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>除了Label Selector和topologyKey，用户还可以指定Namespace列表来进行限制，Namespace和Label Selector同级，省略Namespace表示使用定义了 affinity/anti-affinity 的Pod所在的Namespace，如果Namespace被设置为空值（""），则表示所有Namespace</p>
+</li>
+<li>
+<p>在所有关联requiredDuringSchedulingIgnoreDuringExecution的matchExpressions全都满足之后，系统才能将Pod调度到某个Node上</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="truetaints和tolerations污点和容忍"><a class="anchor" href="#truetaints和tolerations污点和容忍"></a>Taints和Tolerations（污点和容忍）</h4>
+<div class="paragraph">
+<p>Taint让Node拒绝Pod的运行。Taints需要和Tolerations配合使用，让Pod避开那些不合适的Node，在Node上设置一个或多个Taint之后，除非Pod明确声明能够容忍这些污点，否则无法在这些Node上运行。Tolerations是Pod的属性，让Pod能够（非必须）运行在标注了Taint的Node上。</p>
+</div>
+<div class="paragraph">
+<p>创建Taint信息命令： <code>kubectl taint nodes node1 key=value:NoSchedule</code></p>
+</div>
+<div class="paragraph">
+<p>这个设置为node1加上了一个Taint，该Taint的键为key，值为value，Taint的效果是NoSchedule。这意为着除非Pod明确声明可以容忍这个Taint，否则就不会被调度到node1上。</p>
+</div>
+<div class="paragraph">
+<p>然后需要在Pod上声明Toleration，下面的两个Toleration都被设置为可以容忍具有该Taint的Node，使得Pod能够被调度到node1上</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">toerations:
+- key: "key"
+  operator: "Equal"
+  value: "value"
+  effect: "NoSchedule"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>或</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">toerations:
+- key: "key"
+  operator: "Exists"
+  effect: "NoSchedule"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>Pod的Toleration声明中的key和effect需要与Taint的设置保持一致，并且满足以下条件之一</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>operator的值是Exists（无须指定value）</p>
+</li>
+<li>
+<p>operator的值是Equal并且value相等。如果不指定operator，则默认值为Equal</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>另外，有如下两个特例</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>空的key配合Exists操作符能够匹配所有的键和值</p>
+</li>
+<li>
+<p>空的effect匹配所有的effect</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>系统允许在同一个Node上设置多个Taint，也可以在Pod上设置多个Toleration，Kubernetes调度器处理多个Taint和Toleration的逻辑顺序为：首先列出节点中所有的Taint，然后忽略Pod的Toleration能够匹配的部分，剩下的没有忽略的Taint就是对Pod的效果了。下面是几种特殊情况</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>如果在剩余的Taint中存在 <code>effect=NoSchedule</code>，则调度器不会把该Pod调度到这一节点上</p>
+</li>
+<li>
+<p>如果在剩余的Taint中没有NoSchedule效果，但有PreferNodeSchedule效果（系统尽量避免把这个Pod调度到这一节点上，但不是强制的），则调度器会尝试不把这个Pod指派给这个节点</p>
+</li>
+<li>
+<p>如果在剩余的Taint中有NoExecute小果果，并且这个Pod已经在该节点上运行，则会被驱逐；如果没有在该节点上运行，则也不会再被调度到该节点上。（如果Pod没有设置tolerationSeconds赋值，则会一直留在这一节点中）</p>
+</li>
+</ul>
+</div>
+</div>
+<div class="sect3">
+<h4 id="truepod-priority-preemption-pod优先级调度"><a class="anchor" href="#truepod-priority-preemption-pod优先级调度"></a>Pod Priority Preemption: Pod优先级调度</h4>
+<div class="paragraph">
+<p>在Kubernetes 1.8版本之前，当集群的可用资源不足时，在用户提交新的Pod创建请求后，该Pod会一直处于Pending状态，即使这个Pod是一个很重要的Pod，也只能被动等待其他Pod被删除并释放资源，才能有机会被调度成功。Kubernetes 1.8版本引入了基于Pod优先级抢占的调度策略，此时Kubernetes会尝试释放目标节点上低优先级的Pod，以腾出空间安置高优先级的Pod。我们可以通过以下几个维度来定义：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Priority，优先级</p>
+</li>
+<li>
+<p>QoS，服务质量等级</p>
+</li>
+<li>
+<p>系统定义的其他度量指标</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>优先级抢占调度策略的核心行为分别是驱逐（Eviction）与抢占（Preemption），这两种行为的使用场景不同，效果相同。Eviction是kubelet进程的行为，即当一个Node发生资源不足（under resource pressure）的情况下，该节点上的kubelet进程会执行驱逐动作，此时kubelet会综合考虑Pod的优先级、资源申请量与实际使用量等信息来计算哪些Pod需要被驱逐；当同样优先级的Pod需要被驱逐时，实际使用的资源量超过申请量最大倍数的高耗能Pod会被首先驱逐。对于QoS等级为 <code>Best Effort</code> 的Pod来说，由于没有定义资源申请（CPU/Memory Request），所以他们实际使用的资源可能非常大。Preemption则是Scheduler执行的行为，当一个新的Pod因为资源无法满足而不能被调度时，Scheduler可能（有权决定）选择驱逐部分低优先级的Pod实例来满足此Pod的调度目标。</p>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+Scheduler可能会驱逐Node A上的一个Pod以满足Node B上的一个新Pod的调度任务。比如：一个低优先级的Pod A在Node A（属于机架R）上运行，此时有一个高优先级的Pod B等待调度，目标节点同属于机架R的Node B，他们中的一个或全部都定义了anti-affinity规则，不允许在同一个机架上运行，此时Scheduler只好驱逐低优先级的Pod A以满足高优先级的Pod B的调度。
+</td>
+</tr>
+</table>
+</div>
+<div class="paragraph">
+<p>Pod优先级调度示例如下：</p>
+</div>
+<div class="paragraph">
+<p>首先由集群管理员创建PriorityClass，PriorityClass不属于任何命名空间</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: scheduling.k8s.io/v1beta1
+kind: PriorityClass
+metadata:
+  name: high-priority
+value: 100000
+globalDefault: false
+description: "This priority class should be used for XYZ serice pods only"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>上述yaml文件定义了一个名为high-priority的优先级类别，优先级为100000，数字越大，优先级越高，超过一亿的数字被系统保留，用于指派给系统组件。</p>
+</div>
+<div class="paragraph">
+<p>我们可以在任意Pod中引用上述Pod优先级类别：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  labels:
+    env: test
+spec:
+  containers:
+  - name: nginx
+    image: nginx
+    imagePullPolicy: IfNotPresent
+  priorityClassName: high-priority</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>优先级抢占的调度方式可能会导致调度陷入死循环状态，当Kubernetes集群配置了多个调度器时，这一行为可能就会发生。使用优先级抢占的调度策略可能会导致某些Pod永远无法被成功调度。因此优先级调度不但增加了系统的复杂性，还可能带来额外不稳定的因素。因此，一旦发生资源紧张的局面，首先要考虑的是集群的扩容，如果无法扩容，则再考虑有监管的优先级调度特性，比如结合基于Namespace的资源配额限制来约束任意优先级抢占行为。</p>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="trueinit-container初始化容器"><a class="anchor" href="#trueinit-container初始化容器"></a>Init Container（初始化容器）</h3>
+<div class="paragraph">
+<p>在很多应用场景中，应用在启动之前都需要进行如下初始化操作</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>等待其他关联组件正确运行（例如数据库或某个后台服务）</p>
+</li>
+<li>
+<p>基于环境变量或配置模板生成配置文件</p>
+</li>
+<li>
+<p>从远程数据库获取本地所需配置，或者将自身注册到某个中央数据库中</p>
+</li>
+<li>
+<p>下载相关依赖包，或者对系统进行一些预配置操作</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p><code>init conatiner</code> 用于在启动应用容器（app container）之前启动一个或多个初始化容器，完成应用容器所需的预置条件。 <code>init conatiner</code> 与应用容器在本质上是一样的，但他们是仅运行一次就结束的任务，并且必须在成功执行完成后，系统才能继续执行下一个容器。根据Pod的重启策略（RestartPolicy），当 <code>init conatiner</code> 执行失败，而且设置了 <code>RestartPolicy=Never</code> 时，Pod将会启动失败；而设置了 <code>RestartPolicy=Always</code> 时，Pod将会被系统自动重启</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-21_15-33-20.png" alt="Snipaste 2021 11 21 15 33 20">
+</div>
+</div>
+<div class="paragraph">
+<p>下面以Nginx应用为例，在启动Nginx之前，通过初始化容器busybox为Nginx创建一个index.html主页文件。这里init container和Nginx设置了一个共享的Volume，以供Nginx访问init container设置的index.html文件</p>
+</div>
+<div class="listingblock">
+<div class="title">nginx-init-containers.yaml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Pod
+metadata:
+  name: nginx
+  annotations:
+spec:
+  # These containers are run during pod
+  initialization
+  initContainers:
+  - name: install
+    image: busybox
+    command:
+    - wget
+    - "-O"
+    - "/work-dir/index.html"
+    - http://kubernetes.io
+    volumeMounts:
+    - name: workdir
+      mountPath: "/work-dir"
+  containers:
+  - name: nginx
+    image: nginx
+    ports:
+    - containerPort: 80
+    volumeMounts:
+    - name: workdir
+      mountPath: /usr/share/nginx/html
+  dnsPolicy: Default
+  volumes:
+  - name: workdir
+    emptyDir: {}</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p><code>init conatiner</code> 与应用容器的区别如下：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><code>init conatiner</code> 的运行方式与应用容器不同，他们必须先于应用容器执行完成，当设置了多个 <code>init conatiner</code> 时，将按顺序逐个运行，并且只有前一个 <code>init conatiner</code> 运行成功后才能运行后一个 <code>init conatiner</code>。当所有 <code>init conatiner</code> 都成功运行后，Kubernetes才会初始化Pod的各种信息，并开始创建和运行应用容器</p>
+</li>
+<li>
+<p>在 <code>init conatiner</code> 的定义中也可以设置资源限制、 Volume的使用和安全策略，等等。但资源限制的设置与应用容器略有不同</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>如果多个 <code>init conatiner</code> 都定义了资源请求/资源限制，则取最大的值作为所有 <code>init conatiner</code> 的资源请求值/资源限制值</p>
+</li>
+<li>
+<p>Pod的有效（effective）资源请求值/资源限制值取以下二者中的较大值：所应用容器的资源请求值/资源限制值之和； <code>init conatiner</code> 的有效资源请求值/资源限制值</p>
+</li>
+<li>
+<p>调度算法将基于Pod的有效资源请求值/资源限制值进行计算，也就是说 <code>init conatiner</code> 可以初始化操作预留系统资源，即使后续应用容器无须使用这些资源</p>
+</li>
+<li>
+<p>Pod的有效QoS等级适用于 <code>init conatiner</code> 和应用容器</p>
+</li>
+<li>
+<p>资源配额和限制将根据Pod的有效资源请求值/资源限制值计算生效</p>
+</li>
+<li>
+<p>Pod级别的cgroup将基于Pod的有效资源请求/限制，与调度机制一致</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p><code>init conatiner</code> 不能设置readinessProbe探针，因为必须在他们成功运行后才能继续运行在Pod中定义的普通容器。在Pod重新启动时， <code>init conatiner</code> 将会重新运行，常见的Pod重启场景如下：</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p><code>init conatiner</code> 的镜像被更新时，<code>init conatiner</code> 将会重新运行，导致Pod重启。仅更新应用容器的镜像指挥使得应用容器被重启</p>
+</li>
+<li>
+<p>Pod的infrastructure容器更新时，Pod将会重启</p>
+</li>
+<li>
+<p>若Pod中的所有应用容器都终止了，并且 <code>RestartPolicy=Always</code>，则Pod会重启</p>
+</li>
+</ol>
+</div>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truepod的升级和回滚"><a class="anchor" href="#truepod的升级和回滚"></a>Pod的升级和回滚</h3>
+<div class="sect3">
+<h4 id="truedeployment的升级"><a class="anchor" href="#truedeployment的升级"></a>Deployment的升级</h4>
+<div class="paragraph">
+<p>以Deployment nginx为例：</p>
+</div>
+<div class="listingblock">
+<div class="title">nginx-deployment.yaml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.7.9
+        ports:
+        - containerPort: 80</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>现在Pod镜像需要被更新为 <code>Nginx:1.9.1</code>，我们可以通过 <code>kubectl set image</code> 命令为Deplyment设置新的镜像名称： <code>kubectl set image deployment/nginx-deployment nginx=nginx:1.9.1</code></p>
+</div>
+<div class="paragraph">
+<p>另一种更新的方法是使用 <code>kubectl edit</code> 命令修改Deployment的配置，将 <code>spec.template.spec.containers[0].image</code> 从 <code>Nginx:1.7.9</code> 更改为 <code>Nginx:1.9.1</code> : <code>kubectl edit deployment/nginx-deployment</code></p>
+</div>
+<div class="paragraph">
+<p>更新的流程，初始创建Deployment时，系统创建了一个ReplicaSet，并按照用户的需求创建了3个Pod副本，当更新Deployment时，系统创建了一个新的ReplicaSet，并将其副本数量扩展到1，然后将旧的ReplicaSet缩减为2.之后继续按照相同的更新策略对新旧两个ReplicaSet进行逐个调整。最后，新的ReplicaSet运行了3个新版本Pod副本，旧的ReplicaSet副本数量则缩减为0.如图所示</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-21_16-10-38.png" alt="Snipaste 2021 11 21 16 10 38">
+</div>
+</div>
+<div class="paragraph">
+<p>在整个升级的过程中，系统会保证至少有两个Pod可用，并且最多同时运行4个Pod，这是Deployment通过复杂的算法完成的。Deployment需要确保在整个更新过程中只有一定数量的Pod可能处于不可用状态。在默认情况下，Deployment确保可用的Pod总数至少为所需的副本数量减1，也就是最多1个不可用（maxUnavailable=1）。Deployment还需要确保在整个更新过程中Pod的总数最多比所需的Pod数量多1个，也就是最多1个浪涌值（maxSurge=1）。Kubernetes 1.6版本开始，maxUnavailable和maxSurge的默认值将从1，1更新为所需副本数量的25%，25%。</p>
+</div>
+<div class="paragraph">
+<p>在Deployment的定义中可以通过 <code>spec.strategy</code> 指定Pod的更新策略，目前支持两种策略： Recreate（重建）和RollingUpdate（滚动更新），默认值为RollingUpdate。</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Recreate： 设置 <code>spec.strategy.type=Recreate</code>， 表示Deployment在更新Pod时，会先杀掉所有正在运行的Pod，然后创建新的Pod</p>
+</li>
+<li>
+<p>RollingUpdate： 设置 <code>spec.strategy.type=RollingUpdate</code>，表示Deployment会以滚动更新的方式来逐个更新Pod。同时，可以通过设置 `spec.strategy.rollingUpdate`下的两个参数（maxUnavaliable和maxSurge）来控制滚动更新的过程</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>下面对滚动更新时两个主要参数的说明如下：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>spec.strategy.rollingUpdate.maxUnavailable: 用于指定Deployment在更新过程中不可用状态的Pod数量的上限。该maxUnavailable的数值可以时绝对值或Pod期望的副本数的百分比，如果被设置为百分比，那么系统会先以向下取整的方式计算出绝对值（整数）。而当另一个参数maxSurge被设置为0时，maxUnavailable则必须设置为绝对数值大于0.</p>
+</li>
+<li>
+<p>spec.strategy.rollingUpdate.maxSurge: 用于指定Deployment更新Pod的过程中Pod总数超过Pod期望副本数部分的最大值。该maxSurge的数值可以时绝对值或Pod期望副本数的百分比。如果设置为百分比，那么系统会先按照向上取整的方式计算出绝对数值。</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>这里需要注意多重更新（Rollover）的情况，如果Deployment的上一次更新正在进行，此时用户再次发起Deployment的更新操作，那么Deployment会为每一次更新都创建一个ReplicaSet，而每次在新的ReplicaSet创建成功后，会逐个增加Pod副本数，同时将之前正在扩容的ReplicaSet停止扩容，并将其加入旧版本ReplicaSet列表中，然后开始缩容至0的操作。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="truedeployment的回滚"><a class="anchor" href="#truedeployment的回滚"></a>Deployment的回滚</h4>
+<div class="paragraph">
+<p>在默认情况下，所有Deployment的发布历史记录都被保留在系统中，以便我们随时进行回滚（可以配置历史记录数量）。</p>
+</div>
+<div class="paragraph">
+<p>为了回滚到之前稳定版本的Deployment，首先用 <code>kubectl rollout history</code> 命令检查这个Deployment部署的历史记录：</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs">kubectl rollout history deployment/nginx-deployment
+# 查看特定版本的详细信息
+kubectl rollout history deployment/nginx-deployment --revision=3
+# 回滚到上一个部署版本
+kubectl rollout undo deployment/nginx-deployment
+# 回滚到指定版本
+kubectl rollout undo deployment/nginx-deployment --to-revision=2</code></pre>
+</div>
+</div>
+<div class="admonitionblock note">
+<table>
+<tr>
+<td class="icon">
+<i class="fa icon-note" title="Note"></i>
+</td>
+<td class="content">
+在创建Deployment时使用 <code>--record</code> 参数，就可以在 <code>CHANGE-CAUSE</code> 列看到每个版本使用的命令了。另外Deployment的更新操作是在Deployment进行部署（Rollout）时被触发的，这意为者当且仅当Deployment的Pod模板（即spec.template）被更改时才会创建新的修订版本，例如更新模板标签或容器镜像。其他更新操作（如扩展副本数）将不会触发Deployment的更新操作，这也意味着我们将Deployment回滚到之前的版本时，只有Deployment的Pod模板部分会被修改。
+</td>
+</tr>
+</table>
+</div>
+</div>
+<div class="sect3">
+<h4 id="true暂停和恢复deployment的部署操作以完成复杂的修改"><a class="anchor" href="#true暂停和恢复deployment的部署操作以完成复杂的修改"></a>暂停和恢复Deployment的部署操作，以完成复杂的修改</h4>
+<div class="paragraph">
+<p>对于一次复杂的Deployment配置修改，为了避免频繁触发Deployment的更新操作，可以先暂停Deployment的更新操作，然后进行配置修改，再恢复Deployment，一次性触发完整的更新操作，就可以避免不必要的Deployment更新操作了。</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="bash" class="language-bash hljs"># 暂停Deployment的更新操作
+kubectl rollout pause deployment/nginx-deployment
+# 修改Deployment的镜像信息
+kubectl set image deploy/nginx-deployment nginx=nginx:1.9.1
+# 恢复这个Deployment的部署操作
+kubectl rollout resume deploy nginx-deployment</code></pre>
+</div>
+</div>
+</div>
+<div class="sect3">
+<h4 id="true使用kubectl-rolling-update-命令完成rc的滚动升级"><a class="anchor" href="#true使用kubectl-rolling-update-命令完成rc的滚动升级"></a>使用kubectl rolling-update 命令完成RC的滚动升级</h4>
+<div class="paragraph">
+<p>对于RC的滚动升级，Kubernetes还提供了一个 `kubectl rolling-update`命令进行实现。该命令创建了一个新的RC，然后自动控制旧的RC中的Pod副本数量逐渐减少到0，同时新的RC中的Pod副本数量从0逐步增加到目标值，来完成Pod的升级。需要注意的是，系统要求新的RC与旧的RC都在相同的命名空间内。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="true其他管理对象的更新策略"><a class="anchor" href="#true其他管理对象的更新策略"></a>其他管理对象的更新策略</h4>
+<div class="paragraph">
+<p>Kubernetes从1.6版本开始，对DaemonSet和StatefulSet的更新策略也引入类似与Deployment的滚动升级，通过不同的策略自动完成应用的版本升级。</p>
+</div>
+<div class="sect4">
+<h5 id="truedaemonset"><a class="anchor" href="#truedaemonset"></a>DaemonSet</h5>
+<div class="paragraph">
+<p>目前DaemonSet的升级策略包括两种： OnDelete和RollingUpdate</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>OnDelete： DaemonSet的默认升级策略，在创建好新的DaemonSet配置之后，新的Pod并不会被自动创建，直到用户手动删除旧版本的Pod，才触发新建操作</p>
+</li>
+<li>
+<p>RollingUpdate： 旧版本的Pod将被自动杀掉，然后自动创建新版本的DaemonSet Pod，整个过程与普通Deployment的滚动升级一样是可控的。不过有两点不同于普通Pod的滚动升级：一是目前Kubernetes还不支持查看和管理DaemonSet的更新历史记录；二是DaemonSet的回滚（Rollback）并不能如同Deployment一样直接通过 `kubectl rollback`命令实现，必须通过再次提交旧版本的配置方式实现。</p>
+</li>
+</ol>
+</div>
+</div>
+<div class="sect4">
+<h5 id="truestatefulset的更新策略"><a class="anchor" href="#truestatefulset的更新策略"></a>StatefulSet的更新策略</h5>
+<div class="paragraph">
+<p>Kubernetes从1.6版本开始，针对StatefulSet的更新策略主键向Deployment和DaemonSet的更新策略看齐，也将实现RollingUpdate、Paritioned和OnDelete这几种更新策略，</p>
+</div>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="truepod的扩缩容"><a class="anchor" href="#truepod的扩缩容"></a>Pod的扩缩容</h3>
+<div class="paragraph">
+<p>Pod的扩缩容操作有手动和自动两种模式，手动模式通过执行 <code>kubectl scale</code> 命令或通过RESTful API对一个Deployment/RC进行Pod副本数量的设置，即可一键完成。自动模式则需要用户更具某个性能指标或者自定义业务指标，并指定Pod副本数量的范围，系统将自动在这个范围内根据性能指标的变化进行调整</p>
+</div>
+<div class="sect3">
+<h4 id="true自动扩缩容机制"><a class="anchor" href="#true自动扩缩容机制"></a>自动扩缩容机制</h4>
+<div class="paragraph">
+<p><code>Horizontal Pod AutoScaler(HPA)</code> 控制器，用于实现基于CPU使用率进行自动Pod扩缩容的功能。HPA控制器基于Master的 <code>kube-controller-manager</code> 服务启动参数 <code>--horizontal-pod-autoscaler-sync-period</code> 定义的探测周期（默认值为15s），周期性的监测目标Pod的资源性能指标，并与HPA资源对象中的扩缩容条件进行对比，在满足条件时对Pod副本数量进行调整。</p>
+</div>
+<div class="paragraph">
+<p>HPA的工作原理：Kubernetes中的某个Metrics Server（Heapster或自定义Metrics Server）持续采集所有Pod副本的指标数据。HPA控制器通过Metrics Server的API（Heapster的API或聚合API）获取这些数据，基于用户定义的扩缩容规则进行计算，得到目标Pod副本数量。当目标副本数量与当前副本数量不同时，HPA控制器就向Pod的副本控制器发起scale操作。</p>
+</div>
+<div class="paragraph">
+<p><strong>指标的类型</strong></p>
+</div>
+<div class="paragraph">
+<p>Master的kube-controller-manager服务持续监测目标Pod的某种性能指标，以计算是否需要调整副本数量。目前Kubernetes支持的指标类型如下：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Pod资源使用率：Pod级别的性能指标，通常是一个比率值，例如CPU使用率</p>
+</li>
+<li>
+<p>Pod自定义指标：Pod级别的性能指标，通常是一个数值，例如接收请求数量</p>
+</li>
+<li>
+<p>Object自定义指标或外部自定义指标：通常是一个数值，需要容器应用以某种方式提供</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>扩缩容算法详解：Autoscaler控制器从聚合API获取到Pod性能指标数据之后，基于下面的算法计算出目标Pod副本数量，与当前运行的Pod副本数量进行对比，决定是否需要进行扩缩容操作： <code>desiredReplicas = ceil[currentPeplicas * ( currentMetricValue / desiredMetricValue)]</code></p>
+</div>
+<div class="paragraph">
+<p>即当前副本数*（当前指标值/期望的指标值），将结果向上取整。</p>
+</div>
+<div class="paragraph">
+<p>此外，存在几种Pod异常的情况，如下所述：</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Pod正在被删除（设置了删除时间戳）：将不会计入目标Pod副本数量</p>
+</li>
+<li>
+<p>Pod的当前指标值无法获得：本次探测不会将这个Pod纳入目标Pod副本数量，后续的探测会被重新纳入计算范围</p>
+</li>
+<li>
+<p>如果指标类型是CPU使用率，则对于正在启动但是还未达到Ready状态的Pod，也暂时不会纳入目标副本数量范围。可以通过 kubectl-controller-manager 服务的启动参数 <code>--horizontal-pod-autoscaler-initial-readiness-delay</code> 设置首次探测Pod是否Ready的延时时间，默认值为30s。另一个启动参数 <code>--horizontal-pod-autoscaler-cpuinitialization-period</code> 设置首次采集Pod的CPU使用率的延时时间</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="true使用statefulset搭建mongodb集群"><a class="anchor" href="#true使用statefulset搭建mongodb集群"></a>使用StatefulSet搭建MongoDB集群</h3>
+<div class="paragraph">
+<p>本节以MongoDB为例，使用StatefulSet完成MongoDB集群的创建，为每个MongoDB实例在共享存储中（这里采用GlusterFS）都申请一片存储空间，以实现一个无单点故障、高可用、可动态扩展的MongoDB集群。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-22_16-40-19.png" alt="Snipaste 2021 11 22 16 40 19">
+</div>
+</div>
+<div class="sect3">
+<h4 id="true前提条件"><a class="anchor" href="#true前提条件"></a>前提条件</h4>
+<div class="paragraph">
+<p>在创建StatefulSet之前，需要确保在Kubernetes集群中管理员已经创建好共享存储，并能够与StorageClass对接，以实现动态存储供应的模式。</p>
+</div>
+</div>
+<div class="sect3">
+<h4 id="true创建statefulset"><a class="anchor" href="#true创建statefulset"></a>创建StatefulSet</h4>
+<div class="paragraph">
+<p>为了完成MongoDB集群的搭建，需要创建如下三个资源对象</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>一个StorageClass，用于StatefulSet自动为各个应用Pod申请PVC</p>
+</li>
+<li>
+<p>一个Headless Service，用于维护MongoDB集群的状态</p>
+</li>
+<li>
+<p>一个StatefulSet</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>首先创建一个StorageClass对象</p>
+</div>
+<div class="listingblock">
+<div class="title">storageclass-fast.yaml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: fast
+provisioner: kubernetes.io/glusterfs
+parameters:
+  resturl: "http://&lt;heketi-rest-url&gt;"</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>执行 <code>kubectl create</code> 命令创建该StorageClass： <code>kubectl create -f storageclass-fast.yaml</code></p>
+</div>
+<div class="paragraph">
+<p>接下来，创建对应的Headless Service。</p>
+</div>
+<div class="paragraph">
+<p><code>mongo-sidecar</code> 作为MongoDB集群的管理者，将使用此Headless Service来维护各个MongoDB实例之间的集群关系，以及集群规模变化时自动更新。</p>
+</div>
+<div class="listingblock">
+<div class="title">mongo-headless-service.yaml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1
+kind: Service
+metadata:
+  name: mongo
+  labels:
+    name: mongo
+spec:
+  ports:
+  - port: 27017
+    targetPort: 27017
+  clusterIp: None
+  selector:
+    role: mongo</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>使用 <code>kubectl create</code> 命令创建该Service： <code>kubectl create -f mongo-headless-service.yaml</code></p>
+</div>
+<div class="paragraph">
+<p>最后，创建MongDB StatefulSet</p>
+</div>
+<div class="listingblock">
+<div class="title">statefulset-mongo.yaml</div>
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: mongo
+spec:
+  serviceName: "mongo"
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        role: mongo
+        environment: test
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: mongo
+        image: mongo
+        command:
+        - mongod
+        - "--replSet"
+        - rs0
+        - "--smallfiles"
+        - "--noprealloc"
+        ports:
+        -containerPort: 27017
+        volumeMounts:
+        - name: mongo-persistent-storage
+          mountPath: /data/db
+      - name: mongo-sidecar
+        image: cvallance/mongo-k8s-sidecar
+        env:
+        - name: MONGO_SIDECAR_POD_LABELS
+          value: "role=mongo,environment=test"
+        - name: KUBERNETES_MONGO_SERVICE_NAME
+          value: "mongo"
+    volumeClainTemplates:
+    - metadata:
+        name: mongo-persistent-storage
+        annotations:
+          volume.beta.kubernetes.io/storage-class: "fast"
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 100Gi</code></pre>
+</div>
+</div>
+<div class="paragraph">
+<p>其中的主要配置说明如下：</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>在该StatefulSet的定义中包括两个容器： mongo和mongo-sidecar。mongo时主服务程序，mongo-sidecar是将多个mongo实例进行集群设置的工具。mongo-sidecar中的环境变量如下：</p>
+<div class="olist loweralpha">
+<ol class="loweralpha" type="a">
+<li>
+<p>MONGO_SIDECAR_POD_LABELS：设置为mongo容器的标签，用于sidecar查询它所需要管理的MongoDB集群实例</p>
+</li>
+<li>
+<p>KUBERNETES_MONGO_SERVICE_NAME： 它的值为mongo，表示sidecar将使用mongo这个服务名来完成MongoDB集群的设置。</p>
+</li>
+</ol>
+</div>
+</li>
+<li>
+<p>replicas=3表示这个MongoDB集群由3个mongo实例组成</p>
+</li>
+<li>
+<p>volumeClainTemplates是StatefulSet最重要的存储设置。 <code>annotations</code> 设置为 <code>volume.beta.kubernetes.io/storage-class: "fast"</code> 表示使用名为fast的StorageClass自动为每个mongo Pod实例分配后端存储。 <code>resources.requests.storage=100Gi</code> 表示为每个mongo实例都分配100GiB的磁盘空间。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>使用 <code>kubectl create</code> 命令创建这个StatefulSet： <code>kubectl create -f statefulset-mongo.yaml</code></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="true深入掌握service"><a class="anchor" href="#true深入掌握service"></a>深入掌握Service</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="trueservice定义详解"><a class="anchor" href="#trueservice定义详解"></a>Service定义详解</h3>
+<div class="listingblock">
+<div class="content">
+<pre class="highlightjs highlight"><code data-lang="yaml" class="language-yaml hljs">apiVersion: v1   // Required
+kind: Service    // Required
+metadata:
+  name: String   // Required
+  namespace: String  // Required
+  labels:
+    - name: string
+  annotations:
+    - name: string
+spec:            // Required
+  selector: []   // Required
+  type: string   // Required
+  clusterIP: string
+  sessionAffinity: string
+  ports:
+  - name: string
+    protocol: string
+    port: int
+    targetPort: int
+    nodePort: int
+  status:
+    loadBalancer:
+      ingress:
+        ip: string
+        hostname: string</code></pre>
+</div>
+</div>
+<table class="tableblock frame-all grid-all stretch">
+<caption class="title">Table 1. 属性说明</caption>
+<colgroup>
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+<col style="width: 25%;">
+</colgroup>
+<thead>
+<tr>
+<th class="tableblock halign-left valign-top">属性名称</th>
+<th class="tableblock halign-left valign-top">取值类型</th>
+<th class="tableblock halign-left valign-top">是否必选</th>
+<th class="tableblock halign-left valign-top">取值说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">version</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">v1</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">kind</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Service</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">metadata</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">元数据</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">metadata.name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Service名称，需符合RFC 1035规范</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">metadata.namespace</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">命名空间，不指定系统时间将使用default的命名空间</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">metadata.labels[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">list</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">自定义标签属性列表</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">metadata.annotation[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">list</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">自定义注解属性列表</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spec</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">详细描述</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spec.selector[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">list</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Label Selector配置，将选择具有指定Label标签的Pod作为管理范围</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spec.type</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Required</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Service的类型，指定Service的访问方式，默认值为ClusterIP。</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spec.clusterIP</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">虚拟服务IP地址，当type=ClusterIP时，如果不指定，则系统进行自动分配，也可以手工指定；当type=LoadBalancer时，则需要指定</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spec.sessionAffinity</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">是否支持Session，可选值为ClientIP，默认值为空。ClientIP：表示将同一个客户端（根据客户端的IP地址决定）的访问请求都转发到同一个后端Pod</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spec.ports[]</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">list</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Service需要暴露的宽口列表</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spec.ports[].name</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">端口名称</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spec.ports[].protocol</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">端口协议，支持TCP和UDP，默认值为TCP</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spec.ports[].port</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">服务监听的端口号</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spec.ports[].targetPort</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">需要转发到后端Pod的端口号</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">spec.ports[].nodePort</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">int</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">当spec.type=NodePort时，指定映射到物理机的端口号</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">Status</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">当spec.type=LoadBalancer时，设置外部负载均衡器的地址，用于公有云环境</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">status.loadBalancer</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">外部负载均衡器</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">status.loadBalancer.ingress</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">object</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">外部负载均衡器</p></td>
+</tr>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">status.loadBalancer.ingress.ip</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">外部负载均衡器的IP地址</p></td>
+</tr>
+</tbody>
+<tfoot>
+<tr>
+<td class="tableblock halign-left valign-top"><p class="tableblock">status.loadBalancer.ingress.hostname</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">string</p></td>
+<td class="tableblock halign-left valign-top"></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">外部负载均衡器的主机名</p></td>
+</tr>
+</tfoot>
+</table>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="true自我整理"><a class="anchor" href="#true自我整理"></a>自我整理</h2>
+<div class="sectionbody">
+
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 1.0 2021-02-24<br>
+Last updated 2022-03-05 14:08:49 +0800
+</div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/styles/github.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.15.6/highlight.min.js"></script>
+<script>hljs.initHighlighting()</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+## Elasticsearch是什么
+
+### Data in: documents and indices
+
+Elasticsearch是一个分布式的文档存储引擎。没有将数据列式的存储为一行，而是把复杂的数据结构序列化成JSON文档存储。当在集群中有多个Elasticsearch nodes的时候，文档被交叉存储在集群的不同node上，并且可以通过任意一个node立即获取到数据。
+
+当一个文档被保存的时候，可以在1秒内被完全索引，并且可以查询。Elasticsearch使用一种叫做倒排索引来实现快速的文档搜索。
+
+node，shard，index的关系，node是真实的物理机器，一个index中的数据被切分成几份shard分布在不同的node上，shard分为主shard和副本shard，index中对应的document都是主shard中的，副本shard只是主shard的备份。但是副本shard可以用于搜索，加大副本shard的数量可以增加搜索的性能。主分片的数量在index创建的时候就固定下来了，不可更改，但是副本shard的数量可以在任何时间修改。
+
+shard数量的优化，越多的shard越多的负载，但是维护shard将会更简单，因为查询的时候需要去所有的shard中查询，需要更多的网络开销，但是shard的移动将会更快速。shard越少意味着shard的体积更大，移动的时候不方便，但是查询有可能速度更快，需要根据具体情况进行设定。
+
+建议：确保平均每个shard的大小在几GB或者几十GB，基于时间的数据他们的大小在20-40GB。避免大量碎片问题。 一个节点可以容纳的分片数量与可用的堆空间成正比。 作为一般规则，每GB堆空间的分片数应小于 20。
+

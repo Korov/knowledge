@@ -4,7 +4,7 @@
 
 ## 1.2 消息引擎系统
 
-![image-20191127232934697](picture\image-20191127232934697.png)
+![image-20191127232934697](http://korov.myqnapcloud.cn:19000/images/image-20191127232934697.png)
 
 在设计一个消息引擎系统时需要考虑两个重要因素：
 
@@ -53,7 +53,7 @@ Kafka通过智能化的分区领导者选举来实现负载均衡的。Kafka使�
 
 定位：分布式流式处理平台。
 
-![image-20191128163747119](picture\image-20191128163747119.png)
+![image-20191128163747119](http://korov.myqnapcloud.cn:19000/images/image-20191128163747119.png)
 
 Kafka服务器的官方名字叫做**broker**，而在Kafka集群中的每条消息都归属于一个topic。
 
@@ -61,7 +61,7 @@ Kafka服务器的官方名字叫做**broker**，而在Kafka集群中的每条消
 
 Kafka中的消息格式由很多字段组成，其中的很多字段都是用于关系消息的元数据字段，对用户来说是完全透明的。Kafka消息格式共经历了3次变迁，他们分别被称为V0，V1，V2。目前大部分用户使用的都是V1格式。
 
-![image-20191128164221815](picture\image-20191128164221815.png)
+![image-20191128164221815](http://korov.myqnapcloud.cn:19000/images/image-20191128164221815.png)
 
 消息由消息头部，key和value组成。
 
@@ -75,7 +75,7 @@ topic只是一个逻辑概念，代表了一类消息，也可以认为是消息
 
 Kafka中的topic通常都会被多个消费者订阅，因此出于性能的考量，Kafka采用了topic-partition-message的三级结构来分散负载。从本质上说，每个topic都由若干个partition组成。
 
-![image-20191128170509823](picture\image-20191128170509823.png)
+![image-20191128170509823](http://korov.myqnapcloud.cn:19000/images/image-20191128170509823.png)
 
 Kafka中的partition是不可修改的有序消息序列，每个partition有自己专属的partition号，通常从0开始，用户对partition唯一能做的操作就是在消息序列的尾部追加写入消息。partition上的每条消息都会被分配一个唯一的序列号--该序列号被称为位移（offset）。该位移值是从0开始顺序递增的整数。
 
@@ -107,7 +107,7 @@ Kafka为partition动态维护一个replica集合，该集合中的所有replica�
 
 配置zoo.cfg文件
 
-![image-20191128221556270](picture\image-20191128221556270.png)
+![image-20191128221556270](http://korov.myqnapcloud.cn:19000/images/image-20191128221556270.png)
 
 - tickTime：zookeeper最小的时间单位，用于丈量心跳时间和超时时间等。通常设置成默认值2秒即可
 - dataDir：非常重要的参数！zookeeper会在内存中保存系统快照，并定期写入该路径指定的文件夹中。生产环境中需要注意该文件夹的磁盘占用情况
@@ -182,7 +182,7 @@ producer的首要功能就是向某个topic分区发送一条消息，首先需�
 4. 而producer的另一个工作线程（I/O发送线程）则负责实时地从该缓冲区中提取出准备就绪的消息封装进一个批次（batch，每个batch中的数据都是发往同一个topic的同一个partition），统一发送给对应的broker。
 5. broker在收到这些消息时会返回一个响应。如果消息成功写入kafka，就返回一个RecordMetaData对象，它包含了主题和分区信息，以及记录在分区里的偏移量。如果写入失败，则会返回一个错误，生产者在收到错误之后会尝试重新发送消息，几次之后如果还是失败，就返回错误信息。
 
-![image-20191129164720558](picture\image-20191129164720558.png)
+![image-20191129164720558](http://korov.myqnapcloud.cn:19000/images/image-20191129164720558.png)
 
 ```java
 public class ProducerTest {
@@ -328,7 +328,7 @@ producer端通过一个io线程将缓存中的数据发送到broker，若此时p
 
 **多线程多KafkaProducer实例**：每个producer主线程都构造一个KafkaProducer实例，并且保证此实例在该线程中封闭。
 
-![image-20191130015150689](picture\image-20191130015150689.png)
+![image-20191130015150689](http://korov.myqnapcloud.cn:19000/images/image-20191130015150689.png)
 
 # 5 consumer开发
 
@@ -481,11 +481,11 @@ bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --f
 
 ### 异步同步混合使用
 
-![image-20201125004724855](picture/image-20201125004724855.png)
+![image-20201125004724855](http://korov.myqnapcloud.cn:19000/images/image-20201125004724855.png)
 
 ### 提交特定偏移量
 
-![image-20201125004912991](picture/image-20201125004912991.png)
+![image-20201125004912991](http://korov.myqnapcloud.cn:19000/images/image-20201125004912991.png)
 
 ## 再均衡监听器
 
@@ -588,7 +588,7 @@ broker会在它所监听的每一个端口上运行一个Acceptor线程，这个
 
 常见的请求类型有：生产请求（生产者发送的请求，它包含客户端要写入broker的消息），获取请求（在消费者和跟随者副本需要从broker读取消息时发送的请求）
 
-![image-20201128104349000](picture/image-20201128104349000.png)
+![image-20201128104349000](http://korov.myqnapcloud.cn:19000/images/image-20201128104349000.png)
 
 客户端需要将请求发送到正确的broker上，客户端使用了**元数据请求**，该请求里包含了客户端感兴趣的主题列表，服务器端的响应消息里指明了这些主题所包含的分区，每个分区都有哪些副本，以及哪个副本是首领。元数据请求可以发送给任意一个broker，因为所有broker都缓存了这些信息
 
@@ -655,7 +655,7 @@ Kafka创建topic的途径有4种：
 - 通过发送MetadataRequest请求且broker端设置了auto.create.topics.enable为true
 - 通过向ZooKeeper的/brokers/topics路径下写入以topic名称命名的子结点。
 
-![image-20200111164237850](picture\image-20200111164237850.png)
+![image-20200111164237850](http://korov.myqnapcloud.cn:19000/images/image-20200111164237850.png)
 
 示例：创建一个topic，名为test-topic，6个分区，每个分区3个副本，同时指定该topic的日志留存时间3天
 

@@ -16,8 +16,6 @@
 
 EventLoop定义了Netty的核心抽象，用于处理连接的声明周期中所发生的事件。
 
-![image-20200719132950602](picture/netty-in-action.png)
-
 他们之间的关系是：
 
 - 一个EventLoopGroup包含一个或者多个EventLoop
@@ -40,7 +38,7 @@ Netty中所有的的IO操作都是异步的，ChannelFuture接口中的addListen
 
 使得事件流经ChannelPipeline时ChannelHandler的工作，他们是在应用程序的初始化或者引导阶段被anzhaung的。这些对象接受事件、执行他们所实现的处理逻辑，并将数据传递给链中的下一个ChannelHandler。他们的执行顺序是由他们被添加的顺序所决定的。实际上，被我们称为ChannelPipeline的是这些ChannelHandler的编排顺序。
 
-![image-20200719134123082](picture/image-20200719134123082.png)
+![image-20200719134123082](http://korov.myqnapcloud.cn:19000/images/image-20200719134123082.png)
 
 上图显示了入站和出战ChannelHandler可以被安装到同一个ChannelPipeline中。如果一个消息或者任何其他的入站事件被读取，那么它会从ChannelPiple的头部开始流动，并被传递给第一个ChannelInboundHandler。这个ChannelHandler不一定会实际的修改数据，具体取决于它的具体功能，在这之后，数据将会被传递给链中的下一个ChannelInboundHandler。最终数据将会到达ChannelPipeline的尾端，届时所有处理就都结束了。
 

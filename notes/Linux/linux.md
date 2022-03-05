@@ -2,7 +2,7 @@
 
 ### 5.2.1 Linux文件属性
 
-![image-20191205200500394](picture/image-20191205200500394.png)
+![image-20191205200500394](http://korov.myqnapcloud.cn:19000/images/image-20191205200500394.png)
 
 #### 1 第一列代表这个文件的类型与权限
 

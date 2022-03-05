@@ -25,7 +25,7 @@
 
 右击选择Properties菜单项
 
-![20200229200709](picture/20200229200709.png)
+![20200229200709](http://korov.myqnapcloud.cn:19000/images/20200229200709.png)
 
 此窗口主要用于设置模型对象属性。
 
@@ -33,25 +33,25 @@
 
 PowerDesigner中每种对象都应符合一定的规范，为了保证对象的有效性，PowerDesigner提供了模型检查功能，可以通过`Tools->Check Model`打开模型检查窗口。
 
-![image-20200229201849891](picture/image-20200229201849891.png)
+![image-20200229201849891](http://korov.myqnapcloud.cn:19000/images/image-20200229201849891.png)
 
 ### 查找对象窗口
 
 `Edit->Find Objects`打开查找模型窗口，里面设置了各种查询条件，可以自行选择
 
-![image-20200229202137076](picture/image-20200229202137076.png)
+![image-20200229202137076](http://korov.myqnapcloud.cn:19000/images/image-20200229202137076.png)
 
 ## 模型转换
 
 已存在的模型生成新模型，并能够保持原模型与目标模型之间的同步
 
-![image-20200229203615604](picture/image-20200229203615604.png)
+![image-20200229203615604](http://korov.myqnapcloud.cn:19000/images/image-20200229203615604.png)
 
 # 需求模型RQM
 
 需求分析对于整个软件开发过程以及产品质量至关重要，需求分析的好坏直接影响到软件开发的成败。RQM能够通过精确的列表和说明来描述系统需求，并且可以让使用RQM的用户能够有效的组织、设计模型对象以及进行之间的相互关联。
 
-![image-20200229204354233](picture/image-20200229204354233.png)
+![image-20200229204354233](http://korov.myqnapcloud.cn:19000/images/image-20200229204354233.png)
 
 新建一个RQM，有三种Model Type：
 

@@ -1,7 +1,6 @@
 = Kubernetes权威指南 =
 Korov9 <korov9@163.com>
 v1.0 2021-02-24
-:imagesdir: picture
 :toc: right
 
 == Kubernetes的基本概念和术语 ==
@@ -36,7 +35,7 @@ Node可已在运行期间动态增加到Kubernetes集群中，前提是这个节
 
 === Pod ===
 
-image:pod.png[]
+image:http://korov.myqnapcloud.cn:19000/images/pod.png[]
 
 每个pod都有一个特殊的被称为根容器的**Pause**容器。**Pause**容器对应的镜像属于kubernetes平台的一部分，除了pause容器，每个pod还包含一个或多个紧密相关的用户业务容器。
 
@@ -46,7 +45,7 @@ kubernetes为每个pod都分配了唯一的ip地址（pod ip），一个pod中�
 
 pod有两种类型，普通的pod及静态pod。静态pod并没有被存放在kubernetes的etcd存储里，而是被存放在某个具体的node上的一个具体的文件中，并且只在此node上启动，运行。普通的pod一旦被创建，就会被放入etcd中存储，随后会被kubernetes master调度到某个具体的node上并进行绑定，随后该pod被对应的node上的kubelet进程实例化成一组相关的docker容器并启动。默认情况下，pod中的某个容器停止时，kubernetes会自动检测到这个问题并且重新启动这个pod，如果pod所在的node宕机，就会将这个node上的所有pod重新调度到其他节点上。
 
-image:pod-node.png[]
+image:http://korov.myqnapcloud.cn:19000/images/pod-node.png[]
 
 [source, YAML]
 ----
@@ -192,7 +191,7 @@ StatefulSet除了要与PV卷捆绑使用以存储Pod的数据状态，还要与H
 
 kubernetes里的每个Service其实就是我们经常提起的微服务架构中的一个微服务。
 
-image::Snipaste_2021-11-20_11-29-18.png[]
+image::http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-20_11-29-18.png[]
 
 Service定义了一个微服务的访问入口地址，前端的应用Pod通过这个入口地址访问其背后的一组由Pod副本组成的集群实例，Service与其后端Pod副本集群之间则是通过Label Selector来实现无缝对接的。RC的作用实际上是保证Service的服务能力和服务质量始终符合预期标准。
 
@@ -645,7 +644,7 @@ spec:
 
 同一个Pod中的多个容器能够共享Pod级别的存储卷Volume。Volume可以被定义为各种类型，多个容器各自进行挂载操作，将一个Volume挂载为容器内部需要的目录，如图所示
 
-image::Snipaste_2021-11-20_18-21-17.png[]
+image::http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-20_18-21-17.png[]
 
 配置文件如下：
 
@@ -1255,7 +1254,7 @@ spec:
 
 `init conatiner` 用于在启动应用容器（app container）之前启动一个或多个初始化容器，完成应用容器所需的预置条件。 `init conatiner` 与应用容器在本质上是一样的，但他们是仅运行一次就结束的任务，并且必须在成功执行完成后，系统才能继续执行下一个容器。根据Pod的重启策略（RestartPolicy），当 `init conatiner` 执行失败，而且设置了 `RestartPolicy=Never` 时，Pod将会启动失败；而设置了 `RestartPolicy=Always` 时，Pod将会被系统自动重启
 
-image::Snipaste_2021-11-21_15-33-20.png[]
+image::http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-21_15-33-20.png[]
 
 下面以Nginx应用为例，在启动Nginx之前，通过初始化容器busybox为Nginx创建一个index.html主页文件。这里init container和Nginx设置了一个共享的Volume，以供Nginx访问init container设置的index.html文件
 
@@ -1342,7 +1341,7 @@ spec:
 
 更新的流程，初始创建Deployment时，系统创建了一个ReplicaSet，并按照用户的需求创建了3个Pod副本，当更新Deployment时，系统创建了一个新的ReplicaSet，并将其副本数量扩展到1，然后将旧的ReplicaSet缩减为2.之后继续按照相同的更新策略对新旧两个ReplicaSet进行逐个调整。最后，新的ReplicaSet运行了3个新版本Pod副本，旧的ReplicaSet副本数量则缩减为0.如图所示
 
-image::Snipaste_2021-11-21_16-10-38.png[]
+image::http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-21_16-10-38.png[]
 
 在整个升级的过程中，系统会保证至少有两个Pod可用，并且最多同时运行4个Pod，这是Deployment通过复杂的算法完成的。Deployment需要确保在整个更新过程中只有一定数量的Pod可能处于不可用状态。在默认情况下，Deployment确保可用的Pod总数至少为所需的副本数量减1，也就是最多1个不可用（maxUnavailable=1）。Deployment还需要确保在整个更新过程中Pod的总数最多比所需的Pod数量多1个，也就是最多1个浪涌值（maxSurge=1）。Kubernetes 1.6版本开始，maxUnavailable和maxSurge的默认值将从1，1更新为所需副本数量的25%，25%。
 
@@ -1442,7 +1441,7 @@ Master的kube-controller-manager服务持续监测目标Pod的某种性能指标
 
 本节以MongoDB为例，使用StatefulSet完成MongoDB集群的创建，为每个MongoDB实例在共享存储中（这里采用GlusterFS）都申请一片存储空间，以实现一个无单点故障、高可用、可动态扩展的MongoDB集群。
 
-image::Snipaste_2021-11-22_16-40-19.png[]
+image::http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-22_16-40-19.png[]
 
 ==== 前提条件
 
@@ -1623,7 +1622,6 @@ spec:            // Required
 
 == 自我整理
 
-=== 
 
 
 

@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="generator" content="Asciidoctor 2.0.8.dev">
+<meta name="author" content="Korov9">
+<title>ETCD</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700">
+<style>
+/* Asciidoctor default stylesheet | MIT License | https://asciidoctor.org */
+/* Uncomment @import statement to use as custom stylesheet */
+/*@import "https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400,700";*/
+article,aside,details,figcaption,figure,footer,header,hgroup,main,nav,section{display:block}
+audio,video{display:inline-block}
+audio:not([controls]){display:none;height:0}
+html{font-family:sans-serif;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}
+a{background:none}
+a:focus{outline:thin dotted}
+a:active,a:hover{outline:0}
+h1{font-size:2em;margin:.67em 0}
+abbr[title]{border-bottom:1px dotted}
+b,strong{font-weight:bold}
+dfn{font-style:italic}
+hr{-moz-box-sizing:content-box;box-sizing:content-box;height:0}
+mark{background:#ff0;color:#000}
+code,kbd,pre,samp{font-family:monospace;font-size:1em}
+pre{white-space:pre-wrap}
+q{quotes:"\201C" "\201D" "\2018" "\2019"}
+small{font-size:80%}
+sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}
+sup{top:-.5em}
+sub{bottom:-.25em}
+img{border:0}
+svg:not(:root){overflow:hidden}
+figure{margin:0}
+fieldset{border:1px solid silver;margin:0 2px;padding:.35em .625em .75em}
+legend{border:0;padding:0}
+button,input,select,textarea{font-family:inherit;font-size:100%;margin:0}
+button,input{line-height:normal}
+button,select{text-transform:none}
+button,html input[type="button"],input[type="reset"],input[type="submit"]{-webkit-appearance:button;cursor:pointer}
+button[disabled],html input[disabled]{cursor:default}
+input[type="checkbox"],input[type="radio"]{box-sizing:border-box;padding:0}
+button::-moz-focus-inner,input::-moz-focus-inner{border:0;padding:0}
+textarea{overflow:auto;vertical-align:top}
+table{border-collapse:collapse;border-spacing:0}
+*,*::before,*::after{-moz-box-sizing:border-box;-webkit-box-sizing:border-box;box-sizing:border-box}
+html,body{font-size:100%}
+body{background:#fff;color:rgba(0,0,0,.8);padding:0;margin:0;font-family:"Noto Serif","DejaVu Serif",serif;font-weight:400;font-style:normal;line-height:1;position:relative;cursor:auto;tab-size:4;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased}
+a:hover{cursor:pointer}
+img,object,embed{max-width:100%;height:auto}
+object,embed{height:100%}
+img{-ms-interpolation-mode:bicubic}
+.left{float:left!important}
+.right{float:right!important}
+.text-left{text-align:left!important}
+.text-right{text-align:right!important}
+.text-center{text-align:center!important}
+.text-justify{text-align:justify!important}
+.hide{display:none}
+img,object,svg{display:inline-block;vertical-align:middle}
+textarea{height:auto;min-height:50px}
+select{width:100%}
+.center{margin-left:auto;margin-right:auto}
+.stretch{width:100%}
+.subheader,.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{line-height:1.45;color:#7a2518;font-weight:400;margin-top:0;margin-bottom:.25em}
+div,dl,dt,dd,ul,ol,li,h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6,pre,form,p,blockquote,th,td{margin:0;padding:0;direction:ltr}
+a{color:#2156a5;text-decoration:underline;line-height:inherit}
+a:hover,a:focus{color:#1d4b8f}
+a img{border:0}
+p{font-family:inherit;font-weight:400;font-size:1em;line-height:1.6;margin-bottom:1.25em;text-rendering:optimizeLegibility}
+p aside{font-size:.875em;line-height:1.35;font-style:italic}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{font-family:"Open Sans","DejaVu Sans",sans-serif;font-weight:300;font-style:normal;color:#ba3925;text-rendering:optimizeLegibility;margin-top:1em;margin-bottom:.5em;line-height:1.0125em}
+h1 small,h2 small,h3 small,#toctitle small,.sidebarblock>.content>.title small,h4 small,h5 small,h6 small{font-size:60%;color:#e99b8f;line-height:0}
+h1{font-size:2.125em}
+h2{font-size:1.6875em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.375em}
+h4,h5{font-size:1.125em}
+h6{font-size:1em}
+hr{border:solid #dddddf;border-width:1px 0 0;clear:both;margin:1.25em 0 1.1875em;height:0}
+em,i{font-style:italic;line-height:inherit}
+strong,b{font-weight:bold;line-height:inherit}
+small{font-size:60%;line-height:inherit}
+code{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;font-weight:400;color:rgba(0,0,0,.9)}
+ul,ol,dl{font-size:1em;line-height:1.6;margin-bottom:1.25em;list-style-position:outside;font-family:inherit}
+ul,ol{margin-left:1.5em}
+ul li ul,ul li ol{margin-left:1.25em;margin-bottom:0;font-size:1em}
+ul.square li ul,ul.circle li ul,ul.disc li ul{list-style:inherit}
+ul.square{list-style-type:square}
+ul.circle{list-style-type:circle}
+ul.disc{list-style-type:disc}
+ol li ul,ol li ol{margin-left:1.25em;margin-bottom:0}
+dl dt{margin-bottom:.3125em;font-weight:bold}
+dl dd{margin-bottom:1.25em}
+abbr,acronym{text-transform:uppercase;font-size:90%;color:rgba(0,0,0,.8);border-bottom:1px dotted #ddd;cursor:help}
+abbr{text-transform:none}
+blockquote{margin:0 0 1.25em;padding:.5625em 1.25em 0 1.1875em;border-left:1px solid #ddd}
+blockquote cite{display:block;font-size:.9375em;color:rgba(0,0,0,.6)}
+blockquote cite::before{content:"\2014 \0020"}
+blockquote cite a,blockquote cite a:visited{color:rgba(0,0,0,.6)}
+blockquote,blockquote p{line-height:1.6;color:rgba(0,0,0,.85)}
+@media screen and (min-width:768px){h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2}
+h1{font-size:2.75em}
+h2{font-size:2.3125em}
+h3,#toctitle,.sidebarblock>.content>.title{font-size:1.6875em}
+h4{font-size:1.4375em}}
+table{background:#fff;margin-bottom:1.25em;border:solid 1px #dedede}
+table thead,table tfoot{background:#f7f8f7}
+table thead tr th,table thead tr td,table tfoot tr th,table tfoot tr td{padding:.5em .625em .625em;font-size:inherit;color:rgba(0,0,0,.8);text-align:left}
+table tr th,table tr td{padding:.5625em .625em;font-size:inherit;color:rgba(0,0,0,.8)}
+table tr.even,table tr.alt{background:#f8f8f7}
+table thead tr th,table tfoot tr th,table tbody tr td,table tr td,table tfoot tr td{display:table-cell;line-height:1.6}
+h1,h2,h3,#toctitle,.sidebarblock>.content>.title,h4,h5,h6{line-height:1.2;word-spacing:-.05em}
+h1 strong,h2 strong,h3 strong,#toctitle strong,.sidebarblock>.content>.title strong,h4 strong,h5 strong,h6 strong{font-weight:400}
+.clearfix::before,.clearfix::after,.float-group::before,.float-group::after{content:" ";display:table}
+.clearfix::after,.float-group::after{clear:both}
+:not(pre):not([class^=L])>code{font-size:.9375em;font-style:normal!important;letter-spacing:0;padding:.1em .5ex;word-spacing:-.15em;background:#f7f7f8;-webkit-border-radius:4px;border-radius:4px;line-height:1.45;text-rendering:optimizeSpeed;word-wrap:break-word}
+:not(pre)>code.nobreak{word-wrap:normal}
+:not(pre)>code.nowrap{white-space:nowrap}
+pre{color:rgba(0,0,0,.9);font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;line-height:1.45;text-rendering:optimizeSpeed}
+pre code,pre pre{color:inherit;font-size:inherit;line-height:inherit}
+pre>code{display:block}
+pre.nowrap,pre.nowrap pre{white-space:pre;word-wrap:normal}
+em em{font-style:normal}
+strong strong{font-weight:400}
+.keyseq{color:rgba(51,51,51,.8)}
+kbd{font-family:"Droid Sans Mono","DejaVu Sans Mono",monospace;display:inline-block;color:rgba(0,0,0,.8);font-size:.65em;line-height:1.45;background:#f7f7f7;border:1px solid #ccc;-webkit-border-radius:3px;border-radius:3px;-webkit-box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em white inset;box-shadow:0 1px 0 rgba(0,0,0,.2),0 0 0 .1em #fff inset;margin:0 .15em;padding:.2em .5em;vertical-align:middle;position:relative;top:-.1em;white-space:nowrap}
+.keyseq kbd:first-child{margin-left:0}
+.keyseq kbd:last-child{margin-right:0}
+.menuseq,.menuref{color:#000}
+.menuseq b:not(.caret),.menuref{font-weight:inherit}
+.menuseq{word-spacing:-.02em}
+.menuseq b.caret{font-size:1.25em;line-height:.8}
+.menuseq i.caret{font-weight:bold;text-align:center;width:.45em}
+b.button::before,b.button::after{position:relative;top:-1px;font-weight:400}
+b.button::before{content:"[";padding:0 3px 0 2px}
+b.button::after{content:"]";padding:0 2px 0 3px}
+p a>code:hover{color:rgba(0,0,0,.9)}
+#header,#content,#footnotes,#footer{width:100%;margin-left:auto;margin-right:auto;margin-top:0;margin-bottom:0;max-width:62.5em;*zoom:1;position:relative;padding-left:.9375em;padding-right:.9375em}
+#header::before,#header::after,#content::before,#content::after,#footnotes::before,#footnotes::after,#footer::before,#footer::after{content:" ";display:table}
+#header::after,#content::after,#footnotes::after,#footer::after{clear:both}
+#content{margin-top:1.25em}
+#content::before{content:none}
+#header>h1:first-child{color:rgba(0,0,0,.85);margin-top:2.25rem;margin-bottom:0}
+#header>h1:first-child+#toc{margin-top:8px;border-top:1px solid #dddddf}
+#header>h1:only-child,body.toc2 #header>h1:nth-last-child(2){border-bottom:1px solid #dddddf;padding-bottom:8px}
+#header .details{border-bottom:1px solid #dddddf;line-height:1.45;padding-top:.25em;padding-bottom:.25em;padding-left:.25em;color:rgba(0,0,0,.6);display:-ms-flexbox;display:-webkit-flex;display:flex;-ms-flex-flow:row wrap;-webkit-flex-flow:row wrap;flex-flow:row wrap}
+#header .details span:first-child{margin-left:-.125em}
+#header .details span.email a{color:rgba(0,0,0,.85)}
+#header .details br{display:none}
+#header .details br+span::before{content:"\00a0\2013\00a0"}
+#header .details br+span.author::before{content:"\00a0\22c5\00a0";color:rgba(0,0,0,.85)}
+#header .details br+span#revremark::before{content:"\00a0|\00a0"}
+#header #revnumber{text-transform:capitalize}
+#header #revnumber::after{content:"\00a0"}
+#content>h1:first-child:not([class]){color:rgba(0,0,0,.85);border-bottom:1px solid #dddddf;padding-bottom:8px;margin-top:0;padding-top:1rem;margin-bottom:1.25rem}
+#toc{border-bottom:1px solid #e7e7e9;padding-bottom:.5em}
+#toc>ul{margin-left:.125em}
+#toc ul.sectlevel0>li>a{font-style:italic}
+#toc ul.sectlevel0 ul.sectlevel1{margin:.5em 0}
+#toc ul{font-family:"Open Sans","DejaVu Sans",sans-serif;list-style-type:none}
+#toc li{line-height:1.3334;margin-top:.3334em}
+#toc a{text-decoration:none}
+#toc a:active{text-decoration:underline}
+#toctitle{color:#7a2518;font-size:1.2em}
+@media screen and (min-width:768px){#toctitle{font-size:1.375em}
+body.toc2{padding-left:15em;padding-right:0}
+#toc.toc2{margin-top:0!important;background:#f8f8f7;position:fixed;width:15em;left:0;top:0;border-right:1px solid #e7e7e9;border-top-width:0!important;border-bottom-width:0!important;z-index:1000;padding:1.25em 1em;height:100%;overflow:auto}
+#toc.toc2 #toctitle{margin-top:0;margin-bottom:.8rem;font-size:1.2em}
+#toc.toc2>ul{font-size:.9em;margin-bottom:0}
+#toc.toc2 ul ul{margin-left:0;padding-left:1em}
+#toc.toc2 ul.sectlevel0 ul.sectlevel1{padding-left:0;margin-top:.5em;margin-bottom:.5em}
+body.toc2.toc-right{padding-left:0;padding-right:15em}
+body.toc2.toc-right #toc.toc2{border-right-width:0;border-left:1px solid #e7e7e9;left:auto;right:0}}
+@media screen and (min-width:1280px){body.toc2{padding-left:20em;padding-right:0}
+#toc.toc2{width:20em}
+#toc.toc2 #toctitle{font-size:1.375em}
+#toc.toc2>ul{font-size:.95em}
+#toc.toc2 ul ul{padding-left:1.25em}
+body.toc2.toc-right{padding-left:0;padding-right:20em}}
+#content #toc{border-style:solid;border-width:1px;border-color:#e0e0dc;margin-bottom:1.25em;padding:1.25em;background:#f8f8f7;-webkit-border-radius:4px;border-radius:4px}
+#content #toc>:first-child{margin-top:0}
+#content #toc>:last-child{margin-bottom:0}
+#footer{max-width:100%;background:rgba(0,0,0,.8);padding:1.25em}
+#footer-text{color:rgba(255,255,255,.8);line-height:1.44}
+#content{margin-bottom:.625em}
+.sect1{padding-bottom:.625em}
+@media screen and (min-width:768px){#content{margin-bottom:1.25em}
+.sect1{padding-bottom:1.25em}}
+.sect1:last-child{padding-bottom:0}
+.sect1+.sect1{border-top:1px solid #e7e7e9}
+#content h1>a.anchor,h2>a.anchor,h3>a.anchor,#toctitle>a.anchor,.sidebarblock>.content>.title>a.anchor,h4>a.anchor,h5>a.anchor,h6>a.anchor{position:absolute;z-index:1001;width:1.5ex;margin-left:-1.5ex;display:block;text-decoration:none!important;visibility:hidden;text-align:center;font-weight:400}
+#content h1>a.anchor::before,h2>a.anchor::before,h3>a.anchor::before,#toctitle>a.anchor::before,.sidebarblock>.content>.title>a.anchor::before,h4>a.anchor::before,h5>a.anchor::before,h6>a.anchor::before{content:"\00A7";font-size:.85em;display:block;padding-top:.1em}
+#content h1:hover>a.anchor,#content h1>a.anchor:hover,h2:hover>a.anchor,h2>a.anchor:hover,h3:hover>a.anchor,#toctitle:hover>a.anchor,.sidebarblock>.content>.title:hover>a.anchor,h3>a.anchor:hover,#toctitle>a.anchor:hover,.sidebarblock>.content>.title>a.anchor:hover,h4:hover>a.anchor,h4>a.anchor:hover,h5:hover>a.anchor,h5>a.anchor:hover,h6:hover>a.anchor,h6>a.anchor:hover{visibility:visible}
+#content h1>a.link,h2>a.link,h3>a.link,#toctitle>a.link,.sidebarblock>.content>.title>a.link,h4>a.link,h5>a.link,h6>a.link{color:#ba3925;text-decoration:none}
+#content h1>a.link:hover,h2>a.link:hover,h3>a.link:hover,#toctitle>a.link:hover,.sidebarblock>.content>.title>a.link:hover,h4>a.link:hover,h5>a.link:hover,h6>a.link:hover{color:#a53221}
+details,.audioblock,.imageblock,.literalblock,.listingblock,.stemblock,.videoblock{margin-bottom:1.25em}
+details>summary:first-of-type{cursor:pointer;display:list-item;outline:none;margin-bottom:.75em}
+.admonitionblock td.content>.title,.audioblock>.title,.exampleblock>.title,.imageblock>.title,.listingblock>.title,.literalblock>.title,.stemblock>.title,.openblock>.title,.paragraph>.title,.quoteblock>.title,table.tableblock>.title,.verseblock>.title,.videoblock>.title,.dlist>.title,.olist>.title,.ulist>.title,.qlist>.title,.hdlist>.title{text-rendering:optimizeLegibility;text-align:left;font-family:"Noto Serif","DejaVu Serif",serif;font-size:1rem;font-style:italic}
+table.tableblock.fit-content>caption.title{white-space:nowrap;width:0}
+.paragraph.lead>p,#preamble>.sectionbody>[class="paragraph"]:first-of-type p{font-size:1.21875em;line-height:1.6;color:rgba(0,0,0,.85)}
+table.tableblock #preamble>.sectionbody>[class="paragraph"]:first-of-type p{font-size:inherit}
+.admonitionblock>table{border-collapse:separate;border:0;background:none;width:100%}
+.admonitionblock>table td.icon{text-align:center;width:80px}
+.admonitionblock>table td.icon img{max-width:none}
+.admonitionblock>table td.icon .title{font-weight:bold;font-family:"Open Sans","DejaVu Sans",sans-serif;text-transform:uppercase}
+.admonitionblock>table td.content{padding-left:1.125em;padding-right:1.25em;border-left:1px solid #dddddf;color:rgba(0,0,0,.6)}
+.admonitionblock>table td.content>:last-child>:last-child{margin-bottom:0}
+.exampleblock>.content{border-style:solid;border-width:1px;border-color:#e6e6e6;margin-bottom:1.25em;padding:1.25em;background:#fff;-webkit-border-radius:4px;border-radius:4px}
+.exampleblock>.content>:first-child{margin-top:0}
+.exampleblock>.content>:last-child{margin-bottom:0}
+.sidebarblock{border-style:solid;border-width:1px;border-color:#dbdbd6;margin-bottom:1.25em;padding:1.25em;background:#f3f3f2;-webkit-border-radius:4px;border-radius:4px}
+.sidebarblock>:first-child{margin-top:0}
+.sidebarblock>:last-child{margin-bottom:0}
+.sidebarblock>.content>.title{color:#7a2518;margin-top:0;text-align:center}
+.exampleblock>.content>:last-child>:last-child,.exampleblock>.content .olist>ol>li:last-child>:last-child,.exampleblock>.content .ulist>ul>li:last-child>:last-child,.exampleblock>.content .qlist>ol>li:last-child>:last-child,.sidebarblock>.content>:last-child>:last-child,.sidebarblock>.content .olist>ol>li:last-child>:last-child,.sidebarblock>.content .ulist>ul>li:last-child>:last-child,.sidebarblock>.content .qlist>ol>li:last-child>:last-child{margin-bottom:0}
+.literalblock pre,.listingblock>.content>pre{-webkit-border-radius:4px;border-radius:4px;word-wrap:break-word;overflow-x:auto;padding:1em;font-size:.8125em}
+@media screen and (min-width:768px){.literalblock pre,.listingblock>.content>pre{font-size:.90625em}}
+@media screen and (min-width:1280px){.literalblock pre,.listingblock>.content>pre{font-size:1em}}
+.literalblock pre,.listingblock>.content>pre:not(.highlight),.listingblock>.content>pre[class="highlight"],.listingblock>.content>pre[class^="highlight "]{background:#f7f7f8}
+.literalblock.output pre{color:#f7f7f8;background:rgba(0,0,0,.9)}
+.listingblock>.content{position:relative}
+.listingblock code[data-lang]::before{display:none;content:attr(data-lang);position:absolute;font-size:.75em;top:.425rem;right:.5rem;line-height:1;text-transform:uppercase;color:inherit;opacity:.5}
+.listingblock:hover code[data-lang]::before{display:block}
+.listingblock.terminal pre .command::before{content:attr(data-prompt);padding-right:.5em;color:inherit;opacity:.5}
+.listingblock.terminal pre .command:not([data-prompt])::before{content:"$"}
+.listingblock pre.highlightjs{padding:0}
+.listingblock pre.highlightjs>code{padding:1em;-webkit-border-radius:4px;border-radius:4px}
+.listingblock pre.prettyprint{border-width:0}
+.prettyprint{background:#f7f7f8}
+pre.prettyprint .linenums{line-height:1.45;margin-left:2em}
+pre.prettyprint li{background:none;list-style-type:inherit;padding-left:0}
+pre.prettyprint li code[data-lang]::before{opacity:1}
+pre.prettyprint li:not(:first-child) code[data-lang]::before{display:none}
+table.linenotable{border-collapse:separate;border:0;margin-bottom:0;background:none}
+table.linenotable td[class]{color:inherit;vertical-align:top;padding:0;line-height:inherit;white-space:normal}
+table.linenotable td.code{padding-left:.75em}
+table.linenotable td.linenos{border-right:1px solid currentColor;opacity:.35;padding-right:.5em}
+pre.pygments .lineno{border-right:1px solid currentColor;opacity:.35;display:inline-block;margin-right:.75em}
+pre.pygments .lineno::before{content:"";margin-right:-.125em}
+.quoteblock{margin:0 1em 1.25em 1.5em;display:table}
+.quoteblock>.title{margin-left:-1.5em;margin-bottom:.75em}
+.quoteblock blockquote,.quoteblock p{color:rgba(0,0,0,.85);font-size:1.15rem;line-height:1.75;word-spacing:.1em;letter-spacing:0;font-style:italic;text-align:justify}
+.quoteblock blockquote{margin:0;padding:0;border:0}
+.quoteblock blockquote::before{content:"\201c";float:left;font-size:2.75em;font-weight:bold;line-height:.6em;margin-left:-.6em;color:#7a2518;text-shadow:0 1px 2px rgba(0,0,0,.1)}
+.quoteblock blockquote>.paragraph:last-child p{margin-bottom:0}
+.quoteblock .attribution{margin-top:.75em;margin-right:.5ex;text-align:right}
+.verseblock{margin:0 1em 1.25em}
+.verseblock pre{font-family:"Open Sans","DejaVu Sans",sans;font-size:1.15rem;color:rgba(0,0,0,.85);font-weight:300;text-rendering:optimizeLegibility}
+.verseblock pre strong{font-weight:400}
+.verseblock .attribution{margin-top:1.25rem;margin-left:.5ex}
+.quoteblock .attribution,.verseblock .attribution{font-size:.9375em;line-height:1.45;font-style:italic}
+.quoteblock .attribution br,.verseblock .attribution br{display:none}
+.quoteblock .attribution cite,.verseblock .attribution cite{display:block;letter-spacing:-.025em;color:rgba(0,0,0,.6)}
+.quoteblock.abstract blockquote::before,.quoteblock.excerpt blockquote::before,.quoteblock .quoteblock blockquote::before{display:none}
+.quoteblock.abstract blockquote,.quoteblock.abstract p,.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{line-height:1.6;word-spacing:0}
+.quoteblock.abstract{margin:0 1em 1.25em;display:block}
+.quoteblock.abstract>.title{margin:0 0 .375em;font-size:1.15em;text-align:center}
+.quoteblock.excerpt,.quoteblock .quoteblock{margin:0 0 1.25em;padding:0 0 .25em 1em;border-left:.25em solid #dddddf}
+.quoteblock.excerpt blockquote,.quoteblock.excerpt p,.quoteblock .quoteblock blockquote,.quoteblock .quoteblock p{color:inherit;font-size:1.0625rem}
+.quoteblock.excerpt .attribution,.quoteblock .quoteblock .attribution{color:inherit;text-align:left;margin-right:0}
+table.tableblock{max-width:100%;border-collapse:separate}
+p.tableblock:last-child{margin-bottom:0}
+td.tableblock>.content>:last-child{margin-bottom:-1.25em}
+td.tableblock>.content>:last-child.sidebarblock{margin-bottom:0}
+table.tableblock,th.tableblock,td.tableblock{border:0 solid #dedede}
+table.grid-all>thead>tr>.tableblock,table.grid-all>tbody>tr>.tableblock{border-width:0 1px 1px 0}
+table.grid-all>tfoot>tr>.tableblock{border-width:1px 1px 0 0}
+table.grid-cols>*>tr>.tableblock{border-width:0 1px 0 0}
+table.grid-rows>thead>tr>.tableblock,table.grid-rows>tbody>tr>.tableblock{border-width:0 0 1px}
+table.grid-rows>tfoot>tr>.tableblock{border-width:1px 0 0}
+table.grid-all>*>tr>.tableblock:last-child,table.grid-cols>*>tr>.tableblock:last-child{border-right-width:0}
+table.grid-all>tbody>tr:last-child>.tableblock,table.grid-all>thead:last-child>tr>.tableblock,table.grid-rows>tbody>tr:last-child>.tableblock,table.grid-rows>thead:last-child>tr>.tableblock{border-bottom-width:0}
+table.frame-all{border-width:1px}
+table.frame-sides{border-width:0 1px}
+table.frame-topbot,table.frame-ends{border-width:1px 0}
+table.stripes-all tr,table.stripes-odd tr:nth-of-type(odd),table.stripes-even tr:nth-of-type(even),table.stripes-hover tr:hover{background:#f8f8f7}
+th.halign-left,td.halign-left{text-align:left}
+th.halign-right,td.halign-right{text-align:right}
+th.halign-center,td.halign-center{text-align:center}
+th.valign-top,td.valign-top{vertical-align:top}
+th.valign-bottom,td.valign-bottom{vertical-align:bottom}
+th.valign-middle,td.valign-middle{vertical-align:middle}
+table thead th,table tfoot th{font-weight:bold}
+tbody tr th{display:table-cell;line-height:1.6;background:#f7f8f7}
+tbody tr th,tbody tr th p,tfoot tr th,tfoot tr th p{color:rgba(0,0,0,.8);font-weight:bold}
+p.tableblock>code:only-child{background:none;padding:0}
+p.tableblock{font-size:1em}
+ol{margin-left:1.75em}
+ul li ol{margin-left:1.5em}
+dl dd{margin-left:1.125em}
+dl dd:last-child,dl dd:last-child>:last-child{margin-bottom:0}
+ol>li p,ul>li p,ul dd,ol dd,.olist .olist,.ulist .ulist,.ulist .olist,.olist .ulist{margin-bottom:.625em}
+ul.checklist,ul.none,ol.none,ul.no-bullet,ol.no-bullet,ol.unnumbered,ul.unstyled,ol.unstyled{list-style-type:none}
+ul.no-bullet,ol.no-bullet,ol.unnumbered{margin-left:.625em}
+ul.unstyled,ol.unstyled{margin-left:0}
+ul.checklist{margin-left:.625em}
+ul.checklist li>p:first-child>.fa-square-o:first-child,ul.checklist li>p:first-child>.fa-check-square-o:first-child{width:1.25em;font-size:.8em;position:relative;bottom:.125em}
+ul.checklist li>p:first-child>input[type="checkbox"]:first-child{margin-right:.25em}
+ul.inline{display:-ms-flexbox;display:-webkit-box;display:flex;-ms-flex-flow:row wrap;-webkit-flex-flow:row wrap;flex-flow:row wrap;list-style:none;margin:0 0 .625em -1.25em}
+ul.inline>li{margin-left:1.25em}
+.unstyled dl dt{font-weight:400;font-style:normal}
+ol.arabic{list-style-type:decimal}
+ol.decimal{list-style-type:decimal-leading-zero}
+ol.loweralpha{list-style-type:lower-alpha}
+ol.upperalpha{list-style-type:upper-alpha}
+ol.lowerroman{list-style-type:lower-roman}
+ol.upperroman{list-style-type:upper-roman}
+ol.lowergreek{list-style-type:lower-greek}
+.hdlist>table,.colist>table{border:0;background:none}
+.hdlist>table>tbody>tr,.colist>table>tbody>tr{background:none}
+td.hdlist1,td.hdlist2{vertical-align:top;padding:0 .625em}
+td.hdlist1{font-weight:bold;padding-bottom:1.25em}
+.literalblock+.colist,.listingblock+.colist{margin-top:-.5em}
+.colist td:not([class]):first-child{padding:.4em .75em 0;line-height:1;vertical-align:top}
+.colist td:not([class]):first-child img{max-width:none}
+.colist td:not([class]):last-child{padding:.25em 0}
+.thumb,.th{line-height:0;display:inline-block;border:solid 4px #fff;-webkit-box-shadow:0 0 0 1px #ddd;box-shadow:0 0 0 1px #ddd}
+.imageblock.left{margin:.25em .625em 1.25em 0}
+.imageblock.right{margin:.25em 0 1.25em .625em}
+.imageblock>.title{margin-bottom:0}
+.imageblock.thumb,.imageblock.th{border-width:6px}
+.imageblock.thumb>.title,.imageblock.th>.title{padding:0 .125em}
+.image.left,.image.right{margin-top:.25em;margin-bottom:.25em;display:inline-block;line-height:0}
+.image.left{margin-right:.625em}
+.image.right{margin-left:.625em}
+a.image{text-decoration:none;display:inline-block}
+a.image object{pointer-events:none}
+sup.footnote,sup.footnoteref{font-size:.875em;position:static;vertical-align:super}
+sup.footnote a,sup.footnoteref a{text-decoration:none}
+sup.footnote a:active,sup.footnoteref a:active{text-decoration:underline}
+#footnotes{padding-top:.75em;padding-bottom:.75em;margin-bottom:.625em}
+#footnotes hr{width:20%;min-width:6.25em;margin:-.25em 0 .75em;border-width:1px 0 0}
+#footnotes .footnote{padding:0 .375em 0 .225em;line-height:1.3334;font-size:.875em;margin-left:1.2em;margin-bottom:.2em}
+#footnotes .footnote a:first-of-type{font-weight:bold;text-decoration:none;margin-left:-1.05em}
+#footnotes .footnote:last-of-type{margin-bottom:0}
+#content #footnotes{margin-top:-.625em;margin-bottom:0;padding:.75em 0}
+.gist .file-data>table{border:0;background:#fff;width:100%;margin-bottom:0}
+.gist .file-data>table td.line-data{width:99%}
+div.unbreakable{page-break-inside:avoid}
+.big{font-size:larger}
+.small{font-size:smaller}
+.underline{text-decoration:underline}
+.overline{text-decoration:overline}
+.line-through{text-decoration:line-through}
+.aqua{color:#00bfbf}
+.aqua-background{background:#00fafa}
+.black{color:#000}
+.black-background{background:#000}
+.blue{color:#0000bf}
+.blue-background{background:#0000fa}
+.fuchsia{color:#bf00bf}
+.fuchsia-background{background:#fa00fa}
+.gray{color:#606060}
+.gray-background{background:#7d7d7d}
+.green{color:#006000}
+.green-background{background:#007d00}
+.lime{color:#00bf00}
+.lime-background{background:#00fa00}
+.maroon{color:#600000}
+.maroon-background{background:#7d0000}
+.navy{color:#000060}
+.navy-background{background:#00007d}
+.olive{color:#606000}
+.olive-background{background:#7d7d00}
+.purple{color:#600060}
+.purple-background{background:#7d007d}
+.red{color:#bf0000}
+.red-background{background:#fa0000}
+.silver{color:#909090}
+.silver-background{background:#bcbcbc}
+.teal{color:#006060}
+.teal-background{background:#007d7d}
+.white{color:#bfbfbf}
+.white-background{background:#fafafa}
+.yellow{color:#bfbf00}
+.yellow-background{background:#fafa00}
+span.icon>.fa{cursor:default}
+a span.icon>.fa{cursor:inherit}
+.admonitionblock td.icon [class^="fa icon-"]{font-size:2.5em;text-shadow:1px 1px 2px rgba(0,0,0,.5);cursor:default}
+.admonitionblock td.icon .icon-note::before{content:"\f05a";color:#19407c}
+.admonitionblock td.icon .icon-tip::before{content:"\f0eb";text-shadow:1px 1px 2px rgba(155,155,0,.8);color:#111}
+.admonitionblock td.icon .icon-warning::before{content:"\f071";color:#bf6900}
+.admonitionblock td.icon .icon-caution::before{content:"\f06d";color:#bf3400}
+.admonitionblock td.icon .icon-important::before{content:"\f06a";color:#bf0000}
+.conum[data-value]{display:inline-block;color:#fff!important;background:rgba(0,0,0,.8);-webkit-border-radius:100px;border-radius:100px;text-align:center;font-size:.75em;width:1.67em;height:1.67em;line-height:1.67em;font-family:"Open Sans","DejaVu Sans",sans-serif;font-style:normal;font-weight:bold}
+.conum[data-value] *{color:#fff!important}
+.conum[data-value]+b{display:none}
+.conum[data-value]::after{content:attr(data-value)}
+pre .conum[data-value]{position:relative;top:-.125em}
+b.conum *{color:inherit!important}
+.conum:not([data-value]):empty{display:none}
+dt,th.tableblock,td.content,div.footnote{text-rendering:optimizeLegibility}
+h1,h2,p,td.content,span.alt{letter-spacing:-.01em}
+p strong,td.content strong,div.footnote strong{letter-spacing:-.005em}
+p,blockquote,dt,td.content,span.alt{font-size:1.0625rem}
+p{margin-bottom:1.25rem}
+.sidebarblock p,.sidebarblock dt,.sidebarblock td.content,p.tableblock{font-size:1em}
+.exampleblock>.content{background:#fffef7;border-color:#e0e0dc;-webkit-box-shadow:0 1px 4px #e0e0dc;box-shadow:0 1px 4px #e0e0dc}
+.print-only{display:none!important}
+@page{margin:1.25cm .75cm}
+@media print{*{-webkit-box-shadow:none!important;box-shadow:none!important;text-shadow:none!important}
+html{font-size:80%}
+a{color:inherit!important;text-decoration:underline!important}
+a.bare,a[href^="#"],a[href^="mailto:"]{text-decoration:none!important}
+a[href^="http:"]:not(.bare)::after,a[href^="https:"]:not(.bare)::after{content:"(" attr(href) ")";display:inline-block;font-size:.875em;padding-left:.25em}
+abbr[title]::after{content:" (" attr(title) ")"}
+pre,blockquote,tr,img,object,svg{page-break-inside:avoid}
+thead{display:table-header-group}
+svg{max-width:100%}
+p,blockquote,dt,td.content{font-size:1em;orphans:3;widows:3}
+h2,h3,#toctitle,.sidebarblock>.content>.title{page-break-after:avoid}
+#toc,.sidebarblock,.exampleblock>.content{background:none!important}
+#toc{border-bottom:1px solid #dddddf!important;padding-bottom:0!important}
+body.book #header{text-align:center}
+body.book #header>h1:first-child{border:0!important;margin:2.5em 0 1em}
+body.book #header .details{border:0!important;display:block;padding:0!important}
+body.book #header .details span:first-child{margin-left:0!important}
+body.book #header .details br{display:block}
+body.book #header .details br+span::before{content:none!important}
+body.book #toc{border:0!important;text-align:left!important;padding:0!important;margin:0!important}
+body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-break-before:always}
+.listingblock code[data-lang]::before{display:block}
+#footer{padding:0 .9375em}
+.hide-on-print{display:none!important}
+.print-only{display:block!important}
+.hide-for-print{display:none!important}
+.show-for-print{display:inherit!important}}
+@media print,amzn-kf8{#header>h1:first-child{margin-top:1.25rem}
+.sect1{padding:0!important}
+.sect1+.sect1{border:0}
+#footer{background:none}
+#footer-text{color:rgba(0,0,0,.6);font-size:.9em}}
+@media amzn-kf8{#header,#content,#footnotes,#footer{padding:0}}
+</style>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body class="article toc2 toc-right">
+<div id="header">
+<h1>ETCD</h1>
+<div class="details">
+<span id="author" class="author">Korov9</span><br>
+<span id="email" class="email"><a href="mailto:korov9@163.com">korov9@163.com</a></span><br>
+<span id="revnumber">version 1.0 2021-10-31</span>
+</div>
+<div id="toc" class="toc2">
+<div id="toctitle">Table of Contents</div>
+<ul class="sectlevel1">
+<li><a href="#trueraft协议">Raft协议</a>
+<ul class="sectlevel2">
+<li><a href="#trueleader选举">Leader选举</a></li>
+<li><a href="#true日志复制">日志复制</a></li>
+<li><a href="#true网络的分区场景">网络的分区场景</a></li>
+<li><a href="#true日志的压缩与快照">日志的压缩与快照</a></li>
+<li><a href="#true其他技术">其他技术</a></li>
+</ul>
+</li>
+<li><a href="#trueetcd-特性">ETCD 特性</a></li>
+</ul>
+</div>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="trueraft协议"><a class="anchor" href="#trueraft协议"></a>Raft协议</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="trueleader选举"><a class="anchor" href="#trueleader选举"></a>Leader选举</h3>
+<div class="paragraph">
+<p>在Raft协议中，每个节点都维护了一个状态机，该状态机有三种状态：Leader、Foller和Candidate。在任意时刻，集群中的任意一个节点都处于这三个状态之一。各个状态和转换条件如图所示</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-10_00-00-11.png" alt="Snipaste 2021 11 10 00 00 11">
+</div>
+</div>
+<div class="paragraph">
+<p>在多数情况下，集群中有一个Leader节点，其他节点都处于Follower状态，</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Leader节点负责处理所有客户端的请求，当接受到客户端的写入请求时，Leader节点会在本地追加一条相应的日志，然后将其封装成消息发送到集群中其他的Follower节点。当Follower节点收到该消息时会对其进行响应。如果集群中多数（超过半数）节点都已经收到该请求对应的日志记录时，则Leader节点认为该条日志记录已提交（committed），可以向客户端返回响应。Leader还会处理客户端的只读请求。Leader节点另一项工作时定期向集群中的Follower节点发送心跳消息，这主要是为了防止集群中的其他Follower节点的选举计时器超时而触发新一轮选举</p>
+</li>
+<li>
+<p>Follower节点不会发送任何请求，他们只是简单的相应来自Leader或者Candidate的请求；Follower节点也不会处理Client的请求，而是将请求重定向给集群中的Leader节点</p>
+</li>
+<li>
+<p>Candidte节点是由Follower节点转换而来的，当Follower节点长时间没有收到Leader节点发送的心跳消息时，则该节点的选举计时器就会过期，同时将自身状态转换成Candidate，发起新一轮选举。</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>在Raft协议中有两个时间控制Leader选举发生，其中一个是选举超时时间（election timeout），每个Follower节点在接收不到Leader节点的心跳消息之后，并不会立即发起新一轮选举，而是需要等待一段时间之后才切换成Candidate状态发起新一轮选举。这段等待时长就是这里所说的election timeout。之所以这样设计，主要是Leader节点发送的心跳消息可能因为瞬间的网络延迟或程序瞬间的卡顿而迟到（或是丢失），因此就触发新一轮选举是没有必要的。election timeout一般设置为150ms~300ms之间的一个随机数。另一个超时时间是心跳的超时时间（heartbeat timeout），也就是Leader节点向集群中其他Follower节点发送心跳消息的时间间隔。</p>
+</div>
+<div class="paragraph">
+<p>当集群初始化时，所有节点都处于Follower的状态，此时的集群中没有Leader节点。当Follower节点一段时间（选举计时器超时）内收不到Leader节点的心跳消息，则认为Leader节点出现故障导致任期（Term）过期，Follower节点会转换成Candidate状态，发起新一轮的选举。任期实际上是一个全局的、连续递增的整数，在Raft协议中每进行一次选举，任期加一，在每个节点中都会记录当前的任期值（currentTerm）。每一个任期都是从一次选举开始的，在选举时，会出现一个或多个Candidte节点尝试成为Leader节点，如果其中一个Candidate节点赢得选举，则该节点就会切换为Leader状态并成为该任期的Leader节点，直到该任期结束。</p>
+</div>
+<div class="paragraph">
+<p>假设有三个节点A、B、C。A由于长时间未收到Leader的心跳消息，就会切换成为Candidate并发起选举（A的选举计时器election timer已被重置）。在选举的过程中，节点A首先将自己的选票投给自己，并会向集群中其他节点发送选举请求（Request Vote）以获取选票，如图1所示；此时节点B和C还都是处于Term=0的任期中，且都是Follower状态，均未透出Term=1任期中的选票，所以节点B和C在接受到A的选举请求后会选票投给节点A，另外节点B和C在收到节点A的选举请求的同时会将选举定时器重置，这是为了防止一个任期中同时出现多个Candidate节点，导致选举失败，如图2所示</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-10_00-48-59.png" alt="Snipaste 2021 11 10 00 48 59">
+</div>
+</div>
+<div class="paragraph">
+<p>在节点A收到节点B、C的投票之后，其收到了集群中超过半数的选票，所以在Term=1这个任期中，该集群的Leader节点就是节点A，其他节点将切换成Follower状态。集群中的节点除了记录当前任期号（currentTerm），还会记录在该任期中当前节点的投票结果（VoteFor）</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-10_00-55-10.png" alt="Snipaste 2021 11 10 00 55 10">
+</div>
+</div>
+<div class="paragraph">
+<p>A成为Term=1任期的Leader节点之后，节点A会定期向集群中的其他节点发送心跳消息，这样就可以防止节点B和C中的需那句计时器（election timer）超时而触发新一轮的选举；当节点B和C收到节点A的心跳消息之后会重置选举计时器。由此可见心跳超时时间（heartbeat timeout）需要远小于选举超时时间（election timeout）</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-10_00-58-30.png" alt="Snipaste 2021 11 10 00 58 30">
+</div>
+</div>
+<div class="paragraph">
+<p>如果有两个或两个以上节点的选举计时器同时过期，则这些节点会同时由Follower状态切换成Candidate状态，然后同时触发新一轮选举，在该轮选举中，每个Candidate节点获取的选票都不到半数，怎么办？假设集群中有4个节点，其中A节点和B节点的选举计时器同时到期，切换到Candidte状态并向集群中其他节点发送选举请求，假设A节点发出的选举请求先抵达C，B的选举请求先抵达D，则A和B都获得了两票。在这种情况下Term=4这个任期会以选举失败结束，随着时间的流逝，当任意节点的选举计时器到期之后，会再次发起新一轮的选举。前面提到election timeout是在一个时间区间内取的随机数，所以在配置合理的时候，像上述情况出现的概率并不大。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-10_01-06-31.png" alt="Snipaste 2021 11 10 01 06 31">
+</div>
+</div>
+<div class="paragraph">
+<p>这里假设节点A的选举计时器再次到期（此次节点B，C，D的选举计时器并未到期），它会切换成Candidate状态并发起新一轮选举（Term=5），其中节点B虽然处于Candidate状态，但是接收到Term值比自身记录Term值大的请求时，节点会切换成Follower状态并更新自身记录的Term值，所以该实例中的节点B也会将选票投给A</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-10_01-10-33.png" alt="Snipaste 2021 11 10 01 10 33">
+</div>
+</div>
+<div class="paragraph">
+<p>在获取集群中半数以上的选票并成为新任期（Term=5）的Leader之后，节点A会定期向集群中其他节点发送心跳消息；当集群中其他节点收到Leader节点的心跳消息的时候，会重置选举定时器</p>
+</div>
+<div class="paragraph">
+<p>当集群中的Leader宕机之后，一段时间之后其他节点会触发Leader选举，选举成功之后Term=6，此时宕机的节点恢复之后会收到Term=6的心跳，恢复的节点的Term=5，此时恢复的节点会切换为Follower，并更新自己的任期号。</p>
+</div>
+<div class="paragraph">
+<p>Leader选举是Raft算法中对时间要求较为严格的一个点，一般要求整个集群中的时间满足如下不等式： <code>广播时间 &lt;&lt; 选举超时时间 &lt;&lt; 平均故障时间</code>。</p>
+</div>
+<div class="paragraph">
+<p>广播时间指的是从一个节点发送心跳消息到集群中其他节点并接收响应的平均时间；平均故障时间就是对于一个节点而言，两次故障之间的平均时间。广播时间必须比选举时间小一个数量级，这样Leader节点才能够发送稳定的心跳消息来重置其他Follower节点的选举计时器，从而防止他们切换成Candidate，触发新一轮选举。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="true日志复制"><a class="anchor" href="#true日志复制"></a>日志复制</h3>
+<div class="paragraph">
+<p>Leader节点除了向Follower节点发送心跳消息，还会处理客户端的请求，并将客户端的更新操作以消息（Append Entries消息）的形式发送到集群中所有的Follower节点。当Follower节点记录收到的这些消息之后，会向Leader节点返回相应的响应消息。当Leader节点在收到半数以上的Follower节点的响应消息之后，会对客户端的请求进行应答。最后，Leader会提交客户端的更新操作，该过程会发送Append Entries消息到Follower节点，通知Follower节点该操作已经提交，同时Leader节点和Follower节点也就可以将该操作应用到自己的状态机中。</p>
+</div>
+<div class="paragraph">
+<p>假设当前集群中有三个节点（A、B、C）。其中A是Leader节点，此时有一个客户端发送了一个更新操作到集群。节点A会将该更新操作记录到本地的Log中如图所示</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-10_12-26-26.png" alt="Snipaste 2021 11 10 12 26 26">
+</div>
+</div>
+<div class="paragraph">
+<p>之后节点A会向其他节点发送Append Entries消息，其中记录了Leader节点最近接受到的请求日志，集群中其他Follower节点收到该Append Entries消息之后，会将该操作记录到本地Log中，并返回响应的响应消息，如图所示</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-10_12-28-07.png" alt="Snipaste 2021 11 10 12 28 07">
+</div>
+</div>
+<div class="paragraph">
+<p>当Leader节点收到半数以上的响应消息之后，会认为集群中有半数以上的节点已经记录了该更新操作，Leader节点会将该更新操作对应的日志记录设置未已提交（committed），并应用到自身的状态机中。同时Leader节点还会对客户端的请求作出响应。同时Leader节点还会向集群中其他Follower节点发送消息，通知他们该更新操作已经被提交，Follower节点收到该消息之后，才会将该更新操作应用到自己的状态机中，如图所示</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-10_12-31-19.png" alt="Snipaste 2021 11 10 12 31 19">
+</div>
+</div>
+<div class="paragraph">
+<p>集群中各个节点都会维护一个本地Log用于记录更新操作，除此之外，每个节点还会维护commitIndex和lastApplied两个值，他们是本地Log的索引值，其中commitIndex表示的是当前节点已知的、最大的、已提交的日志索引值，lastApplied表示的是当前节点最后一条被应用到状态机中的日志索引值。当节点中的commitIndex值大于lastApplied值时，会将lastApplied加1，并将lastApplied对应的日志应用到状态机中。</p>
+</div>
+<div class="paragraph">
+<p>Leader节点中不仅需要知道自己的上述信息，还需要了解集群中其他Follower节点的这些信息，例如，Leader节点需要了解每个Follower节点的日志复制到哪个位置，从而决定下次发送Append Entries消息中包含那些日志记录。为此，Leader节点会维护nexIndex[]和matchIndex[]两个数组，这两个数组中记录的都是日志索引值，其中nextIndex[]数组记录了需要发送给每个Follower节点的下一条日志的索引值，matchIndex[]表示记录了已经复制给每个Follower节点的最大的日志索引值。</p>
+</div>
+<div class="paragraph">
+<p>假设集群中有三个节点，A是Leader（Term=1），而Follower节点C因为宕机导致有一段时间未与Leader节点同步日志。此时节点C的Log中并不包含全部的已提交日志，而只是节点A的Log的子集，节点C排除故障重新启动，当前集群的状态如图所示</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-10_12-44-33.png" alt="Snipaste 2021 11 10 12 44 33">
+</div>
+</div>
+<div class="paragraph">
+<p>A作为Leader节点，记录了nextIndex[]和matchIndex[]，所以知道应该向节点C发送哪些日志，在本例中，Leader节点在下次发送Append Entries消息时会携带index=2的消息（这里为了描述简单，每条消息只携带单条日志，Raft协议采用批量发送的方式，这样效率更高），当节点C收到Append Entries消息后，会将日志记录到本地Log中，然后向Leader节点返回追加日志成功的响应，当Leader节点收到响应之后，会递增节点C对应的nextIndex和matchIndex，这样Leader节点就知道下次发送日志的位置了。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-10_12-48-38.png" alt="Snipaste 2021 11 10 12 48 38">
+</div>
+</div>
+<div class="paragraph">
+<p>当C故障恢复后，节点A宕机重启，并且导致节点B成为新任（Term=2）的Leader节点，则此时节点B并不知道旧Leader节点中记录的nextIndex[]和matchIndex[]信息，所以Leader节点会重置nextIndex[]和matchIndex[]，其中会将nextIndex[]全部重置为其自身Log的最后一条已提交日志的Index值，而matchIndex[]全部重置为0，</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-10_12-52-02.png" alt="Snipaste 2021 11 10 12 52 02">
+</div>
+</div>
+<div class="paragraph">
+<p>随后，新任期中的Leader节点会向其他节点发送Append Entries消息，节点A已经拥有了当前Leader的全部日志记录，所以会返回追加成功的响应并等待后续的日志，而节点C并没有Index=2和Index=3两条日志，所以返回追加日志失败的响应，在收到该响应后，Leader节点会向nextIndex前移，然后Leader节点会再次尝试发送Append Entries消息，循环往复，不断减小nextIndex值，直至节点C返回追加成功的响应，之后就进入了正常追加消息记录的流程。</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-10_12-56-15.png" alt="Snipaste 2021 11 10 12 56 15">
+</div>
+</div>
+<div class="paragraph">
+<p>Follower节点投票的时候还需要比肩Candidate节点的日志记录与自身的日志记录，拒绝那些没有自己新的Candidate节点发来的投票请求，确保将选票投给包含了全部已提交（committed）日志记录的Candidate节点，这也保证了已提交的日志记录不会丢失：Candidate节点为了成为Leader节点必然会在选举过程中向集群中半数以上的节点发送选举请求，因为已提交的日志记录必须存在集群中半数以上的节点中，这也就意味着每一条已提交的日志记录肯定在这些接收到节点中至少存在一份。如果Candidate节点上的日志记录与集群中大多数节点上的日志记录一样新，那么其日志一定包含所有已经提交的日志记录，也就可以获得这些节点的投票并成为Leader。</p>
+</div>
+<div class="paragraph">
+<p>Raft协议通过比较两节点日志中的最后一条日志的索引值和任期号，以决定谁的日志比较新：首先会比较最后一条日志记录的任期号，如果最后的日志记录的任期号不同，那么任期号大的日志记录比较新；如果最后一条日志记录的任期号相同，那么日志索引比较大的比较新。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="true网络的分区场景"><a class="anchor" href="#true网络的分区场景"></a>网络的分区场景</h3>
+<div class="paragraph">
+<p>在一个集群中如果有部分节点的网络发生故障，与集群中一部分节点的链接中断，就会出现网络分区，如图集群有A、B、C、D、E五个节点，其中节点A、B相互之间网络联通，节点C、D、E相互之间网络联通，但是这两个部分节点之间出现网络故障，这就形成了网络分区</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-10_23-59-03.png" alt="Snipaste 2021 11 10 23 59 03">
+</div>
+</div>
+<div class="paragraph">
+<p>假设此时A是Leader，他会向集群中其他四个节点发送Append Entries消息和心跳消息，当出现网络分区时，节点A的心跳只有节点B才能收到，而集群中其他的节点收不到。随着时间的流逝，集群中与Leader节点隔离的网络分区（C、D、E    ）中，会率先有一个节点的选举计时器（election timer）超时，这里假设该节点是E，此时的节点E就会切换成Candidate状态并发起下一轮选举，由于网络分区，当前集群中只有节点C、D能够收到节点E的选举请求，这里假设C、D都会将选票投给节点E</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-11_00-05-27.png" alt="Snipaste 2021 11 11 00 05 27">
+</div>
+</div>
+<div class="paragraph">
+<p>到此为止，节点E在此次选举中得到了三票，达到集群半数以上，所以节点E成为新任期（Term=2）的Leader节点。当网络故障被修复时，上述的网络分区就会消失，此时节点A（Term=1的Leader节点）发送的心跳消息会被节点C、D、E接收到，但是这些心跳消息中携带的Term值小于当前C、D、E节点的Term值，会被C、D、E节点忽略；同时节点E（Term=2任期的Leader）发送的心跳消息会被节点A、B接收到，因为Term更大，所以A、B节点会切换成Follower状态，这样整个集群中的Leader节点依旧是E。</p>
+</div>
+<div class="paragraph">
+<p>读者可能会问：如果网络分区时，Leader节点划分到节点较多的分区中，此时节点较少的分区中，会有节点的选举计时器超时，且换成Candidate状态并发起新一轮的选举，但是由于该分区中节点数不足半数，所以无法选举出新的Leader节点，等待一段时间之后，该分区中又会出现某个节点的选举计时器超时，会再次发起新一轮的选举，循环往复，从而导致不断发起选举，Term号不断增长。</p>
+</div>
+<div class="paragraph">
+<p>在Raft协议中对这种情况有一个优化，当某个节点要发起选举之前，需要先进入一个叫作PreVote的状态，在该状态下，节点会先尝试连接集群中的其他节点，如果能够成功连接到半数以上的节点，才能真正发起新一轮的选举。通过这种方式可以解决上述的问题。</p>
+</div>
+<div class="paragraph">
+<p>另一个需要介绍的问题是，网络分区场景下，客户端与集群的交互过程及日志复制的过程。这里我们先简单介绍一下客户端如何与集群进行交互并找到集群的Leader节点。集群中只有Leader节点可以处理客户端发来的请求，当Follower节点收到客户端的请求时，也必须将Leader节点信息告知客户端，然后由Leader节点处理请求，具体过程如下</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>当客户端初次连接到集群时，会随即挑选一个服务器节点进行通信</p>
+</li>
+<li>
+<p>如果客户端第一次挑选的节点不是Leader节点，那么该节点会拒绝客户端的请求，并且将他所知道的Leader信息返回给客户端。</p>
+</li>
+<li>
+<p>当客户端连接到Leader节点之后，即可发送消息进行交互</p>
+</li>
+<li>
+<p>如果在交互过程中Leader节点宕机，那么客户端的请求会超时，客户端会再次随机挑选集群中的节点，并从步骤1重新开始执行</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>这里依然通过一个实例来介绍整个过程，假设集群依然有五个节点，在未发生网络分区时，节点A为集群的Leader节点，此时客户端请求会发送到节点A，经过前面描述的日志复制过程后，节点A也会向客户端返回响应。当节点A、B与节点C、D、E之间发生网络分区之后，客户端发往节点A的请求将会超时，这主要时以为内A无法将请求发送到集群中超过半数的节点上，该请求响应的日志记录也就无法提交，从而导致无法给客户端返回相应的响应，此时另外一个分区中的E节点被选举为Leader，当请求超时之后，客户端会重新随机选择一个节点并获取Leader节点信息，客户端最终会连接到节点E并发送请求，而该网络分区中有超过半数节点，请求对应的日志记录可以提交，所以客户端的请求不会再次出现超时，之后客户端会一直与节点E进行交互。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="true日志的压缩与快照"><a class="anchor" href="#true日志的压缩与快照"></a>日志的压缩与快照</h3>
+<div class="paragraph">
+<p>随着客户端与集群不断的交互，每个节点上的日志记录会不断增加，但是服务器的空间都是有限的，日志量布不能无限制的增长，另外，在节点重启时会重放日志记录，如果日志量记录过多，则需要花费较长的时间完成重放操作。这就需要压缩和清洗机制来减少日志量。</p>
+</div>
+<div class="paragraph">
+<p>定期生成快照时最常见的也是最简单的压缩方法。在创建快照文件时，会将整个节点的状态进行序列化，然后写入稳定的持久化存储中，这样，在该快照文件之前的日志记录就可以全部丢弃了。</p>
+</div>
+<div class="paragraph">
+<p>在快照中除了节点当前的数据状态，还包含了其最后一条日志记录的任期号和索引号，如图所示，该快照包含了6条日志记录，在快照的元数据中记录了第6条日志记录的任期号和索引号，在生成快照文件之后，即可将1～6条日志记录丢弃了</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="http://korov.myqnapcloud.cn:19000/images/Snipaste_2021-11-11_03-23-52.png" alt="Snipaste 2021 11 11 03 23 52">
+</div>
+</div>
+<div class="paragraph">
+<p>一般情况下，集群中每个节点都会自己独立、定时的创建快照，在其状态恢复时，都会使用自己本地最新的快照数据。如果Follower节点长时间宕机（或是刚刚加入集群的新节点），就有可能导致其日志记录远远落后于当前的Leader节点，与此同时，Leader节点中陈旧的日志记录都已被删除。在这种场景下，为了将该Follower节点恢复到正确的状态，Leader节点会将快照发送给该Follower节点，Follower节点会使用该快照数据进行恢复。发送快照时使用特殊的消息类型（快照消息）。etcd的网络层为了高效的传输消息，会将快照的发送与普通消息（Append Entries消息、心跳消息）的发送分开在不同的消息通道中完成</p>
+</div>
+<div class="paragraph">
+<p>当Follower节点接收到该快照消息时，必须决定如果处理已存在的日志记录。一般情况下，快照已包含了该Follower节点中不存在的日志记录，此时Follower节点直接丢弃所有的日志记录，因为这些日志最终会被Leader传递来的快照所替代。如果Follower节点接收到的快照只包含了自己本地日志的一部分，那么该快照所包含的全部日志记录会被全部删除，但是快照之后的日志则会保留。</p>
+</div>
+</div>
+<div class="sect2">
+<h3 id="true其他技术"><a class="anchor" href="#true其他技术"></a>其他技术</h3>
+<div class="sect3">
+<h4 id="truelinearizable语义"><a class="anchor" href="#truelinearizable语义"></a>linearizable语义</h4>
+<div class="paragraph">
+<p>Raft协议的目标是实现linearizable语义，即在客户端每次向集群发送一次请求时，该请求只会被执行一次。但是根据前面的描述，客户端虽然只是想发送一次请求，但是集群中可能多次收到该请求。例如Leader节点负责提交日志记录并将日志记录应用到其状态机中，但是在向客户端返回响应的响应消息之前宕机了，那么客户端会连接到新的Leader节点并重放对应的请求，这就导致该请求再次被执行。或者，网络出现故障，导致请求丢失或是延迟，就会导致一个请求被执行两次</p>
+</div>
+<div class="paragraph">
+<p>常见的解决方案就是客户端对于每个请求都产生一个唯一的序列号，然后由服务端为每个客户端维护一个Session，并对每个请求进行去重。</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="trueetcd-特性"><a class="anchor" href="#trueetcd-特性"></a>ETCD 特性</h2>
+<div class="sectionbody">
+<div class="ulist">
+<ul>
+<li>
+<p>Lease机制：即租约机制（TTL，Time To Live），Etcd 可以为存储的 KV 对设置租约，当租约到期，KV 将失效删除；同时也支持续约，即 KeepAlive。</p>
+</li>
+<li>
+<p>Revision 机制：每个 key 带有一个 Revision 属性值，etcd 每进行一次事务对应的全局 Revision 值都会加一，因此每个 key 对应的 Revision 属性值都是全局唯一的。通过比较 Revision 的大小就可以知道进行写操作的顺序。</p>
+</li>
+<li>
+<p>在实现分布式锁时，多个程序同时抢锁，根据 Revision 值大小依次获得锁，可以避免 “羊群效应” （也称 “惊群效应”），实现公平锁。</p>
+</li>
+<li>
+<p>Prefix 机制：即前缀机制，也称目录机制。可以根据前缀（目录）获取该目录下所有的 key 及对应的属性（包括 key, value 以及 revision 等）。</p>
+</li>
+<li>
+<p>Watch 机制：即监听机制，Watch 机制支持 Watch 某个固定的 key，也支持 Watch 一个目录（前缀机制），当被 Watch 的 key 或目录发生变化，客户端将收到通知。</p>
+</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<div id="footer-text">
+Version 1.0 2021-10-31<br>
+Last updated 2022-03-05 14:03:22 +0800
+</div>
+</div>
+</body>
+</html>

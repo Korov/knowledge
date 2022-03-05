@@ -7,8 +7,12 @@
         "id": "4fce09ef24789d1a",
         "type": "leaf",
         "state": {
-          "type": "empty",
-          "state": {}
+          "type": "markdown",
+          "state": {
+            "file": "设计模式/DesignPatterns.md",
+            "mode": "preview",
+            "source": false
+          }
         }
       }
     ],
@@ -49,7 +53,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 162
+    "width": 361
   },
   "right": {
     "id": "c191412f44b58839",
@@ -65,6 +69,7 @@
             "state": {
               "type": "backlink",
               "state": {
+                "file": "设计模式/DesignPatterns.md",
                 "collapseAll": false,
                 "extraContext": false,
                 "sortOrder": "alphabetical",
@@ -80,7 +85,9 @@
             "type": "leaf",
             "state": {
               "type": "outline",
-              "state": {}
+              "state": {
+                "file": "设计模式/DesignPatterns.md"
+              }
             }
           }
         ]
@@ -92,15 +99,15 @@
   },
   "active": "4fce09ef24789d1a",
   "lastOpenFiles": [
-    "picture/image-20191109154236619.png 1.md",
-    "picture/image-20191109154236619.png.md",
-    "Java/netty/netty-in-action.md",
-    "Java/netty/picture/netty-in-action.md",
-    "Java/java核心技术/Java核心技术.md",
-    "Java/java核心技术/picture/1566312846478.png",
-    "Java/java并发/Java并发编程实战.md",
-    "Java/Arthas/Arthas.md",
-    "interview/Java.md",
-    "interview/Java后端.pdf"
+    "设计模式/DesignPatterns.md",
+    "web/angular/angular.md",
+    "tools/批处理/shell/picture/shell.md",
+    "tools/zookeeper/从Paxos到Zookeeper分布式一致性原理与实践.md",
+    "tools/zookeeper/Zookeeper.md",
+    "tools/seata/Seata.md",
+    "tools/ETCD/ETCD.md",
+    "kotlin/kotlin.md",
+    "Java/log/log.md",
+    "Database/ELK/ELK.md"
   ]
 }

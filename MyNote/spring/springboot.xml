@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?><?asciidoc-toc?><?asciidoc-numbered?><article xmlns="http://docbook.org/ns/docbook" xmlns:xl="http://www.w3.org/1999/xlink" version="5.0" xml:lang="en">
+<info>
+<title>SpringBoot</title>
+<date>2022-03-05</date>
+<author>
+<personname>
+<firstname>Korov9</firstname>
+</personname>
+<email>korov9@163.com</email>
+</author>
+<authorinitials>K</authorinitials>
+</info>
+<section xml:id="_springboot">
+<title>springboot</title>
+<section xml:id="_spring_boot_事务支持">
+<title>Spring Boot 事务支持</title>
+<section xml:id="_spring_事务">
+<title>Spring 事务</title>
+<simpara>Spring并不直接管理事务，而是提供了许多内置事务管理实现，常用的有 <literal>DataSourceTransactionManager</literal>, <literal>JdoTransactionManager</literal>, <literal>JpaTransactionManager</literal> 以及 <literal>HibernateTransactionManager</literal> 等。</simpara>
+<section xml:id="_spring_声明式事务">
+<title>Spring 声明式事务</title>
+<simpara>Spring配置文件中关于事务配置总是由三部分组成，分别是 <literal>DataSource</literal>, <literal>TransactionManager</literal> 和代理机制。无论哪种配置方式，一般变化的只是代理机制部分，<literal>DataSource</literal>, <literal>TransactionManager</literal> 这两部分只会根据数据访问方式有所变化，比如使用 <literal>Hibernate</literal> 进行数据访问时， <literal>DataSource</literal> 实现为 <literal>SessionFactory</literal>， <literal>TransactionManager`的实现为 `HibernateTransactionManager</literal>。</simpara>
+</section>
+<section xml:id="_spring_注解事务行为">
+<title>Spring 注解事务行为</title>
+<simpara>当事务方法被另一个事务方法调用时，必须指定事务应该如何传播。例如，方法可能继续在现有的事务中运行，也可能开启一个新事务，并在自己的事务中运行。事务的传播行为可以在 <literal>@Transactional</literal> 中的属性指定，Spring定义了7种传播行为，</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>PROPAGATION_REQUIRED：如果当前没有事务，就新建一个事务；如果已经存在一个事务，就加入这个事务</simpara>
+</listitem>
+<listitem>
+<simpara>PROPAGATION_SUPPORTS：支持当前事务，如果当前没有事务，就以非事务方式执行</simpara>
+</listitem>
+<listitem>
+<simpara>PROPAGATION_MANDATORY：使用当前的事务，如果当前没有事务就抛出异常</simpara>
+</listitem>
+<listitem>
+<simpara>PROPAGATION_REQUIRES_NEW：新建事务，如果当前存在事务，就把当前事务挂起</simpara>
+</listitem>
+<listitem>
+<simpara>PROPAGATION_NOT_SUPPORTED：以非事务方式执行操作，如果当前存在事务，就把当前事务挂起</simpara>
+</listitem>
+<listitem>
+<simpara>PROPAGATION_NEVER：以非事务方式执行，如果当前存在事务，就抛出异常</simpara>
+</listitem>
+<listitem>
+<simpara>PROPAGATION_NESTED：如果当前存在事务，就在嵌套事务内执行；如果当前没有事务，就执行PROPAGATION_REQUIRED类似的操作</simpara>
+</listitem>
+</orderedlist>
+<simpara>Spring定义了5种事务的隔离级别：</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>ISOLATION_DEFAULT：使用数据库默认的事务隔离级别，另外4个与JDBC的隔离级别相对应</simpara>
+</listitem>
+<listitem>
+<simpara>ISOLATION_READ_UNCOMMITTED：事务最低的隔离级别，允许另一个事务可以看到这个事务未提交的数据，这种隔离级别会产生脏读、不可重复读和幻读</simpara>
+</listitem>
+<listitem>
+<simpara>ISOLATION_READ_COMMITTED：</simpara>
+</listitem>
+<listitem>
+<simpara>ISOLATION_REPEATABLE_READ：</simpara>
+</listitem>
+<listitem>
+<simpara>ISOLATION_SERIALIZABLE：</simpara>
+</listitem>
+</orderedlist>
+<simpara><literal>@Transactional</literal> propagation定义传播行为，isolation定义隔离级别，timeout设置事务的过期时间，readOnly指定当前事务是否是只读事务。rollbackfor（norollbackfor）指定哪个或者哪些异常可以引起（或不可以引起）事务回滚。</simpara>
+</section>
+</section>
+</section>
+</section>
+<section xml:id="_spring">
+<title>Spring</title>
+<section xml:id="_spring中涉及的设计模式">
+<title>Spring中涉及的设计模式</title>
+<section xml:id="_简单工厂模式">
+<title>简单工厂模式</title>
+<simpara><literal>BeanFactory</literal>, Spring中的 <literal>BeanFactory</literal> 就是简单工厂模式的体现，根据传入beanName来获得对象，先从缓存中获取，缓存中没有再创建</simpara>
+<simpara>实现原理：</simpara>
+<orderedlist numeration="arabic">
+<listitem>
+<simpara>bean容器的启动阶段：</simpara>
+<orderedlist numeration="loweralpha">
+<listitem>
+<simpara>读取bean的xml配置文件，将bean元素分别转换成一个BeanDefinition对象。</simpara>
+</listitem>
+<listitem>
+<simpara>然后通过BeanDefinitionRegistry将这些bean注册到beanFactory中，保存在它的一个ConcurrentHashMap中。</simpara>
+</listitem>
+<listitem>
+<simpara>将BeanDefinition注册到了beanFactory之后，在这里Spring为我们提供了一个扩展的切口，允许我们通过实现接口BeanFactoryPostProcessor 在此处来插入我们定义的代码。典型的例子就是：PropertyPlaceholderConfigurer，我们一般在配置数据库的dataSource时使用到的占位符的值，就是它注入进去的。</simpara>
+</listitem>
+</orderedlist>
+</listitem>
+</orderedlist>
+</section>
+<section xml:id="_工厂方法">
+<title>工厂方法</title>
+
+</section>
+<section xml:id="_单例模式">
+<title>单例模式</title>
+
+</section>
+<section xml:id="_适配器模式">
+<title>适配器模式</title>
+
+</section>
+<section xml:id="_装饰器模式">
+<title>装饰器模式</title>
+
+</section>
+<section xml:id="_代理模式">
+<title>代理模式</title>
+
+</section>
+<section xml:id="_观察者模式">
+<title>观察者模式</title>
+
+</section>
+<section xml:id="_策略模式">
+<title>策略模式</title>
+
+</section>
+<section xml:id="_模板方法模式">
+<title>模板方法模式</title>
+
+</section>
+</section>
+</section>
+</article>

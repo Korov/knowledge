@@ -1,6 +1,6 @@
 # 架构
 
-![scrapy_architecture_02.png](picture\scrapy_architecture_02.png)
+![scrapy_architecture_02.png](http://korov.myqnapcloud.cn:19000/images/scrapy_architecture_02.png)
 
 The data flow in Scrapy is controlled by the execution engine, and goes like this:
 

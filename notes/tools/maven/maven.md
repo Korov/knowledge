@@ -125,7 +125,7 @@ Maven Site 插件一般用来创建新的报告文档、部署站点等。
 - post-site： 执行一些需要在生成站点文档之后完成的工作，并且为部署做准备
 - site-deploy：将生成的站点文档部署到特定的服务器上
 
-![maven-lifecycle](picture\maven-lifecycle.jpg)
+![maven-lifecycle](http://korov.myqnapcloud.cn:19000/images/maven-lifecycle.jpg)
 
 ## scope
 

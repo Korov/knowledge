@@ -2,7 +2,6 @@
 Korov9 <korov9@163.com>
 v1.0 2021-11-7
 :toc: right
-:imagesdir: images
 :source-highlighter: highlight.js
 
 Seata是一款开源的分布式事务解决方案，致力于提供高性能和简单易用的分布式事务服务。Seata 将为用户提供了 AT、TCC、SAGA 和 XA 事务模式，为用户打造一站式的分布式解决方案。
@@ -35,11 +34,11 @@ Seata是一款开源的分布式事务解决方案，致力于提供高性能和
 
 tx1 先开始，开启本地事务，拿到本地锁，更新操作 m = 1000 - 100 = 900。本地事务提交前，先拿到该记录的 全局锁 ，本地提交释放本地锁。 tx2 后开始，开启本地事务，拿到本地锁，更新操作 m = 900 - 100 = 800。本地事务提交前，尝试拿该记录的 全局锁 ，tx1 全局提交前，该记录的全局锁被 tx1 持有，tx2 需要重试等待 全局锁 。
 
-image::TB1zaknwVY7gK0jSZKzXXaikpXa-702-521.png["image",height=32,scaledwidth="75%"align="left"]
+image::http://korov.myqnapcloud.cn:19000/images/TB1zaknwVY7gK0jSZKzXXaikpXa-702-521.png["image",height=32,scaledwidth="75%"align="left"]
 
 tx1 二阶段全局提交，释放 全局锁 。tx2 拿到 全局锁 提交本地事务。
 
-image::TB1xW0UwubviK0jSZFNXXaApXXa-718-521.png["image",height=32,scaledwidth="75%"align="left"]
+image::http://korov.myqnapcloud.cn:19000/images/TB1xW0UwubviK0jSZFNXXaApXXa-718-521.png["image",height=32,scaledwidth="75%"align="left"]
 
 如果 tx1 的二阶段全局回滚，则 tx1 需要重新获取该数据的本地锁，进行反向补偿的更新操作，实现分支的回滚。
 
@@ -196,7 +195,7 @@ CREATE TABLE `undo_log` (
 - 一阶段 prepare 行为
 - 二阶段 commit 或 rollback 行为
 
-image::TB14Kguw1H2gK0jSZJnXXaT1FXa-853-482.png[]
+image::http://korov.myqnapcloud.cn:19000/images/TB14Kguw1H2gK0jSZJnXXaT1FXa-853-482.png[]
 
 根据两阶段行为模式的不同，我们将分支事务划分为 Automatic (Branch) Transaction Mode 和 Manual (Branch) Transaction Mode.
 
@@ -236,7 +235,7 @@ TCC 三个方法描述：
 
 Saga模式是SEATA提供的长事务解决方案，在Saga模式中，业务流程中每个参与者都提交本地事务，当出现某一个参与者失败则补偿前面已经成功的参与者，一阶段正向服务和二阶段补偿服务都由业务开发实现。
 
-image::TB1Y2kuw7T2gK0jSZFkXXcIQFXa-445-444.png[]
+image::http://korov.myqnapcloud.cn:19000/images/TB1Y2kuw7T2gK0jSZFkXXcIQFXa-445-444.png[]
 
 长事务解决方案。Saga 是一种补偿协议，在 Saga 模式下，分布式事务内有多个参与者，每一个参与者都是一个冲正补偿服务，需要用户根据业务场景实现其正向操作和逆向回滚操作。
 
