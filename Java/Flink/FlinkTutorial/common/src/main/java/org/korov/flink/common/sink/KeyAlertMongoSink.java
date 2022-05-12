@@ -93,16 +93,16 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
         ServerAddress serverAddress = new ServerAddress(host, port);
-        //MongoCredential.createScramSha1Credential()三个参数分别为 用户名 数据库名称 密码
+        // MongoCredential.createScramSha1Credential()三个参数分别为 用户名 数据库名称 密码
         MongoCredential mongoCredential = MongoCredential.createScramSha256Credential("admin", "kafka", "admin".toCharArray());
         MongoClientOptions options = MongoClientOptions.builder().maxConnectionIdleTime(6000).build();
-        //通过连接认证获取MongoDB连接
+        // 通过连接认证获取MongoDB连接
         // mongoClient = new MongoClient(ImmutableList.of(serverAddress), mongoCredential, options);
 
         ServerAddress localServerAddress = new ServerAddress("192.168.50.100", 27017);
         MongoClientOptions localOptions = MongoClientOptions.builder().maxConnectionIdleTime(6000).build();
-        //通过连接认证获取MongoDB连接
-        localMongoClient = new MongoClient(ImmutableList.of(localServerAddress), localOptions);
+        // 通过连接认证获取MongoDB连接
+        localMongoClient = new MongoClient(ImmutableList.of(localServerAddress), mongoCredential, localOptions);
     }
 
 
