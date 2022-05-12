@@ -4,7 +4,10 @@ docker run -d --name minio -p 9000:9000 -p 9001:9001 -e "MINIO_ROOT_USER=minioad
 
 打开：`localhost:9001`账号密码：`minioadmin:minioadmin`
 
-```
+```bash
+# 如果想要本地化需要修改文件权限
+sudo chown -R 1001:1001 /path/to/minio-persistence
+
 docker run -d --name minio \
     --publish 9000:9000 \
     --publish 9001:9001 \

@@ -2,8 +2,6 @@ package src
 
 import (
 	"fmt"
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
 	"time"
 )
 
@@ -30,7 +28,7 @@ func init() {
 		Encoding:         "json",                                              // 输出格式 console 或 json
 		EncoderConfig:    encoderConfig,                                       // 编码器配置
 		InitialFields:    map[string]interface{}{"serviceName": "spikeProxy"}, // 初始化字段，如：添加一个服务器名称
-		OutputPaths:      []string{"stdout", "./test.log"},               // 输出到指定文件 stdout（标准输出，正常颜色） stderr（错误输出，红色）
+		OutputPaths:      []string{"stdout", "./test.log"},                    // 输出到指定文件 stdout（标准输出，正常颜色） stderr（错误输出，红色）
 		ErrorOutputPaths: []string{"stderr"},
 	}
 	// 构建日志
@@ -70,7 +68,7 @@ func GetLogger() *zap.Logger {
 		Encoding:         "json",                                              // 输出格式 console 或 json
 		EncoderConfig:    encoderConfig,                                       // 编码器配置
 		InitialFields:    map[string]interface{}{"serviceName": "spikeProxy"}, // 初始化字段，如：添加一个服务器名称
-		OutputPaths:      []string{"stdout", "./test.log"},               // 输出到指定文件 stdout（标准输出，正常颜色） stderr（错误输出，红色）
+		OutputPaths:      []string{"stdout", "./test.log"},                    // 输出到指定文件 stdout（标准输出，正常颜色） stderr（错误输出，红色）
 		ErrorOutputPaths: []string{"stderr"},
 	}
 	// 构建日志
