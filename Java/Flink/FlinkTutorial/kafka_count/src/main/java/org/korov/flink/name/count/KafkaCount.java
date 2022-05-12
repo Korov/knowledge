@@ -51,7 +51,7 @@ public class KafkaCount {
         EmbeddedRocksDBStateBackend rocksDbStateBackend = new EmbeddedRocksDBStateBackend(true);
         rocksDbStateBackend.setDbStoragePath("file:////opt/flink/rocksdb");
         env.setStateBackend(rocksDbStateBackend);
-        env.getCheckpointConfig().setCheckpointStorage("s3://flink/checkpoints");
+        env.getCheckpointConfig().setCheckpointStorage("file:////opt/flink/savepoints");
         env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE);
 
         KafkaSource<Tuple3<String, NameModel, Long>> kafkaSource = KafkaSource.<Tuple3<String, NameModel, Long>>builder()
