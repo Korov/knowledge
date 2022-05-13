@@ -18,10 +18,11 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
-import org.korov.flink.common.deserialization.KeyAlertDeserializer;
-import org.korov.flink.common.enums.SinkType;
-import org.korov.flink.common.model.NameModel;
-import org.korov.flink.common.sink.KeyAlertMongoSink;
+import org.korov.flink.name.count.deserialization.KeyAlertDeserializer;
+import org.korov.flink.name.count.enums.SinkType;
+import org.korov.flink.name.count.model.NameModel;
+import org.korov.flink.name.count.sink.KeyAlertMongoSink;
+
 
 import java.time.Duration;
 
