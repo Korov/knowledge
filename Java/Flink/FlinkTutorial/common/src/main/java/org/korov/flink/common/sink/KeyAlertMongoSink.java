@@ -99,10 +99,11 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
         // 通过连接认证获取MongoDB连接
         // mongoClient = new MongoClient(ImmutableList.of(serverAddress), mongoCredential, options);
 
+        // MongoCredential localCredential = MongoCredential.createCredential("admin", "kafka", "admin".toCharArray());
         ServerAddress localServerAddress = new ServerAddress("192.168.50.100", 27017);
         MongoClientOptions localOptions = MongoClientOptions.builder().maxConnectionIdleTime(6000).build();
         // 通过连接认证获取MongoDB连接
-        localMongoClient = new MongoClient(ImmutableList.of(localServerAddress), mongoCredential, localOptions);
+        localMongoClient = new MongoClient(ImmutableList.of(localServerAddress), localOptions);
     }
 
 
