@@ -133,11 +133,11 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <version>2.6</version>
                 <configuration>
-                    <archive>
+                    <!--<archive>
                         <manifest>
                             <mainClass>org.korov.flink.name.count.KafkaToMongo</mainClass>
                         </manifest>
-                    </archive>
+                    </archive>-->
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
