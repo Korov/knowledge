@@ -129,6 +129,6 @@ public class KafkaAlertNameWindowCount {
                     }
                 })
                 .addSink(mongoNameSink).name("mongo-name-sink");
-        env.execute("kafka-count");
+        env.execute("KafkaAlertNameWindowCount");
     }
 }

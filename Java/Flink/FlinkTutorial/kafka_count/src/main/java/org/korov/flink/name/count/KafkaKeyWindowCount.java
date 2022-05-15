@@ -127,6 +127,6 @@ public class KafkaKeyWindowCount {
                 })
                 .addSink(mongoKeySink).name("mongo-key-sink");
 
-        env.execute("kafka-count");
+        env.execute("KafkaKeyWindowCount");
     }
 }

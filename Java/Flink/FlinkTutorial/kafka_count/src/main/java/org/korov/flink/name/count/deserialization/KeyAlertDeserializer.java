@@ -87,9 +87,10 @@ public class KeyAlertDeserializer implements KafkaRecordDeserializationSchema<Tu
                 break;
             case "nmap_data":
                 MapModel model = null;
+                byte[] bytes = GZIPUtils.uncompress(record.value());
+                value = new String(bytes, StandardCharsets.UTF_8);
+                nameModel.setMessage(value);
                 try {
-                    byte[] bytes = GZIPUtils.uncompress(record.value());
-                    value = new String(bytes, StandardCharsets.UTF_8);
                     model = mapper.readValue(value, MapModel.class);
                 } catch (JsonProcessingException e) {
                     log.error("parse key:[{}] value:[{}] failed", key, value, e);

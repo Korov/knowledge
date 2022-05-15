@@ -101,6 +101,6 @@ public class KafkaToMongo {
 
         KeyAlertMongoSink mongoValueSink = new KeyAlertMongoSink(mongoHost, mongoPort, mongoDb, mongoCollection, mongoUser, mongoPassword, SinkType.KEY_NAME_VALUE);
         stream.addSink(mongoValueSink).name("mongo-value-sink");
-        env.execute("kafka-count");
+        env.execute("KafkaToMongo");
     }
 }
