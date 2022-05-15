@@ -14,8 +14,10 @@ import org.korov.flink.name.count.model.FlinkAlertModel;
 import org.korov.flink.name.count.model.MapModel;
 import org.korov.flink.name.count.model.NameModel;
 import org.korov.flink.name.count.model.SPLAlertModel;
+import org.korov.flink.name.count.util.GZIPUtils;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 @Slf4j
 public class KeyAlertDeserializer implements KafkaRecordDeserializationSchema<Tuple3<String, NameModel, Long>> {
@@ -76,6 +78,8 @@ public class KeyAlertDeserializer implements KafkaRecordDeserializationSchema<Tu
             case "nmap_data":
                 MapModel model = null;
                 try {
+                    byte[] bytes = GZIPUtils.uncompress(record.value());
+                    value = new String(bytes, StandardCharsets.UTF_8);
                     model = mapper.readValue(value, MapModel.class);
                 } catch (JsonProcessingException e) {
                     log.error("parse key:[{}] value:[{}] failed", key, value, e);
