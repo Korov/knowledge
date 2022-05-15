@@ -19,21 +19,27 @@ import org.slf4j.LoggerFactory;
 import java.time.ZoneId;
 import java.util.*;
 
+/**
+ * @author korov
+ */
 public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel, Long>> {
     private static final Logger log = LoggerFactory.getLogger(KeyAlertMongoSink.class);
     private final String host;
     private final int port;
     private final String dbname;
     private final String collection;
+    private final String userName;
+    private final String password;
     private final SinkType sinkType;
     MongoClient mongoClient = null;
-    MongoClient localMongoClient = null;
 
-    public KeyAlertMongoSink(String host, int port, String dbname, String collection, SinkType sinkType) {
+    public KeyAlertMongoSink(String host, int port, String dbname, String collection, String userName, String password, SinkType sinkType) {
         this.host = host;
         this.port = port;
         this.dbname = dbname;
         this.collection = collection;
+        this.userName = userName;
+        this.password = password;
         this.sinkType = sinkType;
     }
 
@@ -66,7 +72,8 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
             document.append("uuid", value.f1.getUuid());
         }
         documents.add(document);
-        /*if (mongoClient == null) {
+        if (mongoClient == null) {
+            log.error("mongo client is invalid");
             return;
         }
         try {
@@ -75,17 +82,6 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
             mongoCollection.insertMany(documents);
         } catch (Exception e) {
             log.error("insert documents filed, collection:{}", collection, e);
-        }*/
-
-        if (localMongoClient == null) {
-            return;
-        }
-        try {
-            MongoDatabase db = localMongoClient.getDatabase(dbname);
-            MongoCollection<Document> mongoCollection = db.getCollection(collection);
-            mongoCollection.insertMany(documents);
-        } catch (Exception e) {
-            log.error("insert documents filed, local collection:{}", collection, e);
         }
     }
 
@@ -94,26 +90,25 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
         super.open(parameters);
         ServerAddress serverAddress = new ServerAddress(host, port);
         // MongoCredential.createScramSha1Credential()三个参数分别为 用户名 数据库名称 密码
-        MongoCredential mongoCredential = MongoCredential.createScramSha256Credential("admin", "kafka", "admin".toCharArray());
+        MongoCredential mongoCredential = null;
+        if (userName != null && !"".equals(userName) && password != null && !"".equals(password)) {
+            mongoCredential = MongoCredential.createScramSha256Credential(userName, dbname, password.toCharArray());
+        }
+
         MongoClientOptions options = MongoClientOptions.builder().maxConnectionIdleTime(6000).build();
         // 通过连接认证获取MongoDB连接
-        // mongoClient = new MongoClient(ImmutableList.of(serverAddress), mongoCredential, options);
-
-        // MongoCredential localCredential = MongoCredential.createCredential("admin", "kafka", "admin".toCharArray());
-        ServerAddress localServerAddress = new ServerAddress("192.168.50.100", 27017);
-        MongoClientOptions localOptions = MongoClientOptions.builder().maxConnectionIdleTime(6000).build();
-        // 通过连接认证获取MongoDB连接
-        localMongoClient = new MongoClient(ImmutableList.of(localServerAddress), localOptions);
+        if (mongoCredential != null) {
+            mongoClient = new MongoClient(ImmutableList.of(serverAddress), mongoCredential, options);
+        } else {
+            mongoClient = new MongoClient(ImmutableList.of(serverAddress), options);
+        }
     }
 
 
     @Override
     public void close() {
-        /*if (mongoClient != null) {
+        if (mongoClient != null) {
             mongoClient.close();
-        }*/
-        if (localMongoClient != null) {
-            localMongoClient.close();
         }
     }
 }

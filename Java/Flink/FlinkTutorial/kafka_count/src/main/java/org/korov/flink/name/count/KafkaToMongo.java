@@ -1,6 +1,10 @@
 package org.korov.flink.name.count;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.Options;
 import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
@@ -18,21 +22,40 @@ import org.korov.flink.name.count.enums.SinkType;
 import org.korov.flink.name.count.model.NameModel;
 import org.korov.flink.name.count.sink.KeyAlertMongoSink;
 
-
 import java.time.Duration;
 
 /**
  * 将kafka中的数据格式化之后发送到mongo中
+ * --mongo_host "localhost" --mongo_port 27017 --mongo_db "kafka" --mongo_collection "value-record" --mongo_user "" --mongo_password "" --kafka_addr "192.168.1.19:9092" --kafka_topic "flink_siem" --kafka_group "kafka-name-count"
  * @author zhu.lei
  * @date 2021-05-05 14:00
  */
 @Slf4j
 public class KafkaToMongo {
-    // private static final String MONGO_HOST = "localhost";
-    private static final String MONGO_HOST = "korov.myqnapcloud.cn";
-    private static final String DB_NAME = "kafka";
 
     public static void main(String[] args) throws Exception {
+        Options options = new Options();
+        options.addOption(Option.builder().longOpt("mongo_host").hasArg(true).required(true).build());
+        options.addOption(Option.builder().longOpt("mongo_port").hasArg(true).required(true).build());
+        options.addOption(Option.builder().longOpt("mongo_db").hasArg(true).required(true).build());
+        options.addOption(Option.builder().longOpt("mongo_collection").hasArg(true).required(true).build());
+
+        options.addOption(Option.builder().longOpt("kafka_addr").hasArg(true).required(true).build());
+        options.addOption(Option.builder().longOpt("kafka_topic").hasArg(true).required(true).build());
+        options.addOption(Option.builder().longOpt("kafka_group").hasArg(true).required(true).build());
+
+        CommandLine cmd = new DefaultParser().parse(options, args);
+        String mongoHost = cmd.getOptionValue("mongo_host");
+        int mongoPort = Integer.parseInt(cmd.getOptionValue("mongo_port"));
+        String mongoUser = cmd.getOptionValue("mongo_user");
+        String mongoPassword = cmd.getOptionValue("mongo_password");
+        String mongoDb = cmd.getOptionValue("mongo_db");
+        String mongoCollection = cmd.getOptionValue("mongo_collection");
+
+        String kafkaAddr = cmd.getOptionValue("kafka_addr");
+        String kafkaTopic = cmd.getOptionValue("kafka_topic");
+        String kafkaGroup = cmd.getOptionValue("kafka_group");
+
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setRuntimeMode(RuntimeExecutionMode.STREAMING);
         env.setParallelism(2);
@@ -52,10 +75,10 @@ public class KafkaToMongo {
         env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE);
 
         KafkaSource<Tuple3<String, NameModel, Long>> kafkaSource = KafkaSource.<Tuple3<String, NameModel, Long>>builder()
-                .setBootstrapServers("192.168.1.19:9092")
-                .setGroupId("kafka-name-count")
+                .setBootstrapServers(kafkaAddr)
+                .setGroupId(kafkaGroup)
                 .setStartingOffsets(OffsetsInitializer.committedOffsets(OffsetResetStrategy.EARLIEST))
-                .setTopics("flink_siem")
+                .setTopics(kafkaTopic)
                 .setDeserializer(new KeyAlertDeserializer())
                 .build();
 
@@ -113,7 +136,7 @@ public class KafkaToMongo {
                 })
                 .addSink(mongoKeySink).name("mongo-key-sink");*/
 
-        KeyAlertMongoSink mongoValueSink = new KeyAlertMongoSink(MONGO_HOST, 27017, DB_NAME, "value-record", SinkType.KEY_NAME_VALUE);
+        KeyAlertMongoSink mongoValueSink = new KeyAlertMongoSink(mongoHost, mongoPort, mongoDb, mongoCollection, mongoUser, mongoPassword, SinkType.KEY_NAME_VALUE);
         stream.addSink(mongoValueSink).name("mongo-value-sink");
         env.execute("kafka-count");
     }
