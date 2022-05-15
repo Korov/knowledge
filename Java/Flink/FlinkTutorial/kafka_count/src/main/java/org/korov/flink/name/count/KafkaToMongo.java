@@ -23,6 +23,7 @@ import org.korov.flink.name.count.model.NameModel;
 import org.korov.flink.name.count.sink.KeyAlertMongoSink;
 
 import java.time.Duration;
+import java.util.Optional;
 
 /**
  * 将kafka中的数据格式化之后发送到mongo中
@@ -61,7 +62,6 @@ public class KafkaToMongo {
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setRuntimeMode(RuntimeExecutionMode.STREAMING);
-        env.setParallelism(2);
         env.getConfig().setUseSnapshotCompression(true);
         env.getCheckpointConfig().setCheckpointInterval(5 * 60000);
         env.getCheckpointConfig().setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE);
