@@ -31,15 +31,15 @@ import java.time.Duration;
 
 /**
  * 将kafka中的数据格式化之后发送到mongo中
- * org.korov.flink.name.count.KafkaToMongo
+ * org.korov.flink.name.count.KafkaKeyWindowCount
  * <p>
- * --mongo_host localhost --mongo_port 27017 --mongo_db kafka --mongo_collection value-record --kafka_addr 192.168.1.19:9092 --kafka_topic flink_siem --kafka_group kafka-name-count
+ * --mongo_host localhost --mongo_port 27017 --mongo_db kafka --mongo_collection kafka_key_count --kafka_addr 192.168.1.19:9092 --kafka_topic flink_siem --kafka_group kafka-key-count
  *
  * @author zhu.lei
  * @date 2021-05-05 14:00
  */
 @Slf4j
-public class KafkaWindowCount {
+public class KafkaKeyWindowCount {
 
     public static void main(String[] args) throws Exception {
         Options options = new Options();
@@ -91,7 +91,9 @@ public class KafkaWindowCount {
                 .build();
 
         DataStream<Tuple3<String, NameModel, Long>> stream = env.fromSource(kafkaSource,
+                // 允许数据迟到5分钟
                 WatermarkStrategy.<Tuple3<String, NameModel, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
+                        // 抽取kafka中的告警时间作为事件时间
                         .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, NameModel, Long>>() {
                             @Override
                             public long extractTimestamp(Tuple3<String, NameModel, Long> element, long recordTimestamp) {
@@ -104,26 +106,6 @@ public class KafkaWindowCount {
                             }
                         }).withIdleness(Duration.ofMinutes(5)), "kafka-source");
 
-        KeyAlertMongoSink mongoNameSink = new KeyAlertMongoSink(mongoHost, mongoPort, mongoDb, mongoCollection, mongoUser, mongoPassword, SinkType.KEY_NAME);
-        stream.keyBy(new KeySelector<Tuple3<String, NameModel, Long>, Object>() {
-                    @Override
-                    public Object getKey(Tuple3<String, NameModel, Long> value) throws Exception {
-                        try {
-                            return Joiner.on("-").join(value.f0, value.f1.getName());
-                        } catch (Exception e) {
-                            log.error("get name key failed", e);
-                            return value.f0 + "null";
-                        }
-                    }
-                }).window(TumblingEventTimeWindows.of(Time.minutes(1)))
-                .reduce(new ReduceFunction<Tuple3<String, NameModel, Long>>() {
-                    @Override
-                    public Tuple3<String, NameModel, Long> reduce(Tuple3<String, NameModel, Long> value1, Tuple3<String, NameModel, Long> value2) throws Exception {
-                        return new Tuple3<>(value1.f0, value1.f1, value1.f2 + value2.f2);
-                    }
-                })
-                .addSink(mongoNameSink).name("mongo-name-sink");
-
         KeyAlertMongoSink mongoKeySink = new KeyAlertMongoSink(mongoHost, mongoPort, mongoDb, mongoCollection, mongoUser, mongoPassword, SinkType.KEY_NAME);
         stream.keyBy(new KeySelector<Tuple3<String, NameModel, Long>, Object>() {
                     @Override
@@ -135,7 +117,8 @@ public class KafkaWindowCount {
                             return "null";
                         }
                     }
-                }).window(TumblingEventTimeWindows.of(Time.minutes(1)))
+                })
+                .window(TumblingEventTimeWindows.of(Time.minutes(1)))
                 .reduce(new ReduceFunction<Tuple3<String, NameModel, Long>>() {
                     @Override
                     public Tuple3<String, NameModel, Long> reduce(Tuple3<String, NameModel, Long> value1, Tuple3<String, NameModel, Long> value2) throws Exception {
@@ -144,8 +127,6 @@ public class KafkaWindowCount {
                 })
                 .addSink(mongoKeySink).name("mongo-key-sink");
 
-        KeyAlertMongoSink mongoValueSink = new KeyAlertMongoSink(mongoHost, mongoPort, mongoDb, mongoCollection, mongoUser, mongoPassword, SinkType.KEY_NAME_VALUE);
-        stream.addSink(mongoValueSink).name("mongo-value-sink");
         env.execute("kafka-count");
     }
 }

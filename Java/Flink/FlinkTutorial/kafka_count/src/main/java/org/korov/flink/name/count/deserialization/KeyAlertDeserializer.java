@@ -19,6 +19,10 @@ import org.korov.flink.name.count.util.GZIPUtils;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 
+
+/**
+ * 将kafka中的数据解析成对应的数据结构
+ */
 @Slf4j
 public class KeyAlertDeserializer implements KafkaRecordDeserializationSchema<Tuple3<String, NameModel, Long>> {
     @Override
@@ -32,6 +36,12 @@ public class KeyAlertDeserializer implements KafkaRecordDeserializationSchema<Tu
         KafkaRecordDeserializationSchema.super.open(context);
     }
 
+    /**
+     * key是kafka的key，NameModel中对应的数据是告警名称，告警元数据，告警的时间，以后后面的数量
+     *
+     * @param record The ConsumerRecord to deserialize.
+     * @param out The collector to put the resulting messages.
+     */
     @Override
     public void deserialize(ConsumerRecord<byte[], byte[]> record, Collector<Tuple3<String, NameModel, Long>> out) throws IOException {
         String key = new String(record.key());
