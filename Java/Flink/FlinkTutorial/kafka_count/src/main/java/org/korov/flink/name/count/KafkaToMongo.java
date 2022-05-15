@@ -1,12 +1,9 @@
 package org.korov.flink.name.count;
 
-import com.google.common.base.Joiner;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.common.functions.ReduceFunction;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
@@ -15,8 +12,6 @@ import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
-import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.korov.flink.name.count.deserialization.KeyAlertDeserializer;
 import org.korov.flink.name.count.enums.SinkType;
@@ -27,11 +22,12 @@ import org.korov.flink.name.count.sink.KeyAlertMongoSink;
 import java.time.Duration;
 
 /**
+ * 将kafka中的数据格式化之后发送到mongo中
  * @author zhu.lei
  * @date 2021-05-05 14:00
  */
 @Slf4j
-public class KafkaCount {
+public class KafkaToMongo {
     // private static final String MONGO_HOST = "localhost";
     private static final String MONGO_HOST = "korov.myqnapcloud.cn";
     private static final String DB_NAME = "kafka";

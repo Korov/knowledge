@@ -135,7 +135,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.korov.flink.name.count.KafkaCount</mainClass>
+                            <mainClass>org.korov.flink.name.count.KafkaToMongo</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
