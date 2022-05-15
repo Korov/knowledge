@@ -1,5 +1,6 @@
 package org.korov.flink.name.count.util;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,10 +15,9 @@ import java.util.zip.GZIPOutputStream;
  * @version 1.0
  * @date 2019-08-05 17:32
  */
+@Slf4j
 public class GZIPUtils {
-
     public static final String GZIP_ENCODE_UTF_8 = "UTF-8";
-    private final static Logger logger = LoggerFactory.getLogger(GZIPUtils.class);
 
     /**
      * 字符串压缩为GZIP字节数组
@@ -46,7 +46,7 @@ public class GZIPUtils {
             gzip.finish();
             return out.toByteArray();
         } catch (IOException e) {
-            logger.error("compress failed", e);
+            log.error("compress failed", e);
         }
         return null;
     }
@@ -72,7 +72,7 @@ public class GZIPUtils {
             }
             return out.toByteArray();
         } catch (IOException e) {
-            logger.error("uncompress failed", e);
+            log.error("uncompress failed", e);
         }
         return null;
     }
@@ -104,7 +104,7 @@ public class GZIPUtils {
             }
             return out.toString(encoding);
         } catch (IOException e) {
-            logger.error("uncompress to string failed", e);
+            log.error("uncompress to string failed", e);
         }
         return null;
     }
