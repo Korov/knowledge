@@ -9,7 +9,7 @@
         <property name="ERROR_LOG_FILE_NAME">logs/basic</property>
         <property name="WARN_LOG_FILE_NAME">logs/basic</property>
 
-        <property name="PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t-%L] %highlight{%-5level} %logger{36} - %msg%n
+        <property name="PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%-5level} [%t-%L] %logger{36} - %msg%n
         </property>
     </Properties>
 
