@@ -74,7 +74,7 @@ public class KafkaAlertNameSlideWindowCount {
         env.getCheckpointConfig().setMinPauseBetweenCheckpoints(60000);
         env.getCheckpointConfig().setCheckpointTimeout(5 * 60000);
         env.getCheckpointConfig().setMaxConcurrentCheckpoints(1);
-        env.getCheckpointConfig().enableExternalizedCheckpoints(
+        env.getCheckpointConfig().setExternalizedCheckpointCleanup(
                 CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
 
         EmbeddedRocksDBStateBackend rocksDbStateBackend = new EmbeddedRocksDBStateBackend(true);
