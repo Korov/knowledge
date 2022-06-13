@@ -23,7 +23,6 @@ import org.korov.flink.name.count.model.NameModel;
 import org.korov.flink.name.count.sink.KeyAlertMongoSink;
 
 import java.time.Duration;
-import java.util.Optional;
 
 /**
  * 将kafka中的数据格式化之后发送到mongo中
