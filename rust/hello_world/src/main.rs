@@ -1,3 +1,5 @@
+pub mod algorithm;
+
 use env_logger::{Builder, Target};
 use log::{debug, error, info, log_enabled, Level, LevelFilter};
 
