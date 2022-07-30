@@ -50,7 +50,15 @@ pub fn find_median_sorted_arrays(nums1: Vec<i32>, nums2: Vec<i32>) -> f64 {
         let mut index1 = 0;
         let mut index2 = 0;
         for _i in 0..mid + 1 {
-            if nums1[index1] <= nums2[index2] {
+            if index1 >= nums1.len() || index2 >= nums2.len() {
+                if index1 >= nums1.len() {
+                    all_nums.push(nums2[index2]);
+                    index2 = index2 + 1;
+                } else {
+                    all_nums.push(nums1[index1]);
+                    index1 = index1 + 1;
+                }
+            } else if nums1[index1] <= nums2[index2] {
                 if index1 < nums1.len() {
                     all_nums.push(nums1[index1]);
                     index1 = index1 + 1;
@@ -73,8 +81,16 @@ pub fn find_median_sorted_arrays(nums1: Vec<i32>, nums2: Vec<i32>) -> f64 {
         let mid2 = mid + 1;
         let mut index1 = 0;
         let mut index2 = 0;
-        for i in 0..mid2 {
-            if nums1[index1] <= nums2[index2] {
+        for _i in 0..mid2 {
+            if index1 >= nums1.len() || index2 >= nums2.len() {
+                if index1 >= nums1.len() {
+                    all_nums.push(nums2[index2]);
+                    index2 = index2 + 1;
+                } else {
+                    all_nums.push(nums1[index1]);
+                    index1 = index1 + 1;
+                }
+            } else if nums1[index1] <= nums2[index2] {
                 if index1 < nums1.len() {
                     all_nums.push(nums1[index1]);
                     index1 = index1 + 1;
@@ -133,8 +149,8 @@ mod test {
     #[test]
     fn test_find_median_sorted_arrays() {
         init();
-        let nums1 = vec![1, 3];
-        let nums2 = vec![2];
+        let nums1 = vec![1, 2];
+        let nums2 = vec![3, 4];
         let result = find_median_sorted_arrays(nums1, nums2);
         info!("result:{}", result)
     }
