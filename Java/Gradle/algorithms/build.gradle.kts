@@ -42,13 +42,13 @@ repositories {
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_16
-    targetCompatibility = JavaVersion.VERSION_16
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
 }
 
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-    sourceCompatibility = "16"
+    sourceCompatibility = "17"
 }
 
 tasks.withType<Test> {
@@ -73,4 +73,17 @@ tasks.test {
 
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
+}
+
+tasks.register<Copy>("copyJarDemo") {
+    copy {
+        from("build/libs/algorithms-1.0-SNAPSHOT.jar") {
+            rename("algorithms-1.0-SNAPSHOT.jar", "algorithms.jar")
+        }
+        into("$buildDir/../logs")
+    }
+}
+
+tasks.build {
+    finalizedBy(tasks.getByName("copyJarDemo"))
 }
