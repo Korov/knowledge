@@ -4,13 +4,12 @@
       class="el-menu-demo"
       mode="horizontal"
       @select="handleSelect">
-<!--    <MySubMenu :menuData="menuData"></MySubMenu>-->
-    <el-menu-item v-for="item in menuData" :key="item.id" :index="item.id">
+    <el-sub-menu v-for="item in menuData" :key="item.id" :index="item.id">
       <template #title>{{ item.title }}</template>
-      <el-sub-menu v-for="subItem in item.subNav" :key="subItem.id" :index="subItem.id">
+      <el-menu-item v-for="subItem in item.subNav" :key="subItem.id" :index="subItem.id">
         <template #title>{{ item.title }}</template>
-      </el-sub-menu>
-    </el-menu-item>
+      </el-menu-item>
+    </el-sub-menu>
   </el-menu>
 </template>
 
