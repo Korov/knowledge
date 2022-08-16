@@ -170,8 +170,9 @@ def generate_audi_template():
         zh_match_result = re.findall(r'\$[\w]+', origin_value_zh, re.ASCII)
         en_match_result = re.findall(r'\$[\w]+', origin_value_en, re.ASCII)
 
+        print(f'zh keys:{zh_match_result}, en keys:{en_match_result}')
         if len(zh_match_result) != len(en_match_result):
-            print(f'column index:{column_index}, not match, zh match:{zh_match_result}, en match:{en_match_result}')
+            print(f'column index:{column_index}, not match count, zh match:{zh_match_result}, en match:{en_match_result}')
         else:
             zh_match_map = {}
             for value_index, result_value in enumerate(zh_match_result):
@@ -185,8 +186,10 @@ def generate_audi_template():
                                                               '{' + str(zh_match_map.get(result_value)) + '}')
                     origin_value_en = origin_value_en.replace(result_value,
                                                               '{' + str(zh_match_map.get(result_value)) + '}')
+                # else:
+                    # print(f'column index:{column_index}, not match key:{result_value} zh match:{zh_match_result}, en match:{en_match_result}')
 
-        print(f"{str(column_index - 1).zfill(5)} = {origin_value_en}")
+        # print(f"{str(column_index - 1).zfill(5)} = {origin_value_zh}")
         # worksheet.cell(column_index, 3).value = origin_value_zh
         # worksheet.cell(column_index, 4).value = origin_value_en
         # workbook.save('C:\\Users\\korov\\Desktop\\temp\\SIEM操作审计cn&en_bak.xlsx')
