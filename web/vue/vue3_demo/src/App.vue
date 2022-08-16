@@ -1,18 +1,38 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js + TypeScript App"/>
+  <div class="common-layout">
+    <el-container>
+      <el-header class="my-header">
+        <el-button
+            v-for="button in buttons"
+            :key="button.text"
+            :type="button.type"
+            :disabled="button.disabled"
+            link
+        >{{ button.text }}
+        </el-button>
+      </el-header>
+      <el-main class="my-main">Main</el-main>
+    </el-container>
+  </div>
 </template>
 
 <script lang="ts">
-import { Options, Vue } from 'vue-class-component';
-import HelloWorld from './components/HelloWorld.vue';
+import {Options, Vue} from 'vue-class-component';
 
 @Options({
-  components: {
-    HelloWorld,
-  },
+  components: {},
 })
-export default class App extends Vue {}
+// 变量通过声明属性的方式定义在这里
+export default class App extends Vue {
+  buttons = [
+    {type: '', text: 'plain', disabled: false},
+    {type: 'primary', text: 'primary', disabled: true},
+    {type: 'success', text: 'success', disabled: false},
+    {type: 'info', text: 'info', disabled: false},
+    {type: 'warning', text: 'warning', disabled: false},
+    {type: 'danger', text: 'danger', disabled: false},
+  ] as const
+}
 </script>
 
 <style>
@@ -23,5 +43,13 @@ export default class App extends Vue {}
   text-align: center;
   color: #2c3e50;
   margin-top: 60px;
+}
+
+.my-header {
+  /*background: goldenrod;*/
+}
+
+.my-main {
+  background: darkcyan;
 }
 </style>
