@@ -1,21 +1,39 @@
 <template>
-  <div id="main" style='height: 500px'>grgrrg</div>
+  <div ref="myChart" :style="{ width: '300px', height: '300px' }"></div>
 </template>
 
-<script>
+<script lang="ts">
 import * as echarts from 'echarts'
-
-//初始化
-var myChart = echarts.init(document.getElementById('main'))
-//设置参数
-myChart.setOption({
-  xAxis:{},
-  yAxis:{},
-  series:[]
-})
+import {ref, onMounted} from "vue";
 
 export default {
-  name: "DemoChart"
+  name: "DemoChart",
+  setup() {
+    const myChart = ref<HTMLElement>()
+    const myCharts = ref<any>()
+    onMounted(() => {
+      // 绘制图表
+      myCharts.value = echarts.init(myChart.value!)
+      myCharts.value.setOption({
+        title: {text: "总用户量"},
+        tooltip: {},
+        xAxis: {
+          data: ["12-3", "12-4", "12-5", "12-6", "12-7", "12-8"],
+        },
+        yAxis: {},
+        series: [
+          {
+            name: "用户量",
+            type: "line",
+            data: [5, 20, 36, 10, 10, 20],
+          },
+        ],
+      });
+    })
+    return {
+      myChart
+    }
+  }
 }
 </script>
 

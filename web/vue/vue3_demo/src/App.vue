@@ -6,7 +6,7 @@
       </el-header>
       <el-main class="my-main">
         <el-button type="primary" @click="changeNav">Change Nav</el-button>
-        <div ref="myChart" :style="{ width: '300px', height: '300px' }"></div>
+        <component :is="currentView" />
       </el-main>
     </el-container>
   </div>
@@ -15,36 +15,12 @@
 <script lang="ts">
 import MyMenu from '@/components/nav/MyMenu.vue'
 import {computed, provide, ref} from "vue";
-import * as echarts from 'echarts'
-import {onMounted} from 'vue'
 
 export default {
   components: {
     MyMenu
   },
   setup() {
-    const myChart = ref<HTMLElement>();
-    const myCharts = ref<any>();
-    onMounted(() => {
-      // 绘制图表
-      myCharts.value = echarts.init(myChart.value!);
-      myCharts.value.setOption({
-        title: {text: "总用户量"},
-        tooltip: {},
-        xAxis: {
-          data: ["12-3", "12-4", "12-5", "12-6", "12-7", "12-8"],
-        },
-        yAxis: {},
-        series: [
-          {
-            name: "用户量",
-            type: "line",
-            data: [5, 20, 36, 10, 10, 20],
-          },
-        ],
-      });
-    })
-
     let menuData = ref([{
       id: "1",
       title: 'nav1',
@@ -84,7 +60,6 @@ export default {
     return {
       menuData,
       changeNav,
-      myChart
     }
   }
 }
