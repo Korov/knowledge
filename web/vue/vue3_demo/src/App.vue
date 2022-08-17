@@ -13,14 +13,14 @@
 
 <script lang="ts">
 import MyMenu from '@/components/nav/MyMenu.vue'
-import {inject} from "vue";
+import {computed, provide, ref} from "vue";
 
 export default {
   components: {
     MyMenu
   },
   setup() {
-    let menuData = [{
+    let menuData = ref([{
       id: "1",
       title: 'nav1',
       subNav: [{
@@ -42,16 +42,17 @@ export default {
         id: "22",
         title: 'subNav2'
       }]
-    }]
+    }])
 
     const changeNav = () => {
-      console.log(`nav title:${menuData[0].title}`)
-      menuData[0].title = "changed nav"
-      console.log(`nav title:${menuData[0].title}`)
-      // location.reload()
-      inject("reload");
+      console.log(`nav title:${menuData.value[0].title}`)
+      menuData.value[0].title = "changed nav"
+      menuData.value[0].id = "31"
+      console.log(`nav title:${menuData.value[0].title}`)
     }
-
+    provide(
+        "menuData", computed(() => menuData.value)
+    )
     return {
       menuData,
       changeNav
