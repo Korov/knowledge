@@ -4,7 +4,9 @@
       <el-header class="my-header">
         <MyMenu :menuData="menuData"></MyMenu>
       </el-header>
-      <el-main class="my-main">Main</el-main>
+      <el-main class="my-main">
+        <el-button type="primary" @click="changeNav">Change Nav</el-button>
+      </el-main>
     </el-container>
   </div>
 </template>
@@ -35,6 +37,12 @@ let menuData = [{
     title: 'subNav2'
   }]
 }]
+
+function changeNav() {
+  console.log(`nav title:${menuData[0].title}`)
+  menuData[0].title = "changed nav"
+  console.log(`nav title:${menuData[0].title}`)
+}
 
 </script>
 
