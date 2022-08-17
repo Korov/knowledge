@@ -12,6 +12,12 @@ const routes = [
         path: '/nav',
         name: 'nav',
         component: () => import('@/App.vue')
+    },
+    {
+        // 页面逻辑
+        path: '/charts/demo',
+        name: 'demoChart',
+        component: () => import('@/components/charts/DemoChart.vue')
     }
 ]
 const router = createRouter({

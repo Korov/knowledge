@@ -6,7 +6,7 @@
       @select="handleSelect">
     <el-sub-menu v-for="item in menuData" :key="item.id" :index="item.id">
       <template #title>{{ item.title }}</template>
-      <el-menu-item v-for="subItem in item.subNav" :key="subItem.id" :index="subItem.id">
+      <el-menu-item v-for="subItem in item.subNav" :key="subItem.id" :index="subItem.id" :route="subItem.router">
         <template #title>{{ subItem.title }}</template>
       </el-menu-item>
     </el-sub-menu>
