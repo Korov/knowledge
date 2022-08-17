@@ -189,10 +189,10 @@ def generate_audi_template():
                 # else:
                     # print(f'column index:{column_index}, not match key:{result_value} zh match:{zh_match_result}, en match:{en_match_result}')
 
-        # print(f"{str(column_index - 1).zfill(5)} = {origin_value_zh}")
-        # worksheet.cell(column_index, 3).value = origin_value_zh
-        # worksheet.cell(column_index, 4).value = origin_value_en
-        # workbook.save('C:\\Users\\korov\\Desktop\\temp\\SIEM操作审计cn&en_bak.xlsx')
+        print(f"{str(column_index - 1).zfill(5)} = {origin_value_zh}")
+        worksheet.cell(column_index, 3).value = origin_value_zh
+        worksheet.cell(column_index, 4).value = origin_value_en
+        workbook.save('C:\\Users\\korov\\Desktop\\temp\\SIEM操作审计cn&en_bak.xlsx')
         workbook.close()
 
 

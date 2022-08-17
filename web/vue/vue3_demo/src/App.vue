@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import MyMenu from './components/nav/MyMenu'
+import MyMenu from '@/components/nav/MyMenu.vue'
 
 let menuData = [{
   id: "1",
