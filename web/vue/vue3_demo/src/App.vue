@@ -11,38 +11,54 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
 import MyMenu from '@/components/nav/MyMenu.vue'
+import {inject} from "vue";
 
-let menuData = [{
-  id: "1",
-  title: 'nav1',
-  subNav: [{
-    id: "11",
-    title: 'subNav1'
-  }, {
-    id: "12",
-    title: 'subNav2',
-    subNav: [{title: 'subNav21'}
-    ]
-  }]
-}, {
-  id: "2",
-  title: 'nav2',
-  subNav: [{
-    id: "21",
-    title: 'subNav1'
-  }, {
-    id: "22",
-    title: 'subNav2'
-  }]
-}]
+export default {
+  components: {
+    MyMenu
+  },
+  setup() {
+    let menuData = [{
+      id: "1",
+      title: 'nav1',
+      subNav: [{
+        id: "11",
+        title: 'subNav1'
+      }, {
+        id: "12",
+        title: 'subNav2',
+        subNav: [{title: 'subNav21'}
+        ]
+      }]
+    }, {
+      id: "2",
+      title: 'nav2',
+      subNav: [{
+        id: "21",
+        title: 'subNav1'
+      }, {
+        id: "22",
+        title: 'subNav2'
+      }]
+    }]
 
-function changeNav() {
-  console.log(`nav title:${menuData[0].title}`)
-  menuData[0].title = "changed nav"
-  console.log(`nav title:${menuData[0].title}`)
+    const changeNav = () => {
+      console.log(`nav title:${menuData[0].title}`)
+      menuData[0].title = "changed nav"
+      console.log(`nav title:${menuData[0].title}`)
+      // location.reload()
+      inject("reload");
+    }
+
+    return {
+      menuData,
+      changeNav
+    }
+  }
 }
+
 
 </script>
 
