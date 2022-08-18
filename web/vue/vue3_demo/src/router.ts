@@ -1,27 +1,25 @@
-import {createWebHistory, createRouter} from 'vue-router'
+import { createWebHistory, createRouter } from 'vue-router'
 
 const history = createWebHistory()
 const routes = [
     {
         path: '/',
         name: 'home',
-        redirect: '/nav'
+        redirect: '/charts/pie'
     },
     {
-        // 页面逻辑
-        path: '/nav',
-        name: 'nav',
-        component: () => import('@/App.vue')
+        path: '/charts/pie',
+        name: 'demoPie',
+        component: () => import('@/components/charts/DemoPie.vue')
     },
     {
-        // 页面逻辑
         path: '/charts/demo',
         name: 'demoChart',
         component: () => import('@/components/charts/DemoChart.vue')
     }
 ]
 const router = createRouter({
-    history, // 路由模式
+    history,
     routes
 })
 

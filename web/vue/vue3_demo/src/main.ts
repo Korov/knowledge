@@ -8,7 +8,7 @@ import router from './router'
 const app = createApp(App)
 
 app.use(ElementPlus, {
-    locale: zhCn,
+  locale: zhCn,
 })
 // 注入路由
 app.use(router)

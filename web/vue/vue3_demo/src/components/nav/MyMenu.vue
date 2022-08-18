@@ -1,10 +1,5 @@
 <template>
-  <el-menu
-      :default-active="activeIndex"
-      class="el-menu-demo"
-      mode="horizontal"
-      router
-      @select="handleSelect">
+  <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" router @select="handleSelect">
     <el-sub-menu v-for="item in menuData" :key="item.id" :index="item.id">
       <template #title>{{ item.title }}</template>
       <el-menu-item v-for="subItem in item.subNav" :key="subItem.id" :index="subItem.id" :route="subItem.path">
@@ -15,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import {inject, nextTick, provide, ref} from "vue";
+import { inject, nextTick, provide, ref } from "vue";
 
 export default {
   setup() {

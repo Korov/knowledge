@@ -29,7 +29,7 @@ export default {
       subNav: [{
         id: "11",
         title: 'subNav1',
-        path: "/nav"
+        path: "/charts/pie"
       }]
     }, {
       id: "2",
