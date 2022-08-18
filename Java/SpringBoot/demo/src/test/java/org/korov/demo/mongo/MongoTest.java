@@ -1,5 +1,6 @@
 package org.korov.demo.mongo;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.korov.demo.DemoApplicationTests;
 import org.slf4j.Logger;
@@ -21,6 +22,7 @@ public class MongoTest extends DemoApplicationTests {
         this.valueRecordRepository = valueRecordRepository;
     }
 
+    @Disabled
     @Test
     public void queryTest() {
         Pageable pageable = PageRequest.of(1, 20);

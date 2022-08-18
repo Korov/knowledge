@@ -7,7 +7,11 @@ plugins {
 
 group = "org.korov"
 version = "0.0.1-SNAPSHOT"
-//sourceCompatibility = "17"
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
 
 repositories {
     mavenCentral()
@@ -31,4 +35,8 @@ tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootBuildImage>("
     environment = mapOf(
         "BP_NATIVE_IMAGE" to "true"
     )
+}
+
+tasks.getByName<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
+    systemProperty("springAot", "true")
 }
