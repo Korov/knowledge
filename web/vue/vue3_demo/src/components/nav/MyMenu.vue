@@ -7,7 +7,7 @@
       @select="handleSelect">
     <el-sub-menu v-for="item in menuData" :key="item.id" :index="item.id">
       <template #title>{{ item.title }}</template>
-      <el-menu-item v-for="subItem in item.subNav" :key="subItem.id" :index="subItem.path">
+      <el-menu-item v-for="subItem in item.subNav" :key="subItem.id" :index="subItem.id" :route="subItem.path">
         <template #title>{{ subItem.path }}</template>
       </el-menu-item>
     </el-sub-menu>
@@ -30,7 +30,7 @@ export default {
     };
     provide("reload", reload);
 
-    let activeIndex = "/nav"
+    let activeIndex = "11"
 
     function handleSelect(key: string, keyPath: string[]) {
       activeIndex = key
