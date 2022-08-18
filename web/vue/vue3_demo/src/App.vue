@@ -4,9 +4,11 @@
       <el-header class="my-header">
         <MyMenu :menuData="menuData"></MyMenu>
       </el-header>
-      <el-main class="my-main">
+      <el-row>
         <el-button type="primary" @click="changeNav">Change Nav</el-button>
-        <component :is="currentView" />
+      </el-row>
+      <el-main class="my-main">
+        <router-view></router-view>
       </el-main>
     </el-container>
   </div>
@@ -27,24 +29,15 @@ export default {
       subNav: [{
         id: "11",
         title: 'subNav1',
-        router: "nav"
-      }, {
-        id: "12",
-        title: 'subNav2',
-        router: "/charts/demo",
-        subNav: [{
-          title: 'subNav21'
-        }]
+        path: "/nav"
       }]
     }, {
       id: "2",
       title: 'nav2',
       subNav: [{
         id: "21",
-        title: 'subNav1'
-      }, {
-        id: "22",
-        title: 'subNav2'
+        title: 'subNav1',
+        path: "/charts/demo"
       }]
     }])
 
