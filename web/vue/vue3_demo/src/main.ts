@@ -1,18 +1,15 @@
-import { createApp } from 'vue'
+import {createApp} from 'vue'
 import App from './App.vue'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import zhCn from 'element-plus/es/locale/lang/zh-cn'
 import router from './router'
-import axios from 'axios'
-import VueAxios from 'vue-axios'
+
 
 const app = createApp(App)
 
-app.use(VueAxios, axios)
-
 app.use(ElementPlus, {
-  locale: zhCn,
+    locale: zhCn,
 })
 // 注入路由
 app.use(router)

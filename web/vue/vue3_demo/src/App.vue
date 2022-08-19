@@ -16,7 +16,8 @@
 
 <script lang="ts">
 import MyMenu from '@/components/nav/MyMenu.vue'
-import {computed, inject, provide, ref} from "vue";
+import {computed, provide, ref} from "vue";
+import httpCommon from "@/http-common";
 
 export default {
   components: {
@@ -41,14 +42,12 @@ export default {
       }]
     }])
 
-    const axios: any = inject('axios')
-
     const changeNav = () => {
       console.log(`nav title:${menuData.value[0].title}`)
       menuData.value[0].title = "changed nav"
       menuData.value[0].id = "31"
       console.log(`nav title:${menuData.value[0].title}`)
-      axios.get("http://localhost:6060/hello?name=korov").then((response: { data: any }) => {
+      httpCommon.get("/hello?name=korov").then((response: { data: any }) => {
           console.log(`axiox test:${response.data}`)
         });
     }
