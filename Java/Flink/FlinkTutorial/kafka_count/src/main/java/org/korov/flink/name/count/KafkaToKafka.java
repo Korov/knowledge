@@ -29,7 +29,7 @@ import java.time.Duration;
  * 将kafka中的数据格式化之后发送到kafka中
  * org.korov.flink.name.count.KafkaToKafka
  * <p>
- * --sink_addr 192.168.50.100:9092 --sink_topic sink_topic --kafka_addr 192.168.1.19:9092 --kafka_topic flink_siem --kafka_group kafka-name-count
+ * --sink_addr 192.168.50.100:9092 --sink_topic sink_topic --kafka_addr 192.168.1.19:9092 --kafka_topic flink_siem --kafka_group kafka_sink
  *
  * @author zhu.lei
  * @date 2021-05-05 14:00
@@ -48,8 +48,8 @@ public class KafkaToKafka {
         options.addOption(Option.builder().longOpt("kafka_group").hasArg(true).required(true).build());
 
         CommandLine cmd = new DefaultParser().parse(options, args);
-        String sinkAddr = cmd.getOptionValue("mongo_host");
-        String sinkTopic = cmd.getOptionValue("mongo_user");
+        String sinkAddr = cmd.getOptionValue("sink_addr");
+        String sinkTopic = cmd.getOptionValue("sink_topic");
 
         String kafkaAddr = cmd.getOptionValue("kafka_addr");
         String kafkaTopic = cmd.getOptionValue("kafka_topic");
