@@ -1,13 +1,10 @@
 package org.korov.flink.name.count;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.DefaultParser;
-import org.apache.commons.cli.Option;
-import org.apache.commons.cli.Options;
 import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.connector.base.DeliveryGuarantee;
@@ -20,14 +17,10 @@ import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
-import org.apache.kafka.clients.producer.KafkaProducer;
 import org.korov.flink.name.count.deserialization.KeyAlertDeserializer;
-import org.korov.flink.name.count.enums.SinkType;
 import org.korov.flink.name.count.model.NameModel;
 import org.korov.flink.name.count.serialization.KeyAlertSerialization;
-import org.korov.flink.name.count.sink.KeyAlertMongoSink;
 
 import java.time.Duration;
 
@@ -44,27 +37,10 @@ import java.time.Duration;
 public class KafkaToKafka {
 
     public static void main(String[] args) throws Exception {
-        Options options = new Options();
-        options.addOption(Option.builder().longOpt("mongo_host").hasArg(true).required(true).build());
-        options.addOption(Option.builder().longOpt("mongo_port").hasArg(true).required(true).build());
-        options.addOption(Option.builder().longOpt("mongo_db").hasArg(true).required(true).build());
-        options.addOption(Option.builder().longOpt("mongo_collection").hasArg(true).required(true).build());
 
-        options.addOption(Option.builder().longOpt("kafka_addr").hasArg(true).required(true).build());
-        options.addOption(Option.builder().longOpt("kafka_topic").hasArg(true).required(true).build());
-        options.addOption(Option.builder().longOpt("kafka_group").hasArg(true).required(true).build());
-
-        CommandLine cmd = new DefaultParser().parse(options, args);
-        String mongoHost = cmd.getOptionValue("mongo_host");
-        int mongoPort = Integer.parseInt(cmd.getOptionValue("mongo_port"));
-        String mongoUser = cmd.getOptionValue("mongo_user");
-        String mongoPassword = cmd.getOptionValue("mongo_password");
-        String mongoDb = cmd.getOptionValue("mongo_db");
-        String mongoCollection = cmd.getOptionValue("mongo_collection");
-
-        String kafkaAddr = cmd.getOptionValue("kafka_addr");
-        String kafkaTopic = cmd.getOptionValue("kafka_topic");
-        String kafkaGroup = cmd.getOptionValue("kafka_group");
+        String kafkaAddr = "192.168.1.19:9092";
+        String kafkaTopic = "flink_siem";
+        String kafkaGroup = "test_group1";
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setRuntimeMode(RuntimeExecutionMode.STREAMING);
@@ -77,11 +53,11 @@ public class KafkaToKafka {
         env.getCheckpointConfig().setExternalizedCheckpointCleanup(
                 CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
 
-        EmbeddedRocksDBStateBackend rocksDbStateBackend = new EmbeddedRocksDBStateBackend(true);
-        rocksDbStateBackend.setDbStoragePath("file:////opt/flink/rocksdb");
-        env.setStateBackend(rocksDbStateBackend);
-        env.getCheckpointConfig().setCheckpointStorage("file:////opt/flink/savepoints");
-        env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE);
+        // EmbeddedRocksDBStateBackend rocksDbStateBackend = new EmbeddedRocksDBStateBackend(true);
+        // rocksDbStateBackend.setDbStoragePath("file:////opt/flink/rocksdb");
+        // env.setStateBackend(rocksDbStateBackend);
+        // env.getCheckpointConfig().setCheckpointStorage("file:////opt/flink/savepoints");
+        // env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE);
 
         KafkaSource<Tuple3<String, NameModel, Long>> kafkaSource = KafkaSource.<Tuple3<String, NameModel, Long>>builder()
                 .setBootstrapServers(kafkaAddr)
@@ -93,10 +69,7 @@ public class KafkaToKafka {
 
         KafkaSink<Tuple3<String, NameModel, Long>> kafkaSink = KafkaSink.<Tuple3<String, NameModel, Long>>builder()
                 .setBootstrapServers("192.168.50.100:9092")
-                .setRecordSerializer(KafkaRecordSerializationSchema.builder()
-                        .setTopic("demo1")
-                        .setValueSerializationSchema(new KafkaSerializerWrapper())
-                        .build())
+                .setRecordSerializer(new KeyAlertSerialization("demo2"))
                 .setDeliverGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                 .build();
 
@@ -113,9 +86,7 @@ public class KafkaToKafka {
                                 }
                             }
                         }).withIdleness(Duration.ofMinutes(5)), "kafka-source");
-
-        KeyAlertMongoSink mongoValueSink = new KeyAlertMongoSink(mongoHost, mongoPort, mongoDb, mongoCollection, mongoUser, mongoPassword, SinkType.KEY_NAME_VALUE);
-        stream.addSink(mongoValueSink).name("mongo-value-sink");
-        env.execute("KafkaToMongo");
+        stream.sinkTo(kafkaSink);
+        env.execute("KafkaToKafka");
     }
 }
