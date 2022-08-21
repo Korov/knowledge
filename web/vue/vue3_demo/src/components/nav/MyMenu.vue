@@ -10,12 +10,11 @@
 </template>
 
 <script lang="ts">
-import { inject, nextTick, provide, ref } from "vue";
+import {inject, nextTick, provide, ref} from "vue";
 
 export default {
   setup() {
     const menuData = inject('menuData')
-
     const isRouterAlive = ref(true);
     const reload = () => {
       isRouterAlive.value = false;
@@ -25,11 +24,15 @@ export default {
     };
     provide("reload", reload);
 
-    let activeIndex = "11"
+    let activeIndex = window.sessionStorage.getItem('activeIndex')
+    if (activeIndex == null) {
+      handleSelect("11", ["1", "11"])
+    }
 
     function handleSelect(key: string, keyPath: string[]) {
       activeIndex = key
-      console.log(`key:${key}, path:${keyPath}`)
+      window.sessionStorage.setItem('activeIndex', key)
+      console.log(`key:${key}, key path:${keyPath}`)
     }
 
     return {
