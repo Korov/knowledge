@@ -40,3 +40,17 @@ tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootBuildImage>("
 tasks.getByName<org.springframework.boot.gradle.tasks.run.BootRun>("bootRun") {
     systemProperty("springAot", "true")
 }
+
+tasks.create("printTaskBefore") {
+    println("print task demo before")
+}
+
+tasks.create("printTask") {
+    dependsOn(":printTaskBefore")
+    println("print task demo")
+}
+
+tasks.create("printTaskAfter") {
+    dependsOn(":printTask")
+    println("print task demo after")
+}
