@@ -13,6 +13,7 @@ import org.apache.flink.connector.base.DeliveryGuarantee;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
+import org.apache.flink.contrib.streaming.state.EmbeddedRocksDBStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
@@ -25,7 +26,7 @@ import java.time.Duration;
 
 /**
  * 将kafka中的数据格式化之后发送到kafka中
- * org.korov.flink.name.count.KafkaToKafka
+ * org.korov.flink.name.count.SimpleKafkaToKafka
  * <p>
  * --sink_addr 192.168.50.100:9092 --sink_topic sink_log_river --kafka_addr 192.168.1.19:9092 --kafka_topic log_river --kafka_group kafka_log_river
  *
@@ -64,11 +65,11 @@ public class SimpleKafkaToKafka {
         env.getCheckpointConfig().setExternalizedCheckpointCleanup(
                 CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
 
-        // EmbeddedRocksDBStateBackend rocksDbStateBackend = new EmbeddedRocksDBStateBackend(true);
-        // rocksDbStateBackend.setDbStoragePath("file:////opt/flink/rocksdb");
-        // env.setStateBackend(rocksDbStateBackend);
-        // env.getCheckpointConfig().setCheckpointStorage("file:////opt/flink/savepoints");
-        // env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE);
+        EmbeddedRocksDBStateBackend rocksDbStateBackend = new EmbeddedRocksDBStateBackend(true);
+        rocksDbStateBackend.setDbStoragePath("file:////opt/flink/rocksdb");
+        env.setStateBackend(rocksDbStateBackend);
+        env.getCheckpointConfig().setCheckpointStorage("file:////opt/flink/savepoints");
+        env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE);
 
         KafkaSource<Tuple2<String, String>> kafkaSource = KafkaSource.<Tuple2<String, String>>builder()
                 .setBootstrapServers(kafkaAddr)
