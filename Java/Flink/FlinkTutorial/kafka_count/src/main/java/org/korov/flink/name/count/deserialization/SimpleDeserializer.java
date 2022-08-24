@@ -9,8 +9,6 @@ import org.apache.flink.connector.kafka.source.reader.deserializer.KafkaRecordDe
 import org.apache.flink.util.Collector;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import java.io.IOException;
-
 
 /**
  * 将kafka中的数据解析成对应的数据结构
@@ -35,9 +33,17 @@ public class SimpleDeserializer implements KafkaRecordDeserializationSchema<Tupl
      * @param out    The collector to put the resulting messages.
      */
     @Override
-    public void deserialize(ConsumerRecord<byte[], byte[]> record, Collector<Tuple2<String, String>> out) throws IOException {
-        String key = new String(record.key());
-        String value = new String(record.value());
-        out.collect(new Tuple2<>(key, value));
+    public void deserialize(ConsumerRecord<byte[], byte[]> record, Collector<Tuple2<String, String>> out) {
+        String key = "";
+        String message = "";
+        if (record != null) {
+            if (record.key() != null) {
+                key = new String(record.key());
+            }
+            if (record.value() != null) {
+                message = new String(record.value());
+            }
+        }
+        out.collect(new Tuple2<>(key, message));
     }
 }
