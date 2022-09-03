@@ -29,7 +29,7 @@ import java.time.Duration;
  * 将kafka中的数据格式化之后发送到kafka中
  * org.korov.flink.name.count.KafkaToKafka
  * <p>
- * --sink_addr 192.168.50.100:9092 --sink_topic sink_topic --kafka_addr 192.168.1.19:9092 --kafka_topic flink_siem --kafka_group kafka_sink
+ * --sink_addr 192.168.50.100:9092 --sink_topic alert_topic --kafka_addr 192.168.1.19:9092 --kafka_topic flink_siem --kafka_group kafka_sink
  *
  * @author zhu.lei
  * @date 2021-05-05 14:00
