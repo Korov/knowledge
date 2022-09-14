@@ -162,15 +162,23 @@ def generate_audi_template():
                 f'column index:{column_index}, match count not match, zh:{valid_zh_match}, en:{valid_en_match}, origin zh:{origin_value_zh}, origin en:{origin_value_en}')
         else:
             if len(valid_zh_match) == 1:
-                origin_value_zh = origin_value_zh.replace(valid_zh_match[0], f'$dynamic_value0')
-                origin_value_en = origin_value_en.replace(valid_en_match[0], f'$dynamic_value0')
+                origin_value_zh = origin_value_zh.replace(valid_zh_match[0], f'$dynamic_value')
+                origin_value_en = origin_value_en.replace(valid_en_match[0], f'$dynamic_value')
                 worksheet.cell(column_index, 7).value = valid_zh_match[0]
                 worksheet.cell(column_index, 8).value = valid_en_match[0]
 
         zh_match_result = re.findall(r'\$[\w]+', origin_value_zh, re.ASCII)
         en_match_result = re.findall(r'\$[\w]+', origin_value_en, re.ASCII)
 
-        print(f'zh keys:{zh_match_result}, en keys:{en_match_result}')
+        for index, match_result in enumerate(zh_match_result):
+            new_match_result = str.replace(match_result, "$", "")
+            new_match_result = "${" + new_match_result + "}"
+            origin_value_en = str.replace(origin_value_en, match_result, new_match_result)
+            origin_value_zh = str.replace(origin_value_zh, match_result, new_match_result)
+
+        print(f"{str(column_index - 1).zfill(5)} = {origin_value_en}")
+        # print(f'zh keys:{zh_match_result}, en keys:{en_match_result}')
+
         if len(zh_match_result) != len(en_match_result):
             print(f'column index:{column_index}, not match count, zh match:{zh_match_result}, en match:{en_match_result}')
         else:
@@ -192,6 +200,7 @@ def generate_audi_template():
         print(f"{str(column_index - 1).zfill(5)} = {origin_value_zh}")
         worksheet.cell(column_index, 3).value = origin_value_zh
         worksheet.cell(column_index, 4).value = origin_value_en
+        worksheet.cell(column_index, 9).value = str(column_index - 1).zfill(5)
         workbook.save('C:\\Users\\korov\\Desktop\\temp\\SIEM操作审计cn&en_bak.xlsx')
         workbook.close()
 

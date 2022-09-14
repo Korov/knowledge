@@ -28,7 +28,7 @@ import java.time.Duration;
  * 将kafka中的数据格式化之后发送到kafka中
  * org.korov.flink.name.count.SimpleKafkaToKafka
  * <p>
- * --sink_addr 192.168.50.100:9092 --sink_topic log_river_topic --kafka_addr 192.168.1.19:9092 --kafka_topic log_river --kafka_group kafka_log_river
+ * --sink_addr 192.168.50.100:9092 --sink_topic sink_log_river --kafka_addr 192.168.1.19:9092 --kafka_topic log_river --kafka_group kafka_log_river
  *
  * @author zhu.lei
  * @date 2021-05-05 14:00
@@ -99,6 +99,6 @@ public class SimpleKafkaToKafka {
                             }
                         }).withIdleness(Duration.ofMinutes(5)), "kafka-source");
         stream.sinkTo(kafkaSink);
-        env.execute("KafkaToKafka");
+        env.execute("SimpleKafkaToKafka");
     }
 }
