@@ -22,7 +22,7 @@ public class MongoTest extends DemoApplicationTests {
         this.valueRecordRepository = valueRecordRepository;
     }
 
-//    @Disabled
+    @Disabled
     @Test
     public void queryTest() {
         Pageable pageable = PageRequest.of(1, 20);
