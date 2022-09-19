@@ -24,3 +24,4 @@ These additional references should also help you:
 
 * [Gradle Build Scans – insights for your project's build](https://scans.gradle.com#gradle)
 
+`docker run -p 27017:27017 -e MONGO_INITDB_ROOT_USERNAME="admin" -e MONGO_INITDB_ROOT_PASSWORD="admin" -e MONGO_INITDB_DATABASE="spring3" --name mongo1 -d mongo:6.0.1`
