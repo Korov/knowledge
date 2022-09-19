@@ -1,4 +1,4 @@
-package org.korog.spring3;
+package org.korov.spring3;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
