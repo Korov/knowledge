@@ -42,6 +42,7 @@ pub fn is_square(p1: &Vec<i32>, p2: &Vec<i32>, p3: &Vec<i32>, p4: &Vec<i32>) -> 
     false
 }
 
+// Solution4
 pub fn find_median_sorted_arrays(nums1: Vec<i32>, nums2: Vec<i32>) -> f64 {
     let all_length = nums1.len() + nums2.len();
     let mid = all_length / 2;
