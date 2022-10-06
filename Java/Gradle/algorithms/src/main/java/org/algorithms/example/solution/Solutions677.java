@@ -7,15 +7,9 @@ import java.util.Map;
  * @author zhu.lei
  * @date 2021-11-14 15:48
  */
-public class Solution677 {
-}
-
-class MapSum {
+public class Solutions677 {
     private final Map<String, Integer> innerMap = new HashMap<>(64);
-    TrieNode root = new TrieNode();
-
-    public MapSum() {
-    }
+    Solutions677.TrieNode root = new Solutions677.TrieNode();
 
     public void insert(String key, int val) {
         int delta = val - innerMap.getOrDefault(key, 0);

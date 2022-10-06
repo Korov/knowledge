@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * https://leetcode-cn.com/problems/path-sum/
  */
-public class Solution112 {
+public class Solutions112 {
     private static final Stack<TreeNode> stack = new Stack<>();
 
     private static final Map<TreeNode, Integer> treeMap = new HashMap<>();

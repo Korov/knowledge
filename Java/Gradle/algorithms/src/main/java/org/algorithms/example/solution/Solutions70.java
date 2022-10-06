@@ -6,7 +6,7 @@ import java.util.Map;
 /**
  * https://leetcode-cn.com/problems/climbing-stairs/
  */
-public class Solution70 {
+public class Solutions70 {
     private static final Map<Integer, Integer> cache = new HashMap<>(128);
 
     public int climbStairs(int n) {

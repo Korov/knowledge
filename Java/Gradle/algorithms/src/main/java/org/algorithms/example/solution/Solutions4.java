@@ -1,6 +1,6 @@
 package org.algorithms.example.solution;
 
-public class Solution4 {
+public class Solutions4 {
     public static double findMedianSortedArrays(int[] nums1, int[] nums2) {
         int length = nums1.length + nums2.length;
         int mid = length / 2;

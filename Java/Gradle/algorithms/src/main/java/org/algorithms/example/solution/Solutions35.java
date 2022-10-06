@@ -6,7 +6,7 @@ package org.algorithms.example.solution;
  * @author zhu.lei
  * @date 2021-07-18 02:52
  */
-public class Solution35 {
+public class Solutions35 {
     public int searchInsert(int[] nums, int target) {
         int start = 0;
         int end = nums.length - 1;

@@ -5,6 +5,6 @@ package org.algorithms.example.solution;
  * @author zhu.lei
  * @date 2021-07-18 03:36
  */
-public class Solution169 {
+public class Solutions169 {
 
 }
