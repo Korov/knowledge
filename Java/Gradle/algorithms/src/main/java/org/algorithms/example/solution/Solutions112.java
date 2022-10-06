@@ -10,7 +10,7 @@ public class Solutions112 {
 
     private static final Map<TreeNode, Integer> treeMap = new HashMap<>();
 
-    public boolean hasPathSum(TreeNode root, int targetSum) {
+    public static boolean hasPathSum(TreeNode root, int targetSum) {
         if (root == null) {
             return false;
         } else if (root.left == null && root.right == null) {

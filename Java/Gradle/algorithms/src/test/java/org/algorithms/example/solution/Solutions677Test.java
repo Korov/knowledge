@@ -7,11 +7,11 @@ import org.junit.jupiter.api.Test;
  * @author zhu.lei
  * @date 2021-11-14 15:54
  */
-class Solution677Test {
+class Solutions677Test {
 
     @Test
     void test() {
-        MapSum mapSum = new MapSum();
+        Solutions677 mapSum = new Solutions677();
         mapSum.insert("apple", 3);
         Assertions.assertEquals(3, mapSum.sum("ap"));
         mapSum.insert("app", 2);
