@@ -16,9 +16,9 @@ public class MaxSubArray {
             Result leftResult = getMaxSubArray(array, left, middle);
             Result rightResult = getMaxSubArray(array, middle + 1, right);
             Result middleResult = getMaxMiddleArray(array, left, right, middle);
-            if (leftResult.sum() >= middleResult.sum() && leftResult.sum() >= rightResult.sum()) {
+            if (leftResult.sum >= middleResult.sum && leftResult.sum >= rightResult.sum) {
                 return leftResult;
-            } else if (middleResult.sum() >= leftResult.sum() && middleResult.sum() >= rightResult.sum()) {
+            } else if (middleResult.sum >= leftResult.sum && middleResult.sum >= rightResult.sum) {
                 return middleResult;
             } else {
                 return rightResult;
@@ -57,9 +57,9 @@ public class MaxSubArray {
             Result leftResult = maxSubArray(array, left, right - 1);
             Result rightResult = maxSubArray(array, left, left + 1);
             Result all = new Result(array, left, right);
-            if (all.sum() > leftResult.sum() && all.sum() > rightResult.sum()) {
+            if (all.sum > leftResult.sum && all.sum > rightResult.sum) {
                 return all;
-            } else if (leftResult.sum() >= rightResult.sum()) {
+            } else if (leftResult.sum >= rightResult.sum) {
                 return leftResult;
             } else {
                 return rightResult;
@@ -67,9 +67,19 @@ public class MaxSubArray {
         }
     }
 
-    static record Result(int sum, int left, int right) {
+    static class Result {
+        public final Integer sum;
+        public final Integer left;
+        public final Integer right;
+
         public Result(int[] array, int lefIndex, int rightIndex) {
             this(sumArray(array), lefIndex, rightIndex);
+        }
+
+        public Result(int sum, int left, int right) {
+            this.sum = sum;
+            this.left = left;
+            this.right = right;
         }
 
         private static int sumArray(int[] array) {
