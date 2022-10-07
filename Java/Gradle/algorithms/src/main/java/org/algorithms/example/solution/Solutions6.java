@@ -12,7 +12,9 @@ public class Solutions6 {
             heads[j++] = i;
         }
         StringBuilder stringBuilder = new StringBuilder();
+        // 按行读取数据
         for (int row = 1; row <= numRows; row++) {
+            // 首行和尾行都是只有一个数据
             if (row == 1) {
                 for (int head : heads) {
                     stringBuilder.append(s.charAt(head));
@@ -24,6 +26,7 @@ public class Solutions6 {
                     }
                 }
             } else {
+                // 中间行有两个数据，每行数据的间隔不同
                 gap = 2 * (numRows - row);
                 for (int head : heads) {
                     if (head + row <= s.length()) {
