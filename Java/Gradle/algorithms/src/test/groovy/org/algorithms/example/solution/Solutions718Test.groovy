@@ -7,8 +7,8 @@ class Solutions718Test {
 
     @Test
     void findLength1() {
-        int[] A = {1, 2, 3, 2, 1};
-        int[] B = {3, 2, 1, 4, 7};
+        int[] A = [1, 2, 3, 2, 1];
+        int[] B = [3, 2, 1, 4, 7];
         Solutions718 solutions718 = new Solutions718();
         int result = solutions718.findLength(A, B);
         Assertions.assertEquals(3, result);
