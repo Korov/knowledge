@@ -11,18 +11,19 @@ public class Solutions6 {
         for (int i = 0; i < s.length(); i += gap) {
             heads[j++] = i;
         }
-        StringBuilder stringBuilder = new StringBuilder();
+        j = 0;
+        char[] result = new char[s.length()];
         // 按行读取数据
         for (int row = 1; row <= numRows; row++) {
             // 首行和尾行都是只有一个数据
             if (row == 1) {
                 for (int head : heads) {
-                    stringBuilder.append(s.charAt(head));
+                    result[j++] = s.charAt(head);
                 }
             } else if (row == numRows) {
                 for (int head : heads) {
                     if (head + row <= s.length()) {
-                        stringBuilder.append(s.charAt(head + row - 1));
+                        result[j++] = s.charAt(head + row - 1);
                     }
                 }
             } else {
@@ -30,14 +31,14 @@ public class Solutions6 {
                 gap = 2 * (numRows - row);
                 for (int head : heads) {
                     if (head + row <= s.length()) {
-                        stringBuilder.append(s.charAt(head + row - 1));
+                        result[j++] = s.charAt(head + row - 1);
                     }
                     if (head + row + gap <= s.length()) {
-                        stringBuilder.append(s.charAt(head + row + gap - 1));
+                        result[j++] = s.charAt(head + row + gap - 1);
                     }
                 }
             }
         }
-        return stringBuilder.toString();
+        return new String(result);
     }
 }
