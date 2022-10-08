@@ -1,8 +1,6 @@
 package org.algorithms.example.solution
 
-import org.junit.jupiter.api.Test
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+
 import spock.lang.Specification
 
 class Solutions6Test extends Specification {
