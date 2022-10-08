@@ -2,6 +2,7 @@ package org.algorithms.example.solution;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 public class Solutions870 {
@@ -12,66 +13,86 @@ public class Solutions870 {
             sortList.add(num);
         }
         int[] result = new int[nums1.length];
+        List<Integer> indexSet = new ArrayList<>(nums1.length);
         for (int i = 0; i < nums1.length; i++) {
-            result[i] = getMid(nums2[i], sortList);
+            getMid(result, nums2, i, sortList, indexSet);
         }
-        for (int i = 0; i < result.length; i++) {
-            if (result[i] == -1) {
-                result[i] = sortList.remove(0);
-            }
+        for (Integer index : indexSet) {
+            result[index] = sortList.remove(0);
         }
         return result;
     }
 
-    private static int getMid(int num, List<Integer> nums1) {
+    // exceed time
+    private static void getMid1(int[] result, int[] nums2, int index, List<Integer> sortList, List<Integer> indexSet) {
+        Iterator<Integer> value = sortList.iterator();
+        while (value.hasNext()) {
+            int num = value.next();
+            if (num > nums2[index]) {
+                value.remove();
+                result[index] = num;
+                return;
+            }
+        }
+        indexSet.add(index);
+    }
+
+
+    private static int getMid(int[] result, int[] nums2, int index, List<Integer> sortList, List<Integer> indexSet) {
         int left = 0;
-        int right = nums1.size() - 1;
+        int right = sortList.size() - 1;
         int mid = (left + right) >> 1;
         while (right > left) {
             if (mid == left) {
-                if (nums1.get(mid) > num) {
-                    return nums1.remove(mid);
-                } else if (nums1.get(mid) == num) {
-                    if (mid == nums1.size() - 1) {
+                if (sortList.get(mid) > nums2[index]) {
+                    return result[index] = sortList.remove(mid);
+                } else if (sortList.get(mid) == nums2[index]) {
+                    if (mid == sortList.size() - 1) {
+                        indexSet.add(index);
                         return -1;
                     } else {
-                        while (nums1.get(mid) <= num && mid < right) {
+                        while (sortList.get(mid) <= nums2[index] && mid < right) {
                             mid++;
                         }
-                        if (nums1.get(mid) <= num) {
+                        if (sortList.get(mid) <= nums2[index]) {
+                            indexSet.add(index);
                             return -1;
                         } else {
-                            return nums1.remove(mid);
+                            return result[index] = sortList.remove(mid);
                         }
                     }
                 } else {
-                    if (nums1.get(right) <= num) {
+                    if (sortList.get(right) <= nums2[index]) {
+                        indexSet.add(index);
                         return -1;
                     } else {
-                        return nums1.remove(right);
+                        return result[index] = sortList.remove(right);
                     }
                 }
-            } else if (nums1.get(mid) > num) {
+            } else if (sortList.get(mid) > nums2[index]) {
                 right = mid;
                 mid = (left + right) / 2;
-            } else if (nums1.get(mid) < num) {
+            } else if (sortList.get(mid) < nums2[index]) {
                 left = mid;
                 mid = (left + right) / 2;
             } else {
-                if (mid == nums1.size() - 1) {
+                if (mid == sortList.size() - 1) {
+                    indexSet.add(index);
                     return -1;
                 } else {
-                    while (nums1.get(mid) <= num && mid < right) {
+                    while (sortList.get(mid) <= nums2[index] && mid < right) {
                         mid++;
                     }
-                    if (nums1.get(mid) <= num) {
+                    if (sortList.get(mid) <= nums2[index]) {
+                        indexSet.add(index);
                         return -1;
                     } else {
-                        return nums1.remove(mid);
+                        return result[index] = sortList.remove(mid);
                     }
                 }
             }
         }
+        indexSet.add(index);
         return -1;
     }
 }
