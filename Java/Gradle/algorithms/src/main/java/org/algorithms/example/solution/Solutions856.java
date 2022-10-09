@@ -2,33 +2,33 @@ package org.algorithms.example.solution;
 
 public class Solutions856 {
     public static int scoreOfParentheses(String s) {
-        Object[] stack = new Object[s.length() / 2];
+        int[] stack = new int[s.length() / 2];
         int index = 0;
-        char[] array = s.toCharArray();
-        stack[0] = array[0];
+        byte[] array = s.getBytes();
+        stack[0] = -1;
         for (int i = 1; i < array.length; i++) {
-            if (array[i] == '(') {
-                stack[++index] = array[i];
+            if (array[i] == 40) {
+                stack[++index] = -1;
             } else {
-                if (stack[index] instanceof Character) {
-                    if (index > 0 && stack[index - 1] instanceof Integer) {
-                        stack[index - 1] = (int) stack[index - 1] + 1;
+                if (stack[index] == -1) {
+                    if (index > 0 && stack[index - 1] > 0) {
+                        stack[index - 1] = stack[index - 1] + 1;
                         index--;
                     } else {
                         stack[index] = 1;
                     }
                 } else {
                     if (index > 0) {
-                        stack[index - 1] = 2 * (int) stack[index];
+                        stack[index - 1] = 2 * stack[index];
                         index--;
                     }
-                    if (index > 0 && stack[index - 1] instanceof Integer) {
-                        stack[index - 1] = (int) stack[index - 1] + (int) stack[index];
+                    if (index > 0 && stack[index - 1] > 0) {
+                        stack[index - 1] = stack[index - 1] + stack[index];
                         index--;
                     }
                 }
             }
         }
-        return (int) stack[0];
+        return stack[0];
     }
 }
