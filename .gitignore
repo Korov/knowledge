@@ -7,6 +7,7 @@
 *.iws
 *.ipr
 /**/.idea
+/**/.fleet
 /**/.gradle
 *.log
 *package-lock.json
