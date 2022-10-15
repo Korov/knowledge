@@ -76,4 +76,40 @@ class Solutions10Test extends Specification {
         then:
         result
     }
+
+    def "test6"() {
+        given:
+        def s = "aaa" as String
+        def p = "ab*ac*a" as String
+
+        when:
+        def result = Solutions10.isMatch(s, p) as boolean
+
+        then:
+        result
+    }
+
+    def "test7"() {
+        given:
+        def s = "aaa" as String
+        def p = "ab*a" as String
+
+        when:
+        def result = Solutions10.isMatch(s, p) as boolean
+
+        then:
+        !result
+    }
+
+    def "test6"() {
+        given:
+        def s = "aaa" as String
+        def p = "ab*a*c*a" as String
+
+        when:
+        def result = Solutions10.isMatch(s, p) as boolean
+
+        then:
+        result
+    }
 }
