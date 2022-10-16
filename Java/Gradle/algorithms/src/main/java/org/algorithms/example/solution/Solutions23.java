@@ -7,13 +7,10 @@ public class Solutions23 {
         while (true) {
             int minIndex = -1;
             for (int i = 0; i < lists.length; i++) {
-                ListNode node = lists[i];
-                if (node == null) {
+                if (lists[i] == null) {
                     continue;
                 }
-                if (minIndex == -1) {
-                    minIndex = i;
-                } else if (node.val < lists[minIndex].val) {
+                if (minIndex == -1 || lists[i].val < lists[minIndex].val) {
                     minIndex = i;
                 }
             }
