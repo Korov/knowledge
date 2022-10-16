@@ -101,7 +101,7 @@ class Solutions10Test extends Specification {
         !result
     }
 
-    def "test6"() {
+    def "test8"() {
         given:
         def s = "aaa" as String
         def p = "ab*a*c*a" as String
@@ -111,5 +111,17 @@ class Solutions10Test extends Specification {
 
         then:
         result
+    }
+
+    def "test9"() {
+        given:
+        def s = "a" as String
+        def p = ".*..a*" as String
+
+        when:
+        def result = Solutions10.isMatch(s, p) as boolean
+
+        then:
+        !result
     }
 }
