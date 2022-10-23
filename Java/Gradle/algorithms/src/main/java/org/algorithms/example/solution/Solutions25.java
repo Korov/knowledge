@@ -50,21 +50,6 @@ public class Solutions25 {
         return result;
     }
 
-    /*ListNode tail = null;
-        ListNode previous = list;
-        ListNode current = previous.next;
-        ListNode after = current.next;
-        previous.next = null;
-        while (after != null) {
-            current.next = previous;
-            previous = current;
-            current = after;
-            after = after.next;
-        }
-        current.next = previous;
-        tail = current;
-        return tail;*/
-
     public static class ListNode {
         int val;
         ListNode next;
