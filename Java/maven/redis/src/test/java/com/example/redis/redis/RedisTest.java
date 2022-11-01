@@ -19,7 +19,7 @@ public class RedisTest extends RedisApplicationTests {
     public void testString() {
         String key = "key";
         String value = "value";
-        // redisTemplate.opsForValue().set("key", "value");
+        redisTemplate.opsForValue().set("key", "value");
         log.info("key:{}, type:{}, value:{}", key, redisTemplate.type(key), redisTemplate.opsForValue().get(key));
         Integer length = redisTemplate.opsForValue().append(key, "append");
         log.info("length:{}", length);
@@ -31,12 +31,13 @@ public class RedisTest extends RedisApplicationTests {
     @Test
     public void testList() {
         String key = "list";
+        redisTemplate.delete(key);
         String[] values = new String[3];
         values[0] = ("1");
         values[1] = ("2");
         values[2] = ("3");
+        redisTemplate.opsForList().leftPush(key, "1");
         log.info("size:{}", redisTemplate.opsForList().size(key));
-        redisTemplate.opsForList().set(key, 0, "1");
         log.info("key:{}, type:{}, value:{}", key, redisTemplate.type(key), redisTemplate.opsForList().range(key, 0, 1));
     }
 
@@ -46,5 +47,12 @@ public class RedisTest extends RedisApplicationTests {
         log.info("{}", redisTemplate.opsForHash().get(key, "key1"));
         redisTemplate.opsForHash().put(key, "key1", "value1");
         log.info("{}", redisTemplate.opsForHash().get(key, "key1"));
+    }
+
+    @Test
+    public void testKeys() {
+        String key = "list";
+        log.info("key:{}, type:{}, value:{}", key, redisTemplate.type(key), redisTemplate.opsForValue().get(key));
+        log.info("exist:{}", redisTemplate.hasKey(key));
     }
 }
