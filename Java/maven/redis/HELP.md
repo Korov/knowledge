@@ -1,0 +1,1 @@
+docker run --name redis -p 6379:6379 -d redis:7.0.5 redis-server --save 60 1;
