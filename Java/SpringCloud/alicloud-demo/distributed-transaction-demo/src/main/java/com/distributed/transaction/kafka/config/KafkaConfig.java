@@ -95,7 +95,7 @@ public class KafkaConfig {
     //kafka客户端，在spring中创建这个bean之后可以注入并且创建topic,用于集群环境，创建对个副本
     @Bean
     public AdminClient adminClient() {
-        return AdminClient.create(kafkaAdmin().getConfig());
+        return AdminClient.create(kafkaAdmin().getConfigurationProperties());
     }
 
 
