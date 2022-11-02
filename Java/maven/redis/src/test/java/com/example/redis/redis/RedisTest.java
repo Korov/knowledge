@@ -47,6 +47,9 @@ public class RedisTest extends RedisApplicationTests {
         log.info("{}", redisTemplate.opsForHash().get(key, "key1"));
         redisTemplate.opsForHash().put(key, "key1", "value1");
         log.info("{}", redisTemplate.opsForHash().get(key, "key1"));
+
+        redisTemplate.delete(key);
+        redisTemplate.
     }
 
     @Test
