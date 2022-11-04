@@ -1,9 +1,9 @@
 package com.distributed.transaction.mappertest;
 
-import com.alibaba.fastjson.JSON;
 import com.distributed.transaction.ApplicationTests;
 import com.distributed.transaction.dao.TransactionLogMapper;
 import com.distributed.transaction.model.TransactionLog;
+import com.distributed.transaction.util.JSONUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -31,7 +31,7 @@ public class MapperTest extends ApplicationTests {
     public void sendMessage() {
         List<TransactionLog> logs = transactionLogMapper.selectNewLog();
         for (TransactionLog log : logs) {
-            kafkaTemplate.send("transaction-demo", JSON.toJSONString(log));
+            kafkaTemplate.send("transaction-demo", JSONUtil.objectToJson(log));
             log.setState("PUBLISHED");
             log.setUpdateTime(new Date());
             transactionLogMapper.updateByPrimaryKey(log);

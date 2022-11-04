@@ -1,10 +1,10 @@
 package com.distributed.transaction.kafka.send.transaction;
 
-import com.alibaba.fastjson.JSON;
 import com.distributed.transaction.dao.TransactionLogMapper;
 import com.distributed.transaction.dao.UserInfoMapper;
 import com.distributed.transaction.model.TransactionLog;
 import com.distributed.transaction.model.UserInfo;
+import com.distributed.transaction.util.JSONUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,7 +31,7 @@ public class UserInfoService {
         transactionLog.setId(userInfo.getId());
         transactionLog.setState("NEW");
         transactionLog.setTransactionType("USER_CREATE");
-        transactionLog.setMessage(JSON.toJSONString(userInfo));
+        transactionLog.setMessage(JSONUtil.objectToJson(userInfo));
         transactionLog.setTransactionProcess("NEW");
         transactionLog.setDesc(Thread.currentThread().getName());
         transactionLog.setUpdateTime(new Date());

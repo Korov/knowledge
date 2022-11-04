@@ -1,8 +1,8 @@
 package com.distributed.transaction.kafka.send.checkthread;
 
-import com.alibaba.fastjson.JSON;
 import com.distributed.transaction.dao.TransactionLogMapper;
 import com.distributed.transaction.model.TransactionLog;
+import com.distributed.transaction.util.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -49,7 +49,7 @@ public class CheckTransactionLog {
 
         @Override
         public void run() {
-            kafkaTemplate.send("transaction-demo", JSON.toJSONString(transactionLog));
+            kafkaTemplate.send("transaction-demo", JSONUtil.objectToJson(transactionLog));
             transactionLog.setState("PUBLISHED");
             transactionLog.setUpdateTime(new Date());
             transactionLogMapper.updateByPrimaryKey(transactionLog);
