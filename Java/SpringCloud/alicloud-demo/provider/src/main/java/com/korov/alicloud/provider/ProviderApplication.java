@@ -13,18 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class ProviderApplication {
-    private static final Logger log = LoggerFactory.getLogger(ProviderApplication.class);
 
     public static void main(String[] args) {
         SpringApplication.run(ProviderApplication.class, args);
-    }
-
-    @RestController
-    class EchoController {
-        @RequestMapping(value = "/echo/{string}", method = RequestMethod.GET)
-        public String echo(@PathVariable String string) {
-            log.info("provider get str:{}", string);
-            return "Hello Nacos Discovery " + string;
-        }
     }
 }

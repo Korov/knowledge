@@ -18,33 +18,8 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class ConsumerApplication {
-    private static final Logger log = LoggerFactory.getLogger(ConsumerApplication.class);
 
     public static void main(String[] args) {
         SpringApplication.run(ConsumerApplication.class, args);
-    }
-
-    @LoadBalanced
-    @Bean(name = "rest")
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
-    }
-
-    @RestController
-    public class TestController {
-
-        @Autowired
-        @Qualifier(value = "rest")
-        private final RestTemplate restTemplate;
-
-        public TestController(RestTemplate restTemplate) {
-            this.restTemplate = restTemplate;
-        }
-
-        @RequestMapping(value = "/echo1/{str}", method = RequestMethod.GET)
-        public String echo(@PathVariable String str) {
-            log.info("consumer get str:{}", str);
-            return restTemplate.getForObject("http://service-provider/echo/" + str, String.class);
-        }
     }
 }
