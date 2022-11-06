@@ -1,5 +1,7 @@
 package com.korov.alicloud.consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.SpringApplication;
@@ -16,6 +18,8 @@ import org.springframework.web.client.RestTemplate;
 @SpringBootApplication
 @EnableDiscoveryClient
 public class ConsumerApplication {
+    private static final Logger log = LoggerFactory.getLogger(ConsumerApplication.class);
+
     public static void main(String[] args) {
         SpringApplication.run(ConsumerApplication.class, args);
     }
@@ -39,6 +43,7 @@ public class ConsumerApplication {
 
         @RequestMapping(value = "/echo1/{str}", method = RequestMethod.GET)
         public String echo(@PathVariable String str) {
+            log.info("consumer get str:{}", str);
             return restTemplate.getForObject("http://service-provider/echo/" + str, String.class);
         }
     }
