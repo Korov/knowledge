@@ -4,7 +4,7 @@
 
 NacosServiceRegistry，NacosNamingService
 
-`com.alibaba.nacos.client.naming.net.NamingProxy.registerService`
+`com.alibaba.nacos.client.naming.remote.gprc.NamingGrpcClientProxy.registerService`
 
 这里会把实例注册到nacos中
 
