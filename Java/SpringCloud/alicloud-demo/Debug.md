@@ -17,3 +17,5 @@ com.alibaba.nacos.client.naming.core.HostReactor.UpdateTask  这里定时任务�
 `com.alibaba.nacos.client.naming.net.NamingProxy.getServiceList(int, int, java.lang.String, com.alibaba.nacos.api.selector.AbstractSelector)`
 
 nacos用的spring开发的，nacos-console是启动类
+
+docker中nacos的启动方式`/usr/lib/jvm/java-1.8.0-openjdk/bin/java -Xms1g -Xmx1g -Xmn512m -Dnacos.standalone=true -Dnacos.member.list= -Djava.ext.dirs=/usr/lib/jvm/java-1.8.0-openjdk/jre/lib/ext:/usr/lib/jvm/java-1.8.0-openjdk/lib/ext:/home/nacos/plugins/health:/home/nacos/plugins/cmdb:/home/nacos/plugins/mysql -Xloggc:/home/nacos/logs/nacos_gc.log -verbose:gc -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+PrintGCTimeStamps -XX:+UseGCLogFileRotation -XX:NumberOfGCLogFiles=10 -XX:GCLogFileSize=100M -Dnacos.home=/home/nacos -jar /home/nacos/target/nacos-server.jar --spring.config.additional-location=file:/home/nacos/conf/ --spring.config.name=application --logging.config=/home/nacos/conf/nacos-logback.xml --server.max-http-header-size=524288`
