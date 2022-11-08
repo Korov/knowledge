@@ -14,9 +14,12 @@ if __name__ == "__main__":
         tactics_code = worksheet.cell(column=1, row=3).value.strip()
         tactics_name = worksheet.cell(column=2, row=3).value.strip()
         tactics_description = worksheet.cell(column=3, row=3).value.strip()
+        print('INSERT INTO `siem_att_ck_info`(`code`, `parent_code`, `type`, `name_zh`, `description_zh`, `name_en`, `description_en`, `create_time`, `update_time`) VALUES')
         print(
             "('{}', '', 0, '{}', '{}', '', '', NOW(), NOW()),".format(tactics_code, tactics_name, tactics_description))
-        for cell in cells:
+
+        for cell_index in range(0, len(cells)):
+            cell = cells[cell_index]
             col = cell[0]
             min_row = cell[1]
             max_row = cell[2]
@@ -31,9 +34,17 @@ if __name__ == "__main__":
                 sub_techniques_code = worksheet.cell(column=col + 3, row=row_index).value.strip()
                 sub_techniques_name = worksheet.cell(column=col + 4, row=row_index).value.strip()
                 sub_techniques_description = worksheet.cell(column=col + 5, row=row_index).value.strip()
-                print("('{}', '{}', 2, '{}', '{}', '', '', NOW(), NOW()),".format(sub_techniques_code, techniques_code,
+
+                if row_index == max_row and cell_index == len(cells) - 1:
+                    print("('{}', '{}', 2, '{}', '{}', '', '', NOW(), NOW());".format(sub_techniques_code,
+                                                                                  techniques_code,
                                                                                   sub_techniques_name,
                                                                                   sub_techniques_description))
+                else:
+                    print("('{}', '{}', 2, '{}', '{}', '', '', NOW(), NOW()),".format(sub_techniques_code,
+                                                                                      techniques_code,
+                                                                                      sub_techniques_name,
+                                                                                      sub_techniques_description))
 
         print("\n\n")
 
