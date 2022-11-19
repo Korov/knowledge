@@ -61,6 +61,7 @@ public class SingleThreadMultiplexingNIOTest {
                 break;
             }
         }
+        key.attach("write");
     }
 
     private static void handleWrite(SelectionKey key) throws IOException {
@@ -68,15 +69,17 @@ public class SingleThreadMultiplexingNIOTest {
         String response = "{\"code\":\"200\",\"version\",\"HTTP/1.1\"}";
         ByteBuffer headBuffer = ByteBuffer.wrap(response.getBytes(StandardCharsets.UTF_8));
         ByteBuffer buffer = ByteBuffer.wrap("Thanks!".getBytes(StandardCharsets.UTF_8));
+
+        String type = Optional.ofNullable((String) key.attachment()).orElse("");
         try {
             channel.write(new ByteBuffer[]{headBuffer, buffer});
-            System.out.printf("send respond to client:%s%n", channel.getRemoteAddress());
+            System.out.printf("send respond type:%s to client:%s%n", type, channel.getRemoteAddress());
         } finally {
             channel.close();
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         try {
             initServer(DEFAULT_PORT);
             while (true) {
@@ -100,6 +103,10 @@ public class SingleThreadMultiplexingNIOTest {
             }
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            socketChannel.close();
+            selector.close();
+            System.out.printf("server channel and selector closed%n");
         }
     }
 }
