@@ -15,15 +15,17 @@ public class SingleThreadMultiplexingNIOTest {
     private static ServerSocketChannel socketChannel = null;
     private static Selector selector = null;
 
+    private static final Integer DEFAULT_PORT = 8089;
 
-    public static void initServer() throws Exception {
+
+    public static void initServer(Integer port) throws Exception {
+        port = Optional.ofNullable(port).orElse(DEFAULT_PORT);
         socketChannel = ServerSocketChannel.open();
-
         socketChannel.configureBlocking(false);
-        socketChannel.bind(new InetSocketAddress(8089));
+        socketChannel.bind(new InetSocketAddress(port));
         selector = Selector.open();
-
         socketChannel.register(selector, SelectionKey.OP_ACCEPT);
+        System.out.printf("start server and listen port:%s%n", port);
     }
 
 
@@ -33,7 +35,7 @@ public class SingleThreadMultiplexingNIOTest {
         client.configureBlocking(false);
         ByteBuffer buffer = ByteBuffer.allocate(4096);
         client.register(selector, SelectionKey.OP_READ, buffer);
-        System.out.println("端口号为：" + client.getRemoteAddress() + "的客户端已连接。。。");
+        System.out.printf("client:%s has connected%n", client.getRemoteAddress());
     }
 
 
@@ -51,10 +53,11 @@ public class SingleThreadMultiplexingNIOTest {
                     byte[] data = new byte[buffer.limit()];
                     buffer.get(data);
                     String input = new String(data, StandardCharsets.UTF_8);
-                    System.out.printf("接收到端口号为:%d的客户端发来的数据，值为：%s%n", client.socket().getPort(), input);
+                    System.out.printf("receive data:%s, from client:%s%n", input, client.socket().getRemoteSocketAddress());
                 }
                 buffer.clear();
             } else {
+                System.out.printf("receive empty data from client:%s%n", client.socket().getRemoteSocketAddress());
                 break;
             }
         }
@@ -67,6 +70,7 @@ public class SingleThreadMultiplexingNIOTest {
         ByteBuffer buffer = ByteBuffer.wrap("Thanks!".getBytes(StandardCharsets.UTF_8));
         try {
             channel.write(new ByteBuffer[]{headBuffer, buffer});
+            System.out.printf("send respond to client:%s%n", channel.getRemoteAddress());
         } finally {
             channel.close();
         }
@@ -74,9 +78,10 @@ public class SingleThreadMultiplexingNIOTest {
 
     public static void main(String[] args) {
         try {
-            initServer();
+            initServer(DEFAULT_PORT);
             while (true) {
                 while (selector.select(0) > 0) {
+                    // 获取有事件发生的socket集合
                     Set<SelectionKey> selectionKeys = selector.selectedKeys();
                     Iterator<SelectionKey> iterator = selectionKeys.iterator();
                     while (iterator.hasNext()) {
