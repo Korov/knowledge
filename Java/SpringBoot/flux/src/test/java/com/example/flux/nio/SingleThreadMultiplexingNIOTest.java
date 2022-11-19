@@ -94,6 +94,7 @@ public class SingleThreadMultiplexingNIOTest {
                             handleAccept(key);
                         } else if (key.isReadable()) {
                             handleRead(key);
+                            // 将write写入的SelectionKey的InterSet中，要下次的才会生效
                             key.interestOps(SelectionKey.OP_WRITE);
                         } else if (key.isWritable()) {
                             handleWrite(key);
