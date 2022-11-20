@@ -69,6 +69,7 @@ public class HelloWorldServer {
             HelloReply reply = HelloReply.newBuilder().setMessage("Hello " + req.getName()).build();
             responseObserver.onNext(reply);
             responseObserver.onCompleted();
+            logger.info(String.format("get request from:%s", req.getName()));
         }
     }
 }
