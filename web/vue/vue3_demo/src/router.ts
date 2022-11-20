@@ -1,5 +1,7 @@
-import { createWebHistory, createRouter } from 'vue-router'
+import {createWebHistory, createRouter, createWebHashHistory} from 'vue-router'
 
+// 创建https://example.com/#/bar类型的路由
+// const hasHistory = createWebHashHistory()
 const history = createWebHistory()
 const routes = [
     {
