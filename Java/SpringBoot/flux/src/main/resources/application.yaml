@@ -1,0 +1,8 @@
+server:
+  port=8071
+
+spring:
+  r2dbc:
+    username: root
+    password: root
+    url: r2dbcs:mysql://localhost:3307/test
