@@ -5,11 +5,35 @@ if __name__ == "__main__":
     workbook = openpyxl.load_workbook(originFile)
     techniques_map = dict()
     for worksheet in workbook.worksheets:
-        cells = []
+        merge_cells = []
         for cell in worksheet.merged_cells.ranges:
             if cell.max_col == 4:
                 if cell.min_row >= 3:
-                    cells.append((cell.min_col, cell.min_row, cell.max_row))
+                    merge_cells.append((cell.min_col, cell.min_row, cell.max_row))
+
+        merge_cells.sort()
+
+        cells = []
+        for cell_index in range(0, len(merge_cells)):
+            current_cell = merge_cells[cell_index]
+            current_col = current_cell[0]
+            current_min_row = current_cell[1]
+            current_max_row = current_cell[2]
+            if cell_index == 0 and current_min_row > 3:
+                for row in range(3, current_min_row):
+                    cells.append((current_col, row, row))
+
+            cells.append(current_cell)
+            if cell_index < len(merge_cells) - 1:
+                next_cell = merge_cells[cell_index + 1]
+                next_col = next_cell[0]
+                next_min_row = next_cell[1]
+                next_max_row = next_cell[2]
+
+                if current_max_row + 1 != next_min_row:
+                    for row in range(current_max_row + 1, next_min_row):
+                        cells.append((current_col, row, row))
+
 
         cells.sort()
         tactics_code = worksheet.cell(column=1, row=3).value.strip()
@@ -48,6 +72,9 @@ if __name__ == "__main__":
                                                                                   techniques_description))
 
             for row_index in range(min_row, max_row + 1):
+                sub_techniques_cell = worksheet.cell(column=col + 3, row=row_index)
+                if sub_techniques_cell.value == None:
+                    continue
                 sub_techniques_code = worksheet.cell(column=col + 3, row=row_index).value.strip()
                 sub_techniques_name = worksheet.cell(column=col + 4, row=row_index).value.strip()
                 sub_techniques_description = worksheet.cell(column=col + 5, row=row_index).value.strip()
