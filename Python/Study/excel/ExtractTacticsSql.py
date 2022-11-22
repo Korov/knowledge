@@ -1,7 +1,7 @@
 import openpyxl
 
 if __name__ == "__main__":
-    originFile = 'C:\\Users\\korov\\Downloads\\MITRE ATT&CK   矩阵技术描述列表（中文版)_20220919 - Copy.xlsx'
+    originFile = 'C:\\Users\\korov\\Downloads\\MITRE ATT&CK   矩阵技术描述列表（中文版)_20220919.xlsx'
     workbook = openpyxl.load_workbook(originFile)
     techniques_map = dict()
     for worksheet in workbook.worksheets:
@@ -34,17 +34,18 @@ if __name__ == "__main__":
                 if cell_index == len(cells) - 1:
                     print("('{}', '{}', 1, '{}', '{}', '', '', NOW(), NOW());".format(techniques_code, tactics_code,
                                                                                       techniques_name,
-                                                                                      tactics_description))
+                                                                                      techniques_description))
                 else:
                     print("('{}', '{}', 1, '{}', '{}', '', '', NOW(), NOW()),".format(techniques_code, tactics_code,
                                                                                       techniques_name,
-                                                                                      tactics_description))
+                                                                                      techniques_description))
                 continue
             else:
                 techniques_map[techniques_code] = [tactics_code]
 
                 print("('{}', '{}', 1, '{}', '{}', '', '', NOW(), NOW()),".format(techniques_code, tactics_code,
-                                                                                  techniques_name, tactics_description))
+                                                                                  techniques_name,
+                                                                                  techniques_description))
 
             for row_index in range(min_row, max_row + 1):
                 sub_techniques_code = worksheet.cell(column=col + 3, row=row_index).value.strip()
