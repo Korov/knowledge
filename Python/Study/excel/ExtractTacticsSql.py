@@ -1,10 +1,16 @@
 import openpyxl
 
 if __name__ == "__main__":
-    originFile = 'C:\\Users\\korov\\Downloads\\MITRE ATT&CK   矩阵技术描述列表（中文版)_20220919.xlsx'
-    workbook = openpyxl.load_workbook(originFile)
+    origin_file_zh = 'C:\\Users\\korov\\Downloads\\MITRE ATT&CK   矩阵技术描述列表（中文版)_20220919.xlsx'
+    workbook_zh = openpyxl.load_workbook(origin_file_zh)
+
+    origin_file_en = 'C:\\Users\\korov\\Downloads\\MITRE ATT&CK   矩阵技术描述列表（英文版)_20221123.xlsx'
+    workbook_en = openpyxl.load_workbook(origin_file_en)
+
     techniques_map = dict()
-    for worksheet in workbook.worksheets:
+    for worksheet_index in range(0, len(workbook_zh.worksheets)):
+        worksheet = workbook_zh.worksheets[worksheet_index]
+        worksheet_en = workbook_en.worksheets[worksheet_index]
         merge_cells = []
         max_row = 0
         for cell in worksheet.merged_cells.ranges:
@@ -48,11 +54,23 @@ if __name__ == "__main__":
         tactics_code = worksheet.cell(column=1, row=3).value.strip()
         tactics_name = worksheet.cell(column=2, row=3).value.strip()
         tactics_description = worksheet.cell(column=3, row=3).value.strip()
+
+        tactics_code_en = worksheet_en.cell(column=1, row=3).value.strip()
+        tactics_name_en = worksheet_en.cell(column=2, row=3).value.strip()
+        tactics_description_en = worksheet_en.cell(column=3, row=3).value.strip()
+
+        if tactics_code != tactics_code_en:
+            print(
+                f"work sheet:{worksheet_index}, colum:{1}, row:{3}, tactics code:{tactics_code}, tactics code en:{tactics_code_en} error")
+            exit(-1)
+
         sqls.append(
             'INSERT INTO `siem_att_ck_info`(`code`, `parent_code`, `type`, `name_zh`, `description_zh`, `name_en`, `description_en`, `create_time`, `update_time`) VALUES')
         sqls.append(
-            "('{}', '', 0, '{}', '{}', '', '', NOW(), NOW()),".format(tactics_code, tactics_name,
-                                                                      tactics_description.replace("\\", "\\\\")))
+            "('{}', '', 0, '{}', '{}', '{}', '{}', NOW(), NOW()),".format(tactics_code, tactics_name,
+                                                                          tactics_description.replace("\\", "\\\\"),
+                                                                          tactics_name_en,
+                                                                          tactics_description_en.replace("\\", "\\\\")))
 
         for cell_index in range(0, len(cells)):
             cell = cells[cell_index]
@@ -63,18 +81,39 @@ if __name__ == "__main__":
             techniques_code = worksheet.cell(column=col, row=min_row).value.strip()
             techniques_name = worksheet.cell(column=col + 1, row=min_row).value.strip()
             techniques_description = worksheet.cell(column=col + 2, row=min_row).value.strip()
+
+            techniques_code_en = worksheet_en.cell(column=col, row=min_row).value.strip()
+            techniques_name_en = worksheet_en.cell(column=col + 1, row=min_row).value.strip()
+            techniques_description_en = worksheet_en.cell(column=col + 2, row=min_row).value.strip()
+
+            if techniques_code != techniques_code_en:
+                print(
+                    f"work sheet:{worksheet_index}, colum:{col}, row:{min_row}, techniques_code:{techniques_code}, techniques_code_en:{techniques_code_en} error")
+                exit(-1)
+
             if techniques_map.keys().__contains__(techniques_code):
                 techniques_map[techniques_code].append(tactics_code)
-                sqls.append("('{}', '{}', 1, '{}', '{}', '', '', NOW(), NOW()),".format(techniques_code, tactics_code,
-                                                                                        techniques_name,
-                                                                                        techniques_description.replace("\\", "\\\\")))
+                sqls.append(
+                    "('{}', '{}', 1, '{}', '{}', '{}', '{}', NOW(), NOW()),".format(techniques_code, tactics_code,
+                                                                                    techniques_name,
+                                                                                    techniques_description.replace(
+                                                                                        "\\", "\\\\"),
+                                                                                    techniques_name_en,
+                                                                                    techniques_description_en.replace(
+                                                                                        "\\", "\\\\")
+                                                                                    ))
 
                 continue
             else:
                 techniques_map[techniques_code] = [tactics_code]
-                sqls.append("('{}', '{}', 1, '{}', '{}', '', '', NOW(), NOW()),".format(techniques_code, tactics_code,
-                                                                                        techniques_name,
-                                                                                        techniques_description.replace("\\", "\\\\")))
+                sqls.append(
+                    "('{}', '{}', 1, '{}', '{}', '{}', '{}', NOW(), NOW()),".format(techniques_code, tactics_code,
+                                                                                    techniques_name,
+                                                                                    techniques_description.replace(
+                                                                                        "\\", "\\\\"),
+                                                                                    techniques_name_en,
+                                                                                    techniques_description_en.replace(
+                                                                                        "\\", "\\\\")))
 
             for row_index in range(min_row, max_row + 1):
                 sub_techniques_cell = worksheet.cell(column=col + 3, row=row_index)
@@ -83,10 +122,23 @@ if __name__ == "__main__":
                 sub_techniques_code = worksheet.cell(column=col + 3, row=row_index).value.strip()
                 sub_techniques_name = worksheet.cell(column=col + 4, row=row_index).value.strip()
                 sub_techniques_description = worksheet.cell(column=col + 5, row=row_index).value.strip()
-                sqls.append("('{}', '{}', 2, '{}', '{}', '', '', NOW(), NOW()),".format(sub_techniques_code,
-                                                                                        techniques_code,
-                                                                                        sub_techniques_name,
-                                                                                        sub_techniques_description.replace("\\", "\\\\")))
+
+                sub_techniques_code_en = worksheet_en.cell(column=col + 3, row=row_index).value.strip()
+                sub_techniques_name_en = worksheet_en.cell(column=col + 4, row=row_index).value.strip()
+                sub_techniques_description_en = worksheet_en.cell(column=col + 5, row=row_index).value.strip()
+
+                if sub_techniques_code != sub_techniques_code_en:
+                    print(
+                        f"work sheet:{worksheet_index}, colum:{col + 3}, row:{row_index}, sub_techniques_code:{sub_techniques_code}, sub_techniques_code_en:{sub_techniques_code_en} error")
+                    exit(-1)
+                sqls.append("('{}', '{}', 2, '{}', '{}', '{}', '{}', NOW(), NOW()),".format(sub_techniques_code,
+                                                                                            techniques_code,
+                                                                                            sub_techniques_name,
+                                                                                            sub_techniques_description.replace(
+                                                                                                "\\", "\\\\"),
+                                                                                            sub_techniques_name_en,
+                                                                                            sub_techniques_description_en.replace(
+                                                                                                "\\", "\\\\")))
 
         for sql_index in range(0, len(sqls)):
             sql = sqls[sql_index]
