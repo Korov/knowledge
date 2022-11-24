@@ -22,12 +22,12 @@
 
 <script lang="ts">
 import { defineComponent, inject, nextTick, provide, ref } from 'vue'
-import MenuData from '@/my-interface'
+import MenuDataKey from '@/symbols'
 
 export default defineComponent({
   name: 'MyMenu',
   setup() {
-    const menuData = inject<MenuData>('menuData')
+    const menuData = inject(MenuDataKey)
     const isRouterAlive = ref(true)
     const reload = () => {
       isRouterAlive.value = false

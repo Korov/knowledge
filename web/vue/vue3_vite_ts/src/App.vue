@@ -18,7 +18,8 @@
 import MyMenu from '@/components/nav/MyMenu.vue'
 import { computed, defineComponent, provide, ref } from 'vue'
 import httpCommon from '@/http-common'
-import MenuData from '@/my-interface'
+import MenuData from '@/types'
+import MenuDataKey from '@/symbols'
 
 export default defineComponent({
   components: {
@@ -60,7 +61,7 @@ export default defineComponent({
       })
     }
     provide(
-      'menuData',
+      MenuDataKey,
       computed(() => menuData.value)
     )
     return {
