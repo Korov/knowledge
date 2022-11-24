@@ -16,8 +16,12 @@
     "up": "npx npm-check-updates -u"
   },
   "dependencies": {
+    "core-js": "^3.26.1",
+    "echarts": "^5.4.0",
+    "element-plus": "^2.2.22",
     "pinia": "^2.0.14",
     "vue": "^3.2.37",
+    "vue-axios": "^3.5.2",
     "vue-router": "^4.0.16"
   },
   "devDependencies": {
