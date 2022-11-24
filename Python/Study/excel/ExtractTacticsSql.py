@@ -53,11 +53,12 @@ if __name__ == "__main__":
         cells.sort()
         tactics_code = worksheet.cell(column=1, row=3).value.strip()
         tactics_name = worksheet.cell(column=2, row=3).value.strip()
-        tactics_description = worksheet.cell(column=3, row=3).value.strip()
+        tactics_description = worksheet.cell(column=3, row=3).value.strip().replace("\\", "\\\\")
 
         tactics_code_en = worksheet_en.cell(column=1, row=3).value.strip()
         tactics_name_en = worksheet_en.cell(column=2, row=3).value.strip()
-        tactics_description_en = worksheet_en.cell(column=3, row=3).value.strip()
+        tactics_description_en = worksheet_en.cell(column=3, row=3).value.strip().replace("\\", "\\\\").replace("'",
+                                                                                                                "\\'")
 
         if tactics_code != tactics_code_en:
             print(
@@ -68,9 +69,9 @@ if __name__ == "__main__":
             'INSERT INTO `siem_att_ck_info`(`code`, `parent_code`, `type`, `name_zh`, `description_zh`, `name_en`, `description_en`, `create_time`, `update_time`) VALUES')
         sqls.append(
             "('{}', '', 0, '{}', '{}', '{}', '{}', NOW(), NOW()),".format(tactics_code, tactics_name,
-                                                                          tactics_description.replace("\\", "\\\\"),
+                                                                          tactics_description,
                                                                           tactics_name_en,
-                                                                          tactics_description_en.replace("\\", "\\\\")))
+                                                                          tactics_description_en))
 
         for cell_index in range(0, len(cells)):
             cell = cells[cell_index]
@@ -80,11 +81,13 @@ if __name__ == "__main__":
 
             techniques_code = worksheet.cell(column=col, row=min_row).value.strip()
             techniques_name = worksheet.cell(column=col + 1, row=min_row).value.strip()
-            techniques_description = worksheet.cell(column=col + 2, row=min_row).value.strip()
+            techniques_description = worksheet.cell(column=col + 2, row=min_row).value.strip().replace("\\", "\\\\")
 
             techniques_code_en = worksheet_en.cell(column=col, row=min_row).value.strip()
             techniques_name_en = worksheet_en.cell(column=col + 1, row=min_row).value.strip()
-            techniques_description_en = worksheet_en.cell(column=col + 2, row=min_row).value.strip()
+            techniques_description_en = worksheet_en.cell(column=col + 2, row=min_row).value.strip().replace("\\",
+                                                                                                             "\\\\").replace(
+                "'", "\\'")
 
             if techniques_code != techniques_code_en:
                 print(
@@ -96,11 +99,9 @@ if __name__ == "__main__":
                 sqls.append(
                     "('{}', '{}', 1, '{}', '{}', '{}', '{}', NOW(), NOW()),".format(techniques_code, tactics_code,
                                                                                     techniques_name,
-                                                                                    techniques_description.replace(
-                                                                                        "\\", "\\\\"),
+                                                                                    techniques_description,
                                                                                     techniques_name_en,
-                                                                                    techniques_description_en.replace(
-                                                                                        "\\", "\\\\")
+                                                                                    techniques_description_en
                                                                                     ))
 
                 continue
@@ -109,11 +110,9 @@ if __name__ == "__main__":
                 sqls.append(
                     "('{}', '{}', 1, '{}', '{}', '{}', '{}', NOW(), NOW()),".format(techniques_code, tactics_code,
                                                                                     techniques_name,
-                                                                                    techniques_description.replace(
-                                                                                        "\\", "\\\\"),
+                                                                                    techniques_description,
                                                                                     techniques_name_en,
-                                                                                    techniques_description_en.replace(
-                                                                                        "\\", "\\\\")))
+                                                                                    techniques_description_en))
 
             for row_index in range(min_row, max_row + 1):
                 sub_techniques_cell = worksheet.cell(column=col + 3, row=row_index)
@@ -121,11 +120,13 @@ if __name__ == "__main__":
                     continue
                 sub_techniques_code = worksheet.cell(column=col + 3, row=row_index).value.strip()
                 sub_techniques_name = worksheet.cell(column=col + 4, row=row_index).value.strip()
-                sub_techniques_description = worksheet.cell(column=col + 5, row=row_index).value.strip()
+                sub_techniques_description = worksheet.cell(column=col + 5, row=row_index).value.strip().replace("\\",
+                                                                                                                 "\\\\")
 
                 sub_techniques_code_en = worksheet_en.cell(column=col + 3, row=row_index).value.strip()
                 sub_techniques_name_en = worksheet_en.cell(column=col + 4, row=row_index).value.strip()
-                sub_techniques_description_en = worksheet_en.cell(column=col + 5, row=row_index).value.strip()
+                sub_techniques_description_en = worksheet_en.cell(column=col + 5, row=row_index).value.strip().replace(
+                    "\\", "\\\\").replace("'", "\\'")
 
                 if sub_techniques_code != sub_techniques_code_en:
                     print(
@@ -134,11 +135,9 @@ if __name__ == "__main__":
                 sqls.append("('{}', '{}', 2, '{}', '{}', '{}', '{}', NOW(), NOW()),".format(sub_techniques_code,
                                                                                             techniques_code,
                                                                                             sub_techniques_name,
-                                                                                            sub_techniques_description.replace(
-                                                                                                "\\", "\\\\"),
+                                                                                            sub_techniques_description,
                                                                                             sub_techniques_name_en,
-                                                                                            sub_techniques_description_en.replace(
-                                                                                                "\\", "\\\\")))
+                                                                                            sub_techniques_description_en))
 
         for sql_index in range(0, len(sqls)):
             sql = sqls[sql_index]
