@@ -51,7 +51,8 @@ if __name__ == "__main__":
         sqls.append(
             'INSERT INTO `siem_att_ck_info`(`code`, `parent_code`, `type`, `name_zh`, `description_zh`, `name_en`, `description_en`, `create_time`, `update_time`) VALUES')
         sqls.append(
-            "('{}', '', 0, '{}', '{}', '', '', NOW(), NOW()),".format(tactics_code, tactics_name, tactics_description))
+            "('{}', '', 0, '{}', '{}', '', '', NOW(), NOW()),".format(tactics_code, tactics_name,
+                                                                      tactics_description.replace("\\", "\\\\")))
 
         for cell_index in range(0, len(cells)):
             cell = cells[cell_index]
@@ -66,14 +67,14 @@ if __name__ == "__main__":
                 techniques_map[techniques_code].append(tactics_code)
                 sqls.append("('{}', '{}', 1, '{}', '{}', '', '', NOW(), NOW()),".format(techniques_code, tactics_code,
                                                                                         techniques_name,
-                                                                                        techniques_description))
+                                                                                        techniques_description.replace("\\", "\\\\")))
 
                 continue
             else:
                 techniques_map[techniques_code] = [tactics_code]
                 sqls.append("('{}', '{}', 1, '{}', '{}', '', '', NOW(), NOW()),".format(techniques_code, tactics_code,
                                                                                         techniques_name,
-                                                                                        techniques_description))
+                                                                                        techniques_description.replace("\\", "\\\\")))
 
             for row_index in range(min_row, max_row + 1):
                 sub_techniques_cell = worksheet.cell(column=col + 3, row=row_index)
@@ -85,7 +86,7 @@ if __name__ == "__main__":
                 sqls.append("('{}', '{}', 2, '{}', '{}', '', '', NOW(), NOW()),".format(sub_techniques_code,
                                                                                         techniques_code,
                                                                                         sub_techniques_name,
-                                                                                        sub_techniques_description))
+                                                                                        sub_techniques_description.replace("\\", "\\\\")))
 
         for sql_index in range(0, len(sqls)):
             sql = sqls[sql_index]
