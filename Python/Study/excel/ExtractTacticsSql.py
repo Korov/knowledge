@@ -8,6 +8,7 @@ if __name__ == "__main__":
     workbook_en = openpyxl.load_workbook(origin_file_en)
 
     techniques_map = dict()
+    update_sql_format = "UPDATE `siem_att_ck_info` SET `name_en` = '{}', `description_en` = '{}' WHERE `code` = '{}' and `parent_code` = '{}';"
     for worksheet_index in range(0, len(workbook_zh.worksheets)):
         worksheet = workbook_zh.worksheets[worksheet_index]
         worksheet_en = workbook_en.worksheets[worksheet_index]
@@ -24,6 +25,7 @@ if __name__ == "__main__":
 
         cells = []
         sqls = []
+        update_sqls = []
         for cell_index in range(0, len(merge_cells)):
             current_cell = merge_cells[cell_index]
             current_col = current_cell[0]
@@ -68,10 +70,9 @@ if __name__ == "__main__":
         sqls.append(
             'INSERT INTO `siem_att_ck_info`(`code`, `parent_code`, `type`, `name_zh`, `description_zh`, `name_en`, `description_en`, `create_time`, `update_time`) VALUES')
         sqls.append(
-            "('{}', '', 0, '{}', '{}', '{}', '{}', NOW(), NOW()),".format(tactics_code, tactics_name,
-                                                                          tactics_description,
-                                                                          tactics_name_en,
-                                                                          tactics_description_en))
+            "('{}', '', 0, '{}', '{}', '', '', NOW(), NOW()),".format(tactics_code, tactics_name,
+                                                                      tactics_description))
+        update_sqls.append(update_sql_format.format(tactics_name_en, tactics_description_en, tactics_code, ""))
 
         for cell_index in range(0, len(cells)):
             cell = cells[cell_index]
@@ -97,22 +98,24 @@ if __name__ == "__main__":
             if techniques_map.keys().__contains__(techniques_code):
                 techniques_map[techniques_code].append(tactics_code)
                 sqls.append(
-                    "('{}', '{}', 1, '{}', '{}', '{}', '{}', NOW(), NOW()),".format(techniques_code, tactics_code,
-                                                                                    techniques_name,
-                                                                                    techniques_description,
-                                                                                    techniques_name_en,
-                                                                                    techniques_description_en
-                                                                                    ))
+                    "('{}', '{}', 1, '{}', '{}', '', '', NOW(), NOW()),".format(techniques_code, tactics_code,
+                                                                                techniques_name,
+                                                                                techniques_description
+                                                                                ))
+                update_sqls.append(
+                    update_sql_format.format(techniques_name_en, techniques_description_en, techniques_code,
+                                             tactics_code))
 
                 continue
             else:
                 techniques_map[techniques_code] = [tactics_code]
                 sqls.append(
-                    "('{}', '{}', 1, '{}', '{}', '{}', '{}', NOW(), NOW()),".format(techniques_code, tactics_code,
-                                                                                    techniques_name,
-                                                                                    techniques_description,
-                                                                                    techniques_name_en,
-                                                                                    techniques_description_en))
+                    "('{}', '{}', 1, '{}', '{}', '', '', NOW(), NOW()),".format(techniques_code, tactics_code,
+                                                                                techniques_name,
+                                                                                techniques_description))
+                update_sqls.append(
+                    update_sql_format.format(techniques_name_en, techniques_description_en, techniques_code,
+                                             tactics_code))
 
             for row_index in range(min_row, max_row + 1):
                 sub_techniques_cell = worksheet.cell(column=col + 3, row=row_index)
@@ -132,17 +135,22 @@ if __name__ == "__main__":
                     print(
                         f"work sheet:{worksheet_index}, colum:{col + 3}, row:{row_index}, sub_techniques_code:{sub_techniques_code}, sub_techniques_code_en:{sub_techniques_code_en} error")
                     exit(-1)
-                sqls.append("('{}', '{}', 2, '{}', '{}', '{}', '{}', NOW(), NOW()),".format(sub_techniques_code,
-                                                                                            techniques_code,
-                                                                                            sub_techniques_name,
-                                                                                            sub_techniques_description,
-                                                                                            sub_techniques_name_en,
-                                                                                            sub_techniques_description_en))
+                sqls.append("('{}', '{}', 2, '{}', '{}', '', '', NOW(), NOW()),".format(sub_techniques_code,
+                                                                                        techniques_code,
+                                                                                        sub_techniques_name,
+                                                                                        sub_techniques_description))
+                update_sqls.append(
+                    update_sql_format.format(sub_techniques_name_en, sub_techniques_description_en, sub_techniques_code,
+                                             techniques_code))
 
-        for sql_index in range(0, len(sqls)):
-            sql = sqls[sql_index]
-            if sql_index == len(sqls) - 1:
-                sql = sql[:len(sql) - 1] + ";"
+        # for sql_index in range(0, len(sqls)):
+        #     sql = sqls[sql_index]
+        #     if sql_index == len(sqls) - 1:
+        #         sql = sql[:len(sql) - 1] + ";"
+        #     print(sql)
+
+        for sql_index in range(0, len(update_sqls)):
+            sql = update_sqls[sql_index]
             print(sql)
         print("\n\n")
 
