@@ -9,6 +9,7 @@ if __name__ == "__main__":
 
     techniques_map = dict()
     update_sql_format = "UPDATE `siem_att_ck_info` SET `name_en` = '{}', `description_en` = '{}' WHERE `code` = '{}' and `parent_code` = '{}';"
+    update_sqls = []
     for worksheet_index in range(0, len(workbook_zh.worksheets)):
         worksheet = workbook_zh.worksheets[worksheet_index]
         worksheet_en = workbook_en.worksheets[worksheet_index]
@@ -25,7 +26,7 @@ if __name__ == "__main__":
 
         cells = []
         sqls = []
-        update_sqls = []
+
         for cell_index in range(0, len(merge_cells)):
             current_cell = merge_cells[cell_index]
             current_col = current_cell[0]
@@ -149,10 +150,14 @@ if __name__ == "__main__":
         #         sql = sql[:len(sql) - 1] + ";"
         #     print(sql)
 
-        for sql_index in range(0, len(update_sqls)):
-            sql = update_sqls[sql_index]
-            print(sql)
-        print("\n\n")
+        # print("\n\n")
+
+    for sql_index in range(0, len(update_sqls)):
+        sql = update_sqls[sql_index]
+        print(sql)
+
+        if (sql_index + 1) % 15 == 0:
+            print("\n\n\n")
 
     print("finish")
 

@@ -18,3 +18,11 @@ insert into `user_info`(id, user_name)
 values (1, 'zhangsan'),
        (2, 'lisi');
 ```
+
+# Native build
+
+```bash
+./mvnw spring-boot:build-image -Pnative
+
+./mvnw native:compile -Pnative
+```
