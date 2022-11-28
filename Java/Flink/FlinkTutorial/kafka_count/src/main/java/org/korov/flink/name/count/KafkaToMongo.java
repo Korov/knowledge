@@ -28,7 +28,7 @@ import java.time.Duration;
  * 将kafka中的数据格式化之后发送到mongo中
  * org.korov.flink.name.count.KafkaToMongo
  * <p>
- * --mongo_host 192.168.50.100 --mongo_port 27017 --mongo_db kafka --mongo_collection value-record --kafka_addr 192.168.1.19:9092 --kafka_topic flink_siem --kafka_group kafka-name-count
+ * --mongo_host 192.168.50.100 --mongo_port 27017 --mongo_db kafka --mongo_collection alert_record --kafka_addr 192.168.1.19:9092 --kafka_topic flink_siem --kafka_group kafka-name-count
  *
  * @author zhu.lei
  * @date 2021-05-05 14:00
