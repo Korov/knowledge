@@ -38,4 +38,9 @@ public class UserController {
     public Mono<UserInfo> delete(Long id) {
         return userInfoService.delete(id);
     }
+
+    @GetMapping("/user")
+    public Flux<UserInfo> getAllUser(@RequestParam("offset") long offset, @RequestParam("size") long size) {
+        return userInfoService.findAllUser(offset, size);
+    }
 }

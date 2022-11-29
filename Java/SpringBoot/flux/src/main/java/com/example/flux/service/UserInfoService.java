@@ -14,4 +14,6 @@ public interface UserInfoService {
     Mono<UserInfo> delete(Long id);
 
     Flux<UserInfo> findAllUser();
+
+    Flux<UserInfo> findAllUser(long offset, long size);
 }

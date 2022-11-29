@@ -40,4 +40,10 @@ public class UserInfoImpl implements UserInfoService {
     public Flux<UserInfo> findAllUser() {
         return userInfoRepository.findAll();
     }
+
+    @Override
+    public Flux<UserInfo> findAllUser(long offset, long size) {
+        userInfoRepository.findAll().
+        return null;
+    }
 }
