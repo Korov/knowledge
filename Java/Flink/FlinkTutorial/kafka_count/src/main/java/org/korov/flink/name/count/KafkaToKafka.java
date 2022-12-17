@@ -83,7 +83,7 @@ public class KafkaToKafka {
         KafkaSink<Tuple3<String, NameModel, Long>> kafkaSink = KafkaSink.<Tuple3<String, NameModel, Long>>builder()
                 .setBootstrapServers(sinkAddr)
                 .setRecordSerializer(new KeyAlertSerialization(sinkTopic))
-                .setDeliverGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                 .build();
 
         DataStream<Tuple3<String, NameModel, Long>> stream = env.fromSource(kafkaSource,
