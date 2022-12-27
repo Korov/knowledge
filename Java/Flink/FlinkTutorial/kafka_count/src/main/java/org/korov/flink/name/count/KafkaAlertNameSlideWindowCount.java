@@ -126,6 +126,9 @@ public class KafkaAlertNameSlideWindowCount {
                     // 计算一分钟内相同告警的数量
                     @Override
                     public Tuple3<String, NameModel, Long> reduce(Tuple3<String, NameModel, Long> value1, Tuple3<String, NameModel, Long> value2) throws Exception {
+                        NameModel nameModel = value1.f1;
+                        nameModel.setMinTime(Math.min(nameModel.getMinTime(), value2.f1.getMinTime()));
+                        nameModel.setMaxTime(Math.max(nameModel.getMaxTime(), value2.f1.getMaxTime()));
                         return new Tuple3<>(value1.f0, value1.f1, value1.f2 + value2.f2);
                     }
                 })
