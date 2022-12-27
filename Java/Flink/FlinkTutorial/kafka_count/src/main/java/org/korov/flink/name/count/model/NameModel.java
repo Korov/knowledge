@@ -14,4 +14,8 @@ public class NameModel {
     private Long timestamp;
     private String message;
     private String uuid;
+
+    private Long minTime = Long.MAX_VALUE;
+
+    private Long maxTime = Long.MIN_VALUE;
 }

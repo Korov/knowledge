@@ -63,6 +63,8 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
         document.append("key", value.f0);
         document.append("time", time);
         document.append("timestamp", timestamp);
+        document.append("min_time", value.f1.getMinTime());
+        document.append("max_time", value.f1.getMaxTime());
         document.append("count", value.f2);
         if (sinkType == SinkType.KEY_NAME) {
             document.append("name", value.f1.getName());
