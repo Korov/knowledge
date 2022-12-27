@@ -8,7 +8,7 @@ import org.apache.commons.cli.Options;
 import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.connector.base.DeliveryGuarantee;
 import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
@@ -19,22 +19,23 @@ import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
-import org.korov.flink.name.count.deserialization.SimpleDeserializer;
-import org.korov.flink.name.count.serialization.SimpleSerialization;
+import org.korov.flink.name.count.deserialization.KeyAlertDeserializer;
+import org.korov.flink.name.count.model.NameModel;
+import org.korov.flink.name.count.serialization.KeyAlertSerialization;
 
 import java.time.Duration;
 
 /**
  * 将kafka中的数据格式化之后发送到kafka中
- * org.korov.flink.name.count.SimpleKafkaToKafka
+ * org.korov.flink.name.count.AlertKafkaToKafka
  * <p>
- * --sink_addr 192.168.50.100:9092 --sink_topic sink_log_river --kafka_addr 192.168.1.19:9092 --kafka_topic log_river --kafka_group kafka_log_river
+ * --sink_addr 192.168.50.100:9092 --sink_topic sink_flink_siem --kafka_addr 192.168.1.19:9092 --kafka_topic flink_siem --kafka_group kafka_sink
  *
  * @author zhu.lei
  * @date 2021-05-05 14:00
  */
 @Slf4j
-public class SimpleKafkaToKafka {
+public class AlertKafkaToKafka {
 
     public static void main(String[] args) throws Exception {
 
@@ -71,27 +72,27 @@ public class SimpleKafkaToKafka {
         env.getCheckpointConfig().setCheckpointStorage("file:////opt/flink/savepoints");
         env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE);
 
-        KafkaSource<Tuple2<String, String>> kafkaSource = KafkaSource.<Tuple2<String, String>>builder()
+        KafkaSource<Tuple3<String, NameModel, Long>> kafkaSource = KafkaSource.<Tuple3<String, NameModel, Long>>builder()
                 .setBootstrapServers(kafkaAddr)
                 .setGroupId(kafkaGroup)
                 .setStartingOffsets(OffsetsInitializer.committedOffsets(OffsetResetStrategy.EARLIEST))
                 .setTopics(kafkaTopic)
-                .setDeserializer(new SimpleDeserializer())
+                .setDeserializer(new KeyAlertDeserializer())
                 .build();
 
-        KafkaSink<Tuple2<String, String>> kafkaSink = KafkaSink.<Tuple2<String, String>>builder()
+        KafkaSink<Tuple3<String, NameModel, Long>> kafkaSink = KafkaSink.<Tuple3<String, NameModel, Long>>builder()
                 .setBootstrapServers(sinkAddr)
-                .setRecordSerializer(new SimpleSerialization(sinkTopic))
+                .setRecordSerializer(new KeyAlertSerialization(sinkTopic))
                 .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                 .build();
 
-        DataStream<Tuple2<String, String>> stream = env.fromSource(kafkaSource,
-                WatermarkStrategy.<Tuple2<String, String>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
-                        .withTimestampAssigner(new SerializableTimestampAssigner<Tuple2<String, String>>() {
+        DataStream<Tuple3<String, NameModel, Long>> stream = env.fromSource(kafkaSource,
+                WatermarkStrategy.<Tuple3<String, NameModel, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
+                        .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, NameModel, Long>>() {
                             @Override
-                            public long extractTimestamp(Tuple2<String, String> element, long recordTimestamp) {
+                            public long extractTimestamp(Tuple3<String, NameModel, Long> element, long recordTimestamp) {
                                 try {
-                                    return System.currentTimeMillis();
+                                    return element.f1.getTimestamp();
                                 } catch (Exception e) {
                                     log.error("get name key timestamp failed", e);
                                     return System.currentTimeMillis();
@@ -99,6 +100,6 @@ public class SimpleKafkaToKafka {
                             }
                         }).withIdleness(Duration.ofMinutes(5)), "kafka-source");
         stream.sinkTo(kafkaSink);
-        env.execute("SimpleKafkaToKafka");
+        env.execute("KafkaToKafka");
     }
 }
