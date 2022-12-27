@@ -126,8 +126,10 @@ public class KafkaAlertNameWindowCount {
                     @Override
                     public Tuple3<String, NameModel, Long> reduce(Tuple3<String, NameModel, Long> value1, Tuple3<String, NameModel, Long> value2) throws Exception {
                         NameModel nameModel = value1.f1;
-                        nameModel.setMinTime(Math.min(nameModel.getMinTime(), value2.f1.getMinTime()));
-                        nameModel.setMaxTime(Math.max(nameModel.getMaxTime(), value2.f1.getMaxTime()));
+                        long minTime = Math.min(value1.f1.getTimestamp(), value2.f1.getTimestamp());
+                        long maxTime = Math.max(value1.f1.getTimestamp(), value2.f1.getTimestamp());
+                        nameModel.setMinTime(Math.min(nameModel.getMinTime(), minTime));
+                        nameModel.setMaxTime(Math.max(nameModel.getMaxTime(), maxTime));
                         return new Tuple3<>(value1.f0, value1.f1, value1.f2 + value2.f2);
                     }
                 })

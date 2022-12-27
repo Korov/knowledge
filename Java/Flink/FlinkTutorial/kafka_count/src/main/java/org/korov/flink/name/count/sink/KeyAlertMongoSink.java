@@ -47,24 +47,13 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
     public void invoke(Tuple3<String, NameModel, Long> value, Context context) {
         List<Document> documents = new ArrayList<>();
         Long timestamp = value.f1.getTimestamp();
-        Date date = new Date(timestamp);
-        Calendar calendar = Calendar.getInstance(Locale.SIMPLIFIED_CHINESE);
-        calendar.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Asia/Shanghai")));
-        calendar.setTime(date);
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH) + 1;
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
-        int second = calendar.get(Calendar.SECOND);
-        int millisecond = calendar.get(Calendar.MILLISECOND);
-        String time = String.format("%d-%02d-%02d %02d:%02d:%02d.%03d", year, month, day, hour, minute, second, millisecond);
+        String time = extractTime(timestamp);
         Document document = new Document();
         document.append("key", value.f0);
         document.append("time", time);
         document.append("timestamp", timestamp);
-        document.append("min_time", value.f1.getMinTime());
-        document.append("max_time", value.f1.getMaxTime());
+        document.append("min_time", extractTime(value.f1.getMinTime()));
+        document.append("max_time", extractTime(value.f1.getMaxTime()));
         document.append("count", value.f2);
         if (sinkType == SinkType.KEY_NAME) {
             document.append("name", value.f1.getName());
@@ -85,6 +74,21 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
         } catch (Exception e) {
             log.error("insert documents filed, collection:{}", collection, e);
         }
+    }
+
+    private String extractTime(Long timestamp) {
+        Date date = new Date(timestamp);
+        Calendar calendar = Calendar.getInstance(Locale.SIMPLIFIED_CHINESE);
+        calendar.setTimeZone(TimeZone.getTimeZone(ZoneId.of("Asia/Shanghai")));
+        calendar.setTime(date);
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH) + 1;
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+        int second = calendar.get(Calendar.SECOND);
+        int millisecond = calendar.get(Calendar.MILLISECOND);
+        return String.format("%d-%02d-%02d %02d:%02d:%02d.%03d", year, month, day, hour, minute, second, millisecond);
     }
 
     @Override
