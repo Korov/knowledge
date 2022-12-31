@@ -15,8 +15,8 @@ public class EchoController {
     private static final Logger log = LoggerFactory.getLogger(EchoController.class);
 
     // 在启动时拿到值之后就不再更新
-    @Value("${user.test:default}")
-    private String configValue;
+    @Value("${config.name:default}")
+    private String configName;
 
     private ConfigurableApplicationContext applicationContext;
 
@@ -28,8 +28,8 @@ public class EchoController {
     @RequestMapping(value = "/echo/{string}", method = RequestMethod.GET)
     public String echo(@PathVariable String string) {
         // 当动态配置刷新时，会更新到 Environment 中，因此需要手动获取更新之后的值
-        configValue = applicationContext.getEnvironment().getProperty("user.test");
-        log.info("provider get str:{}, and config name:{}", string, configValue);
+        configName = applicationContext.getEnvironment().getProperty("config.name");
+        log.info("provider get str:{}, and config name:{}", string, configName);
         return "Hello Nacos Discovery " + string;
     }
 }
