@@ -11,17 +11,17 @@ logging.basicConfig(level=logging.INFO, filename="migrate.log", filemode="w",
 
 pg_connection = psycopg2.connect(dbname="backup",
                                  user="postgres",
-                                 password="zl7636012086",
-                                 host="nas.korov.org",
+                                 password="****",
+                                 host="localhost",
                                  port="5432")
 
-mysql_connection = pymysql.connect(host='nas.korov.org',
+mysql_connection = pymysql.connect(host='localhost',
                                    user='root',
-                                   password='zl7636012086',
+                                   password='****',
                                    database='backup',
                                    cursorclass=pymysql.cursors.DictCursor)
 
-client = MongoClient('mongodb://admin:zl7636012086@nas.korov.org:27017/admin')
+client = MongoClient('mongodb://admin:****@localhost:27017/admin')
 db = client['backup']
 collection = db['value-record']
 count = 0

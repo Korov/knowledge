@@ -1,2 +1,0 @@
-user root on ~* &* +@all >password
-user default off

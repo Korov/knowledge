@@ -1,8 +1,0 @@
- 
-network.host: 0.0.0.0
-setup.ilm.enabled: false
-xpack:
-  ml.enabled: false
-  monitoring.enabled: false
-  security.enabled: false
-  watcher.enabled: false

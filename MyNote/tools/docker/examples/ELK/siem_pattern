@@ -1,2 +1,0 @@
-CLASSNAME (?<=([a-zA-Z0-9] ))[a-z][a-zA-Z0-9\$\.]+(?=:)
-THREADNAME [a-zA-Z][a-zA-Z0-9\-\._]+(?= )
