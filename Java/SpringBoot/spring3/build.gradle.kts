@@ -1,9 +1,9 @@
 plugins {
-	id("org.springframework.boot") version("3.0.0")
+	java
+	idea
+	id("org.springframework.boot") version("3.0.2-SNAPSHOT")
 	id("io.spring.dependency-management") version("1.1.0")
 	id("org.graalvm.buildtools.native") version ("0.9.18")
-	id("java")
-	id("idea")
 }
 
 group = "org.korov"
@@ -24,6 +24,7 @@ idea {
 repositories {
 	mavenCentral()
 	maven { url = uri("https://repo.spring.io/milestone") }
+	maven { url = uri("https://repo.spring.io/snapshot") }
 }
 
 dependencies {
