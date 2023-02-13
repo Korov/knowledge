@@ -9,6 +9,8 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
+import org.apache.flink.metrics.Gauge;
+import org.apache.flink.metrics.MetricGroup;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 import org.bson.Document;
 import org.korov.flink.name.count.enums.SinkType;
@@ -31,6 +33,7 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
     private final String userName;
     private final String password;
     private final SinkType sinkType;
+    private transient long insertCount = 0L;
     MongoClient mongoClient = null;
 
     public KeyAlertMongoSink(String host, int port, String dbname, String collection, String userName, String password, SinkType sinkType) {
@@ -71,6 +74,7 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
             MongoDatabase db = mongoClient.getDatabase(dbname);
             MongoCollection<Document> mongoCollection = db.getCollection(collection);
             mongoCollection.insertMany(documents);
+            insertCount += documents.size();
         } catch (Exception e) {
             log.error("insert documents filed, collection:{}", collection, e);
         }
@@ -94,6 +98,11 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
     @Override
     public void open(Configuration parameters) throws Exception {
         super.open(parameters);
+
+        // 会统计数据并展示在界面的metrics中
+        MetricGroup metricGroup = getRuntimeContext().getMetricGroup();
+        metricGroup.gauge("insertCount", (Gauge<Long>) () -> insertCount);
+
         ServerAddress serverAddress = new ServerAddress(host, port);
         // MongoCredential.createScramSha1Credential()三个参数分别为 用户名 数据库名称 密码
         MongoCredential mongoCredential = null;

@@ -8,6 +8,8 @@ import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.connector.kafka.source.reader.deserializer.KafkaRecordDeserializationSchema;
+import org.apache.flink.metrics.Gauge;
+import org.apache.flink.metrics.MetricGroup;
 import org.apache.flink.util.Collector;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.korov.flink.name.count.model.FlinkAlertModel;
@@ -25,6 +27,8 @@ import java.nio.charset.StandardCharsets;
  */
 @Slf4j
 public class KeyAlertDeserializer implements KafkaRecordDeserializationSchema<Tuple3<String, NameModel, Long>> {
+    private transient long kafkaInputCount = 0L;
+
     @Override
     public TypeInformation<Tuple3<String, NameModel, Long>> getProducedType() {
         return TypeInformation.of(new TypeHint<Tuple3<String, NameModel, Long>>() {
@@ -34,6 +38,8 @@ public class KeyAlertDeserializer implements KafkaRecordDeserializationSchema<Tu
     @Override
     public void open(DeserializationSchema.InitializationContext context) throws Exception {
         KafkaRecordDeserializationSchema.super.open(context);
+        MetricGroup metricGroup = context.getMetricGroup();
+        metricGroup.gauge("kafkaInputCount", (Gauge<Long>) () -> kafkaInputCount);
     }
 
     /**
@@ -110,6 +116,7 @@ public class KeyAlertDeserializer implements KafkaRecordDeserializationSchema<Tu
                 nameModel.setName("null");
                 break;
         }
+        kafkaInputCount++;
         out.collect(new Tuple3<>(key, nameModel, 1L));
     }
 }
