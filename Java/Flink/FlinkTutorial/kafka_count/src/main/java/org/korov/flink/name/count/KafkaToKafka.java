@@ -100,6 +100,6 @@ public class KafkaToKafka {
                             }
                         }).withIdleness(Duration.ofMinutes(5)), "kafka-source");
         stream.sinkTo(kafkaSink);
-        env.execute("KafkaToKafka");
+        env.execute(String.format("kafka:[%s,%s,%s] to kafka:[%s,%s]", kafkaAddr,kafkaTopic, kafkaGroup, sinkAddr, sinkTopic));
     }
 }

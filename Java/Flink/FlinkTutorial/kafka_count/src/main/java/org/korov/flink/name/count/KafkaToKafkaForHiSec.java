@@ -140,6 +140,6 @@ public class KafkaToKafkaForHiSec {
                         }).withIdleness(Duration.ofMinutes(5)), "kafka-source")
                 .filter(hiSecFilter).name("hiSecFilter");
         stream.sinkTo(kafkaSink);
-        env.execute("KafkaToKafka");
+        env.execute(String.format("hisec kafka:[%s,%s,%s] to kafka:[%s,%s]", kafkaAddr,kafkaTopic, kafkaGroup, sinkAddr, sinkTopic));
     }
 }
