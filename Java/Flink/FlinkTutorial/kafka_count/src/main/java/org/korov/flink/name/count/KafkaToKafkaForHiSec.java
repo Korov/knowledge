@@ -8,52 +8,57 @@ import org.apache.commons.cli.Options;
 import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.RichFilterFunction;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.apache.flink.configuration.Configuration;
+import org.apache.flink.connector.base.DeliveryGuarantee;
+import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.contrib.streaming.state.EmbeddedRocksDBStateBackend;
+import org.apache.flink.metrics.Gauge;
+import org.apache.flink.metrics.MetricGroup;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
+import org.korov.flink.common.utils.JSONUtils;
 import org.korov.flink.name.count.deserialization.KeyAlertDeserializer;
-import org.korov.flink.name.count.enums.SinkType;
 import org.korov.flink.name.count.model.NameModel;
-import org.korov.flink.name.count.sink.KeyAlertMongoSink;
+import org.korov.flink.name.count.serialization.KeyAlertSerialization;
 
 import java.time.Duration;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
 
 /**
- * 将kafka中的数据格式化之后发送到mongo中
- * org.korov.flink.name.count.KafkaToMongo
+ * 将kafka中的数据格式化之后发送到kafka中
+ * org.korov.flink.name.count.KafkaToKafka
  * <p>
- * --mongo_host 192.168.50.100 --mongo_port 27017 --mongo_db kafka --mongo_collection alert_record --kafka_addr 192.168.1.19:9092 --kafka_topic flink_siem --kafka_group kafka-name-count
+ * --sink_addr 192.168.50.100:9092 --sink_topic sink_flink_siem --kafka_addr 192.168.1.19:9092 --kafka_topic flink_siem --kafka_group kafka_sink
  *
  * @author zhu.lei
  * @date 2021-05-05 14:00
  */
 @Slf4j
-public class KafkaToMongo {
+public class KafkaToKafkaForHiSec {
 
     public static void main(String[] args) throws Exception {
+
         Options options = new Options();
-        options.addOption(Option.builder().longOpt("mongo_host").hasArg(true).required(true).build());
-        options.addOption(Option.builder().longOpt("mongo_port").hasArg(true).required(true).build());
-        options.addOption(Option.builder().longOpt("mongo_db").hasArg(true).required(true).build());
-        options.addOption(Option.builder().longOpt("mongo_collection").hasArg(true).required(true).build());
+        options.addOption(Option.builder().longOpt("sink_addr").hasArg(true).required(true).build());
+        options.addOption(Option.builder().longOpt("sink_topic").hasArg(true).required(true).build());
 
         options.addOption(Option.builder().longOpt("kafka_addr").hasArg(true).required(true).build());
         options.addOption(Option.builder().longOpt("kafka_topic").hasArg(true).required(true).build());
         options.addOption(Option.builder().longOpt("kafka_group").hasArg(true).required(true).build());
 
         CommandLine cmd = new DefaultParser().parse(options, args);
-        String mongoHost = cmd.getOptionValue("mongo_host");
-        int mongoPort = Integer.parseInt(cmd.getOptionValue("mongo_port"));
-        String mongoUser = cmd.getOptionValue("mongo_user");
-        String mongoPassword = cmd.getOptionValue("mongo_password");
-        String mongoDb = cmd.getOptionValue("mongo_db");
-        String mongoCollection = cmd.getOptionValue("mongo_collection");
+        String sinkAddr = cmd.getOptionValue("sink_addr");
+        String sinkTopic = cmd.getOptionValue("sink_topic");
 
         String kafkaAddr = cmd.getOptionValue("kafka_addr");
         String kafkaTopic = cmd.getOptionValue("kafka_topic");
@@ -84,6 +89,42 @@ public class KafkaToMongo {
                 .setDeserializer(new KeyAlertDeserializer())
                 .build();
 
+        KafkaSink<Tuple3<String, NameModel, Long>> kafkaSink = KafkaSink.<Tuple3<String, NameModel, Long>>builder()
+                .setBootstrapServers(sinkAddr)
+                .setRecordSerializer(new KeyAlertSerialization(sinkTopic))
+                .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                .build();
+
+        RichFilterFunction<Tuple3<String, NameModel, Long>> hiSecFilter = new RichFilterFunction<Tuple3<String, NameModel, Long>>() {
+
+            private transient long ignoreCount = 0L;
+            private transient long validCount = 0L;
+
+            @Override
+            public void open(Configuration parameters) throws Exception {
+                super.open(parameters);
+                MetricGroup metricGroup = getRuntimeContext().getMetricGroup();
+                metricGroup.gauge("ignoreCount", (Gauge<Long>)() -> ignoreCount);
+                metricGroup.gauge("validCount", (Gauge<Long>)() -> validCount);
+            }
+
+            @Override
+            public boolean filter(Tuple3<String, NameModel, Long> value) throws Exception {
+                if (value == null || value.f1 == null || value.f1.getMessage() == null) {
+                    ignoreCount++;
+                    return false;
+                }
+                String message = value.f1.getMessage();
+                Map<String, String> messageMap = Optional.ofNullable(JSONUtils.jsonToMapNoException(message)).orElse(Collections.emptyMap());
+                if ("hisec".equalsIgnoreCase(messageMap.get("appname"))) {
+                    validCount++;
+                    return true;
+                }
+                ignoreCount++;
+                return false;
+            }
+        };
+
         DataStream<Tuple3<String, NameModel, Long>> stream = env.fromSource(kafkaSource,
                 WatermarkStrategy.<Tuple3<String, NameModel, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
                         .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, NameModel, Long>>() {
@@ -96,10 +137,9 @@ public class KafkaToMongo {
                                     return System.currentTimeMillis();
                                 }
                             }
-                        }).withIdleness(Duration.ofMinutes(5)), "kafka-source");
-
-        KeyAlertMongoSink mongoValueSink = new KeyAlertMongoSink(mongoHost, mongoPort, mongoDb, mongoCollection, mongoUser, mongoPassword, SinkType.KEY_NAME_VALUE);
-        stream.addSink(mongoValueSink).name("mongo-value-sink");
-        env.execute(String.format("kafka:%s,mongo:%s:%s", kafkaAddr, mongoHost, mongoPort));
+                        }).withIdleness(Duration.ofMinutes(5)), "kafka-source")
+                .filter(hiSecFilter).name("hiSecFilter");
+        stream.sinkTo(kafkaSink);
+        env.execute("KafkaToKafka");
     }
 }

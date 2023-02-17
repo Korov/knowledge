@@ -1,4 +1,4 @@
-package org.korov.flink.name.count.util;
+package org.korov.flink.common.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;

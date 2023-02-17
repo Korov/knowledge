@@ -33,7 +33,7 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
     private final String userName;
     private final String password;
     private final SinkType sinkType;
-    private transient long insertCount = 0L;
+    private transient long mongoSinkCount = 0L;
     MongoClient mongoClient = null;
 
     public KeyAlertMongoSink(String host, int port, String dbname, String collection, String userName, String password, SinkType sinkType) {
@@ -78,7 +78,7 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
             MongoDatabase db = mongoClient.getDatabase(dbname);
             MongoCollection<Document> mongoCollection = db.getCollection(collection);
             mongoCollection.insertMany(documents);
-            insertCount += documents.size();
+            mongoSinkCount += documents.size();
         } catch (Exception e) {
             log.error("insert documents filed, collection:{}", collection, e);
         }
@@ -105,7 +105,7 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
 
         // 会统计数据并展示在界面的metrics中
         MetricGroup metricGroup = getRuntimeContext().getMetricGroup();
-        metricGroup.gauge("insertCount", (Gauge<Long>) () -> insertCount);
+        metricGroup.gauge("mongoSinkCount", (Gauge<Long>) () -> mongoSinkCount);
 
         ServerAddress serverAddress = new ServerAddress(host, port);
         // MongoCredential.createScramSha1Credential()三个参数分别为 用户名 数据库名称 密码

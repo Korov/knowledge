@@ -12,11 +12,11 @@ import org.apache.flink.metrics.Gauge;
 import org.apache.flink.metrics.MetricGroup;
 import org.apache.flink.util.Collector;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.korov.flink.common.utils.GZIPUtils;
 import org.korov.flink.name.count.model.FlinkAlertModel;
 import org.korov.flink.name.count.model.MapModel;
 import org.korov.flink.name.count.model.NameModel;
 import org.korov.flink.name.count.model.SPLAlertModel;
-import org.korov.flink.name.count.util.GZIPUtils;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -27,7 +27,7 @@ import java.nio.charset.StandardCharsets;
  */
 @Slf4j
 public class KeyAlertDeserializer implements KafkaRecordDeserializationSchema<Tuple3<String, NameModel, Long>> {
-    private transient long kafkaInputCount = 0L;
+    private transient long kafkaDeserializationCount = 0L;
 
     @Override
     public TypeInformation<Tuple3<String, NameModel, Long>> getProducedType() {
@@ -39,7 +39,7 @@ public class KeyAlertDeserializer implements KafkaRecordDeserializationSchema<Tu
     public void open(DeserializationSchema.InitializationContext context) throws Exception {
         KafkaRecordDeserializationSchema.super.open(context);
         MetricGroup metricGroup = context.getMetricGroup();
-        metricGroup.gauge("kafkaInputCount", (Gauge<Long>) () -> kafkaInputCount);
+        metricGroup.gauge("kafkaDeserializationCount", (Gauge<Long>) () -> kafkaDeserializationCount);
     }
 
     /**
@@ -116,7 +116,7 @@ public class KeyAlertDeserializer implements KafkaRecordDeserializationSchema<Tu
                 nameModel.setName("null");
                 break;
         }
-        kafkaInputCount++;
+        kafkaDeserializationCount++;
         out.collect(new Tuple3<>(key, nameModel, 1L));
     }
 }
