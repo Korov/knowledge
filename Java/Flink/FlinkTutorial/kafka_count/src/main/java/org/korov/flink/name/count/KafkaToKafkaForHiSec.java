@@ -8,8 +8,8 @@ import org.apache.commons.cli.Options;
 import org.apache.flink.api.common.RuntimeExecutionMode;
 import org.apache.flink.api.common.eventtime.SerializableTimestampAssigner;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.RichFilterFunction;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.connector.base.DeliveryGuarantee;
@@ -25,9 +25,10 @@ import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.korov.flink.common.utils.JSONUtils;
-import org.korov.flink.name.count.deserialization.KeyAlertDeserializer;
+import org.korov.flink.name.count.deserialization.KeyValueDeserializer;
 import org.korov.flink.name.count.model.NameModel;
 import org.korov.flink.name.count.serialization.KeyAlertSerialization;
+import org.korov.flink.name.count.serialization.KeyValueSerialization;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -38,7 +39,7 @@ import java.util.Optional;
  * 将kafka中的数据格式化之后发送到kafka中
  * org.korov.flink.name.count.KafkaToKafkaForHiSec
  * <p>
- * --sink_addr 192.168.50.27:9092 --sink_topic logriver_siem --kafka_addr 192.168.1.19:9092 --kafka_topic logriver_siem --kafka_group kafka_sink
+ * --sink_addr 192.168.50.27:9092 --sink_topic logriver_siem --kafka_addr 192.168.1.19:9092 --kafka_topic logriver_siem --kafka_group kafka_sink_hisec
  *
  * @author zhu.lei
  * @date 2021-05-05 14:00
@@ -81,21 +82,21 @@ public class KafkaToKafkaForHiSec {
         env.getCheckpointConfig().setCheckpointStorage("file:////opt/flink/savepoints");
         env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE);
 
-        KafkaSource<Tuple3<String, NameModel, Long>> kafkaSource = KafkaSource.<Tuple3<String, NameModel, Long>>builder()
+        KafkaSource<Tuple2<String, String>> kafkaSource = KafkaSource.<Tuple2<String, String>>builder()
                 .setBootstrapServers(kafkaAddr)
                 .setGroupId(kafkaGroup)
                 .setStartingOffsets(OffsetsInitializer.committedOffsets(OffsetResetStrategy.EARLIEST))
                 .setTopics(kafkaTopic)
-                .setDeserializer(new KeyAlertDeserializer())
+                .setDeserializer(new KeyValueDeserializer())
                 .build();
 
-        KafkaSink<Tuple3<String, NameModel, Long>> kafkaSink = KafkaSink.<Tuple3<String, NameModel, Long>>builder()
+        KafkaSink<Tuple2<String, String>> kafkaSink = KafkaSink.<Tuple2<String, String>>builder()
                 .setBootstrapServers(sinkAddr)
-                .setRecordSerializer(new KeyAlertSerialization(sinkTopic))
+                .setRecordSerializer(new KeyValueSerialization(sinkTopic))
                 .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
                 .build();
 
-        RichFilterFunction<Tuple3<String, NameModel, Long>> hiSecFilter = new RichFilterFunction<Tuple3<String, NameModel, Long>>() {
+        RichFilterFunction<Tuple2<String, String>> hiSecFilter = new RichFilterFunction<Tuple2<String, String>>() {
 
             private transient long ignoreCount = 0L;
             private transient long validCount = 0L;
@@ -109,12 +110,12 @@ public class KafkaToKafkaForHiSec {
             }
 
             @Override
-            public boolean filter(Tuple3<String, NameModel, Long> value) throws Exception {
-                if (value == null || value.f1 == null || value.f1.getMessage() == null) {
+            public boolean filter(Tuple2<String, String> value) throws Exception {
+                if (value == null || value.f1 == null ) {
                     ignoreCount++;
                     return false;
                 }
-                String message = value.f1.getMessage();
+                String message = value.f1;
                 Map<String, String> messageMap = Optional.ofNullable(JSONUtils.jsonToMapNoException(message)).orElse(Collections.emptyMap());
                 if ("hisec".equalsIgnoreCase(messageMap.get("appname"))) {
                     validCount++;
@@ -125,13 +126,13 @@ public class KafkaToKafkaForHiSec {
             }
         };
 
-        DataStream<Tuple3<String, NameModel, Long>> stream = env.fromSource(kafkaSource,
-                WatermarkStrategy.<Tuple3<String, NameModel, Long>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
-                        .withTimestampAssigner(new SerializableTimestampAssigner<Tuple3<String, NameModel, Long>>() {
+        DataStream<Tuple2<String, String>> stream = env.fromSource(kafkaSource,
+                WatermarkStrategy.<Tuple2<String, String>>forBoundedOutOfOrderness(Duration.ofMinutes(5))
+                        .withTimestampAssigner(new SerializableTimestampAssigner<Tuple2<String, String>>() {
                             @Override
-                            public long extractTimestamp(Tuple3<String, NameModel, Long> element, long recordTimestamp) {
+                            public long extractTimestamp(Tuple2<String, String> element, long recordTimestamp) {
                                 try {
-                                    return element.f1.getTimestamp();
+                                    return System.currentTimeMillis();
                                 } catch (Exception e) {
                                     log.error("get name key timestamp failed", e);
                                     return System.currentTimeMillis();
