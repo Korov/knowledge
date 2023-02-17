@@ -65,8 +65,8 @@ public class KeyAlertMongoSink extends RichSinkFunction<Tuple3<String, NameModel
             try {
                 document.append("message", Document.parse(value.f1.getMessage()));
             } catch (Exception e) {
-                document.append("message", value.f1.getMessage());
             }
+            document.append("raw_message", value.f1.getMessage());
             document.append("uuid", value.f1.getUuid());
         }
         documents.add(document);
