@@ -7,4 +7,4 @@ PyMySQL==1.0.2
 psycopg2-binary==2.9.5
 autopep8==2.0.0
 pynput == 1.7.6
-redis==4.3.4
+redis==4.5.3
