@@ -23,7 +23,7 @@
         <maven.compiler.compilerVersion>11</maven.compiler.compilerVersion>
         <flink.version>1.16.1</flink.version>
         <junit.version>5.9.2</junit.version>
-        <jackson.version>2.13.3</jackson.version>
+        <jackson.version>2.13.4.2</jackson.version>
         <log4j.version>2.18.0</log4j.version>
     </properties>
 
