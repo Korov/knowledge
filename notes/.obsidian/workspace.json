@@ -1,0 +1,131 @@
+{
+  "main": {
+    "id": "e5e344dd606541df",
+    "type": "split",
+    "children": [
+      {
+        "id": "1e846f35bd73535a",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "4fce09ef24789d1a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "web/vue/vue.md",
+                "mode": "preview",
+                "source": false
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "e5e9837cb27d1a3c",
+    "type": "split",
+    "children": [
+      {
+        "id": "586c644fc433f88e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "584d2fd5e087b14b",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical"
+              }
+            }
+          },
+          {
+            "id": "481368889e1b2141",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 361
+  },
+  "right": {
+    "id": "c191412f44b58839",
+    "type": "split",
+    "children": [
+      {
+        "id": "9297fb8d40d8cfa3",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b17a922c4f660c66",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "web/vue/vue.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              }
+            }
+          },
+          {
+            "id": "1600db64baf5518a",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "web/vue/vue.md"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Open quick switcher": false,
+      "graph:Open graph view": false,
+      "canvas:Create new canvas": false,
+      "command-palette:Open command palette": false,
+      "markdown-importer:Open format converter": false,
+      "table-editor-obsidian:Advanced Tables Toolbar": false
+    }
+  },
+  "active": "584d2fd5e087b14b",
+  "lastOpenFiles": [
+    "设计模式/DesignPatterns.md",
+    "web/angular/angular.md",
+    "tools/批处理/shell/picture/shell.md",
+    "tools/zookeeper/从Paxos到Zookeeper分布式一致性原理与实践.md",
+    "tools/zookeeper/Zookeeper.md",
+    "tools/seata/Seata.md",
+    "tools/ETCD/ETCD.md",
+    "kotlin/kotlin.md",
+    "Java/log/log.md",
+    "Database/ELK/ELK.md"
+  ]
+}

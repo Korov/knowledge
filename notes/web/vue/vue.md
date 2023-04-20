@@ -203,7 +203,7 @@ vue ui
 
 上述命令会打开一个浏览器窗口，并以图形化界面将你引导至项目创建的流程。
 
-![图形化界面预览](http://korov.myqnapcloud.cn:19000/images/ui-new-project.png)
+![图形化界面预览](../../images/ui-new-project.png)
 
 ## [#](https://cli.vuejs.org/zh/guide/creating-a-project.html#拉取-2-x-模板-旧版本) 拉取 2.x 模板 (旧版本)
 
