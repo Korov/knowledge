@@ -1,6 +1,8 @@
 package org.korov.flink.common.source;
 
 import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.CreateRequest;
+import co.elastic.clients.elasticsearch.core.CreateResponse;
 import co.elastic.clients.elasticsearch.core.InfoResponse;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
@@ -19,8 +21,26 @@ import java.io.IOException;
 
 public class ElasticTest {
 
+
     @Test
     public void connect() throws IOException {
+
+        ElasticsearchClient client = createClient();
+        InfoResponse response = client.info();
+        System.out.println(response);
+    }
+
+    @Test
+    public void put() throws IOException {
+        ElasticsearchClient client = createClient();
+        CreateRequest.Builder<String> builder = new CreateRequest.Builder<>();
+        CreateRequest<String> request = builder.id("1").document("value").index("demo").build();
+        CreateResponse response = client.create(request);
+        System.out.println(response.toString());
+    }
+
+
+    private ElasticsearchClient createClient() {
         final CredentialsProvider credentialsProvider =
                 new BasicCredentialsProvider();
         credentialsProvider.setCredentials(AuthScope.ANY,
@@ -39,8 +59,6 @@ public class ElasticTest {
                 .build();
         ElasticsearchTransport transport = new RestClientTransport(
                 restClient, new JacksonJsonpMapper());
-        ElasticsearchClient client = new ElasticsearchClient(transport);
-        InfoResponse response = client.info();
-        System.out.println(response);
+        return new ElasticsearchClient(transport);
     }
 }
