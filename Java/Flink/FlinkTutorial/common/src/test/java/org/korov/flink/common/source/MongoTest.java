@@ -15,11 +15,6 @@ import java.util.Date;
 
 @Slf4j
 public class MongoTest {
-    @Test
-    public void test(){
-        Date date = new Date("2021-08-25 17:38:56.918363");
-        log.info("debug");
-    }
 
     @Test
     public void queryBiquge() {
