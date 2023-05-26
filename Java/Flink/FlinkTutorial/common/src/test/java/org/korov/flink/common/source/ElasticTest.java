@@ -7,6 +7,7 @@ import co.elastic.clients.elasticsearch.core.InfoResponse;
 import co.elastic.clients.json.jackson.JacksonJsonpMapper;
 import co.elastic.clients.transport.ElasticsearchTransport;
 import co.elastic.clients.transport.rest_client.RestClientTransport;
+import com.google.common.collect.ImmutableMap;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -18,6 +19,7 @@ import org.elasticsearch.client.RestClientBuilder;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
+import java.util.Map;
 
 public class ElasticTest {
 
@@ -33,8 +35,8 @@ public class ElasticTest {
     @Test
     public void put() throws IOException {
         ElasticsearchClient client = createClient();
-        CreateRequest.Builder<String> builder = new CreateRequest.Builder<>();
-        CreateRequest<String> request = builder.id("1").document("value").index("demo").build();
+        CreateRequest.Builder<Map<String, String>> builder = new CreateRequest.Builder<>();
+        CreateRequest<Map<String, String>> request = builder.id("5").document(ImmutableMap.of("key", "value")).index("map_index").build();
         CreateResponse response = client.create(request);
         System.out.println(response.toString());
     }
