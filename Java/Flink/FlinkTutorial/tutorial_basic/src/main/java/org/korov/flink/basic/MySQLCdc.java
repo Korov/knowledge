@@ -16,10 +16,10 @@ import org.korov.flink.common.utils.JSONUtils;
 public class MySQLCdc {
     public static void main(String[] args) throws Exception {
         MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
-                .hostname("localhost")
+                .hostname("127.0.0.1")
                 .port(3306)
-                .databaseList("rizhiyi_system") // set captured database
-                .tableList("rizhiyi_system.siem_threat_info_all_1") // set captured table
+                .databaseList("test") // set captured database
+                .tableList("test.test") // set captured table
                 .username("root")
                 .password("")
                 .serverTimeZone("UTC")
@@ -38,6 +38,7 @@ public class MySQLCdc {
                     @Override
                     public void invoke(String value, Context context) throws Exception {
                         JsonNode jsonNode = JSONUtils.jsonToNode(value, JSONUtils.DEFAULT_MAPPER);
+                        // {"before":{"id":4,"domain_id":4},"after":{"id":4,"domain_id":5},"source":{"version":"1.6.4.Final","connector":"mysql","name":"mysql_binlog_source","ts_ms":0,"snapshot":"false","db":"rizhiyi_system","sequence":null,"table":"siem_threat_info_all_1","server_id":0,"gtid":null,"file":"","pos":0,"row":0,"thread":null,"query":null},"op":"r","ts_ms":1685524128702,"transaction":null}
                         log.info("mysql record:{}", value);
                     }
                 }).setParallelism(1); // use parallelism 1 for sink to keep message ordering
