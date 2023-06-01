@@ -72,6 +72,7 @@ public class KeyAlertDeserializer implements KafkaRecordDeserializationSchema<Tu
                     nameModel.setTimestamp(alert.getMetaModel().getTimestamp());
                     nameModel.setName(alert.getRuleName());
                     nameModel.setUuid(alert.getMetaModel().getUuid());
+                    nameModel.setRuleId(alert.getMetaModel().getRuleId());
                 }
                 break;
             case "spl_alert":

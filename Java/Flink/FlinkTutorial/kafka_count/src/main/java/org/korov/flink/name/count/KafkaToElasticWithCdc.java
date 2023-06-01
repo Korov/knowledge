@@ -2,6 +2,7 @@ package org.korov.flink.name.count;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
+import com.ververica.cdc.connectors.mysql.source.MySqlSourceBuilder;
 import com.ververica.cdc.debezium.JsonDebeziumDeserializationSchema;
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.api.StatefulRedisConnection;
@@ -23,7 +24,9 @@ import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStream;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.streaming.api.functions.ProcessFunction;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
+import org.apache.flink.util.Collector;
 import org.apache.kafka.clients.consumer.OffsetResetStrategy;
 import org.korov.flink.common.utils.JSONUtils;
 import org.korov.flink.name.count.deserialization.KeyAlertDeserializer;
@@ -32,6 +35,7 @@ import org.korov.flink.name.count.model.NameModel;
 import org.korov.flink.name.count.sink.KeyAlertElasticSink;
 
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
@@ -60,7 +64,7 @@ public class KafkaToElasticWithCdc {
         options.addOption(Option.builder().longOpt("mysql_tables").hasArg(true).required(true).build());
         options.addOption(Option.builder().longOpt("mysql_user").hasArg(true).required(true).build());
         options.addOption(Option.builder().longOpt("mysql_password").hasArg(true).required(true).build());
-        options.addOption(Option.builder().longOpt("mysql_timezone").hasArg(true).required(true).build());
+        options.addOption(Option.builder().longOpt("mysql_timezone").hasArg(true).required(false).build());
 
         options.addOption(Option.builder().longOpt("redis_addr").hasArg(true).required(true).build());
         options.addOption(Option.builder().longOpt("redis_db").hasArg(true).required(true).build());
@@ -97,22 +101,24 @@ public class KafkaToElasticWithCdc {
                 CheckpointConfig.ExternalizedCheckpointCleanup.DELETE_ON_CANCELLATION);
 
         EmbeddedRocksDBStateBackend rocksDbStateBackend = new EmbeddedRocksDBStateBackend(true);
-        rocksDbStateBackend.setDbStoragePath("file:////opt/flink/rocksdb");
-        env.setStateBackend(rocksDbStateBackend);
-        env.getCheckpointConfig().setCheckpointStorage("file:////opt/flink/savepoints");
+        // rocksDbStateBackend.setDbStoragePath("file:////opt/flink/rocksdb");
+        // env.setStateBackend(rocksDbStateBackend);
+        // env.getCheckpointConfig().setCheckpointStorage("file:////opt/flink/savepoints");
         env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE);
 
-
-        MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
+        MySqlSourceBuilder<String> mySqlSourceBuilder = MySqlSource.<String>builder()
                 .hostname(mysqlHost)
                 .port(mysqlPort)
                 .databaseList(mysqlDbs)
                 .tableList(mysqlTables)
                 .username(mysqlUser)
                 .password(mysqlPassword)
-                .serverTimeZone(mysqlTimezone)
-                .deserializer(new JsonDebeziumDeserializationSchema())
-                .build();
+                .deserializer(new JsonDebeziumDeserializationSchema());
+        if (mysqlTimezone != null && !mysqlTimezone.isEmpty()) {
+            mySqlSourceBuilder.serverTimeZone(mysqlTimezone);
+        }
+
+        MySqlSource<String> mySqlSource = mySqlSourceBuilder.build();
 
         DataStream<String> mysqlStream = env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), "MySQL Source")
                 .setParallelism(1);
@@ -130,7 +136,7 @@ public class KafkaToElasticWithCdc {
             }
 
             @Override
-            public void finish() throws Exception {
+            public void close() throws Exception {
                 connection.close();
                 redisClient.shutdown();
             }
@@ -188,8 +194,47 @@ public class KafkaToElasticWithCdc {
                             }
                         }).withIdleness(Duration.ofMinutes(5)), "kafka-source");
 
+
+        stream.process(new ProcessFunction<Tuple3<String, NameModel, Long>, Object>() {
+            private RedisCommands<String, String> syncCommands;
+            private RedisClient redisClient;
+            private StatefulRedisConnection<String, String> connection;
+
+            @Override
+            public void open(Configuration parameters) throws Exception {
+                redisClient = RedisClient.create(String.format("redis://@%s/%s", redisAddr, redisDb));
+                connection = redisClient.connect();
+                syncCommands = connection.sync();
+            }
+
+            @Override
+            public void close() throws Exception {
+                connection.close();
+                redisClient.shutdown();
+            }
+
+            @Override
+            public void processElement(Tuple3<String, NameModel, Long> input, ProcessFunction<Tuple3<String, NameModel, Long>, Object>.Context ctx, Collector<Object> out) throws Exception {
+                NameModel nameModel = input.f1;
+                String ruleId = nameModel.getRuleId();
+                if (ruleId != null) {
+                    String ruleInfo = syncCommands.get(ruleId);
+                    if (ruleInfo != null) {
+                        try {
+                            JsonNode ruleNode = JSONUtils.jsonToNode(ruleInfo, JSONUtils.DEFAULT_MAPPER);
+                            nameModel.setRuleInfo(ruleNode);
+                        } catch (Exception e) {
+                            log.info("parse rule info failed:{}", ruleInfo);
+                        }
+                    }
+                }
+                out.collect(input);
+            }
+        });
+
         KeyAlertElasticSink elasticValueSink = new KeyAlertElasticSink(elasticHost, elasticPort, elasticIndex, null, null, SinkType.KEY_NAME_VALUE);
         stream.addSink(elasticValueSink).name("elastic-value-sink");
-        env.execute(String.format("kafka:[%s,%s,%s] to elastic:[%s:%s,%s]", kafkaAddr, kafkaTopic, kafkaGroup, elasticHost, elasticPort, elasticIndex));
+        env.execute(String.format("kafka:[addr:%s,topic:%s,group:%s] to elastic:[addr:%s:%s,index:%s], mysql:[addr:%s:%s,dbs:%s,tables:%s], redis:[addr:%s,db:%s]",
+                kafkaAddr, kafkaTopic, kafkaGroup, elasticHost, elasticPort, elasticIndex, mysqlHost, mysqlPort, Arrays.toString(mysqlDbs), Arrays.toString(mysqlTables), redisAddr, redisDb));
     }
 }

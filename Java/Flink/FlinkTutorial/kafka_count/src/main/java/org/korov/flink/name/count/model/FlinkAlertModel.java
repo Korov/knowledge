@@ -29,5 +29,8 @@ public class FlinkAlertModel {
 
         @JsonProperty("uuid")
         private String uuid;
+
+        @JsonProperty("rule_id")
+        private String ruleId;
     }
 }

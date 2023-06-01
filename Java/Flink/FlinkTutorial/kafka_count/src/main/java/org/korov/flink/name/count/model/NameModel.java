@@ -1,5 +1,6 @@
 package org.korov.flink.name.count.model;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,6 +15,8 @@ public class NameModel {
     private Long timestamp;
     private String message;
     private String uuid;
+    private String ruleId;
+    private JsonNode ruleInfo;
 
     private Long minTime = Long.MAX_VALUE;
 
