@@ -76,6 +76,10 @@ class _MyHomePageState extends State<MyHomePage> {
     // The Flutter framework has been optimized to make rerunning build methods
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
+    Widget redBox = DecoratedBox(
+      decoration: BoxDecoration(color: Colors.red),
+    );
+
     return Scaffold(
       appBar: AppBar(
         // TRY THIS: Try changing the color here to a specific color (to
@@ -122,6 +126,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   background: Paint()..color = Colors.yellow,
                   decoration: TextDecoration.underline,
                   decorationStyle: TextDecorationStyle.dashed),
+            ),
+            ConstrainedBox(
+              constraints: const BoxConstraints(
+                  minWidth: 50.0, //宽度尽可能大
+                  minHeight: 50.0 //最小高度为50像素
+                  ),
+              child: SizedBox(width: 80.0, height: 80.0, child: redBox),
             ),
           ],
         ),
