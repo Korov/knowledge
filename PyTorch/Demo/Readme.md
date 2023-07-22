@@ -5,5 +5,5 @@ python -m venv ./venv
 source ./venv/bin/activate
 
 # install pytorch with cpu
-pip3 install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
 ```
