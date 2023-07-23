@@ -1,6 +1,6 @@
 import torch
 
-from tests.log import log
+from log import log
 
 x = torch.rand(5, 3)
 log.info(f"version:{torch.__version__}, result:{x}")
