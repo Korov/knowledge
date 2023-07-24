@@ -1,5 +1,3 @@
-use log::*;
-
 pub fn valid_square(p1: Vec<i32>, p2: Vec<i32>, p3: Vec<i32>, p4: Vec<i32>) -> bool {
     if is_square(&p1, &p2, &p3, &p4) {
         return true;
@@ -116,6 +114,7 @@ pub fn find_median_sorted_arrays(nums1: Vec<i32>, nums2: Vec<i32>) -> f64 {
 #[cfg(test)]
 mod test {
     use env_logger::*;
+    use log::{info, LevelFilter};
 
     use super::*;
 
