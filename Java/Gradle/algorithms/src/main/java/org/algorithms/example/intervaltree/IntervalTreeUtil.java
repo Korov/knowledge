@@ -257,13 +257,14 @@ public class IntervalTreeUtil {
         if (node == NULL_NODE) {
             return result;
         }
-        if (node.value.getLow().compareTo(key.getLow()) >= 0 && node.value.getHigh().compareTo(key.getHigh()) <= 0) {
+        if (node.value.getLow().compareTo(key.getLow()) <= 0 && node.value.getHigh().compareTo(key.getHigh()) >= 0) {
             result.add(node);
         }
         resetMax(node);
-        if (node.left.calcMax().compareTo(key.getHigh()) >= 0) {
+        if (node.left != NULL_NODE && node.left.calcMax().compareTo(key.getHigh()) >= 0) {
             result.addAll(listTreeSearch(node.left, key));
-        } else if (node.value.getLow().compareTo(key.getLow()) <= 0) {
+        }
+        if (node.right != NULL_NODE && node.value.getLow().compareTo(key.getLow()) <= 0) {
             result.addAll(listTreeSearch(node.right, key));
         }
         return result;
