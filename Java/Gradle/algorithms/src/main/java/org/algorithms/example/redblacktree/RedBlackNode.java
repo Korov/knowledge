@@ -1,7 +1,5 @@
 package org.algorithms.example.redblacktree;
 
-import com.google.common.base.MoreObjects;
-
 /**
  * @author korov
  */

@@ -1,28 +1,22 @@
-package org.algorithms.example.redblacktree;
+package org.algorithms.example.intervaltree;
 
-import lombok.extern.slf4j.Slf4j;
+import org.algorithms.example.redblacktree.Color;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- * 1.每个节点或是红色，或是黑色
- * 2.根节点是黑色的
- * 3.每个叶结点（NIL）是黑色的
- * 4.如果一个结点是红色的，则它的两个子结点都是黑色的
- * 5.对每个结点，从该结点到其所有后代叶结点的简单路径上，均包含相同数据的黑色结点
- *
- * @author korov
+ * @author zhu.lei
+ * @date 2023-07-28 15:30
  */
-@Slf4j
-public class RedBlackUtil {
-    /**
-     * 哨兵
-     */
-    public static final RedBlackNode NULL_NODE = new RedBlackNode(null, null, null, Color.BLACK, null);
+public class IntervalTreeUtil {
+    public static final IntervalTreeNode NULL_NODE = new IntervalTreeNode(null, null, null, Color.BLACK, null);
 
     /**
      * 对node进行左旋
      */
-    public static <K extends Comparable<K>> RedBlackNode<K> leftRotate(RedBlackNode<K> root, RedBlackNode<K> node) {
-        RedBlackNode<K> rightNode = node.right;
+    private static <T extends Comparable<T>, V> IntervalTreeNode<T, V> leftRotate(IntervalTreeNode<T, V> root, IntervalTreeNode<T, V> node) {
+        IntervalTreeNode<T, V> rightNode = node.right;
         node.right = rightNode.left;
         if (rightNode.left != NULL_NODE) {
             rightNode.left.parent = node;
@@ -44,8 +38,8 @@ public class RedBlackUtil {
     /**
      * 对node进行右旋
      */
-    public static <K extends Comparable<K>> RedBlackNode<K> rightRotate(RedBlackNode<K> root, RedBlackNode<K> node) {
-        RedBlackNode<K> leftNode = node.left;
+    private static <T extends Comparable<T>, V> IntervalTreeNode<T, V> rightRotate(IntervalTreeNode<T, V> root, IntervalTreeNode<T, V> node) {
+        IntervalTreeNode<T, V> leftNode = node.left;
         node.left = leftNode.right;
         if (leftNode.right != NULL_NODE) {
             leftNode.right.parent = node;
@@ -67,10 +61,10 @@ public class RedBlackUtil {
     /**
      * 找到合适的位置将节点插入树中
      */
-    public static <K extends Comparable<K>> RedBlackNode<K> rbInsert(RedBlackNode<K> root, RedBlackNode<K> insertNode) {
+    public static <T extends Comparable<T>, V> IntervalTreeNode<T, V> rbInsert(IntervalTreeNode<T, V> root, IntervalTreeNode<T, V> insertNode) {
 
-        RedBlackNode<K> insertIndex = root;
-        RedBlackNode<K> parentInsertIndex = insertIndex.parent;
+        IntervalTreeNode<T, V> insertIndex = root;
+        IntervalTreeNode<T, V> parentInsertIndex = insertIndex.parent;
         // 找到插入点
         while (insertIndex != NULL_NODE) {
             parentInsertIndex = insertIndex;
@@ -97,10 +91,10 @@ public class RedBlackUtil {
     /**
      * 保持树的红黑性
      */
-    private static <K extends Comparable<K>> RedBlackNode<K> rbInsertFixup(RedBlackNode<K> root, RedBlackNode<K> insertNode) {
+    private static <T extends Comparable<T>, V> IntervalTreeNode<T, V> rbInsertFixup(IntervalTreeNode<T, V> root, IntervalTreeNode<T, V> insertNode) {
         while (insertNode.parent.color == Color.RED) {
             if (insertNode.parent == insertNode.parent.parent.left) {
-                RedBlackNode<K> uncleNode = insertNode.parent.parent.right;
+                IntervalTreeNode<T, V> uncleNode = insertNode.parent.parent.right;
                 if (uncleNode.color == Color.RED) {
                     insertNode.parent.color = Color.BLACK;
                     uncleNode.color = Color.BLACK;
@@ -115,7 +109,7 @@ public class RedBlackUtil {
                     root = rightRotate(root, insertNode.parent.parent);
                 }
             } else {
-                RedBlackNode<K> uncleNode = insertNode.parent.parent.left;
+                IntervalTreeNode<T, V> uncleNode = insertNode.parent.parent.left;
                 if (uncleNode.color == Color.RED) {
                     insertNode.parent.color = Color.BLACK;
                     uncleNode.color = Color.BLACK;
@@ -135,78 +129,9 @@ public class RedBlackUtil {
         return root;
     }
 
-    public static <K extends Comparable<K>> RedBlackNode<K> rbTransplant(RedBlackNode<K> root, RedBlackNode<K> placedNode, RedBlackNode<K> placeNode) {
-        if (placedNode.parent == NULL_NODE) {
-            root = placeNode;
-        } else if (placedNode == placedNode.parent.left) {
-            placedNode.parent.left = placeNode;
-        } else {
-            placedNode.parent.right = placeNode;
-        }
-        placeNode.parent = placedNode.parent;
-        return root;
-    }
-
-    public static <K extends Comparable<K>> RedBlackNode<K> rbDeleteFixup(RedBlackNode<K> root, RedBlackNode<K> deleteNode) {
-        while (deleteNode != root && deleteNode.color == Color.BLACK) {
-            if (deleteNode == deleteNode.parent.left) {
-                RedBlackNode<K> brotherNode = deleteNode.parent.right;
-                if (brotherNode.color == Color.RED) {
-                    brotherNode.color = Color.BLACK;
-                    deleteNode.parent.color = Color.RED;
-                    root = leftRotate(root, deleteNode.parent);
-                    brotherNode = deleteNode.parent.right;
-                }
-                if (brotherNode.left.color == Color.BLACK && brotherNode.right.color == Color.BLACK) {
-                    brotherNode.color = Color.RED;
-                    deleteNode = deleteNode.parent;
-                } else {
-                    if (brotherNode.right.color == Color.BLACK) {
-                        brotherNode.left.color = Color.BLACK;
-                        brotherNode.color = Color.RED;
-                        root = rightRotate(root, brotherNode);
-                        brotherNode = deleteNode.parent.right;
-                    }
-                    brotherNode.color = deleteNode.parent.color;
-                    deleteNode.parent.color = Color.BLACK;
-                    brotherNode.right.color = Color.BLACK;
-                    root = leftRotate(root, deleteNode.parent);
-                    deleteNode = root;
-                }
-            } else {
-                RedBlackNode<K> brotherNode = deleteNode.parent.left;
-                if (brotherNode.color == Color.RED) {
-                    brotherNode.color = Color.BLACK;
-                    deleteNode.parent.color = Color.RED;
-                    root = rightRotate(root, deleteNode.parent);
-                    brotherNode = deleteNode.parent.left;
-                }
-
-                if (brotherNode.left.color == Color.BLACK && brotherNode.right.color == Color.BLACK) {
-                    brotherNode.color = Color.RED;
-                    deleteNode = deleteNode.parent;
-                } else {
-                    if (brotherNode.left.color == Color.BLACK) {
-                        brotherNode.right.color = Color.BLACK;
-                        brotherNode.color = Color.RED;
-                        root = leftRotate(root, brotherNode);
-                        brotherNode = deleteNode.parent.left;
-                    }
-                    brotherNode.color = deleteNode.parent.color;
-                    deleteNode.parent.color = Color.BLACK;
-                    brotherNode.left.color = Color.BLACK;
-                    root = rightRotate(root, deleteNode.parent);
-                    deleteNode = root;
-                }
-            }
-        }
-        deleteNode.color = Color.BLACK;
-        return root;
-    }
-
-    public static <K extends Comparable<K>> RedBlackNode<K> rbDelete(RedBlackNode<K> root, RedBlackNode<K> deleteNode) {
-        RedBlackNode<K> childNode;
-        RedBlackNode<K> originalNode = deleteNode;
+    public static <T extends Comparable<T>, V> IntervalTreeNode<T, V> rbDelete(IntervalTreeNode<T, V> root, IntervalTreeNode<T, V> deleteNode) {
+        IntervalTreeNode<T, V> childNode;
+        IntervalTreeNode<T, V> originalNode = deleteNode;
         Color originalColor = originalNode.color;
         if (deleteNode.left == NULL_NODE) {
             childNode = deleteNode.right;
@@ -236,69 +161,121 @@ public class RedBlackUtil {
         return root;
     }
 
-    /**
-     * 中序遍历
-     *
-     * @param tree
-     */
-    public static <K extends Comparable<K>> void inorderTraversal(RedBlackNode<K> tree) {
-        if (tree == NULL_NODE) {
-            return;
+    private static <T extends Comparable<T>, V> IntervalTreeNode<T, V> rbTransplant(IntervalTreeNode<T, V> root, IntervalTreeNode<T, V> placedNode, IntervalTreeNode<T, V> placeNode) {
+        if (placedNode.parent == NULL_NODE) {
+            root = placeNode;
+        } else if (placedNode == placedNode.parent.left) {
+            placedNode.parent.left = placeNode;
+        } else {
+            placedNode.parent.right = placeNode;
         }
-        inorderTraversal(tree.left);
-        log.info(String.valueOf(tree.value));
-        inorderTraversal(tree.right);
+        placeNode.parent = placedNode.parent;
+        return root;
     }
 
-    public static <K extends Comparable<K>> RedBlackNode<K> minimum(RedBlackNode<K> node) {
+    private static <T extends Comparable<T>, V> IntervalTreeNode<T, V> rbDeleteFixup(IntervalTreeNode<T, V> root, IntervalTreeNode<T, V> deleteNode) {
+        while (deleteNode != root && deleteNode.color == Color.BLACK) {
+            if (deleteNode == deleteNode.parent.left) {
+                IntervalTreeNode<T, V> brotherNode = deleteNode.parent.right;
+                if (brotherNode.color == Color.RED) {
+                    brotherNode.color = Color.BLACK;
+                    deleteNode.parent.color = Color.RED;
+                    root = leftRotate(root, deleteNode.parent);
+                    brotherNode = deleteNode.parent.right;
+                }
+                if (brotherNode.left.color == Color.BLACK && brotherNode.right.color == Color.BLACK) {
+                    brotherNode.color = Color.RED;
+                    deleteNode = deleteNode.parent;
+                } else {
+                    if (brotherNode.right.color == Color.BLACK) {
+                        brotherNode.left.color = Color.BLACK;
+                        brotherNode.color = Color.RED;
+                        root = rightRotate(root, brotherNode);
+                        brotherNode = deleteNode.parent.right;
+                    }
+                    brotherNode.color = deleteNode.parent.color;
+                    deleteNode.parent.color = Color.BLACK;
+                    brotherNode.right.color = Color.BLACK;
+                    root = leftRotate(root, deleteNode.parent);
+                    deleteNode = root;
+                }
+            } else {
+                IntervalTreeNode<T, V> brotherNode = deleteNode.parent.left;
+                if (brotherNode.color == Color.RED) {
+                    brotherNode.color = Color.BLACK;
+                    deleteNode.parent.color = Color.RED;
+                    root = rightRotate(root, deleteNode.parent);
+                    brotherNode = deleteNode.parent.left;
+                }
+
+                if (brotherNode.left.color == Color.BLACK && brotherNode.right.color == Color.BLACK) {
+                    brotherNode.color = Color.RED;
+                    deleteNode = deleteNode.parent;
+                } else {
+                    if (brotherNode.left.color == Color.BLACK) {
+                        brotherNode.right.color = Color.BLACK;
+                        brotherNode.color = Color.RED;
+                        root = leftRotate(root, brotherNode);
+                        brotherNode = deleteNode.parent.left;
+                    }
+                    brotherNode.color = deleteNode.parent.color;
+                    deleteNode.parent.color = Color.BLACK;
+                    brotherNode.left.color = Color.BLACK;
+                    root = rightRotate(root, deleteNode.parent);
+                    deleteNode = root;
+                }
+            }
+        }
+        deleteNode.color = Color.BLACK;
+        return root;
+    }
+
+    private static <T extends Comparable<T>, V> IntervalTreeNode<T, V> minimum(IntervalTreeNode<T, V> node) {
         while (node.left != NULL_NODE) {
             node = node.left;
         }
         return node;
     }
 
-    public static <K extends Comparable<K>> RedBlackNode<K> maximum(RedBlackNode<K> node) {
-        while (node.right != NULL_NODE) {
-            node = node.right;
-        }
-        return node;
-    }
-
-    public static <K extends Comparable<K>> RedBlackNode<K> successor(RedBlackNode<K> node) {
-        if (node.right != NULL_NODE) {
-            return minimum(node.right);
-        }
-
-        RedBlackNode<K> parent = node.parent;
-        while (parent != NULL_NODE && node == parent.right) {
-            node = parent;
-            parent = parent.parent;
-        }
-        return parent;
-    }
-
-    public static <K extends Comparable<K>> RedBlackNode<K> predecessor(RedBlackNode<K> node) {
-        if (node.left != NULL_NODE) {
-            return maximum(node.left);
-        }
-
-        RedBlackNode<K> parent = node.parent;
-        while (parent != NULL_NODE && node == parent.left) {
-            node = parent;
-            parent = parent.parent;
-        }
-
-        return parent;
-    }
-
-    public static <K extends Comparable<K>> RedBlackNode<K> treeSearch(RedBlackNode<K> node, K key) {
-        if (node == NULL_NODE || key.compareTo(node.value) == 0) {
+    public static <T extends Comparable<T>, V> IntervalTreeNode<T, V> treeSearch(IntervalTreeNode<T, V> node, IntervalValue<T, V> key) {
+        if (node == NULL_NODE) {
             return node;
         }
+        if (node.value.getLow().compareTo(key.getLow()) >= 0 && node.value.getHigh().compareTo(key.getHigh()) <= 0) {
+            return node;
+        }
+        resetMax(node);
 
-        if (key.compareTo(node.value) < 0) {
+        if (node.left.calcMax().compareTo(key.getLow()) >= 0) {
             return treeSearch(node.left, key);
         }
         return treeSearch(node.right, key);
+    }
+
+    public static <T extends Comparable<T>, V> List<IntervalTreeNode<T, V>> listTreeSearch(IntervalTreeNode<T, V> node, IntervalValue<T, V> key) {
+        List<IntervalTreeNode<T, V>> result = new ArrayList<>();
+        if (node == NULL_NODE) {
+            return result;
+        }
+        if (node.value.getLow().compareTo(key.getLow()) >= 0 && node.value.getHigh().compareTo(key.getHigh()) <= 0) {
+            result.add(node);
+        }
+        resetMax(node);
+        if (node.left.calcMax().compareTo(key.getHigh()) >= 0) {
+            result.addAll(listTreeSearch(node.left, key));
+        } else if (node.value.getLow().compareTo(key.getLow()) <= 0) {
+            result.addAll(listTreeSearch(node.right, key));
+        }
+        return result;
+    }
+
+
+    public static <T extends Comparable<T>, V> void resetMax(IntervalTreeNode<T, V> tree) {
+        if (tree == NULL_NODE) {
+            return;
+        }
+        tree.value.setMax(null);
+        resetMax(tree.left);
+        resetMax(tree.right);
     }
 }
