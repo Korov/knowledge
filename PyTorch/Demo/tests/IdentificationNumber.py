@@ -65,24 +65,25 @@ if __name__ == "__main__":
     end_time = datetime.datetime.now().microsecond / 1000
     log.info(f"end train cost:{end_time - start_time}ms")
 
+    show_count = 5
     correct_count, all_count = 0, 0
     for images, labels in test_loader:
         with torch.no_grad():
             logps = model(images)
-
 
         ps = torch.exp(logps)
         top_p, top_class = ps.topk(1, dim=1)
 
         log.info(labels)
         num_image = images.numpy().squeeze()
-        plt.figure(figsize=(10, 2))
-        for j in range(20):  # 打印每个批次前 20 张图片
-            plt.subplot(2, 10, j + 1)
-            plt.imshow(num_image[j], cmap='gray')
-            plt.axis('off')
-        plt.show()
-
+        if show_count > 0:
+            plt.figure(figsize=(10, 2))
+            for j in range(20):  # 打印每个批次前 20 张图片
+                plt.subplot(2, 10, j + 1)
+                plt.imshow(num_image[j], cmap='gray')
+                plt.axis('off')
+            plt.show()
+            show_count = show_count - 1
 
         equals = top_class == labels.view(*top_class.shape)
 
