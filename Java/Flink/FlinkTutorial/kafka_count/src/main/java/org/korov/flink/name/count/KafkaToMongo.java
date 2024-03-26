@@ -28,7 +28,7 @@ import java.time.Duration;
  * 将kafka中的数据格式化之后发送到mongo中
  * org.korov.flink.name.count.KafkaToMongo
  * <p>
- * --mongo_host 192.168.50.100 --mongo_port 27017 --mongo_db kafka --mongo_collection alert_record --kafka_addr 192.168.1.19:9092 --kafka_topic flink_siem --kafka_group kafka-name-count
+ * --mongo_host 192.168.50.100 --mongo_port 27017 --mongo_db kafka --mongo_collection alert_record --kafka_addr 192.168.1.19:9092 --kafka_topic flink_siem --kafka_group kafka-name-count --kafka_offset LATEST
  *
  * @author zhu.lei
  * @date 2021-05-05 14:00
@@ -46,6 +46,7 @@ public class KafkaToMongo {
         options.addOption(Option.builder().longOpt("kafka_addr").hasArg(true).required(true).build());
         options.addOption(Option.builder().longOpt("kafka_topic").hasArg(true).required(true).build());
         options.addOption(Option.builder().longOpt("kafka_group").hasArg(true).required(true).build());
+        options.addOption(Option.builder().longOpt("kafka_offset").hasArg(true).required(false).build());
 
         CommandLine cmd = new DefaultParser().parse(options, args);
         String mongoHost = cmd.getOptionValue("mongo_host");
@@ -58,6 +59,21 @@ public class KafkaToMongo {
         String kafkaAddr = cmd.getOptionValue("kafka_addr");
         String kafkaTopic = cmd.getOptionValue("kafka_topic");
         String kafkaGroup = cmd.getOptionValue("kafka_group");
+        String kafkaOffset = cmd.getOptionValue("kafka_offset");
+        OffsetResetStrategy offsetResetStrategy = null;
+        if (kafkaOffset != null && !kafkaOffset.isEmpty()) {
+            switch (kafkaOffset) {
+                case "LATEST":
+                    offsetResetStrategy = OffsetResetStrategy.LATEST;
+                    break;
+                case "EARLIEST":
+                    offsetResetStrategy = OffsetResetStrategy.EARLIEST;
+                    break;
+            }
+        }
+        if (offsetResetStrategy == null) {
+            offsetResetStrategy = OffsetResetStrategy.EARLIEST;
+        }
 
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
         env.setRuntimeMode(RuntimeExecutionMode.STREAMING);
@@ -79,7 +95,7 @@ public class KafkaToMongo {
         KafkaSource<Tuple3<String, NameModel, Long>> kafkaSource = KafkaSource.<Tuple3<String, NameModel, Long>>builder()
                 .setBootstrapServers(kafkaAddr)
                 .setGroupId(kafkaGroup)
-                .setStartingOffsets(OffsetsInitializer.committedOffsets(OffsetResetStrategy.EARLIEST))
+                .setStartingOffsets(OffsetsInitializer.committedOffsets(offsetResetStrategy))
                 .setTopics(kafkaTopic)
                 .setDeserializer(new KeyAlertDeserializer())
                 .build();
